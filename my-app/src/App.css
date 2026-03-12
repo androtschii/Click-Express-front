@@ -1,0 +1,228 @@
+/* App Component Styles */
+.app-container {
+  background: #080808;
+  min-height: 100vh;
+  color: #fff;
+}
+
+/* Hero Section Enhancement */
+.hero-section {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    rgba(0, 0, 0, 0.93) 0%,
+    rgba(0, 0, 0, 0.72) 55%,
+    rgba(8, 0, 0, 0.45) 100%
+  );
+}
+
+.hero-accent-left {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 5px;
+  background: #CC0000;
+}
+
+.hero-accent-bottom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: #CC0000;
+}
+
+/* Section Styles */
+.section-title {
+  font-family: 'Oswald', sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.section-subtitle {
+  font-family: 'Barlow', sans-serif;
+  font-weight: 700;
+  color: #CC0000;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+}
+
+/* Card Hover Effects */
+.load-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.load-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 40px rgba(204, 0, 0, 0.2);
+}
+
+/* Button Styles */
+.btn-primary {
+  background: #CC0000;
+  color: #fff;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+  background: #aa0000;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(204, 0, 0, 0.4);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+  border-color: #CC0000;
+  color: #CC0000;
+}
+
+/* Loading Spinner */
+.loading-spinner {
+  width: 46px;
+  height: 46px;
+  margin: 0 auto 18px;
+  border: 3px solid rgba(204, 0, 0, 0.15);
+  border-top: 3px solid #CC0000;
+  border-radius: 50%;
+  animation: spin 0.75s linear infinite;
+}
+
+/* Stats Badge */
+.stats-badge {
+  background: rgba(204, 0, 0, 0.08);
+  border: 1px solid rgba(204, 0, 0, 0.22);
+  border-radius: 4px;
+  padding: 7px 16px;
+  font-weight: 600;
+  color: #CC0000;
+}
+
+/* Search and Filter */
+.search-filter-container {
+  background: #0d0d0d;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 6px;
+  padding: 16px 20px;
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* Contact Card */
+.contact-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 18px 20px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.contact-card:hover {
+  border-color: #CC0000;
+  background: rgba(204, 0, 0, 0.06);
+}
+
+/* Feature Badge */
+.feature-badge {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 5px 14px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Logo Container */
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.logo-img {
+  border-radius: 50%;
+  background: #fff;
+  padding: 3px;
+}
+
+/* Navigation */
+.nav-link {
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+  padding: 6px 14px;
+  border-radius: 4px;
+  transition: all 0.15s ease;
+  cursor: pointer;
+}
+
+.nav-link:hover {
+  color: #fff;
+  background: rgba(204, 0, 0, 0.14);
+}
+
+/* Footer */
+.footer-link {
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 13px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.footer-link:hover {
+  color: #fff;
+}
+
+/* Modal Overlay */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(5px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease;
+}
+
+.modal-content {
+  background: #0d0d0d;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 32px;
+  max-width: 500px;
+  width: 90%;
+  animation: fadeIn 0.3s ease;
+}
+

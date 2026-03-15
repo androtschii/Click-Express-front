@@ -3,10 +3,13 @@ import React, { useState } from "react";
 interface SearchBarProps {
   value: string;
   onChange: (v: string) => void;
+  theme?: 'dark' | 'light';
 }
 
-export const SearchBar: React.FC<SearchBarProps> = ({ value, onChange }) => {
+export const SearchBar: React.FC<SearchBarProps> = ({ value, onChange, theme = 'dark' }) => {
   const [focused, setFocused] = useState(false);
+  const isDark = theme === 'dark';
+
   return (
     <div style={{ position: "relative", flex: "1 1 280px" }}>
       <span
@@ -31,10 +34,10 @@ export const SearchBar: React.FC<SearchBarProps> = ({ value, onChange }) => {
         style={{
           width: "100%",
           padding: "12px 14px 12px 42px",
-          background: "rgba(255,255,255,0.05)",
-          border: `1px solid ${focused ? "#CC0000" : "rgba(255,255,255,0.12)"}`,
+          background: isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)",
+          border: `1px solid ${focused ? "#CC0000" : isDark ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.15)"}`,
           borderRadius: 4,
-          color: "#fff",
+          color: isDark ? "#fff" : "#1a1a1a",
           fontSize: 14,
           fontFamily: "'Barlow',sans-serif",
           outline: "none",

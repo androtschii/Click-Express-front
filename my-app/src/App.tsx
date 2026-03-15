@@ -28,6 +28,11 @@ function AppContent() {
   const aboutRef = useRef<HTMLDivElement>(null);
   const contactRef = useRef<HTMLDivElement>(null);
 
+  
+  const scrollTo = (ref: React.RefObject<HTMLDivElement | null>) => {
+    ref.current?.scrollIntoView({ behavior: "smooth" } as ScrollIntoViewOptions);
+  };
+
   useEffect(() => {
     setLoading(true);
     const id = setTimeout(() => {
@@ -37,7 +42,7 @@ function AppContent() {
     return () => clearTimeout(id);
   }, []);
 
-  const filtered = loads.filter(l => {
+  const filtered = loads.filter((l: Load) => {
     const q = search.toLowerCase();
     const matchSearch =
       l.route.toLowerCase().includes(q) ||
@@ -50,16 +55,13 @@ function AppContent() {
     return matchSearch && matchFilter;
   });
 
-  const scrollTo = (ref: React.RefObject<HTMLDivElement | null>) =>
-    ref.current?.scrollIntoView({ behavior: "smooth" });
-
   const notify = (text: string) => {
     setNotifications(n => [...n, text]);
   };
 
-  const bgColor = theme === 'dark' ? "#080808" : "#f5f5f5";
-  const textColor = theme === 'dark' ? "#fff" : "#1a1a1a";
-  const cardBg = theme === 'dark' ? "#0d0d0d" : "#ffffff";
+  const bgColor = theme === "dark" ? "#080808" : "#f5f5f5";
+  const textColor = theme === "dark" ? "#fff" : "#1a1a1a";
+  const cardBg = theme === "dark" ? "#0d0d0d" : "#ffffff";
 
   return (
     <div style={{ background: bgColor, minHeight: "100vh", color: textColor, transition: "background 0.3s, color 0.3s" }}>
@@ -69,9 +71,9 @@ function AppContent() {
         body{background:${bgColor};color:${textColor};transition: background 0.3s, color 0.3s;}
         ::selection{background:#CC0000;color:#fff;}
         ::-webkit-scrollbar{width:6px;}
-        ::-webkit-scrollbar-track{background:${theme === 'dark' ? '#0a0a0a' : '#e0e0e0'};}
+        ::-webkit-scrollbar-track{background:${theme === "dark" ? "#0a0a0a" : "#e0e0e0"};}
         ::-webkit-scrollbar-thumb{background:#CC0000;border-radius:3px;}
-        input::placeholder{color:${theme === 'dark' ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.3)'};}
+        input::placeholder{color:${theme === "dark" ? "rgba(255,255,255,0.25)" : "rgba(0,0,0,0.3)"};}
       `}</style>
 
       <Header
@@ -129,12 +131,12 @@ function AppContent() {
               lineHeight: 1,
             }}
           >
-            THE BEST <span style={{ color: "#CC0000" }}>LOADS</span> 
+            THE BEST <span style={{ color: "#CC0000" }}>LOADS</span>{" "}
             <span
               style={{
                 color: "transparent",
-                WebkitTextStroke: `1.5px ${theme === 'dark' ? 'rgba(255,255,255,0.18)' : 'rgba(0,0,0,0.12)'}`,
-              }}
+                WebkitTextStroke: `1.5px ${theme === "dark" ? "rgba(255,255,255,0.18)" : "rgba(0,0,0,0.12)"}`,
+              } as React.CSSProperties}
             >
               OF THE WEEK
             </span>
@@ -155,7 +157,7 @@ function AppContent() {
             setBookCount(c => c + 1);
             notify("Load added to requests");
           }}
-          onSave={saved => {
+          onSave={(saved: boolean) => {
             setSavedCount(c => c + (saved ? 1 : -1));
             notify(saved ? "Saved to favorites" : "Removed from favorites");
           }}
@@ -177,7 +179,7 @@ function AppContent() {
         <Notification
           key={idx}
           text={msg}
-          onClose={() => setNotifications(n => n.filter((_,i) => i !== idx))}
+          onClose={() => setNotifications((n) => n.filter((_, i) => i !== idx))}
         />
       ))}
     </div>
@@ -193,4 +195,3 @@ function App() {
 }
 
 export default App;
-

@@ -11,6 +11,8 @@ interface LoadCardProps {
 export const LoadCard: React.FC<LoadCardProps> = ({ load, onBook, onSave }) => {
   const context = useContext(ThemeContext) as { theme?: 'dark' | 'light'; toggleTheme?: () => void };
   const theme = context.theme || 'dark';
+  const isDark = theme === 'dark';
+
   const [booked, setBooked] = useState(false);
   const [saved, setSaved] = useState(false);
   const [hov, setHov] = useState(false);
@@ -23,13 +25,22 @@ export const LoadCard: React.FC<LoadCardProps> = ({ load, onBook, onSave }) => {
     }
   };
 
+  // ── цвета зависящие от темы ──────────────────
+  const textPrimary   = isDark ? "rgba(255,255,255,0.85)" : "#1a1a1a";
+  const textSecondary = isDark ? "rgba(255,255,255,0.3)"  : "rgba(0,0,0,0.45)";
+  const textMuted     = isDark ? "rgba(255,255,255,0.25)" : "rgba(0,0,0,0.35)";
+  const textPhone     = isDark ? "rgba(255,255,255,0.6)"  : "rgba(0,0,0,0.6)";
+  const dividerColor  = isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.08)";
+  const cardBg        = isDark ? "#0f0f0f" : "#fff";
+  const cardBorder    = isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.1)";
+
   return (
     <div
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => setHov(false)}
       style={{
-        background: theme === 'dark' ? "#0f0f0f" : "#fff",
-        border: `1px solid ${hov ? "#CC0000" : theme === 'dark' ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.1)"}`,
+        background: cardBg,
+        border: `1px solid ${hov ? "#CC0000" : cardBorder}`,
         borderRadius: 6,
         overflow: "hidden",
         transform: hov ? "translateY(-5px)" : "none",
@@ -39,6 +50,7 @@ export const LoadCard: React.FC<LoadCardProps> = ({ load, onBook, onSave }) => {
         transition: "all 0.25s ease",
       }}
     >
+      {/* ── изображение ── */}
       <div style={{ position: "relative", height: 190, overflow: "hidden" }}>
         <img
           src={load.image}
@@ -82,6 +94,7 @@ export const LoadCard: React.FC<LoadCardProps> = ({ load, onBook, onSave }) => {
           </div>
         )}
 
+        {/* цена — всегда на фото, всегда белая */}
         <div style={{ position: "absolute", bottom: 14, left: 14 }}>
           <div
             style={{
@@ -94,13 +107,7 @@ export const LoadCard: React.FC<LoadCardProps> = ({ load, onBook, onSave }) => {
             }}
           >
             ${load.price.toLocaleString()}
-            <span
-              style={{
-                fontSize: 14,
-                color: "rgba(255,255,255,0.5)",
-                marginLeft: 6,
-              }}
-            >
+            <span style={{ fontSize: 14, color: "rgba(255,255,255,0.6)", marginLeft: 6 }}>
               / {load.miles.toLocaleString()} Miles
             </span>
           </div>
@@ -123,6 +130,7 @@ export const LoadCard: React.FC<LoadCardProps> = ({ load, onBook, onSave }) => {
           </div>
         </div>
 
+        {/* кнопка сохранить */}
         <button
           onClick={() => {
             setSaved(s => {
@@ -145,6 +153,7 @@ export const LoadCard: React.FC<LoadCardProps> = ({ load, onBook, onSave }) => {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
+            color: saved ? "#CC0000" : "#fff",
             transform: saved ? "scale(1.2)" : "scale(1)",
             transition: "transform 0.2s",
           }}
@@ -153,105 +162,40 @@ export const LoadCard: React.FC<LoadCardProps> = ({ load, onBook, onSave }) => {
         </button>
       </div>
 
+      {/* ── нижняя часть карточки ── */}
       <div style={{ padding: "16px 18px 18px" }}>
+
+        {/* маршрут */}
         <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
-          <div
-            style={{
-              width: 8,
-              height: 8,
-              borderRadius: "50%",
-              border: "2px solid #CC0000",
-              flexShrink: 0,
-            }}
-          />
-          <span
-            style={{
-              fontFamily: "'Barlow',sans-serif",
-              fontWeight: 700,
-              fontSize: 13,
-              color: "rgba(255,255,255,0.85)",
-            }}
-          >
+          <div style={{ width: 8, height: 8, borderRadius: "50%", border: "2px solid #CC0000", flexShrink: 0 }} />
+          <span style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 13, color: textPrimary }}>
             {load.route}
           </span>
-          <div
-            style={{
-              flex: 1,
-              height: 1,
-              background: "rgba(204,0,0,0.35)",
-              position: "relative",
-            }}
-          >
-            <span
-              style={{
-                position: "absolute",
-                left: "50%",
-                top: -5,
-                transform: "translateX(-50%)",
-                fontSize: 8,
-                color: "#CC0000",
-              }}
-            >
+          <div style={{ flex: 1, height: 1, background: "rgba(204,0,0,0.35)", position: "relative" }}>
+            <span style={{ position: "absolute", left: "50%", top: -5, transform: "translateX(-50%)", fontSize: 8, color: "#CC0000" }}>
               →
             </span>
           </div>
-          <div
-            style={{
-              width: 8,
-              height: 8,
-              borderRadius: "50%",
-              background: "#CC0000",
-              flexShrink: 0,
-            }}
-          />
-          <span
-            style={{
-              fontFamily: "'Barlow',sans-serif",
-              fontWeight: 700,
-              fontSize: 13,
-              color: "rgba(255,255,255,0.85)",
-            }}
-          >
+          <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#CC0000", flexShrink: 0 }} />
+          <span style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 13, color: textPrimary }}>
             {load.dest}
           </span>
         </div>
 
-        <div
-          style={{
-            fontFamily: "'Barlow',sans-serif",
-            fontSize: 11,
-            color: "rgba(255,255,255,0.3)",
-            letterSpacing: 1,
-            textTransform: "uppercase",
-            marginBottom: 14,
-          }}
-        >
+        {/* тип груза */}
+        <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 11, color: textSecondary, letterSpacing: 1, textTransform: "uppercase", marginBottom: 14 }}>
           {load.cargo}
         </div>
 
-        <div style={{ height: 1, background: "rgba(255,255,255,0.06)", margin: "0 0 14px" }} />
+        <div style={{ height: 1, background: dividerColor, margin: "0 0 14px" }} />
 
+        {/* диспетчер + кнопка */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
           <div>
-            <div
-              style={{
-                fontSize: 9,
-                color: "rgba(255,255,255,0.25)",
-                fontFamily: "'Barlow',sans-serif",
-                letterSpacing: 1.5,
-                textTransform: "uppercase",
-              }}
-            >
+            <div style={{ fontSize: 9, color: textMuted, fontFamily: "'Barlow',sans-serif", letterSpacing: 1.5, textTransform: "uppercase" }}>
               Dispatch
             </div>
-            <div
-              style={{
-                fontSize: 13,
-                color: "rgba(255,255,255,0.6)",
-                fontFamily: "'Barlow',sans-serif",
-                fontWeight: 600,
-              }}
-            >
+            <div style={{ fontSize: 13, color: textPhone, fontFamily: "'Barlow',sans-serif", fontWeight: 600 }}>
               +1 786-202-6599
             </div>
           </div>
@@ -285,4 +229,3 @@ export const LoadCard: React.FC<LoadCardProps> = ({ load, onBook, onSave }) => {
     </div>
   );
 };
-

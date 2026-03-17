@@ -24,11 +24,21 @@ export const LoadListView: React.FC<LoadListProps> = ({
   error,
   search,
   filter,
+  theme = 'dark',
   onSearchChange,
   onFilterChange,
   onBook,
   onSave,
 }) => {
+  const isDark = theme === 'dark';
+
+  // ── цвета зависящие от темы ──────────────────
+  const searchBg     = isDark ? "#0d0d0d"                    : "#f0f0f0";
+  const searchBorder = isDark ? "rgba(255,255,255,0.07)"     : "rgba(0,0,0,0.1)";
+  const emptyBorder  = isDark ? "rgba(255,255,255,0.08)"     : "rgba(0,0,0,0.1)";
+  const emptyText    = isDark ? "rgba(255,255,255,0.3)"      : "rgba(0,0,0,0.4)";
+  const loadingText  = isDark ? "rgba(255,255,255,0.35)"     : "rgba(0,0,0,0.4)";
+
   if (loading)
     return (
       <div style={{ textAlign: "center", padding: "90px 0" }}>
@@ -43,66 +53,27 @@ export const LoadListView: React.FC<LoadListProps> = ({
             animation: "spin 0.75s linear infinite",
           }}
         />
-        <p
-          style={{
-            fontFamily: "'Barlow',sans-serif",
-            color: "rgba(255,255,255,0.35)",
-            fontSize: 14,
-          }}
-        >
+        <p style={{ fontFamily: "'Barlow',sans-serif", color: loadingText, fontSize: 14 }}>
           Loading available loads...
         </p>
         <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
       </div>
     );
+
   if (error)
     return (
-      <div
-        style={{
-          textAlign: "center",
-          padding: "60px 20px",
-          border: "1px solid rgba(204,0,0,0.2)",
-          borderRadius: 6,
-        }}
-      >
-        <p
-          style={{
-            color: "#CC0000",
-            fontFamily: "'Barlow',sans-serif",
-          }}
-        >
-          ⚠️ {error}
-        </p>
+      <div style={{ textAlign: "center", padding: "60px 20px", border: "1px solid rgba(204,0,0,0.2)", borderRadius: 6 }}>
+        <p style={{ color: "#CC0000", fontFamily: "'Barlow',sans-serif" }}>⚠️ {error}</p>
       </div>
     );
-  if (!loads.length)
-    return (
-      <div
-        style={{
-          textAlign: "center",
-          padding: "80px 20px",
-          border: "1px dashed rgba(255,255,255,0.08)",
-          borderRadius: 6,
-        }}
-      >
-        <div style={{ fontSize: 48, marginBottom: 14 }}>🚛</div>
-        <p
-          style={{
-            color: "rgba(255,255,255,0.3)",
-            fontFamily: "'Barlow',sans-serif",
-            fontSize: 16,
-          }}
-        >
-          No loads match your search.
-        </p>
-      </div>
-    );
+
   return (
     <div>
+      {/* ── строка поиска + фильтры — ВСЕГДА видна ── */}
       <div
         style={{
-          background: "#0d0d0d",
-          border: "1px solid rgba(255,255,255,0.07)",
+          background: searchBg,
+          border: `1px solid ${searchBorder}`,
           borderRadius: 6,
           padding: "16px 20px",
           display: "flex",
@@ -112,10 +83,11 @@ export const LoadListView: React.FC<LoadListProps> = ({
           marginBottom: 18,
         }}
       >
-        <SearchBar value={search} onChange={onSearchChange} />
-        <FilterButtons active={filter} onChange={onFilterChange} />
+        <SearchBar value={search} onChange={onSearchChange} theme={theme} />
+        <FilterButtons active={filter} onChange={onFilterChange} theme={theme} />
       </div>
 
+      {/* ── счётчик — ВСЕГДА виден ── */}
       <div style={{ display: "flex", gap: 12, marginBottom: 26, flexWrap: "wrap" }}>
         <div
           style={{
@@ -134,13 +106,21 @@ export const LoadListView: React.FC<LoadListProps> = ({
         </div>
       </div>
 
-      <div
-        style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(310px,1fr))", gap: 20 }}
-      >
-        {loads.map(l => (
-          <LoadCard key={l.id} load={l} onBook={onBook} onSave={onSave} />
-        ))}
-      </div>
+      {/* ── карточки или пустой результат ── */}
+      {loads.length === 0 ? (
+        <div style={{ textAlign: "center", padding: "80px 20px", border: `1px dashed ${emptyBorder}`, borderRadius: 6 }}>
+          <div style={{ fontSize: 48, marginBottom: 14 }}>🚛</div>
+          <p style={{ color: emptyText, fontFamily: "'Barlow',sans-serif", fontSize: 16 }}>
+            No loads match your search.
+          </p>
+        </div>
+      ) : (
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(310px,1fr))", gap: 20 }}>
+          {loads.map(l => (
+            <LoadCard key={l.id} load={l} onBook={onBook} onSave={onSave} />
+          ))}
+        </div>
+      )}
     </div>
   );
 };

@@ -10,6 +10,7 @@ interface HeaderProps {
   onAboutClick: () => void;
   onContactClick: () => void;
   onQuoteClick: () => void;
+  onSavedClick?: () => void;
 }
 
 const NavLink: React.FC<{ children: React.ReactNode; onClick?: () => void }> = ({ children, onClick }) => {
@@ -50,7 +51,7 @@ const PhoneLink: React.FC = () => {
 
 export const Header: React.FC<HeaderProps> = ({
   cartCount, savedCount = 0, theme = 'dark', onThemeToggle,
-  onCatalogClick, onAboutClick, onContactClick, onQuoteClick,
+  onCatalogClick, onAboutClick, onContactClick, onQuoteClick, onSavedClick,
 }) => {
   const [scrolled, setScrolled] = useState(false);
   const [reqHov, setReqHov] = useState(false);
@@ -73,7 +74,7 @@ export const Header: React.FC<HeaderProps> = ({
       padding: "0 28px", gap: 24,
     }}>
 
-      {/* Лого — клик скроллит наверх */}
+      {/* Лого */}
       <div
         onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
         style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", flexShrink: 0 }}
@@ -101,28 +102,66 @@ export const Header: React.FC<HeaderProps> = ({
 
       <PhoneLink />
 
-      {/* Переключатель темы */}
+      {/* Красивый переключатель темы */}
       {onThemeToggle && (
-        <button onClick={onThemeToggle} style={{
-          background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)",
-          borderRadius: 20, padding: "6px 14px", color: "#fff",
-          fontFamily: "'Barlow',sans-serif", fontWeight: 600, fontSize: 12,
-          cursor: "pointer", flexShrink: 0, transition: "all 0.15s",
-        }}>
-          {theme === 'dark' ? '☀️ Light' : '🌙 Dark'}
-        </button>
+        <div
+          onClick={onThemeToggle}
+          style={{
+            width: 56, height: 28,
+            borderRadius: 14,
+            background: theme === 'dark'
+              ? "linear-gradient(135deg, #0d0d2b 0%, #1a1a4e 100%)"
+              : "linear-gradient(135deg, #56CCF2 0%, #F7971E 100%)",
+            border: `2px solid ${theme === 'dark' ? "rgba(255,255,255,0.15)" : "rgba(255,255,255,0.4)"}`,
+            cursor: "pointer",
+            position: "relative",
+            flexShrink: 0,
+            transition: "all 0.4s ease",
+            boxShadow: theme === 'dark'
+              ? "0 0 10px rgba(80,80,200,0.4)"
+              : "0 0 10px rgba(255,180,0,0.5)",
+          }}
+        >
+          {/* Звёзды в тёмной теме */}
+          {theme === 'dark' && (
+            <>
+              <div style={{ position: "absolute", top: 4, left: 8, width: 2, height: 2, borderRadius: "50%", background: "#fff", opacity: 0.8 }} />
+              <div style={{ position: "absolute", top: 8, left: 14, width: 1.5, height: 1.5, borderRadius: "50%", background: "#fff", opacity: 0.6 }} />
+              <div style={{ position: "absolute", top: 6, left: 20, width: 1, height: 1, borderRadius: "50%", background: "#fff", opacity: 0.7 }} />
+            </>
+          )}
+          {/* Шарик (луна/солнце) */}
+          <div style={{
+            position: "absolute",
+            top: 2,
+            left: theme === 'dark' ? 2 : 26,
+            width: 20, height: 20,
+            borderRadius: "50%",
+            background: theme === 'dark'
+              ? "radial-gradient(circle at 35% 35%, #e8e8ff 0%, #9090c0 100%)"
+              : "radial-gradient(circle at 35% 35%, #FFF176 0%, #FFB300 100%)",
+            boxShadow: theme === 'dark'
+              ? "0 0 6px rgba(180,180,255,0.9), inset -3px -2px 0 rgba(100,100,180,0.4)"
+              : "0 0 10px rgba(255,200,0,0.9)",
+            transition: "all 0.4s ease",
+          }} />
+        </div>
       )}
 
       {/* Счётчик сохранённых */}
       {savedCount > 0 && (
-        <div style={{
-          display: "flex", alignItems: "center", gap: 5,
-          background: "rgba(204,0,0,0.15)",
-          border: "1px solid rgba(204,0,0,0.35)",
-          borderRadius: 20, padding: "5px 12px",
-          fontFamily: "'Barlow',sans-serif", fontWeight: 700,
-          fontSize: 12, color: "#fff", flexShrink: 0,
-        }}>
+        <div
+          onClick={onSavedClick}
+          style={{
+            display: "flex", alignItems: "center", gap: 5,
+            background: "rgba(204,0,0,0.15)",
+            border: "1px solid rgba(204,0,0,0.35)",
+            borderRadius: 20, padding: "5px 12px",
+            fontFamily: "'Barlow',sans-serif", fontWeight: 700,
+            fontSize: 12, color: "#fff", flexShrink: 0,
+            cursor: "pointer",
+          }}
+        >
           <span style={{ color: "#CC0000", fontSize: 14 }}>♥</span>
           {savedCount}
         </div>

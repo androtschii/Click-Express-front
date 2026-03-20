@@ -7,6 +7,8 @@ import { TrustStrip } from "./components/TrustStrip";
 import { AboutSection } from "./components/AboutSection";
 import { Footer } from "./components/Footer";
 import { QuoteModal } from "./components/QuoteModal";
+import { AuthModal } from "./components/AuthModal";
+import { getSession, logout, type Session } from "./services/authService";
 import { LoadListView } from "./components/LoadList";
 import { Notification } from "./components/Notification";
 import { LOADS } from "./utils/data";
@@ -135,6 +137,8 @@ function AppContent() {
   const [showQuote, setShowQuote] = useState(false);
   const [showFavorites, setShowFavorites] = useState(false);
   const [showRequests, setShowRequests] = useState(false);
+  const [showAuth, setShowAuth] = useState(false);
+  const [session, setSession] = useState<Session | null>(() => getSession());
   const [notifications, setNotifications] = useState<string[]>([]);
 
   const catalogRef = useRef<HTMLDivElement>(null);
@@ -210,6 +214,9 @@ function AppContent() {
         onQuoteClick={() => setShowQuote(true)}
         onSavedClick={() => setShowFavorites(true)}
         onRequestsClick={() => setShowRequests(true)}
+        onLoginClick={() => setShowAuth(true)}
+        session={session}
+        onLogout={() => { logout(); setSession(null); }}
       />
       <Hero onViewLoads={() => scrollTo(catalogRef)} onQuoteClick={() => setShowQuote(true)} />
       <Ticker />
@@ -247,6 +254,7 @@ function AppContent() {
         <Footer theme={theme} onCatalogClick={() => scrollTo(catalogRef)} onAboutClick={() => scrollTo(aboutRef)} onQuoteClick={() => setShowQuote(true)} />
       </div>
 
+      {showAuth && <AuthModal onClose={() => setShowAuth(false)} theme={theme} onSuccess={(s) => { setSession(s); setShowAuth(false); }} />}
       {showQuote && <QuoteModal onClose={() => setShowQuote(false)} theme={theme} />}
       {showFavorites && <FavoritesPanel loads={savedLoads} theme={theme} onClose={() => setShowFavorites(false)} />}
       {showRequests && <RequestsPanel loads={bookedLoads} theme={theme} onClose={() => setShowRequests(false)} />}

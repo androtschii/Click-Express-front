@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { CELogo } from "./Logo";
+import type { Session } from "../services/authService";
 
 interface HeaderProps {
   cartCount: number;
@@ -12,6 +13,9 @@ interface HeaderProps {
   onQuoteClick: () => void;
   onSavedClick?: () => void;
   onRequestsClick?: () => void;
+  onLoginClick?: () => void;
+  session?: Session | null;
+  onLogout?: () => void;
 }
 
 const NavLink: React.FC<{ children: React.ReactNode; onClick?: () => void }> = ({ children, onClick }) => {
@@ -54,11 +58,13 @@ const PhoneLink: React.FC = () => {
 
 export const Header: React.FC<HeaderProps> = ({
   cartCount, savedCount = 0, theme = 'dark', onThemeToggle,
-  onCatalogClick, onAboutClick, onContactClick, onQuoteClick, onSavedClick, onRequestsClick,
+  onCatalogClick, onAboutClick, onContactClick, onQuoteClick, onSavedClick, onRequestsClick, onLoginClick,
+  session, onLogout,
 }) => {
   const [scrolled, setScrolled] = useState(false);
   const [reqHov, setReqHov] = useState(false);
   const [heartBurst, setHeartBurst] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
 
   useEffect(() => {
     const fn = () => setScrolled(window.scrollY > 60);
@@ -166,6 +172,61 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
           <span style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 800, fontSize: 13, color: "#fff" }}>{savedCount}</span>
         </div>
+      )}
+
+      {/* Login / User avatar */}
+      {session ? (
+        <div style={{ position: "relative", flexShrink: 0 }}>
+          <div onClick={() => setUserMenuOpen(o => !o)} style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", padding: "4px 10px 4px 4px", borderRadius: 24, border: "1px solid rgba(204,0,0,0.4)", background: "rgba(204,0,0,0.1)", transition: "all 0.2s" }}
+            onMouseEnter={e => { e.currentTarget.style.background = "rgba(204,0,0,0.2)"; e.currentTarget.style.borderColor = "#CC0000"; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "rgba(204,0,0,0.1)"; e.currentTarget.style.borderColor = "rgba(204,0,0,0.4)"; }}>
+            {/* Avatar circle */}
+            {session.avatar ? (
+              <img src={session.avatar} alt="" style={{ width: 30, height: 30, borderRadius: "50%", objectFit: "cover", border: "1px solid #CC0000" }} />
+            ) : (
+              <div style={{ width: 30, height: 30, borderRadius: "50%", background: "linear-gradient(135deg,#CC0000,#ff4d4d)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 13, color: "#fff" }}>
+                {session.name.charAt(0).toUpperCase()}
+              </div>
+            )}
+            <span style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 600, fontSize: 12, color: "rgba(255,255,255,0.85)", maxWidth: 90, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              {session.name.split(" ")[0]}
+            </span>
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="rgba(255,255,255,0.5)" style={{ transform: userMenuOpen ? "rotate(180deg)" : "none", transition: "transform 0.2s" }}>
+              <path d="M7 10l5 5 5-5z"/>
+            </svg>
+          </div>
+
+          {/* Dropdown */}
+          {userMenuOpen && (
+            <div onClick={() => setUserMenuOpen(false)} style={{ position: "absolute", top: "calc(100% + 8px)", right: 0, minWidth: 180, background: "#0f0f0f", border: "1px solid rgba(204,0,0,0.3)", borderRadius: 10, overflow: "hidden", boxShadow: "0 16px 40px rgba(0,0,0,0.7)", zIndex: 100 }}>
+              <div style={{ padding: "12px 14px", borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
+                <div style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 13, color: "#fff" }}>{session.name}</div>
+                <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 11, color: "rgba(255,255,255,0.35)", marginTop: 2 }}>{session.email}</div>
+              </div>
+              <div style={{ padding: "6px 0" }}>
+                {[{ label: "My Profile", icon: "👤" }, { label: "My Orders", icon: "📋" }].map(item => (
+                  <div key={item.label} style={{ padding: "9px 14px", display: "flex", alignItems: "center", gap: 10, cursor: "pointer", fontFamily: "'Barlow',sans-serif", fontSize: 13, color: "rgba(255,255,255,0.7)", transition: "all 0.15s" }}
+                    onMouseEnter={e => { e.currentTarget.style.background = "rgba(204,0,0,0.1)"; e.currentTarget.style.color = "#fff"; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "rgba(255,255,255,0.7)"; }}>
+                    <span>{item.icon}</span>{item.label}
+                  </div>
+                ))}
+                <div style={{ margin: "6px 0", height: 1, background: "rgba(255,255,255,0.07)" }} />
+                <div onClick={onLogout} style={{ padding: "9px 14px", display: "flex", alignItems: "center", gap: 10, cursor: "pointer", fontFamily: "'Barlow',sans-serif", fontSize: 13, color: "#ff6b6b", transition: "all 0.15s" }}
+                  onMouseEnter={e => { e.currentTarget.style.background = "rgba(204,0,0,0.15)"; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}>
+                  <span>🚪</span> Sign Out
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      ) : (
+        <button onClick={onLoginClick} style={{ background: "transparent", border: "1px solid rgba(255,255,255,0.2)", borderRadius: 20, padding: "7px 18px", color: "rgba(255,255,255,0.7)", fontFamily: "'Barlow',sans-serif", fontWeight: 600, fontSize: 12, letterSpacing: 1.5, textTransform: "uppercase", cursor: "pointer", flexShrink: 0, transition: "all 0.15s" }}
+          onMouseEnter={e => { e.currentTarget.style.borderColor = "#CC0000"; e.currentTarget.style.color = "#fff"; }}
+          onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.2)"; e.currentTarget.style.color = "rgba(255,255,255,0.7)"; }}>
+          LOGIN
+        </button>
       )}
 
       {/* Кнопка Requests */}

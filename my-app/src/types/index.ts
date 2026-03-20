@@ -17,3 +17,16 @@ export interface QuoteFormData {
   to: string;
   cargo: string;
 }
+
+// ── AutoMapper аналог — отображаемая модель ───────────────────────────────
+export interface LoadDisplay {
+  id: number;
+  title: string;
+  priceFormatted: string;
+  milesFormatted: string;
+  pricePerMile: string;
+  type: string;
+  cargo: string;
+  image: string;
+  tag: string | null;
+}

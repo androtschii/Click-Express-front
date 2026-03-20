@@ -1,8 +1,6 @@
-import type { Load, QuoteFormData } from "../types/index";
+import type { Load, LoadDisplay } from "../types/index";
 
 // ── УРОВЕНЬ БИЗНЕС-ЛОГИКИ (Business Logic Layer) ──────────────────────────
-// Этот слой содержит всю логику обработки данных.
-// Компоненты не знают КАК фильтруются данные — они просто вызывают сервис.
 
 // ── 1. ФИЛЬТРАЦИЯ МАРШРУТОВ ───────────────────────────────────────────────
 export const filterLoads = (
@@ -51,13 +49,12 @@ export const getLoadsByType = (loads: Load[], type: string): Load[] => {
 
 // ── 5. СТАТИСТИКА ─────────────────────────────────────────────────────────
 export const getStats = (loads: Load[]) => {
-  if (loads.length === 0) return { total: 0, avgPrice: 0, avgMiles: 0, maxPrice: 0, minPrice: 0 };
-
+  if (loads.length === 0)
+    return { total: 0, avgPrice: 0, avgMiles: 0, maxPrice: 0, minPrice: 0 };
   const prices = loads.map(l => l.price);
-  const miles = loads.map(l => l.miles);
-
+  const miles  = loads.map(l => l.miles);
   return {
-    total: loads.length,
+    total:    loads.length,
     avgPrice: Math.round(prices.reduce((a, b) => a + b, 0) / loads.length),
     avgMiles: Math.round(miles.reduce((a, b) => a + b, 0) / loads.length),
     maxPrice: Math.max(...prices),
@@ -67,41 +64,48 @@ export const getStats = (loads: Load[]) => {
 
 // ── 6. ВАЛИДАЦИЯ ФОРМЫ ЗАЯВКИ ─────────────────────────────────────────────
 export const validateQuoteForm = (
-  data: QuoteFormData
+  name: string, phone: string, from: string, to: string
 ): { valid: boolean; error?: string } => {
-  if (!data.name.trim())
-    return { valid: false, error: "Name is required" };
-  if (!data.phone.trim())
-    return { valid: false, error: "Phone is required" };
-  if (data.phone.replace(/\D/g, "").length < 10)
+  if (!name.trim())  return { valid: false, error: "Name is required" };
+  if (!phone.trim()) return { valid: false, error: "Phone is required" };
+  if (phone.replace(/\D/g, "").length < 10)
     return { valid: false, error: "Enter a valid phone number (10+ digits)" };
-  if (!data.from.trim())
-    return { valid: false, error: "Origin city is required" };
-  if (!data.to.trim())
-    return { valid: false, error: "Destination city is required" };
-  if (data.from.toLowerCase() === data.to.toLowerCase())
+  if (!from.trim())  return { valid: false, error: "Origin city is required" };
+  if (!to.trim())    return { valid: false, error: "Destination city is required" };
+  if (from.toLowerCase() === to.toLowerCase())
     return { valid: false, error: "Origin and destination cannot be the same" };
   return { valid: true };
 };
 
 // ── 7. ФОРМАТИРОВАНИЕ ─────────────────────────────────────────────────────
-export const formatPrice = (price: number): string => {
-  return `$${price.toLocaleString("en-US")}`;
-};
+export const formatPrice = (price: number): string =>
+  `$${price.toLocaleString("en-US")}`;
 
-export const formatMiles = (miles: number): string => {
-  return `${miles.toLocaleString("en-US")} mi`;
-};
+export const formatMiles = (miles: number): string =>
+  `${miles.toLocaleString("en-US")} mi`;
 
-// ── 8. ИМИТАЦИЯ ЗАГРУЗКИ ДАННЫХ (Data Access Layer) ──────────────────────
+// ── 8. ЗАГРУЗКА ДАННЫХ (Data Access Layer) ────────────────────────────────
 export const fetchLoads = async (data: Load[]): Promise<Load[]> => {
-  return new Promise((resolve, reject) => {
+  return new Promise<Load[]>((resolve, reject) => {
     setTimeout(() => {
-      if (data.length === 0) {
-        reject(new Error("No loads available"));
-      } else {
-        resolve(data);
-      }
+      if (data.length === 0) reject(new Error("No loads available"));
+      else resolve(data);
     }, 800);
   });
 };
+
+// ── 9. AUTOMAPPER — конвертация Load → LoadDisplay ────────────────────────
+export const mapLoadToDisplay = (load: Load): LoadDisplay => ({
+  id:             load.id,
+  title:          `${load.route} → ${load.dest}`,
+  priceFormatted: formatPrice(load.price),
+  milesFormatted: formatMiles(load.miles),
+  pricePerMile:   `$${getPricePerMile(load)}/mi`,
+  type:           load.type,
+  cargo:          load.cargo,
+  image:          load.image,
+  tag:            load.tag,
+});
+
+export const mapLoadsToDisplay = (loads: Load[]): LoadDisplay[] =>
+  loads.map(mapLoadToDisplay);

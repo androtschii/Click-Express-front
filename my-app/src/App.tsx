@@ -17,73 +17,107 @@ import { filterLoads, fetchLoads } from "./services/loadService.ts";
 function FavoritesPanel({ loads, theme, onClose }: { loads: Load[]; theme: string; onClose: () => void }) {
   const isDark = theme === "dark";
   return (
-    <div style={{
-      position: "fixed", inset: 0, zIndex: 2000,
-      background: "rgba(0,0,0,0.7)", backdropFilter: "blur(6px)",
-    }} onClick={onClose}>
-      <div
-        onClick={e => e.stopPropagation()}
-        style={{
-          position: "absolute", right: 0, top: 0, bottom: 0,
-          width: "min(420px, 100vw)",
-          background: isDark ? "#0f0f0f" : "#fff",
-          borderLeft: "2px solid #CC0000",
-          display: "flex", flexDirection: "column",
-          boxShadow: "-20px 0 60px rgba(0,0,0,0.5)",
-        }}
-      >
-        {/* Заголовок */}
+    <div style={{ position: "fixed", inset: 0, zIndex: 2000, background: "rgba(0,0,0,0.7)", backdropFilter: "blur(6px)" }} onClick={onClose}>
+      <div onClick={e => e.stopPropagation()} style={{ position: "absolute", right: 0, top: 0, bottom: 0, width: "min(420px, 100vw)", background: isDark ? "#0f0f0f" : "#fff", borderLeft: "2px solid #CC0000", display: "flex", flexDirection: "column", boxShadow: "-20px 0 60px rgba(0,0,0,0.5)" }}>
         <div style={{ padding: "24px 24px 16px", borderBottom: `1px solid ${isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.08)"}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <div>
             <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 10, color: "#CC0000", letterSpacing: 3, textTransform: "uppercase", marginBottom: 4 }}>Saved</div>
-            <h3 style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 22, color: isDark ? "#fff" : "#1a1a1a", textTransform: "uppercase" }}>
-              FAVORITES <span style={{ color: "#CC0000" }}>({loads.length})</span>
-            </h3>
+            <h3 style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 22, color: isDark ? "#fff" : "#1a1a1a", textTransform: "uppercase" }}>FAVORITES <span style={{ color: "#CC0000" }}>({loads.length})</span></h3>
           </div>
           <button onClick={onClose} style={{ background: "rgba(255,255,255,0.07)", border: "none", borderRadius: "50%", width: 36, height: 36, color: isDark ? "rgba(255,255,255,0.5)" : "#666", fontSize: 18, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
         </div>
-
-        {/* Список */}
         <div style={{ flex: 1, overflowY: "auto", padding: "16px 24px", display: "flex", flexDirection: "column", gap: 12 }}>
           {loads.length === 0 ? (
             <div style={{ textAlign: "center", padding: "60px 0" }}>
               <div style={{ fontSize: 48, marginBottom: 12 }}>🤍</div>
               <p style={{ fontFamily: "'Barlow',sans-serif", color: isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.4)", fontSize: 14 }}>No saved loads yet</p>
-              <p style={{ fontFamily: "'Barlow',sans-serif", color: isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.3)", fontSize: 12, marginTop: 6 }}>Click ♥ on any load to save it</p>
             </div>
-          ) : (
-            loads.map(l => (
-              <div key={l.id} style={{ background: isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)", border: `1px solid ${isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)"}`, borderRadius: 8, overflow: "hidden" }}>
-                <div style={{ position: "relative", height: 120 }}>
-                  <img src={l.image} alt={l.route} style={{ width: "100%", height: "100%", objectFit: "cover", filter: "brightness(0.65)" }} />
-                  <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, transparent 30%, rgba(0,0,0,0.85))" }} />
-                  <div style={{ position: "absolute", bottom: 10, left: 12 }}>
-                    <div style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 22, color: "#fff" }}>
-                      ${l.price.toLocaleString()}
-                      <span style={{ fontSize: 12, color: "rgba(255,255,255,0.5)", marginLeft: 6 }}>/ {l.miles.toLocaleString()} mi</span>
-                    </div>
-                    <div style={{ display: "inline-block", background: "#CC0000", color: "#fff", fontFamily: "'Barlow',sans-serif", fontWeight: 800, fontSize: 8, letterSpacing: 2, textTransform: "uppercase", padding: "2px 8px", borderRadius: 2, marginTop: 3 }}>{l.type}</div>
-                  </div>
-                </div>
-                <div style={{ padding: "10px 12px" }}>
-                  <div style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 12, color: isDark ? "rgba(255,255,255,0.85)" : "#1a1a1a" }}>
-                    {l.route} → {l.dest}
-                  </div>
-                  <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 10, color: isDark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.45)", textTransform: "uppercase", letterSpacing: 1, marginTop: 3 }}>{l.cargo}</div>
+          ) : loads.map(l => (
+            <div key={l.id} style={{ background: isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)", border: `1px solid ${isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)"}`, borderRadius: 8, overflow: "hidden" }}>
+              <div style={{ position: "relative", height: 120 }}>
+                <img src={l.image} alt={l.route} style={{ width: "100%", height: "100%", objectFit: "cover", filter: "brightness(0.65)" }} />
+                <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, transparent 30%, rgba(0,0,0,0.85))" }} />
+                <div style={{ position: "absolute", bottom: 10, left: 12 }}>
+                  <div style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 22, color: "#fff" }}>${l.price.toLocaleString()} <span style={{ fontSize: 12, color: "rgba(255,255,255,0.5)" }}>/ {l.miles.toLocaleString()} mi</span></div>
+                  <div style={{ display: "inline-block", background: "#CC0000", color: "#fff", fontFamily: "'Barlow',sans-serif", fontWeight: 800, fontSize: 8, letterSpacing: 2, textTransform: "uppercase", padding: "2px 8px", borderRadius: 2, marginTop: 3 }}>{l.type}</div>
                 </div>
               </div>
-            ))
-          )}
-        </div>
-
-        {/* Футер панели */}
-        {loads.length > 0 && (
-          <div style={{ padding: "16px 24px", borderTop: `1px solid ${isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.08)"}` }}>
-            <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 12, color: isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.4)", textAlign: "center" }}>
-              📞 To book: <span style={{ color: "#CC0000", fontWeight: 700 }}>+1 786-202-6599</span>
+              <div style={{ padding: "10px 12px" }}>
+                <div style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 12, color: isDark ? "rgba(255,255,255,0.85)" : "#1a1a1a" }}>{l.route} → {l.dest}</div>
+                <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 10, color: isDark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.45)", textTransform: "uppercase", letterSpacing: 1, marginTop: 3 }}>{l.cargo}</div>
+              </div>
             </div>
+          ))}
+        </div>
+        {loads.length > 0 && (
+          <div style={{ padding: "16px 24px", borderTop: `1px solid ${isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.08)"}`, textAlign: "center" }}>
+            <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 12, color: isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.4)" }}>📞 To book: <span style={{ color: "#CC0000", fontWeight: 700 }}>+1 786-202-6599</span></div>
           </div>
         )}
+      </div>
+    </div>
+  );
+}
+
+// ── Панель заявок ─────────────────────────────────────────────────────────
+function RequestsPanel({ loads, theme, onClose }: { loads: Load[]; theme: string; onClose: () => void }) {
+  const isDark = theme === "dark";
+  return (
+    <div style={{ position: "fixed", inset: 0, zIndex: 2000, background: "rgba(0,0,0,0.7)", backdropFilter: "blur(6px)" }} onClick={onClose}>
+      <div onClick={e => e.stopPropagation()} style={{ position: "absolute", right: 0, top: 0, bottom: 0, width: "min(480px, 100vw)", background: isDark ? "#0f0f0f" : "#fff", borderLeft: "2px solid #CC0000", display: "flex", flexDirection: "column", boxShadow: "-20px 0 60px rgba(0,0,0,0.5)" }}>
+        {/* Заголовок */}
+        <div style={{ padding: "24px 24px 16px", borderBottom: `1px solid ${isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.08)"}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div>
+            <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 10, color: "#CC0000", letterSpacing: 3, textTransform: "uppercase", marginBottom: 4 }}>Booked</div>
+            <h3 style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 22, color: isDark ? "#fff" : "#1a1a1a", textTransform: "uppercase" }}>REQUESTS <span style={{ color: "#CC0000" }}>({loads.length})</span></h3>
+          </div>
+          <button onClick={onClose} style={{ background: "rgba(204,0,0,0.1)", border: "1px solid rgba(204,0,0,0.3)", borderRadius: "50%", width: 36, height: 36, color: "#CC0000", fontSize: 16, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
+        </div>
+
+        {/* Список */}
+        <div style={{ flex: 1, overflowY: "auto", padding: "16px 20px", display: "flex", flexDirection: "column", gap: 14 }}>
+          {loads.length === 0 ? (
+            <div style={{ textAlign: "center", padding: "60px 0" }}>
+              <div style={{ fontSize: 52, marginBottom: 14 }}>📋</div>
+              <p style={{ fontFamily: "'Barlow',sans-serif", color: isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.4)", fontSize: 14 }}>No requests yet</p>
+              <p style={{ fontFamily: "'Barlow',sans-serif", color: isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.25)", fontSize: 12, marginTop: 6 }}>Click BOOK LOAD on any card</p>
+            </div>
+          ) : loads.map((l, idx) => (
+            <div key={`${l.id}-${idx}`} style={{ background: isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)", border: `1px solid ${isDark ? "rgba(0,180,80,0.2)" : "rgba(0,180,80,0.3)"}`, borderRadius: 10, overflow: "hidden" }}>
+              <div style={{ position: "relative", height: 130 }}>
+                <img src={l.image} alt={l.route} style={{ width: "100%", height: "100%", objectFit: "cover", filter: "brightness(0.6)" }} />
+                <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, transparent 20%, rgba(0,0,0,0.9))" }} />
+                {/* Бейдж статуса */}
+                <div style={{ position: "absolute", top: 10, right: 10, background: "rgba(0,180,80,0.9)", color: "#fff", borderRadius: 20, padding: "4px 12px", fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 10, letterSpacing: 1 }}>✓ REQUESTED</div>
+                <div style={{ position: "absolute", bottom: 10, left: 12 }}>
+                  <div style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 24, color: "#fff", lineHeight: 1 }}>
+                    ${l.price.toLocaleString()}
+                    <span style={{ fontSize: 11, color: "rgba(255,255,255,0.5)", marginLeft: 5 }}>/ {l.miles.toLocaleString()} mi</span>
+                  </div>
+                  <div style={{ display: "inline-block", background: "#CC0000", color: "#fff", fontFamily: "'Barlow',sans-serif", fontWeight: 800, fontSize: 7, letterSpacing: 2, textTransform: "uppercase", padding: "2px 8px", borderRadius: 2, marginTop: 4 }}>{l.type}</div>
+                </div>
+              </div>
+              <div style={{ padding: "12px 14px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 5, marginBottom: 6 }}>
+                  <div style={{ width: 6, height: 6, borderRadius: "50%", border: "2px solid #CC0000", flexShrink: 0 }} />
+                  <span style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 12, color: isDark ? "rgba(255,255,255,0.9)" : "#1a1a1a" }}>{l.route}</span>
+                  <span style={{ color: "#CC0000", fontSize: 10 }}>→</span>
+                  <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#CC0000", flexShrink: 0 }} />
+                  <span style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 12, color: isDark ? "rgba(255,255,255,0.9)" : "#1a1a1a" }}>{l.dest}</span>
+                </div>
+                <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 10, color: isDark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.45)", textTransform: "uppercase", letterSpacing: 1 }}>{l.cargo}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Футер */}
+        <div style={{ padding: "16px 20px", borderTop: `1px solid ${isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.08)"}`, textAlign: "center" }}>
+          <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 12, color: isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.4)" }}>
+            Our dispatcher will contact you shortly
+          </div>
+          <a href="tel:+17862026599" style={{ display: "block", marginTop: 6, fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 14, color: "#CC0000", textDecoration: "none" }}>📞 +1 786-202-6599</a>
+        </div>
       </div>
     </div>
   );
@@ -96,10 +130,11 @@ function AppContent() {
   const [loads, setLoads] = useState<Load[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [bookCount, setBookCount] = useState(0);
+  const [bookedLoads, setBookedLoads] = useState<Load[]>([]);
   const [savedLoads, setSavedLoads] = useState<Load[]>([]);
   const [showQuote, setShowQuote] = useState(false);
   const [showFavorites, setShowFavorites] = useState(false);
+  const [showRequests, setShowRequests] = useState(false);
   const [notifications, setNotifications] = useState<string[]>([]);
 
   const catalogRef = useRef<HTMLDivElement>(null);
@@ -129,10 +164,18 @@ function AppContent() {
   const filtered = filterLoads(loads, search, filter);
 
   const handleSave = (load: Load, saved: boolean) => {
-    setSavedLoads(prev =>
-      saved ? [...prev, load] : prev.filter(l => l.id !== load.id)
-    );
+    setSavedLoads(prev => saved ? [...prev, load] : prev.filter(l => l.id !== load.id));
     notify(saved ? "Saved to favorites" : "Removed from favorites");
+  };
+
+  const handleCancelBook = (load?: Load) => {
+    if (load) setBookedLoads(prev => prev.filter(l => l.id !== load.id));
+    notify("Request cancelled");
+  };
+
+  const handleBook = (load?: Load) => {
+    if (load) setBookedLoads(prev => [...prev, load]);
+    notify("Load added to requests");
   };
 
   const notify = (text: string) => {
@@ -157,7 +200,7 @@ function AppContent() {
       `}</style>
 
       <Header
-        cartCount={bookCount}
+        cartCount={bookedLoads.length}
         savedCount={savedLoads.length}
         theme={theme}
         onThemeToggle={toggleTheme}
@@ -166,6 +209,7 @@ function AppContent() {
         onContactClick={() => scrollTo(contactRef)}
         onQuoteClick={() => setShowQuote(true)}
         onSavedClick={() => setShowFavorites(true)}
+        onRequestsClick={() => setShowRequests(true)}
       />
       <Hero onViewLoads={() => scrollTo(catalogRef)} onQuoteClick={() => setShowQuote(true)} />
       <Ticker />
@@ -193,10 +237,9 @@ function AppContent() {
           cardBg={cardBg}
           onSearchChange={setSearch}
           onFilterChange={setFilter}
-          onBook={() => { setBookCount(c => c + 1); notify("Load added to requests"); }}
-          onSave={(saved: boolean, load?: Load) => {
-            if (load) handleSave(load, saved);
-          }}
+          onBook={(load?: Load) => handleBook(load)}
+          onCancelBook={(load?: Load) => handleCancelBook(load)}
+          onSave={(saved: boolean, load?: Load) => { if (load) handleSave(load, saved); }}
         />
       </section>
 
@@ -206,6 +249,7 @@ function AppContent() {
 
       {showQuote && <QuoteModal onClose={() => setShowQuote(false)} theme={theme} />}
       {showFavorites && <FavoritesPanel loads={savedLoads} theme={theme} onClose={() => setShowFavorites(false)} />}
+      {showRequests && <RequestsPanel loads={bookedLoads} theme={theme} onClose={() => setShowRequests(false)} />}
       {notifications.map((msg, idx) => (
         <Notification key={idx} text={msg} onClose={() => setNotifications(n => n.filter((_, i) => i !== idx))} />
       ))}

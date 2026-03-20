@@ -14,13 +14,14 @@ interface LoadListProps {
   cardBg?: string;
   onSearchChange: (v: string) => void;
   onFilterChange: (v: string) => void;
-  onBook: () => void;
+  onBook: (load?: Load) => void;
+  onCancelBook?: (load?: Load) => void;
   onSave?: (saved: boolean, load?: Load) => void;
 }
 
 export const LoadListView: React.FC<LoadListProps> = ({
   loads, loading, error, search, filter,
-  theme = 'dark', onSearchChange, onFilterChange, onBook, onSave,
+theme = 'dark', onSearchChange, onFilterChange, onBook, onCancelBook, onSave,
 }) => {
   const isDark = theme === 'dark';
   const searchBg    = isDark ? "#0d0d0d"                : "#f0f0f0";
@@ -67,7 +68,7 @@ export const LoadListView: React.FC<LoadListProps> = ({
       ) : (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(310px,1fr))", gap: 20 }}>
           {loads.map(l => (
-            <LoadCard key={l.id} load={l} onBook={onBook} onSave={onSave} />
+            <LoadCard key={l.id} load={l} onBook={onBook} onCancelBook={onCancelBook} onSave={onSave} />
           ))}
         </div>
       )}

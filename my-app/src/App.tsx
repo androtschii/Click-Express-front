@@ -10,6 +10,7 @@ import { QuoteModal } from "./components/QuoteModal";
 import { AuthModal } from "./components/AuthModal";
 import { getSession, logout, type Session } from "./services/authService";
 import { LoadListView } from "./components/LoadList";
+import { LoadDetailPage } from "./components/LoadDetailPage";
 import { Notification } from "./components/Notification";
 import { LOADS } from "./utils/data";
 import type { Load } from "./types/index";
@@ -139,6 +140,7 @@ function AppContent() {
   const [showRequests, setShowRequests] = useState(false);
   const [showAuth, setShowAuth] = useState(false);
   const [session, setSession] = useState<Session | null>(() => getSession());
+  const [detailLoad, setDetailLoad] = useState<Load | null>(null);
   const [notifications, setNotifications] = useState<string[]>([]);
 
   const catalogRef = useRef<HTMLDivElement>(null);
@@ -190,34 +192,69 @@ function AppContent() {
   const textColor = theme === "dark" ? "#fff" : "#1a1a1a";
   const cardBg = theme === "dark" ? "#0d0d0d" : "#ffffff";
 
+  const sharedStyle = (
+    <style>{`
+      @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Barlow:wght@400;500;600;700;800&display=swap');
+      *{box-sizing:border-box;margin:0;padding:0;}
+      body{background:${bgColor};color:${textColor};transition: background 0.3s, color 0.3s;}
+      ::selection{background:#CC0000;color:#fff;}
+      ::-webkit-scrollbar{width:6px;}
+      ::-webkit-scrollbar-track{background:${theme === "dark" ? "#0a0a0a" : "#e0e0e0"};}
+      ::-webkit-scrollbar-thumb{background:#CC0000;border-radius:3px;}
+      input::placeholder{color:${theme === "dark" ? "rgba(255,255,255,0.25)" : "rgba(0,0,0,0.3)"};}
+    `}</style>
+  );
+
+  const sharedHeader = (
+    <Header
+      cartCount={bookedLoads.length}
+      savedCount={savedLoads.length}
+      theme={theme}
+      onThemeToggle={toggleTheme}
+      onCatalogClick={() => { setDetailLoad(null); setTimeout(() => scrollTo(catalogRef), 50); }}
+      onAboutClick={() => { setDetailLoad(null); setTimeout(() => scrollTo(aboutRef), 50); }}
+      onContactClick={() => { setDetailLoad(null); setTimeout(() => scrollTo(contactRef), 50); }}
+      onQuoteClick={() => setShowQuote(true)}
+      onSavedClick={() => setShowFavorites(true)}
+      onRequestsClick={() => setShowRequests(true)}
+      onLoginClick={() => setShowAuth(true)}
+      session={session}
+      onLogout={() => { logout(); setSession(null); }}
+    />
+  );
+
+  // ── Detail page — full screen ──────────────────────────────────────────
+  if (detailLoad) {
+    return (
+      <div style={{ background: bgColor, minHeight: "100vh", color: textColor }}>
+        {sharedStyle}
+        {sharedHeader}
+        <div style={{ paddingTop: 70 }}>
+          <LoadDetailPage
+            load={detailLoad}
+            theme={theme}
+            isBooked={bookedLoads.some(l => l.id === detailLoad.id)}
+            onClose={() => { setDetailLoad(null); setTimeout(() => scrollTo(catalogRef), 80); }}
+            onBook={(load) => handleBook(load)}
+            onCancelBook={(load) => handleCancelBook(load)}
+          />
+        </div>
+        {showAuth && <AuthModal onClose={() => setShowAuth(false)} theme={theme} onSuccess={(s) => { setSession(s); setShowAuth(false); }} />}
+        {showQuote && <QuoteModal onClose={() => setShowQuote(false)} theme={theme} />}
+        {showFavorites && <FavoritesPanel loads={savedLoads} theme={theme} onClose={() => setShowFavorites(false)} />}
+        {showRequests && <RequestsPanel loads={bookedLoads} theme={theme} onClose={() => setShowRequests(false)} />}
+        {notifications.map((msg, idx) => (
+          <Notification key={idx} text={msg} onClose={() => setNotifications(n => n.filter((_, i) => i !== idx))} />
+        ))}
+      </div>
+    );
+  }
+
+  // ── Main page ──────────────────────────────────────────────────────────
   return (
     <div style={{ background: bgColor, minHeight: "100vh", color: textColor, transition: "background 0.3s, color 0.3s" }}>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Barlow:wght@400;500;600;700;800&display=swap');
-        *{box-sizing:border-box;margin:0;padding:0;}
-        body{background:${bgColor};color:${textColor};transition: background 0.3s, color 0.3s;}
-        ::selection{background:#CC0000;color:#fff;}
-        ::-webkit-scrollbar{width:6px;}
-        ::-webkit-scrollbar-track{background:${theme === "dark" ? "#0a0a0a" : "#e0e0e0"};}
-        ::-webkit-scrollbar-thumb{background:#CC0000;border-radius:3px;}
-        input::placeholder{color:${theme === "dark" ? "rgba(255,255,255,0.25)" : "rgba(0,0,0,0.3)"};}
-      `}</style>
-
-      <Header
-        cartCount={bookedLoads.length}
-        savedCount={savedLoads.length}
-        theme={theme}
-        onThemeToggle={toggleTheme}
-        onCatalogClick={() => scrollTo(catalogRef)}
-        onAboutClick={() => scrollTo(aboutRef)}
-        onContactClick={() => scrollTo(contactRef)}
-        onQuoteClick={() => setShowQuote(true)}
-        onSavedClick={() => setShowFavorites(true)}
-        onRequestsClick={() => setShowRequests(true)}
-        onLoginClick={() => setShowAuth(true)}
-        session={session}
-        onLogout={() => { logout(); setSession(null); }}
-      />
+      {sharedStyle}
+      {sharedHeader}
       <Hero onViewLoads={() => scrollTo(catalogRef)} onQuoteClick={() => setShowQuote(true)} />
       <Ticker />
       <TrustStrip theme={theme} />
@@ -247,6 +284,8 @@ function AppContent() {
           onBook={(load?: Load) => handleBook(load)}
           onCancelBook={(load?: Load) => handleCancelBook(load)}
           onSave={(saved: boolean, load?: Load) => { if (load) handleSave(load, saved); }}
+          onDetails={(load: Load) => { setDetailLoad(load); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+          bookedIds={bookedLoads.map(l => l.id)}
         />
       </section>
 

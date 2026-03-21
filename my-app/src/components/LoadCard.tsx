@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { ThemeContext } from "../theme";
 import type { Load } from "../types/index";
 
@@ -7,6 +7,8 @@ interface LoadCardProps {
   onBook?: (load?: Load) => void;
   onCancelBook?: (load?: Load) => void;
   onSave?: (saved: boolean, load?: Load) => void;
+  onDetails?: (load: Load) => void;
+  isBooked?: boolean;
 }
 
 const HeartIcon = ({ saved, onClick }: { saved: boolean; onClick: () => void }) => {
@@ -36,12 +38,13 @@ const HeartIcon = ({ saved, onClick }: { saved: boolean; onClick: () => void }) 
   );
 };
 
-export const LoadCard: React.FC<LoadCardProps> = ({ load, onBook, onCancelBook, onSave }) => {
+export const LoadCard: React.FC<LoadCardProps> = ({ load, onBook, onCancelBook, onSave, onDetails, isBooked = false }) => {
   const context = useContext(ThemeContext) as { theme?: 'dark' | 'light' };
   const theme = context.theme || 'dark';
   const isDark = theme === 'dark';
 
-  const [booked, setBooked] = useState(false);
+  const [booked, setBooked] = useState(isBooked);
+  useEffect(() => { setBooked(isBooked); }, [isBooked]);
   const [saved, setSaved] = useState(false);
   const [hov, setHov] = useState(false);
   const [bookHov, setBookHov] = useState(false);
@@ -70,8 +73,13 @@ export const LoadCard: React.FC<LoadCardProps> = ({ load, onBook, onCancelBook, 
 
   return (
     <div onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)} style={{ background:cardBg, border:`1px solid ${hov?"#CC0000":cardBorder}`, borderRadius:6, overflow:"hidden", transform:hov?"translateY(-5px)":"none", boxShadow:hov?"0 24px 50px rgba(0,0,0,0.6), 0 0 0 1px rgba(204,0,0,0.2)":"none", transition:"all 0.25s ease" }}>
-      <div style={{ position:"relative", height:190, overflow:"hidden" }}>
+      <div onClick={() => onDetails && onDetails(load)} style={{ position:"relative", height:190, overflow:"hidden", cursor: onDetails ? "pointer" : "default" }}>
         <img src={load.image} alt={load.route} style={{ width:"100%", height:"100%", objectFit:"cover", transform:hov?"scale(1.06)":"scale(1)", filter:"brightness(0.68)", transition:"transform 0.4s ease" }} />
+        {onDetails && (
+          <div style={{ position:"absolute", bottom:14, right:14, background:"rgba(0,0,0,0.55)", border:"1px solid rgba(255,255,255,0.2)", borderRadius:20, padding:"4px 12px", fontFamily:"'Barlow',sans-serif", fontWeight:600, fontSize:10, color:"rgba(255,255,255,0.8)", letterSpacing:1, backdropFilter:"blur(4px)" }}>
+            VIEW DETAILS →
+          </div>
+        )}
         <div style={{ position:"absolute", inset:0, background:"linear-gradient(to bottom,transparent 30%,rgba(0,0,0,0.85))" }} />
         {load.tag && (
           <div style={{ position:"absolute", top:0, left:0, background:load.tag==="Military Load"?"#1a3a6b":"#CC0000", color:"#fff", padding:"5px 14px", fontFamily:"'Barlow',sans-serif", fontWeight:800, fontSize:9, letterSpacing:2, textTransform:"uppercase", borderBottomRightRadius:6 }}>

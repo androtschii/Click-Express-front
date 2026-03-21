@@ -16,6 +16,7 @@ interface HeaderProps {
   onLoginClick?: () => void;
   session?: Session | null;
   onLogout?: () => void;
+  onLogoClick?: () => void;
 }
 
 const NavLink: React.FC<{ children: React.ReactNode; onClick?: () => void }> = ({ children, onClick }) => {
@@ -59,7 +60,7 @@ const PhoneLink: React.FC = () => {
 export const Header: React.FC<HeaderProps> = ({
   cartCount, savedCount = 0, theme = 'dark', onThemeToggle,
   onCatalogClick, onAboutClick, onContactClick, onQuoteClick, onSavedClick, onRequestsClick, onLoginClick,
-  session, onLogout,
+  session, onLogout, onLogoClick,
 }) => {
   const [scrolled, setScrolled] = useState(false);
   const [reqHov, setReqHov] = useState(false);
@@ -81,9 +82,10 @@ export const Header: React.FC<HeaderProps> = ({
   return (
     <header style={{
       position: "fixed", top: 0, left: 0, right: 0, zIndex: 999, height: 70,
-      background: scrolled ? "rgba(8,0,0,0.97)" : "linear-gradient(180deg,rgba(0,0,0,0.82) 0%,transparent 100%)",
-      backdropFilter: scrolled ? "blur(18px)" : "none",
-      borderBottom: scrolled ? "2px solid #CC0000" : "none",
+      background: scrolled ? "rgba(8,0,0,0.38)" : "linear-gradient(180deg,rgba(0,0,0,0.32) 0%,transparent 100%)",
+      backdropFilter: "blur(24px)",
+      WebkitBackdropFilter: "blur(24px)",
+      borderBottom: scrolled ? "1px solid rgba(204,0,0,0.3)" : "none",
       transition: "background 0.3s, border 0.3s",
       display: "flex", alignItems: "center", padding: "0 28px", gap: 24,
     }}>
@@ -93,7 +95,7 @@ export const Header: React.FC<HeaderProps> = ({
       `}</style>
 
       {/* Лого */}
-      <div onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", flexShrink: 0 }}>
+      <div onClick={onLogoClick || (() => window.scrollTo({ top: 0, behavior: "smooth" }))} style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", flexShrink: 0 }}>
         <CELogo size={42} />
         <div style={{ lineHeight: 1 }}>
           <div style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 19, color: "#fff", letterSpacing: 1, textTransform: "uppercase" }}>

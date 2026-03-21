@@ -17,12 +17,13 @@ import type { Load } from "./types/index";
 import { filterLoads, fetchLoads } from "./services/loadService.ts";
 
 // ── Панель избранного ─────────────────────────────────────────────────────
-function FavoritesPanel({ loads, theme, onClose }: { loads: Load[]; theme: string; onClose: () => void }) {
+function FavoritesPanel({ loads, theme, onClose, onDetails }: { loads: Load[]; theme: string; onClose: () => void; onDetails?: (l: Load) => void }) {
   const isDark = theme === "dark";
+  const bord = isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.08)";
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 2000, background: "rgba(0,0,0,0.7)", backdropFilter: "blur(6px)" }} onClick={onClose}>
       <div onClick={e => e.stopPropagation()} style={{ position: "absolute", right: 0, top: 0, bottom: 0, width: "min(420px, 100vw)", background: isDark ? "#0f0f0f" : "#fff", borderLeft: "2px solid #CC0000", display: "flex", flexDirection: "column", boxShadow: "-20px 0 60px rgba(0,0,0,0.5)" }}>
-        <div style={{ padding: "24px 24px 16px", borderBottom: `1px solid ${isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.08)"}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div style={{ padding: "24px 24px 16px", borderBottom: `1px solid ${bord}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <div>
             <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 10, color: "#CC0000", letterSpacing: 3, textTransform: "uppercase", marginBottom: 4 }}>Saved</div>
             <h3 style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 22, color: isDark ? "#fff" : "#1a1a1a", textTransform: "uppercase" }}>FAVORITES <span style={{ color: "#CC0000" }}>({loads.length})</span></h3>
@@ -36,10 +37,15 @@ function FavoritesPanel({ loads, theme, onClose }: { loads: Load[]; theme: strin
               <p style={{ fontFamily: "'Barlow',sans-serif", color: isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.4)", fontSize: 14 }}>No saved loads yet</p>
             </div>
           ) : loads.map(l => (
-            <div key={l.id} style={{ background: isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)", border: `1px solid ${isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)"}`, borderRadius: 8, overflow: "hidden" }}>
+            <div key={l.id} onClick={() => { onClose(); setTimeout(() => onDetails && onDetails(l), 120); }}
+              style={{ background: isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)", border: `1px solid ${bord}`, borderRadius: 10, overflow: "hidden", cursor: "pointer", transition: "all 0.2s" }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = "#CC0000"; (e.currentTarget as HTMLElement).style.transform = "translateY(-2px)"; (e.currentTarget as HTMLElement).style.boxShadow = "0 8px 24px rgba(0,0,0,0.4)"; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = bord; (e.currentTarget as HTMLElement).style.transform = "none"; (e.currentTarget as HTMLElement).style.boxShadow = "none"; }}
+            >
               <div style={{ position: "relative", height: 120 }}>
                 <img src={l.image} alt={l.route} style={{ width: "100%", height: "100%", objectFit: "cover", filter: "brightness(0.65)" }} />
                 <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, transparent 30%, rgba(0,0,0,0.85))" }} />
+                <div style={{ position: "absolute", top: 8, right: 8, background: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 12, padding: "3px 8px", fontFamily: "'Barlow',sans-serif", fontSize: 9, color: "rgba(255,255,255,0.7)", letterSpacing: 1, backdropFilter: "blur(4px)" }}>VIEW →</div>
                 <div style={{ position: "absolute", bottom: 10, left: 12 }}>
                   <div style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 22, color: "#fff" }}>${l.price.toLocaleString()} <span style={{ fontSize: 12, color: "rgba(255,255,255,0.5)" }}>/ {l.miles.toLocaleString()} mi</span></div>
                   <div style={{ display: "inline-block", background: "#CC0000", color: "#fff", fontFamily: "'Barlow',sans-serif", fontWeight: 800, fontSize: 8, letterSpacing: 2, textTransform: "uppercase", padding: "2px 8px", borderRadius: 2, marginTop: 3 }}>{l.type}</div>
@@ -53,7 +59,7 @@ function FavoritesPanel({ loads, theme, onClose }: { loads: Load[]; theme: strin
           ))}
         </div>
         {loads.length > 0 && (
-          <div style={{ padding: "16px 24px", borderTop: `1px solid ${isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.08)"}`, textAlign: "center" }}>
+          <div style={{ padding: "16px 24px", borderTop: `1px solid ${bord}`, textAlign: "center" }}>
             <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 12, color: isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.4)" }}>📞 To book: <span style={{ color: "#CC0000", fontWeight: 700 }}>+1 786-202-6599</span></div>
           </div>
         )}
@@ -63,7 +69,7 @@ function FavoritesPanel({ loads, theme, onClose }: { loads: Load[]; theme: strin
 }
 
 // ── Панель заявок ─────────────────────────────────────────────────────────
-function RequestsPanel({ loads, theme, onClose }: { loads: Load[]; theme: string; onClose: () => void }) {
+function RequestsPanel({ loads, theme, onClose, onDetails }: { loads: Load[]; theme: string; onClose: () => void; onDetails?: (l: Load) => void }) {
   const isDark = theme === "dark";
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 2000, background: "rgba(0,0,0,0.7)", backdropFilter: "blur(6px)" }} onClick={onClose}>
@@ -86,12 +92,19 @@ function RequestsPanel({ loads, theme, onClose }: { loads: Load[]; theme: string
               <p style={{ fontFamily: "'Barlow',sans-serif", color: isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.25)", fontSize: 12, marginTop: 6 }}>Click BOOK LOAD on any card</p>
             </div>
           ) : loads.map((l, idx) => (
-            <div key={`${l.id}-${idx}`} style={{ background: isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)", border: `1px solid ${isDark ? "rgba(0,180,80,0.2)" : "rgba(0,180,80,0.3)"}`, borderRadius: 10, overflow: "hidden" }}>
+            <div key={`${l.id}-${idx}`}
+              onClick={() => { onClose(); setTimeout(() => onDetails && onDetails(l), 120); }}
+              style={{ background: isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)", border: `1px solid ${isDark ? "rgba(0,180,80,0.2)" : "rgba(0,180,80,0.3)"}`, borderRadius: 10, overflow: "hidden", cursor: "pointer", transition: "all 0.2s" }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = "#CC0000"; (e.currentTarget as HTMLElement).style.transform = "translateY(-2px)"; (e.currentTarget as HTMLElement).style.boxShadow = "0 8px 24px rgba(0,0,0,0.4)"; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = isDark ? "rgba(0,180,80,0.2)" : "rgba(0,180,80,0.3)"; (e.currentTarget as HTMLElement).style.transform = "none"; (e.currentTarget as HTMLElement).style.boxShadow = "none"; }}
+            >
               <div style={{ position: "relative", height: 130 }}>
                 <img src={l.image} alt={l.route} style={{ width: "100%", height: "100%", objectFit: "cover", filter: "brightness(0.6)" }} />
                 <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, transparent 20%, rgba(0,0,0,0.9))" }} />
-                {/* Бейдж статуса */}
-                <div style={{ position: "absolute", top: 10, right: 10, background: "rgba(0,180,80,0.9)", color: "#fff", borderRadius: 20, padding: "4px 12px", fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 10, letterSpacing: 1 }}>✓ REQUESTED</div>
+                <div style={{ position: "absolute", top: 10, right: 10, display: "flex", gap: 6 }}>
+                  <div style={{ background: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.15)", color: "rgba(255,255,255,0.8)", borderRadius: 12, padding: "3px 8px", fontFamily: "'Barlow',sans-serif", fontSize: 9, letterSpacing: 1, backdropFilter: "blur(4px)" }}>VIEW →</div>
+                  <div style={{ background: "rgba(0,180,80,0.9)", color: "#fff", borderRadius: 20, padding: "4px 12px", fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 10, letterSpacing: 1 }}>✓ REQUESTED</div>
+                </div>
                 <div style={{ position: "absolute", bottom: 10, left: 12 }}>
                   <div style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 24, color: "#fff", lineHeight: 1 }}>
                     ${l.price.toLocaleString()}
@@ -220,6 +233,7 @@ function AppContent() {
       onLoginClick={() => setShowAuth(true)}
       session={session}
       onLogout={() => { logout(); setSession(null); }}
+      onLogoClick={() => { setDetailLoad(null); window.scrollTo({ top: 0, behavior: "smooth" }); }}
     />
   );
 
@@ -241,8 +255,8 @@ function AppContent() {
         </div>
         {showAuth && <AuthModal onClose={() => setShowAuth(false)} theme={theme} onSuccess={(s) => { setSession(s); setShowAuth(false); }} />}
         {showQuote && <QuoteModal onClose={() => setShowQuote(false)} theme={theme} />}
-        {showFavorites && <FavoritesPanel loads={savedLoads} theme={theme} onClose={() => setShowFavorites(false)} />}
-        {showRequests && <RequestsPanel loads={bookedLoads} theme={theme} onClose={() => setShowRequests(false)} />}
+        {showFavorites && <FavoritesPanel loads={savedLoads} theme={theme} onClose={() => setShowFavorites(false)} onDetails={(l) => { setShowFavorites(false); setDetailLoad(l); window.scrollTo({ top: 0 }); }} />}
+        {showRequests && <RequestsPanel loads={bookedLoads} theme={theme} onClose={() => setShowRequests(false)} onDetails={(l) => { setShowRequests(false); setDetailLoad(l); window.scrollTo({ top: 0 }); }} />}
         {notifications.map((msg, idx) => (
           <Notification key={idx} text={msg} onClose={() => setNotifications(n => n.filter((_, i) => i !== idx))} />
         ))}
@@ -286,6 +300,7 @@ function AppContent() {
           onSave={(saved: boolean, load?: Load) => { if (load) handleSave(load, saved); }}
           onDetails={(load: Load) => { setDetailLoad(load); window.scrollTo({ top: 0, behavior: "smooth" }); }}
           bookedIds={bookedLoads.map(l => l.id)}
+          savedIds={savedLoads.map(l => l.id)}
         />
       </section>
 
@@ -295,8 +310,8 @@ function AppContent() {
 
       {showAuth && <AuthModal onClose={() => setShowAuth(false)} theme={theme} onSuccess={(s) => { setSession(s); setShowAuth(false); }} />}
       {showQuote && <QuoteModal onClose={() => setShowQuote(false)} theme={theme} />}
-      {showFavorites && <FavoritesPanel loads={savedLoads} theme={theme} onClose={() => setShowFavorites(false)} />}
-      {showRequests && <RequestsPanel loads={bookedLoads} theme={theme} onClose={() => setShowRequests(false)} />}
+      {showFavorites && <FavoritesPanel loads={savedLoads} theme={theme} onClose={() => setShowFavorites(false)} onDetails={(l) => { setShowFavorites(false); setDetailLoad(l); window.scrollTo({ top: 0 }); }} />}
+      {showRequests && <RequestsPanel loads={bookedLoads} theme={theme} onClose={() => setShowRequests(false)} onDetails={(l) => { setShowRequests(false); setDetailLoad(l); window.scrollTo({ top: 0 }); }} />}
       {notifications.map((msg, idx) => (
         <Notification key={idx} text={msg} onClose={() => setNotifications(n => n.filter((_, i) => i !== idx))} />
       ))}

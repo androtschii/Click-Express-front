@@ -19,11 +19,12 @@ interface LoadListProps {
   onSave?: (saved: boolean, load?: Load) => void;
   onDetails?: (load: Load) => void;
   bookedIds?: number[];
+  savedIds?: number[];
 }
 
 export const LoadListView: React.FC<LoadListProps> = ({
   loads, loading, error, search, filter,
-theme = 'dark', onSearchChange, onFilterChange, onBook, onCancelBook, onSave, onDetails, bookedIds = [],
+theme = 'dark', onSearchChange, onFilterChange, onBook, onCancelBook, onSave, onDetails, bookedIds = [], savedIds = [],
 }) => {
   const isDark = theme === 'dark';
   const searchBg    = isDark ? "#0d0d0d"                : "#f0f0f0";
@@ -70,7 +71,7 @@ theme = 'dark', onSearchChange, onFilterChange, onBook, onCancelBook, onSave, on
       ) : (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(310px,1fr))", gap: 20 }}>
           {loads.map(l => (
-            <LoadCard key={l.id} load={l} onBook={onBook} onCancelBook={onCancelBook} onSave={onSave} onDetails={onDetails} isBooked={bookedIds.includes(l.id)} />
+            <LoadCard key={l.id} load={l} onBook={onBook} onCancelBook={onCancelBook} onSave={onSave} onDetails={onDetails} isBooked={bookedIds.includes(l.id)} isSaved={savedIds.includes(l.id)} />
           ))}
         </div>
       )}

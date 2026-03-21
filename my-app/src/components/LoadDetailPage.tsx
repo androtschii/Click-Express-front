@@ -58,6 +58,13 @@ export const LoadDetailPage: React.FC<LoadDetailPageProps> = ({
   const [mapLoaded, setMapLoaded] = useState(false);
   const [booked, setBooked] = useState(isBooked);
   const topRef = useRef<HTMLDivElement>(null);
+  const [msgOpen, setMsgOpen] = useState(false);
+  const msgRef = useRef<HTMLDivElement>(null);
+  const [msgName, setMsgName] = useState("");
+  const [msgPhone, setMsgPhone] = useState("");
+  const [msgDate, setMsgDate] = useState("");
+  const [msgText, setMsgText] = useState("");
+  const [msgSent, setMsgSent] = useState(false);
 
   useEffect(() => {
     requestAnimationFrame(() => setEntered(true));
@@ -117,7 +124,7 @@ export const LoadDetailPage: React.FC<LoadDetailPageProps> = ({
       {/* ── Top nav bar ── */}
       <div style={{
         position: "sticky", top: 0, zIndex: 100,
-        background: isDark ? "rgba(8,8,8,0.95)" : "rgba(244,244,244,0.97)",
+        background: isDark ? "rgba(8,8,8,0.4)" : "rgba(244,244,244,0.55)",
         backdropFilter: "blur(16px)",
         borderBottom: `1px solid ${bord}`,
         padding: "0 clamp(16px,4vw,48px)",
@@ -322,6 +329,116 @@ export const LoadDetailPage: React.FC<LoadDetailPageProps> = ({
                 </div>
               ))}
             </div>
+
+            {/* Message Dispatcher */}
+            <div ref={msgRef} style={{ background:card, border:`1px solid ${bord}`, borderRadius:14, overflow:"hidden", animation:"detailFadeUp 0.5s ease 0.4s both" }}>
+              {/* Header toggle */}
+              <div
+                onClick={() => { setMsgOpen(o => !o); setMsgSent(false); }}
+                style={{ padding:"18px 24px", display:"flex", alignItems:"center", justifyContent:"space-between", cursor:"pointer", background: msgOpen ? "rgba(204,0,0,0.06)" : "transparent", transition:"background 0.2s" }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "rgba(204,0,0,0.08)"; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = msgOpen ? "rgba(204,0,0,0.06)" : "transparent"; }}
+              >
+                <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+                  <div style={{ width:34, height:34, borderRadius:"50%", background:"linear-gradient(135deg,#CC0000,#ff4d4d)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="white">
+                      <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <div style={{ fontFamily:"'Oswald',sans-serif", fontWeight:600, fontSize:15, color:text }}>Message Dispatcher</div>
+                    <div style={{ fontFamily:"'Barlow',sans-serif", fontSize:11, color:muted }}>Send a request for this route · Quick response</div>
+                  </div>
+                </div>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill={muted} style={{ transform: msgOpen ? "rotate(180deg)" : "none", transition:"transform 0.3s" }}>
+                  <path d="M7 10l5 5 5-5z"/>
+                </svg>
+              </div>
+
+              {/* Form body */}
+              {msgOpen && (
+                <div style={{ padding:"0 24px 24px", borderTop:`1px solid ${bord}` }}>
+                  {msgSent ? (
+                    <div style={{ textAlign:"center", padding:"32px 0", animation:"detailFadeUp 0.4s ease" }}>
+                      <div style={{ width:56, height:56, borderRadius:"50%", background:"linear-gradient(135deg,#00b050,#00d060)", display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto 14px" }}>
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                          <path d="M5 13l4 4L19 7" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      </div>
+                      <div style={{ fontFamily:"'Oswald',sans-serif", fontWeight:700, fontSize:18, color:text, marginBottom:6 }}>Message Sent!</div>
+                      <div style={{ fontFamily:"'Barlow',sans-serif", fontSize:13, color:muted }}>Dispatcher will contact you within 30 minutes</div>
+                    </div>
+                  ) : (
+                    <div style={{ display:"flex", flexDirection:"column", gap:12, paddingTop:20 }}>
+                      {/* Route info (read-only) */}
+                      <div style={{ background: isDark?"rgba(204,0,0,0.06)":"rgba(204,0,0,0.04)", border:"1px solid rgba(204,0,0,0.2)", borderRadius:8, padding:"10px 14px" }}>
+                        <div style={{ fontFamily:"'Barlow',sans-serif", fontSize:9, color:"#CC0000", letterSpacing:1.5, textTransform:"uppercase", marginBottom:3 }}>Route</div>
+                        <div style={{ fontFamily:"'Barlow',sans-serif", fontWeight:700, fontSize:13, color:text }}>{load.route} → {load.dest}</div>
+                      </div>
+
+                      {/* Name + Phone row */}
+                      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10 }}>
+                        <div>
+                          <div style={{ fontFamily:"'Barlow',sans-serif", fontSize:10, color:muted, letterSpacing:1, marginBottom:5 }}>Your Name</div>
+                          <input
+                            value={msgName} onChange={e => setMsgName(e.target.value)}
+                            placeholder="John Smith"
+                            style={{ width:"100%", padding:"10px 12px", background:isDark?"rgba(255,255,255,0.05)":"#f5f5f5", border:`1px solid ${bord}`, borderRadius:7, color:text, fontFamily:"'Barlow',sans-serif", fontSize:13, outline:"none", boxSizing:"border-box", transition:"border-color 0.2s" }}
+                            onFocus={e => e.target.style.borderColor="#CC0000"}
+                            onBlur={e => e.target.style.borderColor=bord}
+                          />
+                        </div>
+                        <div>
+                          <div style={{ fontFamily:"'Barlow',sans-serif", fontSize:10, color:muted, letterSpacing:1, marginBottom:5 }}>Phone</div>
+                          <input
+                            value={msgPhone} onChange={e => setMsgPhone(e.target.value)}
+                            placeholder="+1 (___) ___-____" type="tel"
+                            style={{ width:"100%", padding:"10px 12px", background:isDark?"rgba(255,255,255,0.05)":"#f5f5f5", border:`1px solid ${bord}`, borderRadius:7, color:text, fontFamily:"'Barlow',sans-serif", fontSize:13, outline:"none", boxSizing:"border-box", transition:"border-color 0.2s" }}
+                            onFocus={e => e.target.style.borderColor="#CC0000"}
+                            onBlur={e => e.target.style.borderColor=bord}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Pickup date */}
+                      <div>
+                        <div style={{ fontFamily:"'Barlow',sans-serif", fontSize:10, color:muted, letterSpacing:1, marginBottom:5 }}>Preferred Pickup Date</div>
+                        <input
+                          value={msgDate} onChange={e => setMsgDate(e.target.value)}
+                          type="date"
+                          style={{ width:"100%", padding:"10px 12px", background:isDark?"rgba(255,255,255,0.05)":"#f5f5f5", border:`1px solid ${bord}`, borderRadius:7, color:text, fontFamily:"'Barlow',sans-serif", fontSize:13, outline:"none", boxSizing:"border-box", colorScheme:isDark?"dark":"light", transition:"border-color 0.2s" }}
+                          onFocus={e => e.target.style.borderColor="#CC0000"}
+                          onBlur={e => e.target.style.borderColor=bord}
+                        />
+                      </div>
+
+                      {/* Message textarea */}
+                      <div>
+                        <div style={{ fontFamily:"'Barlow',sans-serif", fontSize:10, color:muted, letterSpacing:1, marginBottom:5 }}>Message</div>
+                        <textarea
+                          value={msgText} onChange={e => setMsgText(e.target.value)}
+                          placeholder={`Hi, I'm interested in the ${load.route} → ${load.dest} route. I'd like to book the ${load.cargo} load on the specified date. Please contact me with availability.`}
+                          rows={4}
+                          style={{ width:"100%", padding:"10px 12px", background:isDark?"rgba(255,255,255,0.05)":"#f5f5f5", border:`1px solid ${bord}`, borderRadius:7, color:text, fontFamily:"'Barlow',sans-serif", fontSize:13, outline:"none", boxSizing:"border-box", resize:"vertical", lineHeight:1.6, transition:"border-color 0.2s" }}
+                          onFocus={e => e.target.style.borderColor="#CC0000"}
+                          onBlur={e => e.target.style.borderColor=bord}
+                        />
+                      </div>
+
+                      {/* Send button */}
+                      <button
+                        onClick={() => { if (msgName || msgPhone) setMsgSent(true); }}
+                        style={{ padding:"12px", background:"linear-gradient(135deg,#CC0000,#ff4d4d)", border:"none", borderRadius:8, color:"#fff", fontFamily:"'Oswald',sans-serif", fontWeight:700, fontSize:14, letterSpacing:2, textTransform:"uppercase", cursor:"pointer", boxShadow:"0 6px 20px rgba(204,0,0,0.35)", transition:"all 0.2s" }}
+                        onMouseEnter={e => { e.currentTarget.style.transform="translateY(-2px)"; e.currentTarget.style.boxShadow="0 10px 28px rgba(204,0,0,0.5)"; }}
+                        onMouseLeave={e => { e.currentTarget.style.transform="none"; e.currentTarget.style.boxShadow="0 6px 20px rgba(204,0,0,0.35)"; }}
+                      >
+                        📨 Send to Dispatcher
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Right column — sticky booking card */}
@@ -365,23 +482,63 @@ export const LoadDetailPage: React.FC<LoadDetailPageProps> = ({
                   <div style={{ fontFamily:"'Barlow',sans-serif", fontSize:11, color:muted, marginTop:2 }}>24 / 7 · Mon–Sun</div>
                 </div>
 
-                {/* Call button */}
-                <a
-                  href="tel:+17862026599"
-                  style={{
-                    display:"flex", alignItems:"center", justifyContent:"center", gap:6,
-                    width:"100%", padding:"11px", marginBottom:10,
-                    background:isDark?"rgba(255,255,255,0.06)":"rgba(0,0,0,0.05)",
-                    border:`1px solid ${bord}`, borderRadius:8,
-                    color:text, fontFamily:"'Oswald',sans-serif", fontWeight:600,
-                    fontSize:13, letterSpacing:1.5, textTransform:"uppercase",
-                    textDecoration:"none", transition:"all 0.15s",
-                  }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor="#CC0000"; (e.currentTarget as HTMLElement).style.color="#CC0000"; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor=bord; (e.currentTarget as HTMLElement).style.color=text; }}
-                >
-                  📞 Call Dispatch
-                </a>
+                {/* Call + Message buttons row */}
+                <div style={{ display:"flex", gap:8, marginBottom:10 }}>
+                  <a
+                    href="tel:+17862026599"
+                    style={{
+                      flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:6,
+                      padding:"11px",
+                      background:isDark?"rgba(255,255,255,0.06)":"rgba(0,0,0,0.05)",
+                      border:`1px solid ${bord}`, borderRadius:8,
+                      color:text, fontFamily:"'Oswald',sans-serif", fontWeight:600,
+                      fontSize:12, letterSpacing:1.5, textTransform:"uppercase",
+                      textDecoration:"none", transition:"all 0.15s",
+                    }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor="#CC0000"; (e.currentTarget as HTMLElement).style.color="#CC0000"; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor=bord; (e.currentTarget as HTMLElement).style.color=text; }}
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+                    Call
+                  </a>
+
+                  {/* Animated message button */}
+                  <button
+                    onClick={() => {
+                      setMsgOpen(true);
+                      setTimeout(() => msgRef.current?.scrollIntoView({ behavior: "smooth", block: "center" }), 50);
+                    }}
+                    style={{
+                      flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:6,
+                      padding:"11px",
+                      background: "linear-gradient(135deg, rgba(204,0,0,0.15), rgba(204,0,0,0.08))",
+                      border:"1px solid rgba(204,0,0,0.35)", borderRadius:8,
+                      color:"#CC0000", fontFamily:"'Oswald',sans-serif", fontWeight:600,
+                      fontSize:12, letterSpacing:1.5, textTransform:"uppercase",
+                      cursor:"pointer", transition:"all 0.2s", position:"relative", overflow:"hidden",
+                    }}
+                    onMouseEnter={e => { e.currentTarget.style.background="linear-gradient(135deg,#CC0000,#ff4d4d)"; e.currentTarget.style.color="#fff"; e.currentTarget.style.borderColor="#CC0000"; }}
+                    onMouseLeave={e => { e.currentTarget.style.background="linear-gradient(135deg, rgba(204,0,0,0.15), rgba(204,0,0,0.08))"; e.currentTarget.style.color="#CC0000"; e.currentTarget.style.borderColor="rgba(204,0,0,0.35)"; }}
+                  >
+                    <style>{`
+                      @keyframes msgPulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.18)} }
+                      @keyframes msgDot1 { 0%,80%,100%{transform:scale(0);opacity:0} 40%{transform:scale(1);opacity:1} }
+                      @keyframes msgDot2 { 0%,20%,100%{transform:scale(0);opacity:0} 60%{transform:scale(1);opacity:1} }
+                      @keyframes msgDot3 { 0%,40%,100%{transform:scale(0);opacity:0} 80%{transform:scale(1);opacity:1} }
+                    `}</style>
+                    <span style={{ display:"flex", alignItems:"center", gap:2, animation:"msgPulse 2s ease infinite" }}>
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
+                      </svg>
+                      <span style={{ display:"flex", gap:2, marginLeft:2 }}>
+                        <span style={{ width:3, height:3, borderRadius:"50%", background:"currentColor", display:"inline-block", animation:"msgDot1 1.4s ease infinite" }} />
+                        <span style={{ width:3, height:3, borderRadius:"50%", background:"currentColor", display:"inline-block", animation:"msgDot2 1.4s ease infinite" }} />
+                        <span style={{ width:3, height:3, borderRadius:"50%", background:"currentColor", display:"inline-block", animation:"msgDot3 1.4s ease infinite" }} />
+                      </span>
+                    </span>
+                    Message
+                  </button>
+                </div>
 
                 {/* Book / Cancel button */}
                 <button

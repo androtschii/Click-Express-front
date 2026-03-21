@@ -9,11 +9,13 @@ interface LoadCardProps {
   onSave?: (saved: boolean, load?: Load) => void;
   onDetails?: (load: Load) => void;
   isBooked?: boolean;
+  isSaved?: boolean;
 }
 
 const HeartIcon = ({ saved, onClick }: { saved: boolean; onClick: () => void }) => {
   const [burst, setBurst] = useState(false);
-  const handleClick = () => {
+  const handleClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); // prevent opening detail page
     if (!saved) { setBurst(true); setTimeout(() => setBurst(false), 600); }
     onClick();
   };
@@ -38,14 +40,15 @@ const HeartIcon = ({ saved, onClick }: { saved: boolean; onClick: () => void }) 
   );
 };
 
-export const LoadCard: React.FC<LoadCardProps> = ({ load, onBook, onCancelBook, onSave, onDetails, isBooked = false }) => {
+export const LoadCard: React.FC<LoadCardProps> = ({ load, onBook, onCancelBook, onSave, onDetails, isBooked = false, isSaved = false }) => {
   const context = useContext(ThemeContext) as { theme?: 'dark' | 'light' };
   const theme = context.theme || 'dark';
   const isDark = theme === 'dark';
 
   const [booked, setBooked] = useState(isBooked);
   useEffect(() => { setBooked(isBooked); }, [isBooked]);
-  const [saved, setSaved] = useState(false);
+  const [saved, setSaved] = useState(isSaved);
+  useEffect(() => { setSaved(isSaved); }, [isSaved]);
   const [hov, setHov] = useState(false);
   const [bookHov, setBookHov] = useState(false);
 

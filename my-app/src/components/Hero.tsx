@@ -101,6 +101,7 @@ export const Hero: React.FC<HeroProps> = ({ onViewLoads, onQuoteClick }) => {
             padding: "5px 16px",
             marginBottom: 28,
             background: "rgba(204,0,0,0.08)",
+            animation: "heroSlideIn 0.6s ease 0.1s both",
           }}
         >
           <div
@@ -135,6 +136,7 @@ export const Hero: React.FC<HeroProps> = ({ onViewLoads, onQuoteClick }) => {
             lineHeight: 0.9,
             margin: "0 0 8px",
             textTransform: "uppercase",
+            animation: "heroFadeUp 0.6s ease 0.2s both",
           }}
         >
           INFRASTRUCTURE
@@ -149,6 +151,7 @@ export const Hero: React.FC<HeroProps> = ({ onViewLoads, onQuoteClick }) => {
             lineHeight: 0.9,
             margin: "0 0 8px",
             textTransform: "uppercase",
+            animation: "heroFadeUp 0.6s ease 0.35s both",
           }}
         >
           DOESN'T MOVE
@@ -162,6 +165,7 @@ export const Hero: React.FC<HeroProps> = ({ onViewLoads, onQuoteClick }) => {
             lineHeight: 0.9,
             margin: "0 0 32px",
             textTransform: "uppercase",
+            animation: "heroFadeUp 0.6s ease 0.5s both",
           }}
         >
           WE DO.
@@ -175,20 +179,21 @@ export const Hero: React.FC<HeroProps> = ({ onViewLoads, onQuoteClick }) => {
             lineHeight: 1.8,
             maxWidth: 500,
             marginBottom: 40,
+            animation: "heroFadeUp 0.6s ease 0.65s both",
           }}
         >
           Our purpose is to empower businesses with uninterrupted performance, ensuring
           stability, reliability, and efficiency in everything they do.
         </p>
 
-        <div style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
+        <div style={{ display: "flex", gap: 14, flexWrap: "wrap", animation: "heroFadeUp 0.6s ease 0.8s both" }}>
           <HeroBtn primary onClick={onViewLoads}>
             VIEW AVAILABLE LOADS
           </HeroBtn>
           <HeroBtn onClick={onQuoteClick}>GET A FREE QUOTE</HeroBtn>
         </div>
       </div>
-      <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.35}}`}</style>
+      <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.35}} @keyframes heroFadeUp { from { opacity:0; transform:translateY(28px); } to { opacity:1; transform:translateY(0); } } @keyframes heroSlideIn { from { opacity:0; transform:translateX(-24px); } to { opacity:1; transform:translateX(0); } }`}</style>
     </section>
   );
 };

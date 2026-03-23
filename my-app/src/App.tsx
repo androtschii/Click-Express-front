@@ -11,13 +11,15 @@ import { AuthModal } from "./components/AuthModal";
 import { getSession, logout, type Session } from "./services/authService";
 import { LoadListView } from "./components/LoadList";
 import { LoadDetailPage } from "./components/LoadDetailPage";
+import { CareersPage } from "./components/CareersPage";
 import { Notification } from "./components/Notification";
+import { PhoneIcon } from "./components/PhoneIcon";
 import { LOADS } from "./utils/data";
 import type { Load } from "./types/index";
 import { filterLoads, fetchLoads } from "./services/loadService.ts";
 
 // ── Панель избранного ─────────────────────────────────────────────────────
-function FavoritesPanel({ loads, theme, onClose, onDetails }: { loads: Load[]; theme: string; onClose: () => void; onDetails?: (l: Load) => void }) {
+function FavoritesPanel({ loads, theme, onClose, onDetails, onRemove }: { loads: Load[]; theme: string; onClose: () => void; onDetails?: (l: Load) => void; onRemove?: (l: Load) => void }) {
   const isDark = theme === "dark";
   const bord = isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.08)";
   return (
@@ -42,25 +44,41 @@ function FavoritesPanel({ loads, theme, onClose, onDetails }: { loads: Load[]; t
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = "#CC0000"; (e.currentTarget as HTMLElement).style.transform = "translateY(-2px)"; (e.currentTarget as HTMLElement).style.boxShadow = "0 8px 24px rgba(0,0,0,0.4)"; }}
               onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = bord; (e.currentTarget as HTMLElement).style.transform = "none"; (e.currentTarget as HTMLElement).style.boxShadow = "none"; }}
             >
-              <div style={{ position: "relative", height: 120 }}>
+              <div style={{ position: "relative", height: 110 }}>
                 <img src={l.image} alt={l.route} style={{ width: "100%", height: "100%", objectFit: "cover", filter: "brightness(0.65)" }} />
                 <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, transparent 30%, rgba(0,0,0,0.85))" }} />
                 <div style={{ position: "absolute", top: 8, right: 8, background: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 12, padding: "3px 8px", fontFamily: "'Barlow',sans-serif", fontSize: 9, color: "rgba(255,255,255,0.7)", letterSpacing: 1, backdropFilter: "blur(4px)" }}>VIEW →</div>
-                <div style={{ position: "absolute", bottom: 10, left: 12 }}>
-                  <div style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 22, color: "#fff" }}>${l.price.toLocaleString()} <span style={{ fontSize: 12, color: "rgba(255,255,255,0.5)" }}>/ {l.miles.toLocaleString()} mi</span></div>
-                  <div style={{ display: "inline-block", background: "#CC0000", color: "#fff", fontFamily: "'Barlow',sans-serif", fontWeight: 800, fontSize: 8, letterSpacing: 2, textTransform: "uppercase", padding: "2px 8px", borderRadius: 2, marginTop: 3 }}>{l.type}</div>
+                <div style={{ position: "absolute", bottom: 8, left: 12 }}>
+                  <div style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 20, color: "#fff" }}>${l.price.toLocaleString()} <span style={{ fontSize: 11, color: "rgba(255,255,255,0.5)" }}>/ {l.miles.toLocaleString()} mi</span></div>
+                  <div style={{ display: "inline-block", background: "#CC0000", color: "#fff", fontFamily: "'Barlow',sans-serif", fontWeight: 800, fontSize: 7, letterSpacing: 2, textTransform: "uppercase", padding: "2px 8px", borderRadius: 2, marginTop: 2 }}>{l.type}</div>
                 </div>
               </div>
-              <div style={{ padding: "10px 12px" }}>
-                <div style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 12, color: isDark ? "rgba(255,255,255,0.85)" : "#1a1a1a" }}>{l.route} → {l.dest}</div>
-                <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 10, color: isDark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.45)", textTransform: "uppercase", letterSpacing: 1, marginTop: 3 }}>{l.cargo}</div>
+              <div style={{ padding: "8px 12px 10px" }}>
+                <div style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 12, color: isDark ? "rgba(255,255,255,0.85)" : "#1a1a1a", marginBottom: 2 }}>{l.route} → {l.dest}</div>
+                <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 10, color: isDark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.45)", textTransform: "uppercase", letterSpacing: 1, marginBottom: 8 }}>{l.cargo}</div>
+                {/* Action buttons */}
+                <div style={{ display: "flex", gap: 8 }} onClick={e => e.stopPropagation()}>
+                  <button onClick={() => { onClose(); setTimeout(() => onDetails && onDetails(l), 120); }} style={{ flex: 1, padding: "6px", background: "rgba(204,0,0,0.1)", border: "1px solid rgba(204,0,0,0.3)", borderRadius: 6, color: "#CC0000", fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 10, letterSpacing: 1, textTransform: "uppercase", cursor: "pointer", transition: "all 0.15s" }}
+                    onMouseEnter={e => { e.currentTarget.style.background = "#CC0000"; e.currentTarget.style.color = "#fff"; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = "rgba(204,0,0,0.1)"; e.currentTarget.style.color = "#CC0000"; }}>
+                    View Details →
+                  </button>
+                  <button onClick={() => onRemove && onRemove(l)} style={{ padding: "6px 12px", background: "rgba(255,255,255,0.05)", border: `1px solid ${bord}`, borderRadius: 6, color: isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.4)", fontFamily: "'Barlow',sans-serif", fontSize: 10, cursor: "pointer", display: "flex", alignItems: "center", gap: 4, transition: "all 0.15s" }}
+                    onMouseEnter={e => { e.currentTarget.style.borderColor = "#ff4d6d"; e.currentTarget.style.color = "#ff4d6d"; e.currentTarget.style.background = "rgba(255,77,109,0.1)"; }}
+                    onMouseLeave={e => { e.currentTarget.style.borderColor = bord; e.currentTarget.style.color = isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.4)"; e.currentTarget.style.background = "rgba(255,255,255,0.05)"; }}>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                    Unlike
+                  </button>
+                </div>
               </div>
             </div>
           ))}
         </div>
         {loads.length > 0 && (
-          <div style={{ padding: "16px 24px", borderTop: `1px solid ${bord}`, textAlign: "center" }}>
-            <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 12, color: isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.4)" }}>📞 To book: <span style={{ color: "#CC0000", fontWeight: 700 }}>+1 786-202-6599</span></div>
+          <div style={{ padding: "14px 24px", borderTop: `1px solid ${bord}`, display: "flex", alignItems: "center", gap: 8 }}>
+            <PhoneIcon size={14} color="#CC0000" />
+            <span style={{ fontFamily: "'Barlow',sans-serif", fontSize: 12, color: isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.4)" }}>To book: </span>
+            <a href="tel:+17862026599" style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 13, color: "#CC0000", textDecoration: "none" }}>+1 786-202-6599</a>
           </div>
         )}
       </div>
@@ -69,13 +87,14 @@ function FavoritesPanel({ loads, theme, onClose, onDetails }: { loads: Load[]; t
 }
 
 // ── Панель заявок ─────────────────────────────────────────────────────────
-function RequestsPanel({ loads, theme, onClose, onDetails }: { loads: Load[]; theme: string; onClose: () => void; onDetails?: (l: Load) => void }) {
+function RequestsPanel({ loads, theme, onClose, onDetails, onCancel }: { loads: Load[]; theme: string; onClose: () => void; onDetails?: (l: Load) => void; onCancel?: (l: Load) => void }) {
   const isDark = theme === "dark";
+  const bord = isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.08)";
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 2000, background: "rgba(0,0,0,0.7)", backdropFilter: "blur(6px)" }} onClick={onClose}>
       <div onClick={e => e.stopPropagation()} style={{ position: "absolute", right: 0, top: 0, bottom: 0, width: "min(480px, 100vw)", background: isDark ? "#0f0f0f" : "#fff", borderLeft: "2px solid #CC0000", display: "flex", flexDirection: "column", boxShadow: "-20px 0 60px rgba(0,0,0,0.5)" }}>
         {/* Заголовок */}
-        <div style={{ padding: "24px 24px 16px", borderBottom: `1px solid ${isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.08)"}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div style={{ padding: "24px 24px 16px", borderBottom: `1px solid ${bord}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <div>
             <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 10, color: "#CC0000", letterSpacing: 3, textTransform: "uppercase", marginBottom: 4 }}>Booked</div>
             <h3 style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 22, color: isDark ? "#fff" : "#1a1a1a", textTransform: "uppercase" }}>REQUESTS <span style={{ color: "#CC0000" }}>({loads.length})</span></h3>
@@ -94,34 +113,46 @@ function RequestsPanel({ loads, theme, onClose, onDetails }: { loads: Load[]; th
           ) : loads.map((l, idx) => (
             <div key={`${l.id}-${idx}`}
               onClick={() => { onClose(); setTimeout(() => onDetails && onDetails(l), 120); }}
-              style={{ background: isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)", border: `1px solid ${isDark ? "rgba(0,180,80,0.2)" : "rgba(0,180,80,0.3)"}`, borderRadius: 10, overflow: "hidden", cursor: "pointer", transition: "all 0.2s" }}
+              style={{ background: isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)", border: "1px solid rgba(0,180,80,0.25)", borderRadius: 10, overflow: "hidden", cursor: "pointer", transition: "all 0.2s" }}
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = "#CC0000"; (e.currentTarget as HTMLElement).style.transform = "translateY(-2px)"; (e.currentTarget as HTMLElement).style.boxShadow = "0 8px 24px rgba(0,0,0,0.4)"; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = isDark ? "rgba(0,180,80,0.2)" : "rgba(0,180,80,0.3)"; (e.currentTarget as HTMLElement).style.transform = "none"; (e.currentTarget as HTMLElement).style.boxShadow = "none"; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(0,180,80,0.25)"; (e.currentTarget as HTMLElement).style.transform = "none"; (e.currentTarget as HTMLElement).style.boxShadow = "none"; }}
             >
-              <div style={{ position: "relative", height: 130 }}>
+              <div style={{ position: "relative", height: 120 }}>
                 <img src={l.image} alt={l.route} style={{ width: "100%", height: "100%", objectFit: "cover", filter: "brightness(0.6)" }} />
                 <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, transparent 20%, rgba(0,0,0,0.9))" }} />
                 <div style={{ position: "absolute", top: 10, right: 10, display: "flex", gap: 6 }}>
                   <div style={{ background: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.15)", color: "rgba(255,255,255,0.8)", borderRadius: 12, padding: "3px 8px", fontFamily: "'Barlow',sans-serif", fontSize: 9, letterSpacing: 1, backdropFilter: "blur(4px)" }}>VIEW →</div>
                   <div style={{ background: "rgba(0,180,80,0.9)", color: "#fff", borderRadius: 20, padding: "4px 12px", fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 10, letterSpacing: 1 }}>✓ REQUESTED</div>
                 </div>
-                <div style={{ position: "absolute", bottom: 10, left: 12 }}>
-                  <div style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 24, color: "#fff", lineHeight: 1 }}>
-                    ${l.price.toLocaleString()}
-                    <span style={{ fontSize: 11, color: "rgba(255,255,255,0.5)", marginLeft: 5 }}>/ {l.miles.toLocaleString()} mi</span>
+                <div style={{ position: "absolute", bottom: 8, left: 12 }}>
+                  <div style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 22, color: "#fff", lineHeight: 1 }}>
+                    ${l.price.toLocaleString()} <span style={{ fontSize: 11, color: "rgba(255,255,255,0.5)" }}>/ {l.miles.toLocaleString()} mi</span>
                   </div>
-                  <div style={{ display: "inline-block", background: "#CC0000", color: "#fff", fontFamily: "'Barlow',sans-serif", fontWeight: 800, fontSize: 7, letterSpacing: 2, textTransform: "uppercase", padding: "2px 8px", borderRadius: 2, marginTop: 4 }}>{l.type}</div>
+                  <div style={{ display: "inline-block", background: "#CC0000", color: "#fff", fontFamily: "'Barlow',sans-serif", fontWeight: 800, fontSize: 7, letterSpacing: 2, textTransform: "uppercase", padding: "2px 8px", borderRadius: 2, marginTop: 3 }}>{l.type}</div>
                 </div>
               </div>
-              <div style={{ padding: "12px 14px" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 5, marginBottom: 6 }}>
+              <div style={{ padding: "10px 14px 12px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 5, marginBottom: 4 }}>
                   <div style={{ width: 6, height: 6, borderRadius: "50%", border: "2px solid #CC0000", flexShrink: 0 }} />
                   <span style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 12, color: isDark ? "rgba(255,255,255,0.9)" : "#1a1a1a" }}>{l.route}</span>
                   <span style={{ color: "#CC0000", fontSize: 10 }}>→</span>
                   <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#CC0000", flexShrink: 0 }} />
                   <span style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 12, color: isDark ? "rgba(255,255,255,0.9)" : "#1a1a1a" }}>{l.dest}</span>
                 </div>
-                <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 10, color: isDark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.45)", textTransform: "uppercase", letterSpacing: 1 }}>{l.cargo}</div>
+                <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 10, color: isDark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.45)", textTransform: "uppercase", letterSpacing: 1, marginBottom: 8 }}>{l.cargo}</div>
+                {/* Action buttons */}
+                <div style={{ display: "flex", gap: 8 }} onClick={e => e.stopPropagation()}>
+                  <button onClick={() => { onClose(); setTimeout(() => onDetails && onDetails(l), 120); }} style={{ flex: 1, padding: "6px", background: "rgba(204,0,0,0.1)", border: "1px solid rgba(204,0,0,0.3)", borderRadius: 6, color: "#CC0000", fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 10, letterSpacing: 1, textTransform: "uppercase", cursor: "pointer", transition: "all 0.15s" }}
+                    onMouseEnter={e => { e.currentTarget.style.background = "#CC0000"; e.currentTarget.style.color = "#fff"; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = "rgba(204,0,0,0.1)"; e.currentTarget.style.color = "#CC0000"; }}>
+                    View Details →
+                  </button>
+                  <button onClick={() => onCancel && onCancel(l)} style={{ padding: "6px 12px", background: "rgba(255,255,255,0.04)", border: `1px solid ${bord}`, borderRadius: 6, color: isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.4)", fontFamily: "'Barlow',sans-serif", fontSize: 10, cursor: "pointer", display: "flex", alignItems: "center", gap: 4, transition: "all 0.15s" }}
+                    onMouseEnter={e => { e.currentTarget.style.borderColor = "#CC0000"; e.currentTarget.style.color = "#CC0000"; e.currentTarget.style.background = "rgba(204,0,0,0.08)"; }}
+                    onMouseLeave={e => { e.currentTarget.style.borderColor = bord; e.currentTarget.style.color = isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.4)"; e.currentTarget.style.background = "rgba(255,255,255,0.04)"; }}>
+                    ✕ Cancel
+                  </button>
+                </div>
               </div>
             </div>
           ))}
@@ -132,7 +163,7 @@ function RequestsPanel({ loads, theme, onClose, onDetails }: { loads: Load[]; th
           <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 12, color: isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.4)" }}>
             Our dispatcher will contact you shortly
           </div>
-          <a href="tel:+17862026599" style={{ display: "block", marginTop: 6, fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 14, color: "#CC0000", textDecoration: "none" }}>📞 +1 786-202-6599</a>
+          <a href="tel:+17862026599" style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 6, fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 14, color: "#CC0000", textDecoration: "none" }}><PhoneIcon size={14} color="#CC0000" />+1 786-202-6599</a>
         </div>
       </div>
     </div>
@@ -154,6 +185,7 @@ function AppContent() {
   const [showAuth, setShowAuth] = useState(false);
   const [session, setSession] = useState<Session | null>(() => getSession());
   const [detailLoad, setDetailLoad] = useState<Load | null>(null);
+  const [showCareers, setShowCareers] = useState(false);
   const [notifications, setNotifications] = useState<string[]>([]);
 
   const catalogRef = useRef<HTMLDivElement>(null);
@@ -224,16 +256,16 @@ function AppContent() {
       savedCount={savedLoads.length}
       theme={theme}
       onThemeToggle={toggleTheme}
-      onCatalogClick={() => { setDetailLoad(null); setTimeout(() => scrollTo(catalogRef), 50); }}
-      onAboutClick={() => { setDetailLoad(null); setTimeout(() => scrollTo(aboutRef), 50); }}
-      onContactClick={() => { setDetailLoad(null); setTimeout(() => scrollTo(contactRef), 50); }}
+      onCatalogClick={() => { setDetailLoad(null); setShowCareers(false); setTimeout(() => scrollTo(catalogRef), 50); }}
+      onAboutClick={() => { setDetailLoad(null); setShowCareers(false); setTimeout(() => scrollTo(aboutRef), 50); }}
+      onContactClick={() => { setDetailLoad(null); setShowCareers(false); setTimeout(() => scrollTo(contactRef), 50); }}
       onQuoteClick={() => setShowQuote(true)}
       onSavedClick={() => setShowFavorites(true)}
       onRequestsClick={() => setShowRequests(true)}
       onLoginClick={() => setShowAuth(true)}
       session={session}
       onLogout={() => { logout(); setSession(null); }}
-      onLogoClick={() => { setDetailLoad(null); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+      onLogoClick={() => { setDetailLoad(null); setShowCareers(false); window.scrollTo({ top: 0, behavior: "smooth" }); }}
     />
   );
 
@@ -255,11 +287,26 @@ function AppContent() {
         </div>
         {showAuth && <AuthModal onClose={() => setShowAuth(false)} theme={theme} onSuccess={(s) => { setSession(s); setShowAuth(false); }} />}
         {showQuote && <QuoteModal onClose={() => setShowQuote(false)} theme={theme} />}
-        {showFavorites && <FavoritesPanel loads={savedLoads} theme={theme} onClose={() => setShowFavorites(false)} onDetails={(l) => { setShowFavorites(false); setDetailLoad(l); window.scrollTo({ top: 0 }); }} />}
-        {showRequests && <RequestsPanel loads={bookedLoads} theme={theme} onClose={() => setShowRequests(false)} onDetails={(l) => { setShowRequests(false); setDetailLoad(l); window.scrollTo({ top: 0 }); }} />}
+        {showFavorites && <FavoritesPanel loads={savedLoads} theme={theme} onClose={() => setShowFavorites(false)} onDetails={(l) => { setShowFavorites(false); setDetailLoad(l); window.scrollTo({ top: 0 }); }} onRemove={(l) => { handleSave(l, false); notify("Removed from favorites"); }} />}
+        {showRequests && <RequestsPanel loads={bookedLoads} theme={theme} onClose={() => setShowRequests(false)} onDetails={(l) => { setShowRequests(false); setDetailLoad(l); window.scrollTo({ top: 0 }); }} onCancel={(l) => handleCancelBook(l)} />}
         {notifications.map((msg, idx) => (
           <Notification key={idx} text={msg} onClose={() => setNotifications(n => n.filter((_, i) => i !== idx))} />
         ))}
+      </div>
+    );
+  }
+
+  // ── Careers page ──────────────────────────────────────────────────────
+  if (showCareers) {
+    return (
+      <div style={{ background: bgColor, minHeight: "100vh", color: textColor }}>
+        {sharedStyle}
+        {sharedHeader}
+        <div style={{ paddingTop: 70 }}>
+          <CareersPage theme={theme} onBack={() => { setShowCareers(false); window.scrollTo({ top: 0 }); }} />
+        </div>
+        {showAuth && <AuthModal onClose={() => setShowAuth(false)} theme={theme} onSuccess={(s) => { setSession(s); setShowAuth(false); }} />}
+        {showQuote && <QuoteModal onClose={() => setShowQuote(false)} theme={theme} />}
       </div>
     );
   }
@@ -276,7 +323,69 @@ function AppContent() {
         <AboutSection onContactClick={() => scrollTo(contactRef)} theme={theme} />
       </div>
 
-      <section ref={catalogRef} style={{ maxWidth: 1240, margin: "0 auto", padding: "72px clamp(20px,4vw,56px) 80px" }}>
+      {/* ── WEEKLY BEST ──────────────────────────────────────────────────── */}
+      {!loading && (() => {
+        const best = loads.filter(l => l.tag === "Best Load of the Week").slice(0, 4);
+        if (!best.length) return null;
+        return (
+          <section style={{ maxWidth: 1240, margin: "0 auto", padding: "56px clamp(20px,4vw,56px) 0" }}>
+            <style>{`
+              @keyframes weeklyGlow { 0%,100%{box-shadow:0 0 20px rgba(204,0,0,0.25)} 50%{box-shadow:0 0 40px rgba(204,0,0,0.55)} }
+              @keyframes starSpin { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }
+            `}</style>
+            {/* Header */}
+            <div style={{ display:"flex", alignItems:"center", gap:16, marginBottom:24 }}>
+              <div style={{ width:44, height:44, borderRadius:"50%", background:"linear-gradient(135deg,#CC0000,#ff4d4d)", display:"flex", alignItems:"center", justifyContent:"center", animation:"weeklyGlow 2s ease infinite", flexShrink:0 }}>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="#fff"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              </div>
+              <div>
+                <div style={{ fontFamily:"'Barlow',sans-serif", fontWeight:700, fontSize:10, color:"#CC0000", letterSpacing:4, textTransform:"uppercase", marginBottom:4 }}>★ Weekly Special</div>
+                <h2 style={{ fontFamily:"'Oswald',sans-serif", fontWeight:700, fontSize:"clamp(26px,4vw,42px)", color:textColor, textTransform:"uppercase", lineHeight:1 }}>
+                  BEST LOAD <span style={{ color:"#CC0000" }}>OF THE WEEK</span>
+                </h2>
+              </div>
+            </div>
+
+            {/* Horizontal scroll cards */}
+            <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))", gap:16 }}>
+              {best.map((l, i) => (
+                <div key={l.id} onClick={() => { setDetailLoad(l); window.scrollTo({ top:0, behavior:"smooth" }); }}
+                  style={{ borderRadius:12, overflow:"hidden", cursor:"pointer", border:"1px solid rgba(204,0,0,0.35)", background:cardBg, animation:`weeklyGlow ${2 + i * 0.3}s ease infinite`, transition:"transform 0.25s, box-shadow 0.25s", position:"relative" }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform="translateY(-6px)"; (e.currentTarget as HTMLElement).style.border="1px solid #CC0000"; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform="none"; (e.currentTarget as HTMLElement).style.border="1px solid rgba(204,0,0,0.35)"; }}
+                >
+                  {/* Star badge */}
+                  <div style={{ position:"absolute", top:10, left:10, zIndex:2, background:"linear-gradient(135deg,#CC0000,#ff4d4d)", borderRadius:20, padding:"4px 10px", display:"flex", alignItems:"center", gap:5, boxShadow:"0 4px 12px rgba(204,0,0,0.5)" }}>
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="#fff"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <span style={{ fontFamily:"'Barlow',sans-serif", fontWeight:800, fontSize:8, color:"#fff", letterSpacing:1.5, textTransform:"uppercase" }}>Best of Week</span>
+                  </div>
+                  <div style={{ position:"relative", height:160 }}>
+                    <img src={l.image} alt={l.route} style={{ width:"100%", height:"100%", objectFit:"cover", filter:"brightness(0.6)" }} />
+                    <div style={{ position:"absolute", inset:0, background:"linear-gradient(to bottom,transparent 30%,rgba(0,0,0,0.9))" }} />
+                    <div style={{ position:"absolute", bottom:12, left:14 }}>
+                      <div style={{ fontFamily:"'Oswald',sans-serif", fontWeight:700, fontSize:28, color:"#fff", lineHeight:1, textShadow:"0 2px 8px rgba(0,0,0,0.8)" }}>${l.price.toLocaleString()}</div>
+                      <div style={{ fontFamily:"'Barlow',sans-serif", fontSize:11, color:"rgba(255,255,255,0.55)", marginTop:2 }}>{l.miles.toLocaleString()} miles · {(l.price/l.miles).toFixed(2)}/mi</div>
+                    </div>
+                  </div>
+                  <div style={{ padding:"12px 14px 14px" }}>
+                    <div style={{ display:"flex", alignItems:"center", gap:6, marginBottom:4 }}>
+                      <div style={{ width:7, height:7, borderRadius:"50%", border:"2px solid #CC0000" }} />
+                      <span style={{ fontFamily:"'Barlow',sans-serif", fontWeight:700, fontSize:12, color:textColor }}>{l.route}</span>
+                      <span style={{ color:"#CC0000" }}>→</span>
+                      <div style={{ width:7, height:7, borderRadius:"50%", background:"#CC0000" }} />
+                      <span style={{ fontFamily:"'Barlow',sans-serif", fontWeight:700, fontSize:12, color:textColor }}>{l.dest}</span>
+                    </div>
+                    <div style={{ fontFamily:"'Barlow',sans-serif", fontSize:10, color:theme==="dark"?"rgba(255,255,255,0.35)":"rgba(0,0,0,0.45)", textTransform:"uppercase", letterSpacing:1 }}>{l.cargo}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div style={{ height:1, background:"linear-gradient(to right,transparent,rgba(204,0,0,0.4),transparent)", margin:"40px 0 0" }} />
+          </section>
+        );
+      })()}
+
+      <section ref={catalogRef} style={{ maxWidth: 1240, margin: "0 auto", padding: "56px clamp(20px,4vw,56px) 80px" }}>
         <div style={{ marginBottom: 36 }}>
           <div style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 10, color: "#CC0000", letterSpacing: 4, textTransform: "uppercase", marginBottom: 10 }}>— Available Now</div>
           <h2 style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: "clamp(34px,5.5vw,56px)", color: textColor, textTransform: "uppercase", lineHeight: 1 }}>
@@ -305,13 +414,13 @@ function AppContent() {
       </section>
 
       <div ref={contactRef}>
-        <Footer theme={theme} onCatalogClick={() => scrollTo(catalogRef)} onAboutClick={() => scrollTo(aboutRef)} onQuoteClick={() => setShowQuote(true)} />
+        <Footer theme={theme} onCatalogClick={() => scrollTo(catalogRef)} onAboutClick={() => scrollTo(aboutRef)} onQuoteClick={() => setShowQuote(true)} onContactClick={() => scrollTo(contactRef)} onCareersClick={() => { setShowCareers(true); window.scrollTo({ top: 0, behavior: "smooth" }); }} />
       </div>
 
       {showAuth && <AuthModal onClose={() => setShowAuth(false)} theme={theme} onSuccess={(s) => { setSession(s); setShowAuth(false); }} />}
       {showQuote && <QuoteModal onClose={() => setShowQuote(false)} theme={theme} />}
-      {showFavorites && <FavoritesPanel loads={savedLoads} theme={theme} onClose={() => setShowFavorites(false)} onDetails={(l) => { setShowFavorites(false); setDetailLoad(l); window.scrollTo({ top: 0 }); }} />}
-      {showRequests && <RequestsPanel loads={bookedLoads} theme={theme} onClose={() => setShowRequests(false)} onDetails={(l) => { setShowRequests(false); setDetailLoad(l); window.scrollTo({ top: 0 }); }} />}
+      {showFavorites && <FavoritesPanel loads={savedLoads} theme={theme} onClose={() => setShowFavorites(false)} onDetails={(l) => { setShowFavorites(false); setDetailLoad(l); window.scrollTo({ top: 0 }); }} onRemove={(l) => { handleSave(l, false); notify("Removed from favorites"); }} />}
+      {showRequests && <RequestsPanel loads={bookedLoads} theme={theme} onClose={() => setShowRequests(false)} onDetails={(l) => { setShowRequests(false); setDetailLoad(l); window.scrollTo({ top: 0 }); }} onCancel={(l) => handleCancelBook(l)} />}
       {notifications.map((msg, idx) => (
         <Notification key={idx} text={msg} onClose={() => setNotifications(n => n.filter((_, i) => i !== idx))} />
       ))}

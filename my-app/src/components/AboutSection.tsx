@@ -25,17 +25,17 @@ const InstagramIcon = () => (
   </svg>
 );
 
-// Messenger SVG иконка
-const MessengerIcon = () => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-    <defs>
-      <linearGradient id="mg1" x1="0%" y1="100%" x2="100%" y2="0%">
-        <stop offset="0%" stopColor="#0078FF"/>
-        <stop offset="100%" stopColor="#A033FF"/>
-      </linearGradient>
-    </defs>
-    <path d="M12 2C6.477 2 2 6.145 2 11.259c0 2.7 1.1 5.13 2.89 6.89L4.5 21l2.94-1.54A10.52 10.52 0 0012 20.52C17.523 20.52 22 16.373 22 11.26 22 6.145 17.523 2 12 2z" fill="url(#mg1)"/>
-    <path d="M6.5 14l3.5-3.75 2 2 3.5-2.25-3.5 3.75-2-2L6.5 14z" fill="#fff"/>
+// LinkedIn SVG иконка
+const LinkedInIcon = () => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="#0A66C2">
+    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+  </svg>
+);
+
+// Facebook SVG иконка
+const FacebookIcon = () => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="#1877F2">
+    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
   </svg>
 );
 
@@ -44,17 +44,6 @@ const MapIcon = () => (
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
     <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="#CC0000"/>
     <circle cx="12" cy="9" r="2.5" fill="#fff"/>
-  </svg>
-);
-
-// Website иконка
-const WebIcon = () => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-    <circle cx="12" cy="12" r="9" stroke="#4A90D9" strokeWidth="1.8" fill="none"/>
-    <ellipse cx="12" cy="12" rx="4" ry="9" stroke="#4A90D9" strokeWidth="1.8" fill="none"/>
-    <line x1="3" y1="12" x2="21" y2="12" stroke="#4A90D9" strokeWidth="1.8"/>
-    <line x1="3" y1="8" x2="21" y2="8" stroke="#4A90D9" strokeWidth="1.2" strokeDasharray="2"/>
-    <line x1="3" y1="16" x2="21" y2="16" stroke="#4A90D9" strokeWidth="1.2" strokeDasharray="2"/>
   </svg>
 );
 
@@ -84,19 +73,19 @@ const contacts = [
     highlight: false,
   },
   {
-    icon: <WebIcon />,
-    iconBg: "rgba(74,144,217,0.15)",
-    label: "Website",
-    value: "clickexpressinc.com",
-    href: "https://clickexpressinc.com",
+    icon: <LinkedInIcon />,
+    iconBg: "rgba(10,102,194,0.15)",
+    label: "LinkedIn",
+    value: "Click Express Inc",
+    href: "https://www.linkedin.com/company/clickexpressinc",
     highlight: false,
   },
   {
-    icon: <MessengerIcon />,
-    iconBg: "rgba(160,51,255,0.15)",
-    label: "Messenger",
-    value: "Click Express inc",
-    href: "https://m.me/clickexpressinc",
+    icon: <FacebookIcon />,
+    iconBg: "rgba(24,119,242,0.15)",
+    label: "Facebook",
+    value: "Click Express Inc",
+    href: "https://www.facebook.com/share/1FP9dJ2L4i/",
     highlight: false,
   },
   {

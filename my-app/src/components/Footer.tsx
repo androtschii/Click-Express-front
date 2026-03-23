@@ -1,28 +1,53 @@
 import React, { useState } from "react";
 import { CELogo } from "./Logo";
+import { PhoneIcon } from "./PhoneIcon";
 
 interface FooterProps {
-  theme?: 'dark' | 'light';
+  theme?: "dark" | "light";
   onCatalogClick?: () => void;
   onAboutClick?: () => void;
   onQuoteClick?: () => void;
+  onContactClick?: () => void;
+  onCareersClick?: () => void;
 }
 
-const FooterLink: React.FC<{ children: React.ReactNode; onClick?: () => void }> = ({ children, onClick }) => {
+const FooterLink: React.FC<{
+  children: React.ReactNode;
+  onClick?: () => void;
+  href?: string;
+  target?: string;
+}> = ({ children, onClick, href, target }) => {
   const [hov, setHov] = useState(false);
+  const style: React.CSSProperties = {
+    color: hov ? "#CC0000" : "rgba(255,255,255,0.35)",
+    fontSize: 13,
+    marginBottom: 10,
+    fontFamily: "'Barlow',sans-serif",
+    cursor: "pointer",
+    transition: "color 0.15s",
+    display: "block",
+    textDecoration: "none",
+  };
+  if (href) {
+    return (
+      <a
+        href={href}
+        target={target}
+        rel="noreferrer"
+        onMouseEnter={() => setHov(true)}
+        onMouseLeave={() => setHov(false)}
+        style={style}
+      >
+        {children}
+      </a>
+    );
+  }
   return (
     <div
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => setHov(false)}
       onClick={onClick}
-      style={{
-        color: hov ? "#fff" : "rgba(255,255,255,0.3)",
-        fontSize: 13,
-        marginBottom: 10,
-        fontFamily: "'Barlow',sans-serif",
-        cursor: onClick ? "pointer" : "default",
-        transition: "color 0.15s",
-      }}
+      style={style}
     >
       {children}
     </div>
@@ -33,6 +58,8 @@ export const Footer: React.FC<FooterProps> = ({
   onCatalogClick,
   onAboutClick,
   onQuoteClick,
+  onContactClick,
+  onCareersClick,
 }) => {
   return (
     <footer
@@ -51,8 +78,16 @@ export const Footer: React.FC<FooterProps> = ({
             marginBottom: 44,
           }}
         >
+          {/* Brand col */}
           <div>
-            <div style={{ display: "flex", alignItems: "center", gap: 11, marginBottom: 16 }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 11,
+                marginBottom: 16,
+              }}
+            >
               <CELogo size={46} />
               <div>
                 <div
@@ -88,10 +123,17 @@ export const Footer: React.FC<FooterProps> = ({
                 maxWidth: 270,
               }}
             >
-              Our purpose is to empower businesses with uninterrupted performance,
-              ensuring stability, reliability, and efficiency.
+              Our purpose is to empower businesses with uninterrupted
+              performance, ensuring stability, reliability, and efficiency.
             </p>
-            <div style={{ marginTop: 16, display: "flex", flexDirection: "column", gap: 6 }}>
+            <div
+              style={{
+                marginTop: 16,
+                display: "flex",
+                flexDirection: "column",
+                gap: 8,
+              }}
+            >
               <a
                 href="tel:+17862026599"
                 style={{
@@ -100,9 +142,13 @@ export const Footer: React.FC<FooterProps> = ({
                   fontFamily: "'Barlow',sans-serif",
                   fontWeight: 700,
                   textDecoration: "none",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 7,
                 }}
               >
-                📞 +1 786-202-6599
+                <PhoneIcon size={14} color="#CC0000" />
+                +1 786-202-6599
               </a>
               <a
                 href="mailto:clickexpress.inc@gmail.com"
@@ -111,22 +157,45 @@ export const Footer: React.FC<FooterProps> = ({
                   fontSize: 12,
                   fontFamily: "'Barlow',sans-serif",
                   textDecoration: "none",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 7,
                 }}
               >
-                ✉️ clickexpress.inc@gmail.com
+                <svg
+                  width="13"
+                  height="13"
+                  viewBox="0 0 24 24"
+                  fill="rgba(255,255,255,0.4)"
+                >
+                  <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" />
+                </svg>
+                clickexpress.inc@gmail.com
               </a>
               <span
                 style={{
                   color: "rgba(255,255,255,0.28)",
                   fontSize: 12,
                   fontFamily: "'Barlow',sans-serif",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 7,
                 }}
               >
-                📍 Hallandale Beach, FL 33009
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="rgba(255,255,255,0.28)"
+                >
+                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
+                </svg>
+                Hallandale Beach, FL 33009
               </span>
             </div>
           </div>
 
+          {/* Services */}
           <div>
             <div
               style={{
@@ -141,18 +210,21 @@ export const Footer: React.FC<FooterProps> = ({
             >
               Services
             </div>
-            {[
-              "Full Truckload (FTL)",
-              "Partial Loads (LTL)",
-              "Flatbed Shipping",
-              "Oversized / Heavy",
-              "Military Loads",
-              "Construction Equip.",
-            ].map(i => (
-              <FooterLink key={i}>{i}</FooterLink>
-            ))}
+            <FooterLink onClick={onCatalogClick}>
+              Full Truckload (FTL)
+            </FooterLink>
+            <FooterLink onClick={onCatalogClick}>
+              Partial Loads (LTL)
+            </FooterLink>
+            <FooterLink onClick={onCatalogClick}>Flatbed Shipping</FooterLink>
+            <FooterLink onClick={onCatalogClick}>Oversized / Heavy</FooterLink>
+            <FooterLink onClick={onCatalogClick}>Military Loads</FooterLink>
+            <FooterLink onClick={onCatalogClick}>
+              Construction Equip.
+            </FooterLink>
           </div>
 
+          {/* Company */}
           <div>
             <div
               style={{
@@ -168,17 +240,19 @@ export const Footer: React.FC<FooterProps> = ({
               Company
             </div>
             <FooterLink onClick={onAboutClick}>About Us</FooterLink>
-            {[
-              "Our Fleet",
-              "Dispatchers",
-              "Careers",
-              "Safety Record",
-              "Green Card Drivers",
-            ].map(i => (
-              <FooterLink key={i}>{i}</FooterLink>
-            ))}
+            <FooterLink onClick={onAboutClick}>Our Fleet</FooterLink>
+            <FooterLink onClick={onAboutClick}>Dispatchers</FooterLink>
+            <FooterLink onClick={onCareersClick}>Careers</FooterLink>
+            <FooterLink onClick={onContactClick}>Safety Record</FooterLink>
+            <FooterLink
+              href="https://www.instagram.com/clickexpress.official"
+              target="_blank"
+            >
+              Green Card Drivers
+            </FooterLink>
           </div>
 
+          {/* Quick Links */}
           <div>
             <div
               style={{
@@ -195,34 +269,13 @@ export const Footer: React.FC<FooterProps> = ({
             </div>
             <FooterLink onClick={onCatalogClick}>View Loads</FooterLink>
             <FooterLink onClick={onQuoteClick}>Get a Quote</FooterLink>
-            <a
+            <FooterLink
               href="https://www.instagram.com/clickexpress.official"
               target="_blank"
-              rel="noreferrer"
-              style={{
-                color: "rgba(255,255,255,0.3)",
-                fontSize: 13,
-                marginBottom: 10,
-                fontFamily: "'Barlow',sans-serif",
-                display: "block",
-                textDecoration: "none",
-              }}
             >
               Instagram
-            </a>
-            <a
-              href="mailto:clickexpress.inc@gmail.com"
-              style={{
-                color: "rgba(255,255,255,0.3)",
-                fontSize: 13,
-                marginBottom: 10,
-                fontFamily: "'Barlow',sans-serif",
-                display: "block",
-                textDecoration: "none",
-              }}
-            >
-              Contact Us
-            </a>
+            </FooterLink>
+            <FooterLink onClick={onContactClick}>Contact Us</FooterLink>
           </div>
         </div>
 
@@ -243,8 +296,8 @@ export const Footer: React.FC<FooterProps> = ({
               fontFamily: "'Barlow',sans-serif",
             }}
           >
-            © 2024 Click Express Inc. All rights reserved. · DOT & FMCSA Licensed Carrier ·
-            Hallandale Beach, FL
+            © 2025 Click Express Inc. All rights reserved. · DOT & FMCSA
+            Licensed Carrier · Hallandale Beach, FL
           </p>
           <p
             style={{
@@ -253,7 +306,7 @@ export const Footer: React.FC<FooterProps> = ({
               fontFamily: "'Barlow',sans-serif",
             }}
           >
-            React · UTM Lab #2
+            React · UTM Lab
           </p>
         </div>
       </div>

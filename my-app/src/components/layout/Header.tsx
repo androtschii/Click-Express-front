@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { CELogo } from "../ui/Logo";
 import type { Session } from "../../services/authService";
+import { useLanguage } from "../../context/LanguageContext";
+import { translations } from "../../i18n/translations";
 
 interface HeaderProps {
   cartCount: number;
@@ -66,6 +68,8 @@ export const Header: React.FC<HeaderProps> = ({
   const [reqHov, setReqHov] = useState(false);
   const [heartBurst, setHeartBurst] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const { lang, toggleLang } = useLanguage();
+  const t = translations[lang];
 
   useEffect(() => {
     const fn = () => setScrolled(window.scrollY > 60);
@@ -109,11 +113,11 @@ export const Header: React.FC<HeaderProps> = ({
       <div style={{ width: 1, height: 30, background: "rgba(255,255,255,0.1)", flexShrink: 0 }} />
 
       <nav style={{ display: "flex", gap: 2, flex: 1 }}>
-        <NavLink onClick={onCatalogClick}>Catalog</NavLink>
-        <NavLink onClick={onQuoteClick}>Get Quote</NavLink>
-        <NavLink onClick={onAboutClick}>About Us</NavLink>
-        <NavLink onClick={onContactClick}>Contact</NavLink>
-        <NavLink onClick={onCareersClick}>Careers</NavLink>
+        <NavLink onClick={onCatalogClick}>{t.nav.catalog}</NavLink>
+        <NavLink onClick={onQuoteClick}>{t.nav.getQuote}</NavLink>
+        <NavLink onClick={onAboutClick}>{t.nav.aboutUs}</NavLink>
+        <NavLink onClick={onContactClick}>{t.nav.contact}</NavLink>
+        <NavLink onClick={onCareersClick}>{t.nav.careers}</NavLink>
       </nav>
 
       <PhoneLink />
@@ -139,6 +143,27 @@ export const Header: React.FC<HeaderProps> = ({
           }} />
         </div>
       )}
+
+      <button
+        onClick={toggleLang}
+        style={{
+          display: "flex", alignItems: "center", gap: 0,
+          background: "transparent", border: "1px solid rgba(255,255,255,0.15)",
+          borderRadius: 4, overflow: "hidden", cursor: "pointer", flexShrink: 0,
+          padding: 0,
+        }}
+      >
+        {(['en', 'ru'] as const).map(l => (
+          <span key={l} style={{
+            padding: "5px 9px",
+            fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 11,
+            letterSpacing: 1, textTransform: "uppercase",
+            background: lang === l ? "#CC0000" : "transparent",
+            color: lang === l ? "#fff" : "rgba(255,255,255,0.45)",
+            transition: "all 0.15s",
+          }}>{l}</span>
+        ))}
+      </button>
 
       {savedCount > 0 && (
         <div onClick={handleSavedClick} style={{
@@ -199,7 +224,7 @@ export const Header: React.FC<HeaderProps> = ({
                 <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 11, color: "rgba(255,255,255,0.35)", marginTop: 2 }}>{session.email}</div>
               </div>
               <div style={{ padding: "6px 0" }}>
-                {[{ label: "My Profile", icon: "👤" }, { label: "My Orders", icon: "📋" }].map(item => (
+                {[{ label: t.header.myProfile, icon: "👤" }, { label: t.header.myOrders, icon: "📋" }].map(item => (
                   <div key={item.label} style={{ padding: "9px 14px", display: "flex", alignItems: "center", gap: 10, cursor: "pointer", fontFamily: "'Barlow',sans-serif", fontSize: 13, color: "rgba(255,255,255,0.7)", transition: "all 0.15s" }}
                     onMouseEnter={e => { e.currentTarget.style.background = "rgba(204,0,0,0.1)"; e.currentTarget.style.color = "#fff"; }}
                     onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "rgba(255,255,255,0.7)"; }}>
@@ -210,7 +235,7 @@ export const Header: React.FC<HeaderProps> = ({
                 <div onClick={onLogout} style={{ padding: "9px 14px", display: "flex", alignItems: "center", gap: 10, cursor: "pointer", fontFamily: "'Barlow',sans-serif", fontSize: 13, color: "#ff6b6b", transition: "all 0.15s" }}
                   onMouseEnter={e => { e.currentTarget.style.background = "rgba(204,0,0,0.15)"; }}
                   onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}>
-                  <span>🚪</span> Sign Out
+                  <span>🚪</span> {t.header.signOut}
                 </div>
               </div>
             </div>
@@ -220,7 +245,7 @@ export const Header: React.FC<HeaderProps> = ({
         <button onClick={onLoginClick} style={{ background: "transparent", border: "1px solid rgba(255,255,255,0.2)", borderRadius: 20, padding: "7px 18px", color: "rgba(255,255,255,0.7)", fontFamily: "'Barlow',sans-serif", fontWeight: 600, fontSize: 12, letterSpacing: 1.5, textTransform: "uppercase", cursor: "pointer", flexShrink: 0, transition: "all 0.15s" }}
           onMouseEnter={e => { e.currentTarget.style.borderColor = "#CC0000"; e.currentTarget.style.color = "#fff"; }}
           onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.2)"; e.currentTarget.style.color = "rgba(255,255,255,0.7)"; }}>
-          LOGIN
+          {t.header.login}
         </button>
       )}
 
@@ -244,7 +269,7 @@ export const Header: React.FC<HeaderProps> = ({
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0 }}>
           <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l7.59-7.59L21 8l-9 9z" fill="#fff"/>
         </svg>
-        Requests
+        {t.header.requests}
         {cartCount > 0 && (
           <span style={{ background: "#fff", color: "#CC0000", borderRadius: "50%", width: 18, height: 18, fontSize: 10, fontWeight: 900, display: "inline-flex", alignItems: "center", justifyContent: "center" }}>{cartCount}</span>
         )}

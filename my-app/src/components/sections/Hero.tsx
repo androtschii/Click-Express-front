@@ -1,5 +1,7 @@
 import React, { useState, useContext } from "react";
 import { ThemeContext } from "../../theme";
+import { useLanguage } from "../../context/LanguageContext";
+import { translations } from "../../i18n/translations";
 
 interface HeroBtnProps {
   children: React.ReactNode;
@@ -44,6 +46,8 @@ interface HeroProps {
 export const Hero: React.FC<HeroProps> = ({ onViewLoads, onQuoteClick }) => {
   const context = useContext(ThemeContext) as { theme?: 'dark' | 'light'; toggleTheme?: () => void };
   const theme = context.theme || 'dark';
+  const { lang } = useLanguage();
+  const t = translations[lang].hero;
   return (
     <section
       style={{
@@ -123,7 +127,7 @@ export const Hero: React.FC<HeroProps> = ({ onViewLoads, onQuoteClick }) => {
               textTransform: "uppercase",
             }}
           >
-            USA-Wide Heavy & Oversized Freight · Est. 2019
+            {t.badge}
           </span>
         </div>
 
@@ -139,7 +143,7 @@ export const Hero: React.FC<HeroProps> = ({ onViewLoads, onQuoteClick }) => {
             animation: "heroFadeUp 0.6s ease 0.2s both",
           }}
         >
-          INFRASTRUCTURE
+          {t.line1}
         </h1>
         <h1
           style={{
@@ -154,7 +158,7 @@ export const Hero: React.FC<HeroProps> = ({ onViewLoads, onQuoteClick }) => {
             animation: "heroFadeUp 0.6s ease 0.35s both",
           }}
         >
-          DOESN'T MOVE
+          {t.line2}
         </h1>
         <h1
           style={{
@@ -168,7 +172,7 @@ export const Hero: React.FC<HeroProps> = ({ onViewLoads, onQuoteClick }) => {
             animation: "heroFadeUp 0.6s ease 0.5s both",
           }}
         >
-          WE DO.
+          {t.line3}
         </h1>
 
         <p
@@ -182,15 +186,14 @@ export const Hero: React.FC<HeroProps> = ({ onViewLoads, onQuoteClick }) => {
             animation: "heroFadeUp 0.6s ease 0.65s both",
           }}
         >
-          Our purpose is to empower businesses with uninterrupted performance, ensuring
-          stability, reliability, and efficiency in everything they do.
+          {t.desc}
         </p>
 
         <div style={{ display: "flex", gap: 14, flexWrap: "wrap", animation: "heroFadeUp 0.6s ease 0.8s both" }}>
           <HeroBtn primary onClick={onViewLoads}>
-            VIEW AVAILABLE LOADS
+            {t.viewLoads}
           </HeroBtn>
-          <HeroBtn onClick={onQuoteClick}>GET A FREE QUOTE</HeroBtn>
+          <HeroBtn onClick={onQuoteClick}>{t.getQuote}</HeroBtn>
         </div>
       </div>
       <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.35}} @keyframes heroFadeUp { from { opacity:0; transform:translateY(28px); } to { opacity:1; transform:translateY(0); } } @keyframes heroSlideIn { from { opacity:0; transform:translateX(-24px); } to { opacity:1; transform:translateX(0); } }`}</style>

@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { useLanguage } from "../../context/LanguageContext";
+import { translations } from "../../i18n/translations";
 
 interface SearchBarProps {
   value: string;
@@ -9,6 +11,8 @@ interface SearchBarProps {
 export const SearchBar: React.FC<SearchBarProps> = ({ value, onChange, theme = 'dark' }) => {
   const [focused, setFocused] = useState(false);
   const isDark = theme === 'dark';
+  const { lang } = useLanguage();
+  const placeholder = translations[lang].search.placeholder;
 
   return (
     <div style={{ position: "relative", flex: "1 1 280px" }}>
@@ -28,7 +32,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({ value, onChange, theme = '
       <input
         value={value}
         onChange={e => onChange(e.target.value)}
-        placeholder="Search by city or state..."
+        placeholder={placeholder}
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
         style={{

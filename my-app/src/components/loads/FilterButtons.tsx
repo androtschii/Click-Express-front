@@ -1,6 +1,9 @@
 import React, { useState } from "react";
+import { useLanguage } from "../../context/LanguageContext";
+import { translations } from "../../i18n/translations";
 
-const FILTERS = ["All Loads", "Full Load", "Partial", "Military Load"];
+// Internal filter keys stay in English (used by loadService.ts filterLoads)
+const FILTER_KEYS = ["All Loads", "Full Load", "Partial", "Military Load"] as const;
 
 interface FilterBtnProps {
   label: string;
@@ -56,10 +59,14 @@ interface FilterButtonsProps {
 }
 
 export const FilterButtons: React.FC<FilterButtonsProps> = ({ active, onChange, theme = 'dark' }) => {
+  const { lang } = useLanguage();
+  const tf = translations[lang].filters;
+  const labels = [tf.allLoads, tf.fullLoad, tf.partial, tf.military];
+
   return (
     <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-      {FILTERS.map(f => (
-        <FilterBtn key={f} label={f} active={active === f} onClick={() => onChange(f)} theme={theme} />
+      {FILTER_KEYS.map((key, i) => (
+        <FilterBtn key={key} label={labels[i]} active={active === key} onClick={() => onChange(key)} theme={theme} />
       ))}
     </div>
   );

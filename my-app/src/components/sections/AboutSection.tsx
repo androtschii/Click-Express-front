@@ -1,6 +1,8 @@
 import React from "react";
 import { CELogo } from "../ui/Logo";
 import { Phone, Mail } from "lucide-react";
+import { useLanguage } from "../../context/LanguageContext";
+import { translations } from "../../i18n/translations";
 
 interface AboutSectionProps {
   onContactClick?: () => void;
@@ -43,59 +45,19 @@ const MapIcon = () => (
   </svg>
 );
 
-const contacts = [
-  {
-    icon: <MapIcon />,
-    iconBg: "rgba(204,0,0,0.15)",
-    label: "Address",
-    value: "Hallandale Beach, FL, United States, 33009",
-    href: "https://maps.google.com/?q=Hallandale+Beach+FL+33009",
-    highlight: false,
-  },
-  {
-    icon: <Phone size={20} color="#22C55E" strokeWidth={2} />,
-    iconBg: "rgba(34,197,94,0.15)",
-    label: "Phone",
-    value: "+1 786-202-6599",
-    href: "tel:+17862026599",
-    highlight: true,
-  },
-  {
-    icon: <Mail size={20} color="#60A5FA" strokeWidth={2} />,
-    iconBg: "rgba(96,165,250,0.15)",
-    label: "Email",
-    value: "clickexpress.inc@gmail.com",
-    href: "mailto:clickexpress.inc@gmail.com",
-    highlight: false,
-  },
-  {
-    icon: <LinkedInIcon />,
-    iconBg: "rgba(10,102,194,0.15)",
-    label: "LinkedIn",
-    value: "Click Express Inc",
-    href: "https://www.linkedin.com/company/clickexpressinc",
-    highlight: false,
-  },
-  {
-    icon: <FacebookIcon />,
-    iconBg: "rgba(24,119,242,0.15)",
-    label: "Facebook",
-    value: "Click Express Inc",
-    href: "https://www.facebook.com/share/1FP9dJ2L4i/",
-    highlight: false,
-  },
-  {
-    icon: <InstagramIcon />,
-    iconBg: "rgba(214,36,159,0.15)",
-    label: "Instagram",
-    value: "@clickexpress.official",
-    href: "https://www.instagram.com/clickexpress.official",
-    highlight: false,
-  },
+const contactsBase = [
+  { icon: <MapIcon />, iconBg: "rgba(204,0,0,0.15)", key: "Address" as const, value: "Hallandale Beach, FL, United States, 33009", href: "https://maps.google.com/?q=Hallandale+Beach+FL+33009", highlight: false },
+  { icon: <Phone size={20} color="#22C55E" strokeWidth={2} />, iconBg: "rgba(34,197,94,0.15)", key: "Phone" as const, value: "+1 786-202-6599", href: "tel:+17862026599", highlight: true },
+  { icon: <Mail size={20} color="#60A5FA" strokeWidth={2} />, iconBg: "rgba(96,165,250,0.15)", key: "Email" as const, value: "clickexpress.inc@gmail.com", href: "mailto:clickexpress.inc@gmail.com", highlight: false },
+  { icon: <LinkedInIcon />, iconBg: "rgba(10,102,194,0.15)", key: "LinkedIn" as const, value: "Click Express Inc", href: "https://www.linkedin.com/company/clickexpressinc", highlight: false },
+  { icon: <FacebookIcon />, iconBg: "rgba(24,119,242,0.15)", key: "Facebook" as const, value: "Click Express Inc", href: "https://www.facebook.com/share/1FP9dJ2L4i/", highlight: false },
+  { icon: <InstagramIcon />, iconBg: "rgba(214,36,159,0.15)", key: "Instagram" as const, value: "@clickexpress.official", href: "https://www.instagram.com/clickexpress.official", highlight: false },
 ];
 
 export const AboutSection: React.FC<AboutSectionProps> = ({ onContactClick, theme = 'dark' }) => {
   const isDark = theme === 'dark';
+  const { lang } = useLanguage();
+  const t = translations[lang].about;
 
   return (
     <section style={{ background: isDark ? "#0a0a0a" : "#ffffff", padding: "80px clamp(20px,5vw,64px)" }}>
@@ -104,14 +66,14 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onContactClick, them
         <div style={{ marginBottom: 60, display: "flex", alignItems: "flex-end", justifyContent: "space-between", flexWrap: "wrap", gap: 20 }}>
           <div>
             <div style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 10, color: "#CC0000", letterSpacing: 4, textTransform: "uppercase", marginBottom: 10 }}>
-              — Who We Are
+              {t.who}
             </div>
             <h2 style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: "clamp(32px,5vw,54px)", color: isDark ? "#fff" : "#1a1a1a", textTransform: "uppercase", lineHeight: 1 }}>
-              ABOUT <span style={{ color: "#CC0000" }}>CLICK EXPRESS</span> INC
+              {t.title} <span style={{ color: "#CC0000" }}>{t.titleHighlight}</span> {t.titleEnd}
             </h2>
           </div>
           <button onClick={onContactClick} style={{ background: "#CC0000", color: "#fff", border: "none", borderRadius: 4, padding: "12px 28px", fontFamily: "'Oswald',sans-serif", fontWeight: 600, fontSize: 14, letterSpacing: 2, textTransform: "uppercase", cursor: "pointer", boxShadow: "0 4px 18px rgba(204,0,0,0.4)" }}>
-            GET IN TOUCH
+            {t.getInTouch}
           </button>
         </div>
 
@@ -127,20 +89,20 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onContactClick, them
                   <span style={{ color: "#CC0000" }}>CLICK</span> EXPRESS INC
                 </div>
                 <div style={{ fontSize: 11, color: isDark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.4)", letterSpacing: 2.5, fontFamily: "'Barlow',sans-serif", marginTop: 4 }}>
-                  HEAVY FREIGHT SOLUTIONS · EST. 2019
+                  {t.tagline}
                 </div>
               </div>
             </div>
 
             <p style={{ fontFamily: "'Barlow',sans-serif", fontSize: 15, color: isDark ? "rgba(255,255,255,0.6)" : "rgba(0,0,0,0.7)", lineHeight: 1.9, marginBottom: 20 }}>
-              Click Express Inc is a USA-based heavy freight carrier founded in 2019. We specialize in full truckload, partial, flatbed, and oversized shipments across all 48 continental states.
+              {t.para1}
             </p>
             <p style={{ fontFamily: "'Barlow',sans-serif", fontSize: 15, color: isDark ? "rgba(255,255,255,0.6)" : "rgba(0,0,0,0.7)", lineHeight: 1.9, marginBottom: 32 }}>
-              Our purpose is to empower businesses with uninterrupted performance, ensuring stability, reliability, and efficiency. Behind every load is a dedicated dispatcher working around the clock.
+              {t.para2}
             </p>
 
             <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 16, marginBottom: 32 }}>
-              {[["2019", "Founded"], ["48", "States"], ["24/7", "Dispatch"]].map(([n, l]) => (
+              {[["2019", t.stats.founded], ["48", t.stats.states], ["24/7", t.stats.dispatch]].map(([n, l]) => (
                 <div key={l} style={{ background: isDark ? "rgba(204,0,0,0.08)" : "rgba(204,0,0,0.1)", border: `1px solid ${isDark ? "rgba(204,0,0,0.2)" : "rgba(204,0,0,0.25)"}`, borderRadius: 6, padding: "16px 12px", textAlign: "center" }}>
                   <div style={{ fontFamily: "'Oswald',sans-serif", fontSize: 28, fontWeight: 700, color: "#CC0000" }}>{n}</div>
                   <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 10, color: isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.5)", letterSpacing: 2, textTransform: "uppercase", marginTop: 4 }}>{l}</div>
@@ -149,7 +111,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onContactClick, them
             </div>
 
             <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-              {["DOT Certified", "FMCSA Licensed", "Fully Insured", "GPS Tracked"].map(c => (
+              {t.badges.map(c => (
                 <span key={c} style={{ background: isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.04)", border: `1px solid ${isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)"}`, borderRadius: 20, padding: "5px 14px", fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 10, color: isDark ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.6)", letterSpacing: 1.5, textTransform: "uppercase" }}>
                   ✓ {c}
                 </span>
@@ -159,12 +121,12 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onContactClick, them
 
           <div>
             <div style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 600, fontSize: 13, color: "#CC0000", letterSpacing: 2.5, textTransform: "uppercase", marginBottom: 24 }}>
-              CONTACT INFORMATION
+              {t.contactInfo}
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-              {contacts.map(item => (
+              {contactsBase.map(item => (
                 <a
-                  key={item.label}
+                  key={item.key}
                   href={item.href}
                   target="_blank"
                   rel="noreferrer"
@@ -177,7 +139,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onContactClick, them
                   </div>
                   <div>
                     <div style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 10, color: isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.35)", letterSpacing: 2, textTransform: "uppercase", marginBottom: 3 }}>
-                      {item.label}
+                      {t.contactLabels[item.key]}
                     </div>
                     <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 14, color: item.highlight ? "#22C55E" : (isDark ? "rgba(255,255,255,0.85)" : "rgba(0,0,0,0.8)"), fontWeight: 600 }}>
                       {item.value}

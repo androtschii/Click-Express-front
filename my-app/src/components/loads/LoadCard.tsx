@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useContext } from "react";
 import { ThemeContext } from "../../theme";
 import type { Load } from "../../types/index";
+import { useLanguage } from "../../context/LanguageContext";
+import { translations } from "../../i18n/translations";
 
 interface LoadCardProps {
   load: Load;
@@ -44,6 +46,8 @@ export const LoadCard: React.FC<LoadCardProps> = ({ load, onBook, onCancelBook, 
   const context = useContext(ThemeContext) as { theme?: 'dark' | 'light' };
   const theme = context.theme || 'dark';
   const isDark = theme === 'dark';
+  const { lang } = useLanguage();
+  const t = translations[lang].loadCard;
 
   const [booked, setBooked] = useState(isBooked);
   useEffect(() => { setBooked(isBooked); }, [isBooked]);
@@ -80,7 +84,7 @@ export const LoadCard: React.FC<LoadCardProps> = ({ load, onBook, onCancelBook, 
         <img src={load.image} alt={load.route} style={{ width:"100%", height:"100%", objectFit:"cover", transform:hov?"scale(1.06)":"scale(1)", filter:"brightness(0.68)", transition:"transform 0.4s ease" }} />
         {onDetails && (
           <div style={{ position:"absolute", bottom:14, right:14, background:"rgba(0,0,0,0.55)", border:"1px solid rgba(255,255,255,0.2)", borderRadius:20, padding:"4px 12px", fontFamily:"'Barlow',sans-serif", fontWeight:600, fontSize:10, color:"rgba(255,255,255,0.8)", letterSpacing:1, backdropFilter:"blur(4px)" }}>
-            VIEW DETAILS →
+            {t.viewDetails}
           </div>
         )}
         <div style={{ position:"absolute", inset:0, background:"linear-gradient(to bottom,transparent 30%,rgba(0,0,0,0.85))" }} />
@@ -114,7 +118,7 @@ export const LoadCard: React.FC<LoadCardProps> = ({ load, onBook, onCancelBook, 
 
         <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:10 }}>
           <div>
-            <div style={{ fontSize:9, color:textMuted, fontFamily:"'Barlow',sans-serif", letterSpacing:1.5, textTransform:"uppercase" }}>Dispatch</div>
+            <div style={{ fontSize:9, color:textMuted, fontFamily:"'Barlow',sans-serif", letterSpacing:1.5, textTransform:"uppercase" }}>{t.dispatch}</div>
             <div style={{ fontSize:13, color:textPhone, fontFamily:"'Barlow',sans-serif", fontWeight:600 }}>+1 786-202-6599</div>
           </div>
           <button
@@ -133,7 +137,7 @@ export const LoadCard: React.FC<LoadCardProps> = ({ load, onBook, onCancelBook, 
               transition:"all 0.15s",
             }}
           >
-            {booked ? (bookHov ? "✕ CANCEL" : "✓ REQUESTED") : "BOOK LOAD"}
+            {booked ? (bookHov ? t.cancel : t.requested) : t.bookLoad}
           </button>
         </div>
       </div>

@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { ThemeProvider, useTheme } from "./theme";
+import { LanguageProvider, useLanguage } from "./context/LanguageContext";
+import { translations } from "./i18n/translations";
 import { Header } from "./components/layout/Header";
 import { Hero } from "./components/sections/Hero";
 import { Ticker } from "./components/layout/Ticker";
@@ -22,13 +24,15 @@ import { filterLoads, fetchLoads } from "./services/loadService.ts";
 function FavoritesPanel({ loads, theme, onClose, onDetails, onRemove }: { loads: Load[]; theme: string; onClose: () => void; onDetails?: (l: Load) => void; onRemove?: (l: Load) => void }) {
   const isDark = theme === "dark";
   const bord = isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.08)";
+  const { lang } = useLanguage();
+  const t = translations[lang].favorites;
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 2000, background: "rgba(0,0,0,0.7)", backdropFilter: "blur(6px)" }} onClick={onClose}>
       <div onClick={e => e.stopPropagation()} style={{ position: "absolute", right: 0, top: 0, bottom: 0, width: "min(420px, 100vw)", background: isDark ? "#0f0f0f" : "#fff", borderLeft: "2px solid #CC0000", display: "flex", flexDirection: "column", boxShadow: "-20px 0 60px rgba(0,0,0,0.5)" }}>
         <div style={{ padding: "24px 24px 16px", borderBottom: `1px solid ${bord}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <div>
-            <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 10, color: "#CC0000", letterSpacing: 3, textTransform: "uppercase", marginBottom: 4 }}>Saved</div>
-            <h3 style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 22, color: isDark ? "#fff" : "#1a1a1a", textTransform: "uppercase" }}>FAVORITES <span style={{ color: "#CC0000" }}>({loads.length})</span></h3>
+            <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 10, color: "#CC0000", letterSpacing: 3, textTransform: "uppercase", marginBottom: 4 }}>{t.saved}</div>
+            <h3 style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 22, color: isDark ? "#fff" : "#1a1a1a", textTransform: "uppercase" }}>{t.title} <span style={{ color: "#CC0000" }}>({loads.length})</span></h3>
           </div>
           <button onClick={onClose} style={{ background: "rgba(255,255,255,0.07)", border: "none", borderRadius: "50%", width: 36, height: 36, color: isDark ? "rgba(255,255,255,0.5)" : "#666", fontSize: 18, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
         </div>
@@ -36,7 +40,7 @@ function FavoritesPanel({ loads, theme, onClose, onDetails, onRemove }: { loads:
           {loads.length === 0 ? (
             <div style={{ textAlign: "center", padding: "60px 0" }}>
               <div style={{ fontSize: 48, marginBottom: 12 }}>🤍</div>
-              <p style={{ fontFamily: "'Barlow',sans-serif", color: isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.4)", fontSize: 14 }}>No saved loads yet</p>
+              <p style={{ fontFamily: "'Barlow',sans-serif", color: isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.4)", fontSize: 14 }}>{t.empty}</p>
             </div>
           ) : loads.map(l => (
             <div key={l.id} onClick={() => { onClose(); setTimeout(() => onDetails && onDetails(l), 120); }}
@@ -61,13 +65,13 @@ function FavoritesPanel({ loads, theme, onClose, onDetails, onRemove }: { loads:
                   <button onClick={() => { onClose(); setTimeout(() => onDetails && onDetails(l), 120); }} style={{ flex: 1, padding: "6px", background: "rgba(204,0,0,0.1)", border: "1px solid rgba(204,0,0,0.3)", borderRadius: 6, color: "#CC0000", fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 10, letterSpacing: 1, textTransform: "uppercase", cursor: "pointer", transition: "all 0.15s" }}
                     onMouseEnter={e => { e.currentTarget.style.background = "#CC0000"; e.currentTarget.style.color = "#fff"; }}
                     onMouseLeave={e => { e.currentTarget.style.background = "rgba(204,0,0,0.1)"; e.currentTarget.style.color = "#CC0000"; }}>
-                    View Details →
+                    {t.viewDetails}
                   </button>
                   <button onClick={() => onRemove && onRemove(l)} style={{ padding: "6px 12px", background: "rgba(255,255,255,0.05)", border: `1px solid ${bord}`, borderRadius: 6, color: isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.4)", fontFamily: "'Barlow',sans-serif", fontSize: 10, cursor: "pointer", display: "flex", alignItems: "center", gap: 4, transition: "all 0.15s" }}
                     onMouseEnter={e => { e.currentTarget.style.borderColor = "#ff4d6d"; e.currentTarget.style.color = "#ff4d6d"; e.currentTarget.style.background = "rgba(255,77,109,0.1)"; }}
                     onMouseLeave={e => { e.currentTarget.style.borderColor = bord; e.currentTarget.style.color = isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.4)"; e.currentTarget.style.background = "rgba(255,255,255,0.05)"; }}>
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-                    Unlike
+                    {t.unlike}
                   </button>
                 </div>
               </div>
@@ -77,7 +81,7 @@ function FavoritesPanel({ loads, theme, onClose, onDetails, onRemove }: { loads:
         {loads.length > 0 && (
           <div style={{ padding: "14px 24px", borderTop: `1px solid ${bord}`, display: "flex", alignItems: "center", gap: 8 }}>
             <PhoneIcon size={14} color="#CC0000" />
-            <span style={{ fontFamily: "'Barlow',sans-serif", fontSize: 12, color: isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.4)" }}>To book: </span>
+            <span style={{ fontFamily: "'Barlow',sans-serif", fontSize: 12, color: isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.4)" }}>{t.toBook} </span>
             <a href="tel:+17862026599" style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 13, color: "#CC0000", textDecoration: "none" }}>+1 786-202-6599</a>
           </div>
         )}
@@ -90,14 +94,16 @@ function FavoritesPanel({ loads, theme, onClose, onDetails, onRemove }: { loads:
 function RequestsPanel({ loads, theme, onClose, onDetails, onCancel }: { loads: Load[]; theme: string; onClose: () => void; onDetails?: (l: Load) => void; onCancel?: (l: Load) => void }) {
   const isDark = theme === "dark";
   const bord = isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.08)";
+  const { lang } = useLanguage();
+  const t = translations[lang].requests;
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 2000, background: "rgba(0,0,0,0.7)", backdropFilter: "blur(6px)" }} onClick={onClose}>
       <div onClick={e => e.stopPropagation()} style={{ position: "absolute", right: 0, top: 0, bottom: 0, width: "min(480px, 100vw)", background: isDark ? "#0f0f0f" : "#fff", borderLeft: "2px solid #CC0000", display: "flex", flexDirection: "column", boxShadow: "-20px 0 60px rgba(0,0,0,0.5)" }}>
         {/* Заголовок */}
         <div style={{ padding: "24px 24px 16px", borderBottom: `1px solid ${bord}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <div>
-            <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 10, color: "#CC0000", letterSpacing: 3, textTransform: "uppercase", marginBottom: 4 }}>Booked</div>
-            <h3 style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 22, color: isDark ? "#fff" : "#1a1a1a", textTransform: "uppercase" }}>REQUESTS <span style={{ color: "#CC0000" }}>({loads.length})</span></h3>
+            <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 10, color: "#CC0000", letterSpacing: 3, textTransform: "uppercase", marginBottom: 4 }}>{t.booked}</div>
+            <h3 style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 22, color: isDark ? "#fff" : "#1a1a1a", textTransform: "uppercase" }}>{t.title} <span style={{ color: "#CC0000" }}>({loads.length})</span></h3>
           </div>
           <button onClick={onClose} style={{ background: "rgba(204,0,0,0.1)", border: "1px solid rgba(204,0,0,0.3)", borderRadius: "50%", width: 36, height: 36, color: "#CC0000", fontSize: 16, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
         </div>
@@ -107,8 +113,8 @@ function RequestsPanel({ loads, theme, onClose, onDetails, onCancel }: { loads: 
           {loads.length === 0 ? (
             <div style={{ textAlign: "center", padding: "60px 0" }}>
               <div style={{ fontSize: 52, marginBottom: 14 }}>📋</div>
-              <p style={{ fontFamily: "'Barlow',sans-serif", color: isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.4)", fontSize: 14 }}>No requests yet</p>
-              <p style={{ fontFamily: "'Barlow',sans-serif", color: isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.25)", fontSize: 12, marginTop: 6 }}>Click BOOK LOAD on any card</p>
+              <p style={{ fontFamily: "'Barlow',sans-serif", color: isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.4)", fontSize: 14 }}>{t.empty}</p>
+              <p style={{ fontFamily: "'Barlow',sans-serif", color: isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.25)", fontSize: 12, marginTop: 6 }}>{t.emptyHint}</p>
             </div>
           ) : loads.map((l, idx) => (
             <div key={`${l.id}-${idx}`}
@@ -145,12 +151,12 @@ function RequestsPanel({ loads, theme, onClose, onDetails, onCancel }: { loads: 
                   <button onClick={() => { onClose(); setTimeout(() => onDetails && onDetails(l), 120); }} style={{ flex: 1, padding: "6px", background: "rgba(204,0,0,0.1)", border: "1px solid rgba(204,0,0,0.3)", borderRadius: 6, color: "#CC0000", fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 10, letterSpacing: 1, textTransform: "uppercase", cursor: "pointer", transition: "all 0.15s" }}
                     onMouseEnter={e => { e.currentTarget.style.background = "#CC0000"; e.currentTarget.style.color = "#fff"; }}
                     onMouseLeave={e => { e.currentTarget.style.background = "rgba(204,0,0,0.1)"; e.currentTarget.style.color = "#CC0000"; }}>
-                    View Details →
+                    {t.viewDetails}
                   </button>
                   <button onClick={() => onCancel && onCancel(l)} style={{ padding: "6px 12px", background: "rgba(255,255,255,0.04)", border: `1px solid ${bord}`, borderRadius: 6, color: isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.4)", fontFamily: "'Barlow',sans-serif", fontSize: 10, cursor: "pointer", display: "flex", alignItems: "center", gap: 4, transition: "all 0.15s" }}
                     onMouseEnter={e => { e.currentTarget.style.borderColor = "#CC0000"; e.currentTarget.style.color = "#CC0000"; e.currentTarget.style.background = "rgba(204,0,0,0.08)"; }}
                     onMouseLeave={e => { e.currentTarget.style.borderColor = bord; e.currentTarget.style.color = isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.4)"; e.currentTarget.style.background = "rgba(255,255,255,0.04)"; }}>
-                    ✕ Cancel
+                    {t.cancel}
                   </button>
                 </div>
               </div>
@@ -161,7 +167,7 @@ function RequestsPanel({ loads, theme, onClose, onDetails, onCancel }: { loads: 
         {/* Футер */}
         <div style={{ padding: "16px 20px", borderTop: `1px solid ${isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.08)"}`, textAlign: "center" }}>
           <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 12, color: isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.4)" }}>
-            Our dispatcher will contact you shortly
+            {t.dispatcher}
           </div>
           <a href="tel:+17862026599" style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 6, fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 14, color: "#CC0000", textDecoration: "none" }}><PhoneIcon size={14} color="#CC0000" />+1 786-202-6599</a>
         </div>
@@ -172,6 +178,8 @@ function RequestsPanel({ loads, theme, onClose, onDetails, onCancel }: { loads: 
 
 function AppContent() {
   const { theme, toggleTheme } = useTheme();
+  const { lang } = useLanguage();
+  const tn = translations[lang].notifications;
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("All Loads");
   const [loads, setLoads] = useState<Load[]>([]);
@@ -216,17 +224,17 @@ function AppContent() {
 
   const handleSave = (load: Load, saved: boolean) => {
     setSavedLoads(prev => saved ? [...prev, load] : prev.filter(l => l.id !== load.id));
-    notify(saved ? "Saved to favorites" : "Removed from favorites");
+    notify(saved ? tn.savedToFavorites : tn.removedFromFavorites);
   };
 
   const handleCancelBook = (load?: Load) => {
     if (load) setBookedLoads(prev => prev.filter(l => l.id !== load.id));
-    notify("Request cancelled");
+    notify(tn.requestCancelled);
   };
 
   const handleBook = (load?: Load) => {
     if (load) setBookedLoads(prev => [...prev, load]);
-    notify("Load added to requests");
+    notify(tn.loadAdded);
   };
 
   const notify = (text: string) => {
@@ -288,7 +296,7 @@ function AppContent() {
         </div>
         {showAuth && <AuthModal onClose={() => setShowAuth(false)} theme={theme} onSuccess={(s) => { setSession(s); setShowAuth(false); }} />}
         {showQuote && <QuoteModal onClose={() => setShowQuote(false)} theme={theme} />}
-        {showFavorites && <FavoritesPanel loads={savedLoads} theme={theme} onClose={() => setShowFavorites(false)} onDetails={(l) => { setShowFavorites(false); setDetailLoad(l); window.scrollTo({ top: 0 }); }} onRemove={(l) => { handleSave(l, false); notify("Removed from favorites"); }} />}
+        {showFavorites && <FavoritesPanel loads={savedLoads} theme={theme} onClose={() => setShowFavorites(false)} onDetails={(l) => { setShowFavorites(false); setDetailLoad(l); window.scrollTo({ top: 0 }); }} onRemove={(l) => { handleSave(l, false); notify(tn.removedFromFavorites); }} />}
         {showRequests && <RequestsPanel loads={bookedLoads} theme={theme} onClose={() => setShowRequests(false)} onDetails={(l) => { setShowRequests(false); setDetailLoad(l); window.scrollTo({ top: 0 }); }} onCancel={(l) => handleCancelBook(l)} />}
         {notifications.map((msg, idx) => (
           <Notification key={idx} text={msg} onClose={() => setNotifications(n => n.filter((_, i) => i !== idx))} />
@@ -437,7 +445,7 @@ function AppContent() {
 
       {showAuth && <AuthModal onClose={() => setShowAuth(false)} theme={theme} onSuccess={(s) => { setSession(s); setShowAuth(false); }} />}
       {showQuote && <QuoteModal onClose={() => setShowQuote(false)} theme={theme} />}
-      {showFavorites && <FavoritesPanel loads={savedLoads} theme={theme} onClose={() => setShowFavorites(false)} onDetails={(l) => { setShowFavorites(false); setDetailLoad(l); window.scrollTo({ top: 0 }); }} onRemove={(l) => { handleSave(l, false); notify("Removed from favorites"); }} />}
+      {showFavorites && <FavoritesPanel loads={savedLoads} theme={theme} onClose={() => setShowFavorites(false)} onDetails={(l) => { setShowFavorites(false); setDetailLoad(l); window.scrollTo({ top: 0 }); }} onRemove={(l) => { handleSave(l, false); notify(tn.removedFromFavorites); }} />}
       {showRequests && <RequestsPanel loads={bookedLoads} theme={theme} onClose={() => setShowRequests(false)} onDetails={(l) => { setShowRequests(false); setDetailLoad(l); window.scrollTo({ top: 0 }); }} onCancel={(l) => handleCancelBook(l)} />}
       {notifications.map((msg, idx) => (
         <Notification key={idx} text={msg} onClose={() => setNotifications(n => n.filter((_, i) => i !== idx))} />
@@ -447,7 +455,7 @@ function AppContent() {
 }
 
 function App() {
-  return <ThemeProvider><AppContent /></ThemeProvider>;
+  return <LanguageProvider><ThemeProvider><AppContent /></ThemeProvider></LanguageProvider>;
 }
 
 export default App;

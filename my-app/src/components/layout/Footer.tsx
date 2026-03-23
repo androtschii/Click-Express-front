@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { CELogo } from "../ui/Logo";
 import { PhoneIcon } from "../ui/PhoneIcon";
+import { useLanguage } from "../../context/LanguageContext";
+import { translations } from "../../i18n/translations";
 
 interface FooterProps {
   theme?: "dark" | "light";
@@ -61,6 +63,8 @@ export const Footer: React.FC<FooterProps> = ({
   onContactClick,
   onCareersClick,
 }) => {
+  const { lang } = useLanguage();
+  const t = translations[lang].footer;
   return (
     <footer
       style={{
@@ -122,8 +126,7 @@ export const Footer: React.FC<FooterProps> = ({
                 maxWidth: 270,
               }}
             >
-              Our purpose is to empower businesses with uninterrupted
-              performance, ensuring stability, reliability, and efficiency.
+              {t.tagline}
             </p>
             <div
               style={{
@@ -206,19 +209,38 @@ export const Footer: React.FC<FooterProps> = ({
                 marginBottom: 16,
               }}
             >
-              Services
+              {t.services}
             </div>
-            <FooterLink onClick={onCatalogClick}>
-              Full Truckload (FTL)
-            </FooterLink>
-            <FooterLink onClick={onCatalogClick}>
-              Partial Loads (LTL)
-            </FooterLink>
-            <FooterLink onClick={onCatalogClick}>Flatbed Shipping</FooterLink>
-            <FooterLink onClick={onCatalogClick}>Oversized / Heavy</FooterLink>
-            <FooterLink onClick={onCatalogClick}>Military Loads</FooterLink>
-            <FooterLink onClick={onCatalogClick}>
-              Construction Equip.
+            {t.serviceItems.map((item, i) => (
+              <FooterLink key={i} onClick={onCatalogClick}>{item}</FooterLink>
+            ))}
+          </div>
+
+          <div>
+            <div
+              style={{
+                fontFamily: "'Oswald',sans-serif",
+                fontWeight: 600,
+                fontSize: 13,
+                color: "#CC0000",
+                letterSpacing: 2.5,
+                textTransform: "uppercase",
+                marginBottom: 16,
+              }}
+            >
+              {t.company}
+            </div>
+            {[
+              { label: t.companyItems[0], onClick: onAboutClick },
+              { label: t.companyItems[1], onClick: onAboutClick },
+              { label: t.companyItems[2], onClick: onAboutClick },
+              { label: t.companyItems[3], onClick: onCareersClick },
+              { label: t.companyItems[4], onClick: onContactClick },
+            ].map((item, i) => (
+              <FooterLink key={i} onClick={item.onClick}>{item.label}</FooterLink>
+            ))}
+            <FooterLink href="https://www.instagram.com/clickexpress.official" target="_blank">
+              {t.companyItems[5]}
             </FooterLink>
           </div>
 
@@ -234,44 +256,14 @@ export const Footer: React.FC<FooterProps> = ({
                 marginBottom: 16,
               }}
             >
-              Company
+              {t.quickLinks}
             </div>
-            <FooterLink onClick={onAboutClick}>About Us</FooterLink>
-            <FooterLink onClick={onAboutClick}>Our Fleet</FooterLink>
-            <FooterLink onClick={onAboutClick}>Dispatchers</FooterLink>
-            <FooterLink onClick={onCareersClick}>Careers</FooterLink>
-            <FooterLink onClick={onContactClick}>Safety Record</FooterLink>
-            <FooterLink
-              href="https://www.instagram.com/clickexpress.official"
-              target="_blank"
-            >
-              Green Card Drivers
+            <FooterLink onClick={onCatalogClick}>{t.quickItems[0]}</FooterLink>
+            <FooterLink onClick={onQuoteClick}>{t.quickItems[1]}</FooterLink>
+            <FooterLink href="https://www.instagram.com/clickexpress.official" target="_blank">
+              {t.quickItems[2]}
             </FooterLink>
-          </div>
-
-          <div>
-            <div
-              style={{
-                fontFamily: "'Oswald',sans-serif",
-                fontWeight: 600,
-                fontSize: 13,
-                color: "#CC0000",
-                letterSpacing: 2.5,
-                textTransform: "uppercase",
-                marginBottom: 16,
-              }}
-            >
-              Quick Links
-            </div>
-            <FooterLink onClick={onCatalogClick}>View Loads</FooterLink>
-            <FooterLink onClick={onQuoteClick}>Get a Quote</FooterLink>
-            <FooterLink
-              href="https://www.instagram.com/clickexpress.official"
-              target="_blank"
-            >
-              Instagram
-            </FooterLink>
-            <FooterLink onClick={onContactClick}>Contact Us</FooterLink>
+            <FooterLink onClick={onContactClick}>{t.quickItems[3]}</FooterLink>
           </div>
         </div>
 
@@ -292,8 +284,7 @@ export const Footer: React.FC<FooterProps> = ({
               fontFamily: "'Barlow',sans-serif",
             }}
           >
-            © 2025 Click Express Inc. All rights reserved. · DOT & FMCSA
-            Licensed Carrier · Hallandale Beach, FL
+            {t.copyright}
           </p>
           <p
             style={{

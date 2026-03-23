@@ -1,19 +1,19 @@
 import React, { useState, useRef, useEffect } from "react";
 import { ThemeProvider, useTheme } from "./theme";
-import { Header } from "./components/Header";
-import { Hero } from "./components/Hero";
-import { Ticker } from "./components/Ticker";
-import { TrustStrip } from "./components/TrustStrip";
-import { AboutSection } from "./components/AboutSection";
-import { Footer } from "./components/Footer";
-import { QuoteModal } from "./components/QuoteModal";
-import { AuthModal } from "./components/AuthModal";
+import { Header } from "./components/layout/Header";
+import { Hero } from "./components/sections/Hero";
+import { Ticker } from "./components/layout/Ticker";
+import { TrustStrip } from "./components/sections/TrustStrip";
+import { AboutSection } from "./components/sections/AboutSection";
+import { Footer } from "./components/layout/Footer";
+import { QuoteModal } from "./components/Modals/QuoteModal";
+import { AuthModal } from "./components/Modals/AuthModal";
 import { getSession, logout, type Session } from "./services/authService";
-import { LoadListView } from "./components/LoadList";
-import { LoadDetailPage } from "./components/LoadDetailPage";
-import { CareersPage } from "./components/CareersPage";
-import { Notification } from "./components/Notification";
-import { PhoneIcon } from "./components/PhoneIcon";
+import { LoadListView } from "./components/loads/LoadList";
+import { LoadDetailPage } from "./components/loads/LoadDetailPage";
+import { CareersPage } from "./components/pages/CareersPage";
+import { Notification } from "./components/ui/Notification";
+import { PhoneIcon } from "./components/ui/PhoneIcon";
 import { LOADS } from "./utils/data";
 import type { Load } from "./types/index";
 import { filterLoads, fetchLoads } from "./services/loadService.ts";
@@ -260,6 +260,7 @@ function AppContent() {
       onAboutClick={() => { setDetailLoad(null); setShowCareers(false); setTimeout(() => scrollTo(aboutRef), 50); }}
       onContactClick={() => { setDetailLoad(null); setShowCareers(false); setTimeout(() => scrollTo(contactRef), 50); }}
       onQuoteClick={() => setShowQuote(true)}
+      onCareersClick={() => { setDetailLoad(null); setShowCareers(true); window.scrollTo({ top: 0, behavior: "smooth" }); }}
       onSavedClick={() => setShowFavorites(true)}
       onRequestsClick={() => setShowRequests(true)}
       onLoginClick={() => setShowAuth(true)}
@@ -348,16 +349,24 @@ function AppContent() {
 
             {/* Horizontal scroll cards */}
             <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))", gap:16 }}>
-              {best.map((l, i) => (
+              {best.map((l, i) => {
+                const isSaved = savedLoads.some(s => s.id === l.id);
+                const isBooked = bookedLoads.some(b => b.id === l.id);
+                return (
                 <div key={l.id} onClick={() => { setDetailLoad(l); window.scrollTo({ top:0, behavior:"smooth" }); }}
                   style={{ borderRadius:12, overflow:"hidden", cursor:"pointer", border:"1px solid rgba(204,0,0,0.35)", background:cardBg, animation:`weeklyGlow ${2 + i * 0.3}s ease infinite`, transition:"transform 0.25s, box-shadow 0.25s", position:"relative" }}
                   onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform="translateY(-6px)"; (e.currentTarget as HTMLElement).style.border="1px solid #CC0000"; }}
                   onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform="none"; (e.currentTarget as HTMLElement).style.border="1px solid rgba(204,0,0,0.35)"; }}
                 >
-                  {/* Star badge */}
                   <div style={{ position:"absolute", top:10, left:10, zIndex:2, background:"linear-gradient(135deg,#CC0000,#ff4d4d)", borderRadius:20, padding:"4px 10px", display:"flex", alignItems:"center", gap:5, boxShadow:"0 4px 12px rgba(204,0,0,0.5)" }}>
                     <svg width="10" height="10" viewBox="0 0 24 24" fill="#fff"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
                     <span style={{ fontFamily:"'Barlow',sans-serif", fontWeight:800, fontSize:8, color:"#fff", letterSpacing:1.5, textTransform:"uppercase" }}>Best of Week</span>
+                  </div>
+                  {/* Heart button */}
+                  <div onClick={e => { e.stopPropagation(); handleSave(l, !isSaved); }} style={{ position:"absolute", top:10, right:10, zIndex:2, width:32, height:32, borderRadius:"50%", background: isSaved ? "rgba(204,0,0,0.85)" : "rgba(0,0,0,0.5)", border:`1px solid ${isSaved ? "#CC0000" : "rgba(255,255,255,0.2)"}`, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", backdropFilter:"blur(4px)", transition:"all 0.2s" }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform="scale(1.15)"; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform="scale(1)"; }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill={isSaved ? "#fff" : "none"} stroke={isSaved ? "none" : "#fff"} strokeWidth="2"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
                   </div>
                   <div style={{ position:"relative", height:160 }}>
                     <img src={l.image} alt={l.route} style={{ width:"100%", height:"100%", objectFit:"cover", filter:"brightness(0.6)" }} />
@@ -375,10 +384,19 @@ function AppContent() {
                       <div style={{ width:7, height:7, borderRadius:"50%", background:"#CC0000" }} />
                       <span style={{ fontFamily:"'Barlow',sans-serif", fontWeight:700, fontSize:12, color:textColor }}>{l.dest}</span>
                     </div>
-                    <div style={{ fontFamily:"'Barlow',sans-serif", fontSize:10, color:theme==="dark"?"rgba(255,255,255,0.35)":"rgba(0,0,0,0.45)", textTransform:"uppercase", letterSpacing:1 }}>{l.cargo}</div>
+                    <div style={{ fontFamily:"'Barlow',sans-serif", fontSize:10, color:theme==="dark"?"rgba(255,255,255,0.35)":"rgba(0,0,0,0.45)", textTransform:"uppercase", letterSpacing:1, marginBottom:10 }}>{l.cargo}</div>
+                    {/* Book button */}
+                    <div onClick={e => e.stopPropagation()}>
+                      <button onClick={() => isBooked ? handleCancelBook(l) : handleBook(l)} style={{ width:"100%", padding:"7px", background: isBooked ? "rgba(0,180,80,0.12)" : "#CC0000", border: isBooked ? "1px solid rgba(0,180,80,0.4)" : "none", borderRadius:6, color: isBooked ? "#00b450" : "#fff", fontFamily:"'Barlow',sans-serif", fontWeight:800, fontSize:10, letterSpacing:1.5, textTransform:"uppercase", cursor:"pointer", transition:"all 0.15s" }}
+                        onMouseEnter={e => { e.currentTarget.style.opacity="0.85"; }}
+                        onMouseLeave={e => { e.currentTarget.style.opacity="1"; }}>
+                        {isBooked ? "✓ REQUESTED" : "BOOK LOAD"}
+                      </button>
+                    </div>
                   </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
             <div style={{ height:1, background:"linear-gradient(to right,transparent,rgba(204,0,0,0.4),transparent)", margin:"40px 0 0" }} />
           </section>

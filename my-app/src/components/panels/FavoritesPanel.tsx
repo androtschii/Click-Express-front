@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { Load } from "../types/index";
+import type { Load } from "../../types/index";
 
 interface FavoritesPanelProps {
   loads: Load[];

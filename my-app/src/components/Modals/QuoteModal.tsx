@@ -1,6 +1,6 @@
 import React, { useState, useContext } from "react";
-import { ThemeContext } from "../theme";
-import type { QuoteFormData } from "../types/index";
+import { ThemeContext } from "../../theme";
+import type { QuoteFormData } from "../../types/index";
 
 interface QuoteModalProps {
   onClose?: () => void;
@@ -24,17 +24,15 @@ export const QuoteModal: React.FC<QuoteModalProps> = ({ onClose, theme: themePro
 
   const set = (field: string, value: string) => setForm(f => ({ ...f, [field]: value }));
 
-  const getEstimate = () => {
+  const estimate = (() => {
     if (!form.from || !form.to) return null;
-    const base = 1200 + Math.random() * 3000;
-    const perMile = 2.8 + Math.random() * 1.2;
-    const estMiles = 500 + Math.random() * 1500;
-    const estPrice = Math.round(base + perMile * estMiles / 100) * 100;
-    const days = Math.ceil(estMiles / 500);
-    return { price: estPrice, miles: Math.round(estMiles), days };
-  };
-
-  const estimate = form.from && form.to ? getEstimate() : null;
+    let h = 0;
+    for (let i = 0; i < (form.from + form.to).length; i++) h = (h * 31 + (form.from + form.to).charCodeAt(i)) >>> 0;
+    const frac = (h % 10000) / 10000;
+    const estMiles = Math.round(500 + frac * 1500);
+    const estPrice = Math.round((1200 + frac * 3000 + (2.8 + frac * 1.2) * estMiles / 100) / 100) * 100;
+    return { price: estPrice, miles: estMiles, days: Math.ceil(estMiles / 500) };
+  })();
 
   const handleSubmit = () => {
     if (!form.name || !form.phone || !form.from || !form.to) {
@@ -87,7 +85,6 @@ export const QuoteModal: React.FC<QuoteModalProps> = ({ onClose, theme: themePro
               <button onClick={onClose} style={{ background: "rgba(204,0,0,0.1)", border: "1px solid rgba(204,0,0,0.3)", borderRadius: "50%", width: 36, height: 36, color: "#CC0000", fontSize: 16, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
             </div>
 
-            {/* Маршрут */}
             <div style={{ background: isDark ? "rgba(204,0,0,0.06)" : "rgba(204,0,0,0.04)", border: "1px solid rgba(204,0,0,0.2)", borderRadius: 8, padding: "16px", marginBottom: 20 }}>
               <div style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 10, color: "#CC0000", letterSpacing: 3, textTransform: "uppercase", marginBottom: 12 }}>🗺️ Route</div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr auto 1fr", gap: 8, alignItems: "center" }}>
@@ -103,7 +100,6 @@ export const QuoteModal: React.FC<QuoteModalProps> = ({ onClose, theme: themePro
               </div>
             </div>
 
-            {/* Предварительная оценка */}
             {estimate && (
               <div style={{ background: "rgba(0,180,80,0.08)", border: "1px solid rgba(0,180,80,0.25)", borderRadius: 8, padding: "14px 16px", marginBottom: 20, display: "flex", justifyContent: "space-around" }}>
                 <div style={{ textAlign: "center" }}>
@@ -123,7 +119,6 @@ export const QuoteModal: React.FC<QuoteModalProps> = ({ onClose, theme: themePro
               </div>
             )}
 
-            {/* Тип груза */}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 16 }}>
               <div>
                 <label style={labelStyle}>Cargo Type</label>
@@ -157,7 +152,6 @@ export const QuoteModal: React.FC<QuoteModalProps> = ({ onClose, theme: themePro
               <input value={form.cargo} onChange={e => set("cargo", e.target.value)} placeholder="Steel pipes, machinery parts..." style={inputStyle} onFocus={e => e.target.style.borderColor = "#CC0000"} onBlur={e => e.target.style.borderColor = isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)"} />
             </div>
 
-            {/* Контакты */}
             <div style={{ background: isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.03)", border: `1px solid ${isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)"}`, borderRadius: 8, padding: "16px", marginBottom: 20 }}>
               <div style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 10, color: "#CC0000", letterSpacing: 3, textTransform: "uppercase", marginBottom: 12 }}>👤 Contact Info</div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>

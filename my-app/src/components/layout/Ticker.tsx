@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { ThemeContext } from "../theme";
+import { ThemeContext } from "../../theme";
 
 export const Ticker: React.FC = () => {
   const context = useContext(ThemeContext) as { theme?: 'dark' | 'light'; toggleTheme?: () => void };

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { CELogo } from "./Logo";
-import type { Session } from "../services/authService";
+import { CELogo } from "../ui/Logo";
+import type { Session } from "../../services/authService";
 
 interface HeaderProps {
   cartCount: number;
@@ -11,6 +11,7 @@ interface HeaderProps {
   onAboutClick: () => void;
   onContactClick: () => void;
   onQuoteClick: () => void;
+  onCareersClick?: () => void;
   onSavedClick?: () => void;
   onRequestsClick?: () => void;
   onLoginClick?: () => void;
@@ -34,7 +35,6 @@ const PhoneLink: React.FC = () => {
     <a href="tel:+17862026599" onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
       style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none", flexShrink: 0, whiteSpace: "nowrap", transition: "all 0.2s" }}
     >
-      {/* Красивая иконка телефона */}
       <div style={{
         width: 32, height: 32, borderRadius: "50%",
         background: hov
@@ -59,7 +59,7 @@ const PhoneLink: React.FC = () => {
 
 export const Header: React.FC<HeaderProps> = ({
   cartCount, savedCount = 0, theme = 'dark', onThemeToggle,
-  onCatalogClick, onAboutClick, onContactClick, onQuoteClick, onSavedClick, onRequestsClick, onLoginClick,
+  onCatalogClick, onAboutClick, onContactClick, onQuoteClick, onCareersClick, onSavedClick, onRequestsClick, onLoginClick,
   session, onLogout, onLogoClick,
 }) => {
   const [scrolled, setScrolled] = useState(false);
@@ -76,7 +76,7 @@ export const Header: React.FC<HeaderProps> = ({
   const handleSavedClick = () => {
     setHeartBurst(true);
     setTimeout(() => setHeartBurst(false), 600);
-    onSavedClick && onSavedClick();
+    if (onSavedClick) onSavedClick();
   };
 
   return (
@@ -94,7 +94,6 @@ export const Header: React.FC<HeaderProps> = ({
         @keyframes ringOut { 0%{transform:translate(-50%,-50%) scale(0.3);opacity:1} 100%{transform:translate(-50%,-50%) scale(2.5);opacity:0} }
       `}</style>
 
-      {/* Лого */}
       <div onClick={onLogoClick || (() => window.scrollTo({ top: 0, behavior: "smooth" }))} style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", flexShrink: 0 }}>
         <CELogo size={42} />
         <div style={{ lineHeight: 1 }}>
@@ -114,11 +113,11 @@ export const Header: React.FC<HeaderProps> = ({
         <NavLink onClick={onQuoteClick}>Get Quote</NavLink>
         <NavLink onClick={onAboutClick}>About Us</NavLink>
         <NavLink onClick={onContactClick}>Contact</NavLink>
+        <NavLink onClick={onCareersClick}>Careers</NavLink>
       </nav>
 
       <PhoneLink />
 
-      {/* Переключатель темы */}
       {onThemeToggle && (
         <div onClick={onThemeToggle} style={{
           width: 56, height: 28, borderRadius: 14,
@@ -141,7 +140,6 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
       )}
 
-      {/* Красивое сердечко с анимацией */}
       {savedCount > 0 && (
         <div onClick={handleSavedClick} style={{
           display: "flex", alignItems: "center", gap: 6,
@@ -155,11 +153,9 @@ export const Header: React.FC<HeaderProps> = ({
           onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 0 20px rgba(204,0,0,0.5)"; e.currentTarget.style.background = "linear-gradient(135deg, rgba(204,0,0,0.35), rgba(255,77,109,0.25))"; }}
           onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 0 12px rgba(204,0,0,0.2)"; e.currentTarget.style.background = "linear-gradient(135deg, rgba(204,0,0,0.2), rgba(255,77,109,0.15))"; }}
         >
-          {/* Кольцо взрыва */}
           {heartBurst && (
             <div style={{ position: "absolute", left: "18px", top: "50%", width: 28, height: 28, borderRadius: "50%", border: "2px solid #ff4d6d", animation: "ringOut 0.5s ease-out forwards", pointerEvents: "none" }} />
           )}
-          {/* SVG сердечко */}
           <div style={{ animation: heartBurst ? "heartPulse 0.6s ease" : "none", display: "flex", alignItems: "center", justifyContent: "center" }}>
             <svg width="18" height="18" viewBox="0 0 24 24">
               <defs>
@@ -176,13 +172,11 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
       )}
 
-      {/* Login / User avatar */}
       {session ? (
         <div style={{ position: "relative", flexShrink: 0 }}>
           <div onClick={() => setUserMenuOpen(o => !o)} style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", padding: "4px 10px 4px 4px", borderRadius: 24, border: "1px solid rgba(204,0,0,0.4)", background: "rgba(204,0,0,0.1)", transition: "all 0.2s" }}
             onMouseEnter={e => { e.currentTarget.style.background = "rgba(204,0,0,0.2)"; e.currentTarget.style.borderColor = "#CC0000"; }}
             onMouseLeave={e => { e.currentTarget.style.background = "rgba(204,0,0,0.1)"; e.currentTarget.style.borderColor = "rgba(204,0,0,0.4)"; }}>
-            {/* Avatar circle */}
             {session.avatar ? (
               <img src={session.avatar} alt="" style={{ width: 30, height: 30, borderRadius: "50%", objectFit: "cover", border: "1px solid #CC0000" }} />
             ) : (
@@ -198,7 +192,6 @@ export const Header: React.FC<HeaderProps> = ({
             </svg>
           </div>
 
-          {/* Dropdown */}
           {userMenuOpen && (
             <div onClick={() => setUserMenuOpen(false)} style={{ position: "absolute", top: "calc(100% + 8px)", right: 0, minWidth: 180, background: "#0f0f0f", border: "1px solid rgba(204,0,0,0.3)", borderRadius: 10, overflow: "hidden", boxShadow: "0 16px 40px rgba(0,0,0,0.7)", zIndex: 100 }}>
               <div style={{ padding: "12px 14px", borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
@@ -231,7 +224,6 @@ export const Header: React.FC<HeaderProps> = ({
         </button>
       )}
 
-      {/* Кнопка Requests */}
       <button
         onMouseEnter={() => setReqHov(true)}
         onMouseLeave={() => setReqHov(false)}

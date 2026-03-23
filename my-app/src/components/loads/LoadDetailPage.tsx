@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import type { Load } from "../types/index";
+import type { Load } from "../../types/index";
 
 interface LoadDetailPageProps {
   load: Load;

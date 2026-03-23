@@ -1,5 +1,5 @@
 import React from "react";
-import type { Load } from "../types/index";
+import type { Load } from "../../types/index";
 import { LoadCard } from "./LoadCard";
 import { SearchBar } from "./SearchBar";
 import { FilterButtons } from "./FilterButtons";
@@ -49,20 +49,17 @@ theme = 'dark', onSearchChange, onFilterChange, onBook, onCancelBook, onSave, on
 
   return (
     <div>
-      {/* Поиск + фильтры */}
       <div style={{ background: searchBg, border: `1px solid ${searchBorder}`, borderRadius: 6, padding: "16px 20px", display: "flex", gap: 14, alignItems: "center", flexWrap: "wrap", marginBottom: 18 }}>
         <SearchBar value={search} onChange={onSearchChange} theme={theme} />
         <FilterButtons active={filter} onChange={onFilterChange} theme={theme} />
       </div>
 
-      {/* Счётчик */}
       <div style={{ display: "flex", gap: 12, marginBottom: 26, flexWrap: "wrap" }}>
         <div style={{ background: "rgba(204,0,0,0.08)", border: "1px solid rgba(204,0,0,0.22)", borderRadius: 4, padding: "7px 16px", fontFamily: "'Barlow',sans-serif", fontWeight: 600, fontSize: 12, color: "#CC0000", letterSpacing: 1 }}>
           📋 {loads.length} Load{loads.length !== 1 ? "s" : ""} Available
         </div>
       </div>
 
-      {/* Карточки */}
       {loads.length === 0 ? (
         <div style={{ textAlign: "center", padding: "80px 20px", border: `1px dashed ${emptyBorder}`, borderRadius: 6 }}>
           <div style={{ fontSize: 48, marginBottom: 14 }}>🚛</div>

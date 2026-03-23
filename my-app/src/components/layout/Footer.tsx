@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { CELogo } from "./Logo";
-import { PhoneIcon } from "./PhoneIcon";
+import { CELogo } from "../ui/Logo";
+import { PhoneIcon } from "../ui/PhoneIcon";
 
 interface FooterProps {
   theme?: "dark" | "light";
@@ -78,7 +78,6 @@ export const Footer: React.FC<FooterProps> = ({
             marginBottom: 44,
           }}
         >
-          {/* Brand col */}
           <div>
             <div
               style={{
@@ -195,7 +194,6 @@ export const Footer: React.FC<FooterProps> = ({
             </div>
           </div>
 
-          {/* Services */}
           <div>
             <div
               style={{
@@ -224,7 +222,6 @@ export const Footer: React.FC<FooterProps> = ({
             </FooterLink>
           </div>
 
-          {/* Company */}
           <div>
             <div
               style={{
@@ -252,7 +249,6 @@ export const Footer: React.FC<FooterProps> = ({
             </FooterLink>
           </div>
 
-          {/* Quick Links */}
           <div>
             <div
               style={{

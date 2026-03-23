@@ -71,7 +71,7 @@ export const Catalog = React.forwardRef<HTMLDivElement, CatalogProps>(
               style={{
                 color: "transparent",
                 WebkitTextStroke: "1.5px rgba(255,255,255,0.18)",
-              } as any}
+              } as React.CSSProperties}
             >
               OF THE WEEK
             </span>

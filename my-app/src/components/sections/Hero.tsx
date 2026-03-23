@@ -1,5 +1,5 @@
 import React, { useState, useContext } from "react";
-import { ThemeContext } from "../theme";
+import { ThemeContext } from "../../theme";
 
 interface HeroBtnProps {
   children: React.ReactNode;

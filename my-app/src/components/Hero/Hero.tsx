@@ -156,7 +156,7 @@ export const Hero: React.FC<HeroProps> = ({ onViewLoads, onQuoteClick }) => {
             lineHeight: 0.9,
             margin: "0 0 8px",
             textTransform: "uppercase",
-          } as any}
+          } as React.CSSProperties}
         >
           DOESN'T MOVE
         </h1>

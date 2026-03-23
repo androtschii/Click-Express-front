@@ -1,5 +1,5 @@
 import React from 'react';
-import logoSrc from '../assets/logo.jpg';
+import logoSrc from '../../assets/logo.jpg';
 
 interface CELogoProps {
   size?: number;

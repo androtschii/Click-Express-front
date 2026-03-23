@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
-import { ThemeContext } from "../theme";
-import type { Load } from "../types/index";
+import { ThemeContext } from "../../theme";
+import type { Load } from "../../types/index";
 
 interface LoadCardProps {
   load: Load;
@@ -15,7 +15,7 @@ interface LoadCardProps {
 const HeartIcon = ({ saved, onClick }: { saved: boolean; onClick: () => void }) => {
   const [burst, setBurst] = useState(false);
   const handleClick = (e: React.MouseEvent) => {
-    e.stopPropagation(); // prevent opening detail page
+    e.stopPropagation();
     if (!saved) { setBurst(true); setTimeout(() => setBurst(false), 600); }
     onClick();
   };
@@ -55,15 +55,15 @@ export const LoadCard: React.FC<LoadCardProps> = ({ load, onBook, onCancelBook, 
   const handleBook = () => {
     if (!booked) {
       setBooked(true);
-      onBook && onBook(load);
+      if (onBook) onBook(load);
     } else {
       setBooked(false);
-      onCancelBook && onCancelBook(load);
+      if (onCancelBook) onCancelBook(load);
     }
   };
 
   const handleSaveClick = () => {
-    setSaved(s => { const next = !s; onSave && onSave(next, load); return next; });
+    setSaved(s => { const next = !s; if (onSave) onSave(next, load); return next; });
   };
 
   const textPrimary   = isDark ? "rgba(255,255,255,0.85)" : "#1a1a1a";

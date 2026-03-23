@@ -5,7 +5,7 @@ import {
   loginWithGoogle,
   getSession,
   type Session,
-} from "../services/authService";
+} from "../../services/authService";
 
 interface AuthModalProps {
   onClose: () => void;

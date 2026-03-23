@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { PhoneIcon } from "./PhoneIcon";
+import { PhoneIcon } from "../ui/PhoneIcon";
 
 interface CareersPageProps {
   theme?: "dark" | "light";

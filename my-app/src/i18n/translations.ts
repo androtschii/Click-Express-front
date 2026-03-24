@@ -57,6 +57,14 @@ export const translations = {
       partial: "Partial",
       military: "Military Load",
     },
+    weeklyBest: {
+      badge: "Weekly Special",
+      title: "BEST LOAD",
+      titleHighlight: "OF THE WEEK",
+      cardBadge: "Best of Week",
+      bookLoad: "BOOK LOAD",
+      requested: "✓ REQUESTED",
+    },
     search: {
       placeholder: "Search by city or state...",
     },
@@ -159,6 +167,14 @@ export const translations = {
       fullLoad: "Полная загрузка",
       partial: "Частичная",
       military: "Военный груз",
+    },
+    weeklyBest: {
+      badge: "Акция недели",
+      title: "ЛУЧШИЙ ГРУЗ",
+      titleHighlight: "НЕДЕЛИ",
+      cardBadge: "Лучший недели",
+      bookLoad: "ЗАБРОНИРОВАТЬ",
+      requested: "✓ ЗАЯВКА ПОДАНА",
     },
     search: {
       placeholder: "Поиск по городу или штату...",

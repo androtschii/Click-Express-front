@@ -20,6 +20,28 @@ import { LOADS } from "./utils/data";
 import type { Load } from "./types/index";
 import { filterLoads, fetchLoads } from "./services/loadService.ts";
 
+// ── Анимированное сердечко для секции "Лучшие грузы недели" ──────────────
+function WeeklyHeartBtn({ saved, onClick }: { saved: boolean; onClick: () => void }) {
+  const [burst, setBurst] = useState(false);
+  const handleClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!saved) { setBurst(true); setTimeout(() => setBurst(false), 600); }
+    onClick();
+  };
+  return (
+    <button onClick={handleClick} style={{ position:"absolute", top:10, right:10, zIndex:3, width:38, height:38, borderRadius:"50%", border:"none", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", background: saved ? "linear-gradient(135deg, #ff4d6d, #CC0000)" : "rgba(0,0,0,0.55)", boxShadow: saved ? "0 0 16px rgba(204,0,0,0.7), 0 0 32px rgba(204,0,0,0.3)" : "0 2px 8px rgba(0,0,0,0.4)", transition:"all 0.3s ease", animation: burst ? "heartBeat 0.6s ease" : "none", overflow:"visible" }}>
+      {burst && <div style={{ position:"absolute", left:"50%", top:"50%", width:38, height:38, borderRadius:"50%", border:"2px solid #ff4d6d", animation:"burstRing 0.5s ease-out forwards", pointerEvents:"none", transform:"translate(-50%,-50%)" }} />}
+      {burst && [0,45,90,135,180,225,270,315].map((deg, i) => {
+        const rad = deg * Math.PI / 180;
+        return <div key={i} style={{ position:"absolute", left:"50%", top:"50%", width:5, height:5, borderRadius:"50%", background: i%2===0 ? "#ff4d6d" : "#FFB300", animation:"particle 0.5s ease-out forwards", "--tx":`${Math.cos(rad)*18}px`, "--ty":`${Math.sin(rad)*18}px`, pointerEvents:"none" } as React.CSSProperties} />;
+      })}
+      <svg width="18" height="18" viewBox="0 0 24 24" style={{ transition:"all 0.3s", filter: saved ? "drop-shadow(0 0 4px rgba(255,100,100,0.8))" : "none" }}>
+        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill={saved ? "#fff" : "none"} stroke={saved ? "#fff" : "rgba(255,255,255,0.9)"} strokeWidth={saved ? "0" : "2"} style={{ transition:"all 0.3s" }} />
+      </svg>
+    </button>
+  );
+}
+
 // ── Панель избранного ─────────────────────────────────────────────────────
 function FavoritesPanel({ loads, theme, onClose, onDetails, onRemove }: { loads: Load[]; theme: string; onClose: () => void; onDetails?: (l: Load) => void; onRemove?: (l: Load) => void }) {
   const isDark = theme === "dark";
@@ -180,6 +202,7 @@ function AppContent() {
   const { theme, toggleTheme } = useTheme();
   const { lang } = useLanguage();
   const tn = translations[lang].notifications;
+  const [weeklyIdx, setWeeklyIdx] = useState(0);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("All Loads");
   const [loads, setLoads] = useState<Load[]>([]);
@@ -332,80 +355,159 @@ function AppContent() {
         <AboutSection onContactClick={() => scrollTo(contactRef)} theme={theme} />
       </div>
 
-      {/* ── WEEKLY BEST ──────────────────────────────────────────────────── */}
+      {/* ── WEEKLY BEST CAROUSEL ─────────────────────────────────────────── */}
       {!loading && (() => {
-        const best = loads.filter(l => l.tag === "Best Load of the Week").slice(0, 4);
+        const best = loads.filter(l => l.tag === "Best Load of the Week").slice(0, 6);
         if (!best.length) return null;
+        const tw = translations[lang].weeklyBest;
+        const visible = 3;
+        const maxIdx = Math.max(0, best.length - visible);
+        const canPrev = weeklyIdx > 0;
+        const canNext = weeklyIdx < maxIdx;
+        const needArrows = best.length > visible;
+        // track width: e.g. 4 cards → 133.33%; each card → 25% of track = 33.33% of viewport
+        const trackW = (best.length / visible) * 100;
+        // one step = 1/best.length of track width
+        const step = 100 / best.length;
+
+        const arrowBase: React.CSSProperties = {
+          position: "absolute", top: "50%", zIndex: 10,
+          width: 52, height: 52, borderRadius: "50%", border: "none",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)",
+          transition: "transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease",
+        };
+
         return (
           <section style={{ maxWidth: 1240, margin: "0 auto", padding: "56px clamp(20px,4vw,56px) 0" }}>
             <style>{`
-              @keyframes weeklyGlow { 0%,100%{box-shadow:0 0 20px rgba(204,0,0,0.25)} 50%{box-shadow:0 0 40px rgba(204,0,0,0.55)} }
-              @keyframes starSpin { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }
+              @keyframes weeklyGlow{0%,100%{box-shadow:0 0 20px rgba(204,0,0,0.25)}50%{box-shadow:0 0 40px rgba(204,0,0,0.55)}}
+              @keyframes heartBeat{0%{transform:scale(1)}25%{transform:scale(1.4)}50%{transform:scale(1.1)}75%{transform:scale(1.25)}100%{transform:scale(1)}}
+              @keyframes burstRing{0%{transform:translate(-50%,-50%) scale(0.3);opacity:1}100%{transform:translate(-50%,-50%) scale(2.2);opacity:0}}
+              @keyframes particle{0%{transform:translate(0,0) scale(1);opacity:1}100%{transform:translate(var(--tx),var(--ty)) scale(0);opacity:0}}
             `}</style>
-            {/* Header */}
-            <div style={{ display:"flex", alignItems:"center", gap:16, marginBottom:24 }}>
+
+            {/* Заголовок */}
+            <div style={{ display:"flex", alignItems:"center", gap:16, marginBottom:28 }}>
               <div style={{ width:44, height:44, borderRadius:"50%", background:"linear-gradient(135deg,#CC0000,#ff4d4d)", display:"flex", alignItems:"center", justifyContent:"center", animation:"weeklyGlow 2s ease infinite", flexShrink:0 }}>
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="#fff"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
               </div>
               <div>
-                <div style={{ fontFamily:"'Barlow',sans-serif", fontWeight:700, fontSize:10, color:"#CC0000", letterSpacing:4, textTransform:"uppercase", marginBottom:4 }}>★ Weekly Special</div>
+                <div style={{ fontFamily:"'Barlow',sans-serif", fontWeight:700, fontSize:10, color:"#CC0000", letterSpacing:4, textTransform:"uppercase", marginBottom:4 }}>★ {tw.badge}</div>
                 <h2 style={{ fontFamily:"'Oswald',sans-serif", fontWeight:700, fontSize:"clamp(26px,4vw,42px)", color:textColor, textTransform:"uppercase", lineHeight:1 }}>
-                  BEST LOAD <span style={{ color:"#CC0000" }}>OF THE WEEK</span>
+                  {tw.title} <span style={{ color:"#CC0000" }}>{tw.titleHighlight}</span>
                 </h2>
               </div>
             </div>
 
-            {/* Horizontal scroll cards */}
-            <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))", gap:16 }}>
-              {best.map((l, i) => {
-                const isSaved = savedLoads.some(s => s.id === l.id);
-                const isBooked = bookedLoads.some(b => b.id === l.id);
-                return (
-                <div key={l.id} onClick={() => { setDetailLoad(l); window.scrollTo({ top:0, behavior:"smooth" }); }}
-                  style={{ borderRadius:12, overflow:"hidden", cursor:"pointer", border:"1px solid rgba(204,0,0,0.35)", background:cardBg, animation:`weeklyGlow ${2 + i * 0.3}s ease infinite`, transition:"transform 0.25s, box-shadow 0.25s", position:"relative" }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform="translateY(-6px)"; (e.currentTarget as HTMLElement).style.border="1px solid #CC0000"; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform="none"; (e.currentTarget as HTMLElement).style.border="1px solid rgba(204,0,0,0.35)"; }}
+            {/* Карусель + стрелки по бокам */}
+            <div style={{ position:"relative", padding: needArrows ? "0 68px" : "0" }}>
+
+              {/* Левая стрелка */}
+              {needArrows && (
+                <button
+                  onClick={() => canPrev && setWeeklyIdx(i => i - 1)}
+                  style={{ ...arrowBase, left: 0, transform: "translateY(-50%)", cursor: canPrev ? "pointer" : "default",
+                    background: canPrev ? "linear-gradient(135deg,#CC0000,#ff3333)" : "rgba(255,255,255,0.05)",
+                    boxShadow: canPrev ? "0 8px 28px rgba(204,0,0,0.55), 0 0 0 1px rgba(204,0,0,0.25)" : "inset 0 0 0 1px rgba(255,255,255,0.07)",
+                  }}
+                  onMouseEnter={e => { if (canPrev) { (e.currentTarget as HTMLElement).style.transform="translateY(-50%) scale(1.12)"; (e.currentTarget as HTMLElement).style.boxShadow="0 14px 40px rgba(204,0,0,0.75), 0 0 0 2px rgba(204,0,0,0.4)"; }}}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform="translateY(-50%) scale(1)"; (e.currentTarget as HTMLElement).style.boxShadow = canPrev ? "0 8px 28px rgba(204,0,0,0.55), 0 0 0 1px rgba(204,0,0,0.25)" : "inset 0 0 0 1px rgba(255,255,255,0.07)"; }}
                 >
-                  <div style={{ position:"absolute", top:10, left:10, zIndex:2, background:"linear-gradient(135deg,#CC0000,#ff4d4d)", borderRadius:20, padding:"4px 10px", display:"flex", alignItems:"center", gap:5, boxShadow:"0 4px 12px rgba(204,0,0,0.5)" }}>
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="#fff"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                    <span style={{ fontFamily:"'Barlow',sans-serif", fontWeight:800, fontSize:8, color:"#fff", letterSpacing:1.5, textTransform:"uppercase" }}>Best of Week</span>
-                  </div>
-                  {/* Heart button */}
-                  <div onClick={e => { e.stopPropagation(); handleSave(l, !isSaved); }} style={{ position:"absolute", top:10, right:10, zIndex:2, width:32, height:32, borderRadius:"50%", background: isSaved ? "rgba(204,0,0,0.85)" : "rgba(0,0,0,0.5)", border:`1px solid ${isSaved ? "#CC0000" : "rgba(255,255,255,0.2)"}`, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", backdropFilter:"blur(4px)", transition:"all 0.2s" }}
-                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform="scale(1.15)"; }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform="scale(1)"; }}>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill={isSaved ? "#fff" : "none"} stroke={isSaved ? "none" : "#fff"} strokeWidth="2"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-                  </div>
-                  <div style={{ position:"relative", height:160 }}>
-                    <img src={l.image} alt={l.route} style={{ width:"100%", height:"100%", objectFit:"cover", filter:"brightness(0.6)" }} />
-                    <div style={{ position:"absolute", inset:0, background:"linear-gradient(to bottom,transparent 30%,rgba(0,0,0,0.9))" }} />
-                    <div style={{ position:"absolute", bottom:12, left:14 }}>
-                      <div style={{ fontFamily:"'Oswald',sans-serif", fontWeight:700, fontSize:28, color:"#fff", lineHeight:1, textShadow:"0 2px 8px rgba(0,0,0,0.8)" }}>${l.price.toLocaleString()}</div>
-                      <div style={{ fontFamily:"'Barlow',sans-serif", fontSize:11, color:"rgba(255,255,255,0.55)", marginTop:2 }}>{l.miles.toLocaleString()} miles · {(l.price/l.miles).toFixed(2)}/mi</div>
-                    </div>
-                  </div>
-                  <div style={{ padding:"12px 14px 14px" }}>
-                    <div style={{ display:"flex", alignItems:"center", gap:6, marginBottom:4 }}>
-                      <div style={{ width:7, height:7, borderRadius:"50%", border:"2px solid #CC0000" }} />
-                      <span style={{ fontFamily:"'Barlow',sans-serif", fontWeight:700, fontSize:12, color:textColor }}>{l.route}</span>
-                      <span style={{ color:"#CC0000" }}>→</span>
-                      <div style={{ width:7, height:7, borderRadius:"50%", background:"#CC0000" }} />
-                      <span style={{ fontFamily:"'Barlow',sans-serif", fontWeight:700, fontSize:12, color:textColor }}>{l.dest}</span>
-                    </div>
-                    <div style={{ fontFamily:"'Barlow',sans-serif", fontSize:10, color:theme==="dark"?"rgba(255,255,255,0.35)":"rgba(0,0,0,0.45)", textTransform:"uppercase", letterSpacing:1, marginBottom:10 }}>{l.cargo}</div>
-                    {/* Book button */}
-                    <div onClick={e => e.stopPropagation()}>
-                      <button onClick={() => isBooked ? handleCancelBook(l) : handleBook(l)} style={{ width:"100%", padding:"7px", background: isBooked ? "rgba(0,180,80,0.12)" : "#CC0000", border: isBooked ? "1px solid rgba(0,180,80,0.4)" : "none", borderRadius:6, color: isBooked ? "#00b450" : "#fff", fontFamily:"'Barlow',sans-serif", fontWeight:800, fontSize:10, letterSpacing:1.5, textTransform:"uppercase", cursor:"pointer", transition:"all 0.15s" }}
-                        onMouseEnter={e => { e.currentTarget.style.opacity="0.85"; }}
-                        onMouseLeave={e => { e.currentTarget.style.opacity="1"; }}>
-                        {isBooked ? "✓ REQUESTED" : "BOOK LOAD"}
-                      </button>
-                    </div>
-                  </div>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={canPrev ? "#fff" : "rgba(255,255,255,0.18)"} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="15 18 9 12 15 6"/>
+                  </svg>
+                </button>
+              )}
+
+              {/* Правая стрелка */}
+              {needArrows && (
+                <button
+                  onClick={() => canNext && setWeeklyIdx(i => i + 1)}
+                  style={{ ...arrowBase, right: 0, transform: "translateY(-50%)", cursor: canNext ? "pointer" : "default",
+                    background: canNext ? "linear-gradient(135deg,#CC0000,#ff3333)" : "rgba(255,255,255,0.05)",
+                    boxShadow: canNext ? "0 8px 28px rgba(204,0,0,0.55), 0 0 0 1px rgba(204,0,0,0.25)" : "inset 0 0 0 1px rgba(255,255,255,0.07)",
+                  }}
+                  onMouseEnter={e => { if (canNext) { (e.currentTarget as HTMLElement).style.transform="translateY(-50%) scale(1.12)"; (e.currentTarget as HTMLElement).style.boxShadow="0 14px 40px rgba(204,0,0,0.75), 0 0 0 2px rgba(204,0,0,0.4)"; }}}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform="translateY(-50%) scale(1)"; (e.currentTarget as HTMLElement).style.boxShadow = canNext ? "0 8px 28px rgba(204,0,0,0.55), 0 0 0 1px rgba(204,0,0,0.25)" : "inset 0 0 0 1px rgba(255,255,255,0.07)"; }}
+                >
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={canNext ? "#fff" : "rgba(255,255,255,0.18)"} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="9 18 15 12 9 6"/>
+                  </svg>
+                </button>
+              )}
+
+              {/* Viewport */}
+              <div style={{ overflow:"hidden" }}>
+                {/* Track — явная ширина для точного translateX */}
+                <div style={{
+                  display: "flex",
+                  width: `${trackW}%`,
+                  transform: `translateX(-${weeklyIdx * step}%)`,
+                  transition: "transform 0.48s cubic-bezier(0.25,0.46,0.45,0.94)",
+                }}>
+                  {best.map((l, i) => {
+                    const isSaved = savedLoads.some(s => s.id === l.id);
+                    const isBooked = bookedLoads.some(b => b.id === l.id);
+                    return (
+                      <div key={l.id} style={{ width:`${100 / best.length}%`, padding:"0 8px", boxSizing:"border-box" }}>
+                        <div onClick={() => { setDetailLoad(l); window.scrollTo({ top:0, behavior:"smooth" }); }}
+                          style={{ borderRadius:12, overflow:"hidden", cursor:"pointer", border:"1px solid rgba(204,0,0,0.35)", background:cardBg, animation:`weeklyGlow ${2+i*0.3}s ease infinite`, transition:"transform 0.25s, border-color 0.2s", position:"relative" }}
+                          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform="translateY(-6px)"; (e.currentTarget as HTMLElement).style.borderColor="#CC0000"; }}
+                          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform="none"; (e.currentTarget as HTMLElement).style.borderColor="rgba(204,0,0,0.35)"; }}>
+
+                          <div style={{ position:"absolute", top:10, left:10, zIndex:2, background:"linear-gradient(135deg,#CC0000,#ff4d4d)", borderRadius:20, padding:"4px 10px", display:"flex", alignItems:"center", gap:5, boxShadow:"0 4px 12px rgba(204,0,0,0.5)" }}>
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="#fff"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                            <span style={{ fontFamily:"'Barlow',sans-serif", fontWeight:800, fontSize:8, color:"#fff", letterSpacing:1.5, textTransform:"uppercase" }}>{tw.cardBadge}</span>
+                          </div>
+
+                          <WeeklyHeartBtn saved={isSaved} onClick={() => handleSave(l, !isSaved)} />
+
+                          <div style={{ position:"relative", height:185 }}>
+                            <img src={l.image} alt={l.route} style={{ width:"100%", height:"100%", objectFit:"cover", filter:"brightness(0.6)" }} />
+                            <div style={{ position:"absolute", inset:0, background:"linear-gradient(to bottom,transparent 30%,rgba(0,0,0,0.9))" }} />
+                            <div style={{ position:"absolute", bottom:12, left:14 }}>
+                              <div style={{ fontFamily:"'Oswald',sans-serif", fontWeight:700, fontSize:28, color:"#fff", lineHeight:1, textShadow:"0 2px 8px rgba(0,0,0,0.8)" }}>${l.price.toLocaleString()}</div>
+                              <div style={{ fontFamily:"'Barlow',sans-serif", fontSize:11, color:"rgba(255,255,255,0.55)", marginTop:2 }}>{l.miles.toLocaleString()} mi · {(l.price/l.miles).toFixed(2)}/mi</div>
+                            </div>
+                          </div>
+
+                          <div style={{ padding:"12px 14px 14px" }}>
+                            <div style={{ display:"flex", alignItems:"center", gap:6, marginBottom:4, flexWrap:"wrap" }}>
+                              <div style={{ width:7, height:7, borderRadius:"50%", border:"2px solid #CC0000", flexShrink:0 }} />
+                              <span style={{ fontFamily:"'Barlow',sans-serif", fontWeight:700, fontSize:12, color:textColor }}>{l.route}</span>
+                              <span style={{ color:"#CC0000" }}>→</span>
+                              <div style={{ width:7, height:7, borderRadius:"50%", background:"#CC0000", flexShrink:0 }} />
+                              <span style={{ fontFamily:"'Barlow',sans-serif", fontWeight:700, fontSize:12, color:textColor }}>{l.dest}</span>
+                            </div>
+                            <div style={{ fontFamily:"'Barlow',sans-serif", fontSize:10, color:theme==="dark"?"rgba(255,255,255,0.35)":"rgba(0,0,0,0.45)", textTransform:"uppercase", letterSpacing:1, marginBottom:10 }}>{l.cargo}</div>
+                            <div onClick={e => e.stopPropagation()}>
+                              <button onClick={() => isBooked ? handleCancelBook(l) : handleBook(l)}
+                                style={{ width:"100%", padding:"8px", background: isBooked ? "rgba(0,180,80,0.12)" : "#CC0000", border: isBooked ? "1px solid rgba(0,180,80,0.4)" : "none", borderRadius:6, color: isBooked ? "#00b450" : "#fff", fontFamily:"'Barlow',sans-serif", fontWeight:800, fontSize:10, letterSpacing:1.5, textTransform:"uppercase", cursor:"pointer", transition:"all 0.15s" }}
+                                onMouseEnter={e => { e.currentTarget.style.opacity="0.85"; }}
+                                onMouseLeave={e => { e.currentTarget.style.opacity="1"; }}>
+                                {isBooked ? tw.requested : tw.bookLoad}
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
-                );
-              })}
+              </div>
             </div>
+
+            {/* Точки снизу */}
+            {needArrows && (
+              <div style={{ display:"flex", justifyContent:"center", gap:6, marginTop:18 }}>
+                {Array.from({ length: maxIdx + 1 }).map((_, i) => (
+                  <div key={i} onClick={() => setWeeklyIdx(i)}
+                    style={{ width: weeklyIdx === i ? 28 : 8, height:8, borderRadius:4, background: weeklyIdx === i ? "#CC0000" : "rgba(204,0,0,0.28)", cursor:"pointer", transition:"all 0.35s ease", boxShadow: weeklyIdx === i ? "0 0 10px rgba(204,0,0,0.5)" : "none" }} />
+                ))}
+              </div>
+            )}
+
             <div style={{ height:1, background:"linear-gradient(to right,transparent,rgba(204,0,0,0.4),transparent)", margin:"40px 0 0" }} />
           </section>
         );

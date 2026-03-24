@@ -20,6 +20,8 @@ interface HeaderProps {
   session?: Session | null;
   onLogout?: () => void;
   onLogoClick?: () => void;
+  onProfileClick?: () => void;
+  onOrdersClick?: () => void;
 }
 
 const NavLink: React.FC<{ children: React.ReactNode; onClick?: () => void }> = ({ children, onClick }) => {
@@ -62,7 +64,7 @@ const PhoneLink: React.FC = () => {
 export const Header: React.FC<HeaderProps> = ({
   cartCount, savedCount = 0, theme = 'dark', onThemeToggle,
   onCatalogClick, onAboutClick, onContactClick, onQuoteClick, onCareersClick, onSavedClick, onRequestsClick, onLoginClick,
-  session, onLogout, onLogoClick,
+  session, onLogout, onLogoClick, onProfileClick, onOrdersClick,
 }) => {
   const [scrolled, setScrolled] = useState(false);
   const [reqHov, setReqHov] = useState(false);
@@ -224,8 +226,11 @@ export const Header: React.FC<HeaderProps> = ({
                 <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 11, color: "rgba(255,255,255,0.35)", marginTop: 2 }}>{session.email}</div>
               </div>
               <div style={{ padding: "6px 0" }}>
-                {[{ label: t.header.myProfile, icon: "👤" }, { label: t.header.myOrders, icon: "📋" }].map(item => (
-                  <div key={item.label} style={{ padding: "9px 14px", display: "flex", alignItems: "center", gap: 10, cursor: "pointer", fontFamily: "'Barlow',sans-serif", fontSize: 13, color: "rgba(255,255,255,0.7)", transition: "all 0.15s" }}
+                {[
+                  { label: t.header.myProfile, icon: "👤", onClick: onProfileClick },
+                  { label: t.header.myOrders, icon: "📋", onClick: onOrdersClick },
+                ].map(item => (
+                  <div key={item.label} onClick={() => { setUserMenuOpen(false); item.onClick?.(); }} style={{ padding: "9px 14px", display: "flex", alignItems: "center", gap: 10, cursor: "pointer", fontFamily: "'Barlow',sans-serif", fontSize: 13, color: "rgba(255,255,255,0.7)", transition: "all 0.15s" }}
                     onMouseEnter={e => { e.currentTarget.style.background = "rgba(204,0,0,0.1)"; e.currentTarget.style.color = "#fff"; }}
                     onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "rgba(255,255,255,0.7)"; }}>
                     <span>{item.icon}</span>{item.label}

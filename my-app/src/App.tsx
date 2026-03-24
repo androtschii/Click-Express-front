@@ -14,6 +14,8 @@ import { getSession, logout, type Session } from "./services/authService";
 import { LoadListView } from "./components/loads/LoadList";
 import { LoadDetailPage } from "./components/loads/LoadDetailPage";
 import { CareersPage } from "./components/pages/CareersPage";
+import { ProfilePage } from "./components/pages/ProfilePage";
+import { OrdersPage } from "./components/pages/OrdersPage";
 import { Notification } from "./components/ui/Notification";
 import { PhoneIcon } from "./components/ui/PhoneIcon";
 import { LOADS } from "./utils/data";
@@ -217,6 +219,8 @@ function AppContent() {
   const [session, setSession] = useState<Session | null>(() => getSession());
   const [detailLoad, setDetailLoad] = useState<Load | null>(null);
   const [showCareers, setShowCareers] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
+  const [showOrders, setShowOrders] = useState(false);
   const [notifications, setNotifications] = useState<string[]>([]);
 
   const catalogRef = useRef<HTMLDivElement>(null);
@@ -291,13 +295,15 @@ function AppContent() {
       onAboutClick={() => { setDetailLoad(null); setShowCareers(false); setTimeout(() => scrollTo(aboutRef), 50); }}
       onContactClick={() => { setDetailLoad(null); setShowCareers(false); setTimeout(() => scrollTo(contactRef), 50); }}
       onQuoteClick={() => setShowQuote(true)}
-      onCareersClick={() => { setDetailLoad(null); setShowCareers(true); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+      onCareersClick={() => { setDetailLoad(null); setShowCareers(true); setShowProfile(false); setShowOrders(false); window.scrollTo({ top: 0, behavior: "smooth" }); }}
       onSavedClick={() => setShowFavorites(true)}
       onRequestsClick={() => setShowRequests(true)}
       onLoginClick={() => setShowAuth(true)}
       session={session}
-      onLogout={() => { logout(); setSession(null); }}
-      onLogoClick={() => { setDetailLoad(null); setShowCareers(false); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+      onLogout={() => { logout(); setSession(null); setShowProfile(false); setShowOrders(false); }}
+      onLogoClick={() => { setDetailLoad(null); setShowCareers(false); setShowProfile(false); setShowOrders(false); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+      onProfileClick={() => { setDetailLoad(null); setShowCareers(false); setShowOrders(false); setShowProfile(true); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+      onOrdersClick={() => { setDetailLoad(null); setShowCareers(false); setShowProfile(false); setShowOrders(true); window.scrollTo({ top: 0, behavior: "smooth" }); }}
     />
   );
 
@@ -339,6 +345,53 @@ function AppContent() {
         </div>
         {showAuth && <AuthModal onClose={() => setShowAuth(false)} theme={theme} onSuccess={(s) => { setSession(s); setShowAuth(false); }} />}
         {showQuote && <QuoteModal onClose={() => setShowQuote(false)} theme={theme} />}
+      </div>
+    );
+  }
+
+  // ── Profile page ───────────────────────────────────────────────────────
+  if (showProfile && session) {
+    return (
+      <div style={{ background: bgColor, minHeight: "100vh", color: textColor }}>
+        {sharedStyle}
+        {sharedHeader}
+        <div style={{ paddingTop: 70 }}>
+          <ProfilePage
+            session={session}
+            theme={theme}
+            savedCount={savedLoads.length}
+            bookedCount={bookedLoads.length}
+            onBack={() => { setShowProfile(false); window.scrollTo({ top: 0 }); }}
+            onLogout={() => { logout(); setSession(null); setShowProfile(false); }}
+            onSessionUpdate={(name) => setSession(s => s ? { ...s, name } : s)}
+          />
+        </div>
+        {showAuth && <AuthModal onClose={() => setShowAuth(false)} theme={theme} onSuccess={(s) => { setSession(s); setShowAuth(false); }} />}
+        {showQuote && <QuoteModal onClose={() => setShowQuote(false)} theme={theme} />}
+      </div>
+    );
+  }
+
+  // ── Orders page ────────────────────────────────────────────────────────
+  if (showOrders) {
+    return (
+      <div style={{ background: bgColor, minHeight: "100vh", color: textColor }}>
+        {sharedStyle}
+        {sharedHeader}
+        <div style={{ paddingTop: 70 }}>
+          <OrdersPage
+            orders={bookedLoads}
+            theme={theme}
+            onBack={() => { setShowOrders(false); window.scrollTo({ top: 0 }); }}
+            onCancel={(load) => { handleCancelBook(load); }}
+            onDetails={(load) => { setShowOrders(false); setDetailLoad(load); window.scrollTo({ top: 0 }); }}
+          />
+        </div>
+        {showAuth && <AuthModal onClose={() => setShowAuth(false)} theme={theme} onSuccess={(s) => { setSession(s); setShowAuth(false); }} />}
+        {showQuote && <QuoteModal onClose={() => setShowQuote(false)} theme={theme} />}
+        {notifications.map((msg, idx) => (
+          <Notification key={idx} text={msg} onClose={() => setNotifications(n => n.filter((_, i) => i !== idx))} />
+        ))}
       </div>
     );
   }

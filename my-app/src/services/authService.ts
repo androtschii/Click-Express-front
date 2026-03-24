@@ -167,3 +167,42 @@ export function logout() {
   localStorage.removeItem(SESSION_KEY);
   deleteCookie(COOKIE_NAME);
 }
+
+export function getUserById(userId: string): User | null {
+  return getUsers().find((u) => u.id === userId) ?? null;
+}
+
+export function updateUser(
+  userId: string,
+  updates: { name?: string; currentPassword?: string; newPassword?: string }
+): { ok: boolean; error?: string } {
+  const users = getUsers();
+  const idx = users.findIndex((u) => u.id === userId);
+  if (idx === -1) return { ok: false, error: "User not found" };
+
+  const user = { ...users[idx] };
+
+  if (updates.name !== undefined) {
+    user.name = updates.name.trim();
+  }
+
+  if (updates.newPassword !== undefined) {
+    if (user.provider === "google") return { ok: false, error: "Cannot change password for Google accounts" };
+    if (user.password !== updates.currentPassword) return { ok: false, error: "wrong_password" };
+    if (updates.newPassword.length < 6) return { ok: false, error: "password_short" };
+    user.password = updates.newPassword;
+  }
+
+  users[idx] = user;
+  saveUsers(users);
+
+  // Update session name if changed
+  if (updates.name !== undefined) {
+    const session = JSON.parse(localStorage.getItem(SESSION_KEY) || "null") as Session | null;
+    if (session && session.userId === userId) {
+      localStorage.setItem(SESSION_KEY, JSON.stringify({ ...session, name: user.name }));
+    }
+  }
+
+  return { ok: true };
+}

@@ -95,7 +95,7 @@ export const CareersPage: React.FC<CareersPageProps> = ({ theme = "dark", onBack
       {/* ── Hero ── */}
       <div style={{ position: "relative", height: 420, overflow: "hidden", display: "flex", alignItems: "center" }}>
         <img
-          src="https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?w=1400&q=80"
+          src="/images/hero-bg.jpg"
           alt="careers"
           style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", filter: "brightness(0.25)" }}
         />

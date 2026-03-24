@@ -81,7 +81,7 @@ export const LoadCard: React.FC<LoadCardProps> = ({ load, onBook, onCancelBook, 
   return (
     <div onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)} style={{ background:cardBg, border:`1px solid ${hov?"#CC0000":cardBorder}`, borderRadius:6, overflow:"hidden", transform:hov?"translateY(-5px)":"none", boxShadow:hov?"0 24px 50px rgba(0,0,0,0.6), 0 0 0 1px rgba(204,0,0,0.2)":"none", transition:"all 0.25s ease" }}>
       <div onClick={() => onDetails && onDetails(load)} style={{ position:"relative", height:190, overflow:"hidden", cursor: onDetails ? "pointer" : "default" }}>
-        <img src={load.image} alt={load.route} style={{ width:"100%", height:"100%", objectFit:"cover", transform:hov?"scale(1.06)":"scale(1)", filter:"brightness(0.68)", transition:"transform 0.4s ease" }} />
+        <img src={load.image} alt={load.route} style={{ width:"100%", height:"100%", objectFit:"cover", objectPosition:"center 75%", transform:hov?"scale(1.06)":"scale(1)", filter:"brightness(0.68)", transition:"transform 0.4s ease" }} />
         {onDetails && (
           <div style={{ position:"absolute", bottom:14, right:14, background:"rgba(0,0,0,0.55)", border:"1px solid rgba(255,255,255,0.2)", borderRadius:20, padding:"4px 12px", fontFamily:"'Barlow',sans-serif", fontWeight:600, fontSize:10, color:"rgba(255,255,255,0.8)", letterSpacing:1, backdropFilter:"blur(4px)" }}>
             {t.viewDetails}

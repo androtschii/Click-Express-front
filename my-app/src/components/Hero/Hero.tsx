@@ -56,7 +56,7 @@ export const Hero: React.FC<HeroProps> = ({ onViewLoads, onQuoteClick }) => {
           position: "absolute",
           inset: 0,
           backgroundImage:
-            "url(https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?w=1800&q=90)",
+            "url(/images/hero-bg.jpg)",
           backgroundSize: "cover",
           backgroundPosition: "center 40%",
         }}

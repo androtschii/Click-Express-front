@@ -76,8 +76,8 @@ function FavoritesPanel({ loads, theme, onClose, onDetails, onRemove }: { loads:
                   onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = bord; (e.currentTarget as HTMLElement).style.transform = "none"; (e.currentTarget as HTMLElement).style.boxShadow = "none"; }}
                 >
                   <div style={{ position: "relative", height: 260 }}>
-                    <img src={l.image} alt={l.route} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 72%", filter: "brightness(0.62)" }} />
-                    <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, transparent 35%, rgba(0,0,0,0.88))" }} />
+                    <img src={l.image} alt={l.route} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 72%", filter: isDark ? "brightness(0.62)" : "brightness(0.75)" }} />
+                    <div style={{ position: "absolute", inset: 0, background: isDark ? "linear-gradient(to bottom, transparent 35%, rgba(0,0,0,0.88))" : "linear-gradient(to bottom, transparent 30%, rgba(0,0,0,0.65))" }} />
                     {l.tag && (
                       <div style={{ position: "absolute", top: 10, left: 10, background: l.tag === "Military Load" ? "#1a3a6b" : "#CC0000", color: "#fff", padding: "4px 10px", fontFamily: "'Barlow',sans-serif", fontWeight: 800, fontSize: 8, letterSpacing: 2, textTransform: "uppercase", borderRadius: 4 }}>
                         {l.tag === "Best Load of the Week" ? "★ " : "✈ "}{l.tag}
@@ -157,8 +157,8 @@ function RequestsPanel({ loads, theme, onClose, onDetails, onCancel }: { loads: 
                   onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(0,180,80,0.3)"; (e.currentTarget as HTMLElement).style.transform = "none"; (e.currentTarget as HTMLElement).style.boxShadow = "none"; }}
                 >
                   <div style={{ position: "relative", height: 260 }}>
-                    <img src={l.image} alt={l.route} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 72%", filter: "brightness(0.62)" }} />
-                    <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, transparent 35%, rgba(0,0,0,0.88))" }} />
+                    <img src={l.image} alt={l.route} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 72%", filter: isDark ? "brightness(0.62)" : "brightness(0.75)" }} />
+                    <div style={{ position: "absolute", inset: 0, background: isDark ? "linear-gradient(to bottom, transparent 35%, rgba(0,0,0,0.88))" : "linear-gradient(to bottom, transparent 30%, rgba(0,0,0,0.65))" }} />
                     <div style={{ position: "absolute", top: 10, right: 10, display: "flex", gap: 6 }}>
                       <div style={{ background: "rgba(0,180,80,0.9)", color: "#fff", borderRadius: 20, padding: "5px 12px", fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 9, letterSpacing: 1 }}>✓ REQUESTED</div>
                     </div>
@@ -312,6 +312,13 @@ function AppContent() {
     />
   );
 
+  const sharedPanels = (
+    <>
+      {showFavorites && <FavoritesPanel loads={savedLoads} theme={theme} onClose={() => setShowFavorites(false)} onDetails={(l) => { setShowFavorites(false); setDetailLoad(l); window.scrollTo({ top: 0 }); }} onRemove={(l) => { handleSave(l, false); notify(tn.removedFromFavorites); }} />}
+      {showRequests && <RequestsPanel loads={bookedLoads} theme={theme} onClose={() => setShowRequests(false)} onDetails={(l) => { setShowRequests(false); setDetailLoad(l); window.scrollTo({ top: 0 }); }} onCancel={(l) => handleCancelBook(l)} />}
+    </>
+  );
+
   // ── Detail page — full screen ──────────────────────────────────────────
   if (detailLoad) {
     return (
@@ -330,8 +337,7 @@ function AppContent() {
         </div>
         {showAuth && <AuthModal onClose={() => setShowAuth(false)} theme={theme} onSuccess={(s) => { setSession(s); setShowAuth(false); }} />}
         {showQuote && <QuoteModal onClose={() => setShowQuote(false)} theme={theme} />}
-        {showFavorites && <FavoritesPanel loads={savedLoads} theme={theme} onClose={() => setShowFavorites(false)} onDetails={(l) => { setShowFavorites(false); setDetailLoad(l); window.scrollTo({ top: 0 }); }} onRemove={(l) => { handleSave(l, false); notify(tn.removedFromFavorites); }} />}
-        {showRequests && <RequestsPanel loads={bookedLoads} theme={theme} onClose={() => setShowRequests(false)} onDetails={(l) => { setShowRequests(false); setDetailLoad(l); window.scrollTo({ top: 0 }); }} onCancel={(l) => handleCancelBook(l)} />}
+        {sharedPanels}
         {notifications.map((msg, idx) => (
           <Notification key={idx} text={msg} onClose={() => setNotifications(n => n.filter((_, i) => i !== idx))} />
         ))}
@@ -350,6 +356,7 @@ function AppContent() {
         </div>
         {showAuth && <AuthModal onClose={() => setShowAuth(false)} theme={theme} onSuccess={(s) => { setSession(s); setShowAuth(false); }} />}
         {showQuote && <QuoteModal onClose={() => setShowQuote(false)} theme={theme} />}
+        {sharedPanels}
       </div>
     );
   }
@@ -373,6 +380,7 @@ function AppContent() {
         </div>
         {showAuth && <AuthModal onClose={() => setShowAuth(false)} theme={theme} onSuccess={(s) => { setSession(s); setShowAuth(false); }} />}
         {showQuote && <QuoteModal onClose={() => setShowQuote(false)} theme={theme} />}
+        {sharedPanels}
       </div>
     );
   }
@@ -394,6 +402,7 @@ function AppContent() {
         </div>
         {showAuth && <AuthModal onClose={() => setShowAuth(false)} theme={theme} onSuccess={(s) => { setSession(s); setShowAuth(false); }} />}
         {showQuote && <QuoteModal onClose={() => setShowQuote(false)} theme={theme} />}
+        {sharedPanels}
         {notifications.map((msg, idx) => (
           <Notification key={idx} text={msg} onClose={() => setNotifications(n => n.filter((_, i) => i !== idx))} />
         ))}
@@ -522,8 +531,8 @@ function AppContent() {
                           <WeeklyHeartBtn saved={isSaved} onClick={() => handleSave(l, !isSaved)} />
 
                           <div style={{ position:"relative", height:210 }}>
-                            <img src={l.image} alt={l.route} style={{ width:"100%", height:"100%", objectFit:"cover", objectPosition:"center 72%", filter:"brightness(0.6)" }} />
-                            <div style={{ position:"absolute", inset:0, background:"linear-gradient(to bottom,transparent 30%,rgba(0,0,0,0.9))" }} />
+                            <img src={l.image} alt={l.route} style={{ width:"100%", height:"100%", objectFit:"cover", objectPosition:"center 72%", filter: theme === 'dark' ? "brightness(0.6)" : "brightness(0.75)" }} />
+                            <div style={{ position:"absolute", inset:0, background: theme === 'dark' ? "linear-gradient(to bottom,transparent 30%,rgba(0,0,0,0.9))" : "linear-gradient(to bottom,transparent 25%,rgba(0,0,0,0.68))" }} />
                             <div style={{ position:"absolute", bottom:12, left:14 }}>
                               <div style={{ fontFamily:"'Oswald',sans-serif", fontWeight:700, fontSize:28, color:"#fff", lineHeight:1, textShadow:"0 2px 8px rgba(0,0,0,0.8)" }}>${l.price.toLocaleString()}</div>
                               <div style={{ fontFamily:"'Barlow',sans-serif", fontSize:11, color:"rgba(255,255,255,0.55)", marginTop:2 }}>{l.miles.toLocaleString()} mi · {(l.price/l.miles).toFixed(2)}/mi</div>

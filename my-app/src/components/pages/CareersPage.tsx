@@ -77,8 +77,12 @@ export const CareersPage: React.FC<CareersPageProps> = ({ theme = "dark", onBack
   const [sent, setSent] = useState(false);
 
   const handleApply = (jobId: number) => {
-    setApplied(jobId);
-    window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+    if (applied === jobId) {
+      setApplied(null);
+    } else {
+      setApplied(jobId);
+      window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+    }
   };
 
   const handleSend = () => {
@@ -238,9 +242,29 @@ export const CareersPage: React.FC<CareersPageProps> = ({ theme = "dark", onBack
                     ))}
                   </div>
                 </div>
-                <button onClick={() => handleApply(job.id)} style={{ flexShrink: 0, background: applied === job.id ? "rgba(0,180,80,0.15)" : "#CC0000", color: applied === job.id ? "#00b450" : "#fff", border: applied === job.id ? "1px solid rgba(0,180,80,0.4)" : "none", borderRadius: 6, padding: "12px 28px", fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 14, letterSpacing: 2, textTransform: "uppercase", cursor: "pointer", transition: "all 0.2s", boxShadow: applied === job.id ? "none" : "0 4px 16px rgba(204,0,0,0.35)" }}
-                  onMouseEnter={e => { if (applied !== job.id) { e.currentTarget.style.background = "#aa0000"; e.currentTarget.style.transform = "translateY(-2px)"; } }}
-                  onMouseLeave={e => { if (applied !== job.id) { e.currentTarget.style.background = "#CC0000"; e.currentTarget.style.transform = "none"; } }}>
+                <button onClick={() => handleApply(job.id)} style={{ flexShrink: 0, background: applied === job.id ? "rgba(0,180,80,0.15)" : "#CC0000", color: applied === job.id ? "#00b450" : "#fff", border: applied === job.id ? "1px solid rgba(0,180,80,0.4)" : "none", borderRadius: 6, padding: "12px 28px", fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 14, letterSpacing: 2, textTransform: "uppercase", cursor: "pointer", transition: "all 0.2s", boxShadow: applied === job.id ? "none" : "0 4px 16px rgba(204,0,0,0.35)", minWidth: 140 }}
+                  onMouseEnter={e => {
+                    if (applied === job.id) {
+                      e.currentTarget.style.background = "rgba(204,0,0,0.12)";
+                      e.currentTarget.style.color = "#ff4d4d";
+                      e.currentTarget.style.borderColor = "rgba(204,0,0,0.4)";
+                      e.currentTarget.textContent = "✕ Cancel";
+                    } else {
+                      e.currentTarget.style.background = "#aa0000";
+                      e.currentTarget.style.transform = "translateY(-2px)";
+                    }
+                  }}
+                  onMouseLeave={e => {
+                    if (applied === job.id) {
+                      e.currentTarget.style.background = "rgba(0,180,80,0.15)";
+                      e.currentTarget.style.color = "#00b450";
+                      e.currentTarget.style.borderColor = "rgba(0,180,80,0.4)";
+                      e.currentTarget.textContent = "✓ Selected";
+                    } else {
+                      e.currentTarget.style.background = "#CC0000";
+                      e.currentTarget.style.transform = "none";
+                    }
+                  }}>
                   {applied === job.id ? "✓ Selected" : "Apply Now"}
                 </button>
               </div>
@@ -310,11 +334,11 @@ export const CareersPage: React.FC<CareersPageProps> = ({ theme = "dark", onBack
                     />
                   ))}
                   <select value={applied ?? ""} onChange={e => setApplied(Number(e.target.value))}
-                    style={{ padding: "12px 16px", background: isDark ? "rgba(255,255,255,0.05)" : "#f8f8f8", border: `1px solid ${bord}`, borderRadius: 8, color: text, fontSize: 14, fontFamily: "'Barlow',sans-serif", outline: "none" }}
+                    style={{ padding: "12px 16px", background: isDark ? "#1a1a1a" : "#f8f8f8", border: `1px solid ${bord}`, borderRadius: 8, color: text, fontSize: 14, fontFamily: "'Barlow',sans-serif", outline: "none" }}
                     onFocus={e => e.currentTarget.style.borderColor = "#CC0000"}
                     onBlur={e => e.currentTarget.style.borderColor = bord}>
-                    <option value="">Select Position</option>
-                    {JOBS.map(j => <option key={j.id} value={j.id}>{j.title}</option>)}
+                    <option value="" style={{ background: isDark ? "#1a1a1a" : "#fff", color: isDark ? "#fff" : "#1a1a1a" }}>Select Position</option>
+                    {JOBS.map(j => <option key={j.id} value={j.id} style={{ background: isDark ? "#1a1a1a" : "#fff", color: isDark ? "#fff" : "#1a1a1a" }}>{j.title}</option>)}
                   </select>
                   <textarea value={msg} onChange={e => setMsg(e.target.value)} placeholder="Tell us about yourself (optional)" rows={3}
                     style={{ padding: "12px 16px", background: isDark ? "rgba(255,255,255,0.05)" : "#f8f8f8", border: `1px solid ${bord}`, borderRadius: 8, color: text, fontSize: 14, fontFamily: "'Barlow',sans-serif", outline: "none", resize: "vertical" }}

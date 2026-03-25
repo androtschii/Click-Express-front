@@ -49,9 +49,8 @@ const PhoneLink: React.FC = () => {
         boxShadow: hov ? "0 0 12px rgba(204,0,0,0.5)" : "none",
         transition: "all 0.2s", flexShrink: 0,
       }}>
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
-          <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"
-            fill={hov ? "#fff" : "#CC0000"} style={{ transition: "fill 0.2s" }} />
+        <svg width="15" height="15" viewBox="0 0 256 256" fill={hov ? "#fff" : "#CC0000"} style={{ transition: "fill 0.2s" }}>
+          <path d="M222.37,158.46l-47.11-21.11-.13-.06a16,16,0,0,0-15.17,1.4,8.12,8.12,0,0,0-.75.56L134.87,160c-15.42-7.49-31.34-23.29-38.83-38.51l20.78-24.71c.2-.25.39-.5.57-.77a16,16,0,0,0,1.32-15.06l0-.12L97.54,33.64a16,16,0,0,0-16.62-9.52A56.26,56.26,0,0,0,32,80c0,79.4,64.6,144,144,144a56.26,56.26,0,0,0,55.88-48.92A16,16,0,0,0,222.37,158.46ZM176,208A128.14,128.14,0,0,1,48,80,40.2,40.2,0,0,1,82.87,40a.61.61,0,0,0,0,.12l21,47L83.2,111.86a6.13,6.13,0,0,0-.57.77,16,16,0,0,0-1,15.7c9.06,18.53,27.73,37.06,46.46,46.11a16,16,0,0,0,15.75-1.14,8.44,8.44,0,0,0,.74-.56L168.89,152l47,21.05h0s.08,0,.11,0A40.21,40.21,0,0,1,176,208Z"/>
         </svg>
       </div>
       <span style={{ color: hov ? "#fff" : "rgba(255,255,255,0.6)", fontSize: 13, fontFamily: "'Barlow',sans-serif", fontWeight: 600, transition: "color 0.2s" }}>
@@ -208,8 +207,8 @@ export const Header: React.FC<HeaderProps> = ({
             <span style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 600, fontSize: 12, color: "rgba(255,255,255,0.85)", maxWidth: 90, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
               {session.name.split(" ")[0]}
             </span>
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="rgba(255,255,255,0.5)" style={{ transform: userMenuOpen ? "rotate(180deg)" : "none", transition: "transform 0.2s" }}>
-              <path d="M7 10l5 5 5-5z"/>
+            <svg width="10" height="10" viewBox="0 0 256 256" fill="rgba(255,255,255,0.5)" style={{ transform: userMenuOpen ? "rotate(180deg)" : "none", transition: "transform 0.2s" }}>
+              <path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"/>
             </svg>
           </div>
 
@@ -265,8 +264,8 @@ export const Header: React.FC<HeaderProps> = ({
           transition: "all 0.15s",
         }}
       >
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0 }}>
-          <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l7.59-7.59L21 8l-9 9z" fill="#fff"/>
+        <svg width="14" height="14" viewBox="0 0 256 256" fill="#fff" style={{ flexShrink: 0 }}>
+          <path d="M173.66,98.34a8,8,0,0,1,0,11.32l-56,56a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L112,148.69l50.34-50.35A8,8,0,0,1,173.66,98.34ZM224,48V208a16,16,0,0,1-16,16H48a16,16,0,0,1-16-16V48A16,16,0,0,1,48,32H208A16,16,0,0,1,224,48ZM208,208V48H48V208H208Z"/>
         </svg>
         {t.header.requests}
         {cartCount > 0 && (

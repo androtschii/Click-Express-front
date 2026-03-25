@@ -448,7 +448,7 @@ function AppContent() {
             {/* Заголовок */}
             <div style={{ display:"flex", alignItems:"center", gap:16, marginBottom:28 }}>
               <div style={{ width:44, height:44, borderRadius:"50%", background:"linear-gradient(135deg,#CC0000,#ff4d4d)", display:"flex", alignItems:"center", justifyContent:"center", animation:"weeklyGlow 2s ease infinite", flexShrink:0 }}>
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="#fff"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                <svg width="22" height="22" viewBox="0 0 256 256" fill="#fff"><path d="M239.18,97.26A16.38,16.38,0,0,0,224.92,86l-59-4.76L143.14,26.15a16.36,16.36,0,0,0-30.27,0L90.11,81.23,31.08,86a16.46,16.46,0,0,0-9.37,28.86l45,38.83L53,211.75a16.38,16.38,0,0,0,24.5,17.82L128,198.49l50.53,31.08A16.4,16.4,0,0,0,203,211.75l-13.76-58.07,45-38.83A16.43,16.43,0,0,0,239.18,97.26Zm-15.34,5.47-48.7,42a8,8,0,0,0-2.56,7.91l14.88,62.8a.37.37,0,0,1-.17.48c-.18.14-.23.11-.38,0l-54.72-33.65a8,8,0,0,0-8.38,0L69.09,215.94c-.15.09-.19.12-.38,0a.37.37,0,0,1-.17-.48l14.88-62.8a8,8,0,0,0-2.56-7.91l-48.7-42c-.12-.1-.23-.19-.13-.5s.18-.27.33-.29l63.92-5.16A8,8,0,0,0,103,91.86l24.62-59.61c.08-.17.11-.25.35-.25s.27.08.35.25L153,91.86a8,8,0,0,0,6.75,4.92l63.92,5.16c.15,0,.24,0,.33.29S224,102.63,223.84,102.73Z"/></svg>
               </div>
               <div>
                 <div style={{ fontFamily:"'Barlow',sans-serif", fontWeight:700, fontSize:10, color:"#CC0000", letterSpacing:4, textTransform:"uppercase", marginBottom:4 }}>★ {tw.badge}</div>
@@ -472,8 +472,8 @@ function AppContent() {
                   onMouseEnter={e => { if (canPrev) { (e.currentTarget as HTMLElement).style.transform="translateY(-50%) scale(1.12)"; (e.currentTarget as HTMLElement).style.boxShadow="0 14px 40px rgba(204,0,0,0.75), 0 0 0 2px rgba(204,0,0,0.4)"; }}}
                   onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform="translateY(-50%) scale(1)"; (e.currentTarget as HTMLElement).style.boxShadow = canPrev ? "0 8px 28px rgba(204,0,0,0.55), 0 0 0 1px rgba(204,0,0,0.25)" : "inset 0 0 0 1px rgba(255,255,255,0.07)"; }}
                 >
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={canPrev ? "#fff" : "rgba(255,255,255,0.18)"} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="15 18 9 12 15 6"/>
+                  <svg width="22" height="22" viewBox="0 0 256 256" fill={canPrev ? "#fff" : "rgba(255,255,255,0.18)"}>
+                    <path d="M224,128a8,8,0,0,1-8,8H59.31l58.35,58.34a8,8,0,0,1-11.32,11.32l-72-72a8,8,0,0,1,0-11.32l72-72a8,8,0,0,1,11.32,11.32L59.31,120H216A8,8,0,0,1,224,128Z"/>
                   </svg>
                 </button>
               )}
@@ -489,8 +489,8 @@ function AppContent() {
                   onMouseEnter={e => { if (canNext) { (e.currentTarget as HTMLElement).style.transform="translateY(-50%) scale(1.12)"; (e.currentTarget as HTMLElement).style.boxShadow="0 14px 40px rgba(204,0,0,0.75), 0 0 0 2px rgba(204,0,0,0.4)"; }}}
                   onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform="translateY(-50%) scale(1)"; (e.currentTarget as HTMLElement).style.boxShadow = canNext ? "0 8px 28px rgba(204,0,0,0.55), 0 0 0 1px rgba(204,0,0,0.25)" : "inset 0 0 0 1px rgba(255,255,255,0.07)"; }}
                 >
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={canNext ? "#fff" : "rgba(255,255,255,0.18)"} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="9 18 15 12 9 6"/>
+                  <svg width="22" height="22" viewBox="0 0 256 256" fill={canNext ? "#fff" : "rgba(255,255,255,0.18)"}>
+                    <path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"/>
                   </svg>
                 </button>
               )}
@@ -515,7 +515,7 @@ function AppContent() {
                           onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform="none"; (e.currentTarget as HTMLElement).style.borderColor="rgba(204,0,0,0.35)"; }}>
 
                           <div style={{ position:"absolute", top:10, left:10, zIndex:2, background:"linear-gradient(135deg,#CC0000,#ff4d4d)", borderRadius:20, padding:"4px 10px", display:"flex", alignItems:"center", gap:5, boxShadow:"0 4px 12px rgba(204,0,0,0.5)" }}>
-                            <svg width="10" height="10" viewBox="0 0 24 24" fill="#fff"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                            <svg width="10" height="10" viewBox="0 0 256 256" fill="#fff"><path d="M239.18,97.26A16.38,16.38,0,0,0,224.92,86l-59-4.76L143.14,26.15a16.36,16.36,0,0,0-30.27,0L90.11,81.23,31.08,86a16.46,16.46,0,0,0-9.37,28.86l45,38.83L53,211.75a16.38,16.38,0,0,0,24.5,17.82L128,198.49l50.53,31.08A16.4,16.4,0,0,0,203,211.75l-13.76-58.07,45-38.83A16.43,16.43,0,0,0,239.18,97.26Zm-15.34,5.47-48.7,42a8,8,0,0,0-2.56,7.91l14.88,62.8a.37.37,0,0,1-.17.48c-.18.14-.23.11-.38,0l-54.72-33.65a8,8,0,0,0-8.38,0L69.09,215.94c-.15.09-.19.12-.38,0a.37.37,0,0,1-.17-.48l14.88-62.8a8,8,0,0,0-2.56-7.91l-48.7-42c-.12-.1-.23-.19-.13-.5s.18-.27.33-.29l63.92-5.16A8,8,0,0,0,103,91.86l24.62-59.61c.08-.17.11-.25.35-.25s.27.08.35.25L153,91.86a8,8,0,0,0,6.75,4.92l63.92,5.16c.15,0,.24,0,.33.29S224,102.63,223.84,102.73Z"/></svg>
                             <span style={{ fontFamily:"'Barlow',sans-serif", fontWeight:800, fontSize:8, color:"#fff", letterSpacing:1.5, textTransform:"uppercase" }}>{tw.cardBadge}</span>
                           </div>
 

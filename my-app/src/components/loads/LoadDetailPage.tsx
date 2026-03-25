@@ -264,8 +264,8 @@ export const LoadDetailPage: React.FC<LoadDetailPageProps> = ({
             {/* Google Maps */}
             <div style={{ background:card, border:`1px solid ${bord}`, borderRadius:14, overflow:"hidden", animation:"detailFadeUp 0.5s ease 0.25s both" }}>
               <div style={{ padding:"12px 18px", borderBottom:`1px solid ${bord}`, display:"flex", alignItems:"center", gap:8 }}>
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="#CC0000">
-                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                <svg width="15" height="15" viewBox="0 0 256 256" fill="#CC0000">
+                  <path d="M128,64a40,40,0,1,0,40,40A40,40,0,0,0,128,64Zm0,64a24,24,0,1,1,24-24A24,24,0,0,1,128,128Zm0-112a88.1,88.1,0,0,0-88,88c0,31.4,14.51,64.68,42,96.25a254.19,254.19,0,0,0,41.45,38.3,8,8,0,0,0,9.18,0A254.19,254.19,0,0,0,174,200.25c27.45-31.57,42-64.85,42-96.25A88.1,88.1,0,0,0,128,16Zm0,206c-16.53-13-72-60.75-72-118a72,72,0,0,1,144,0C200,161.23,144.53,209,128,222Z"/>
                 </svg>
                 <span style={{ fontFamily:"'Barlow',sans-serif", fontWeight:700, fontSize:12, color:text, flex:1 }}>{t.routeMap}</span>
                 <a
@@ -331,8 +331,8 @@ export const LoadDetailPage: React.FC<LoadDetailPageProps> = ({
               >
                 <div style={{ display:"flex", alignItems:"center", gap:10 }}>
                   <div style={{ width:34, height:34, borderRadius:"50%", background:"linear-gradient(135deg,#CC0000,#ff4d4d)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="white">
-                      <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/>
+                    <svg width="16" height="16" viewBox="0 0 256 256" fill="white">
+                      <path d="M172,112a8,8,0,0,1-8,8H96a8,8,0,0,1,0-16h68A8,8,0,0,1,172,112Zm-8,24H96a8,8,0,0,0,0,16h68a8,8,0,0,0,0-16Zm68-12A100.11,100.11,0,0,1,132,224H48a16,16,0,0,1-16-16V124a100,100,0,0,1,200,0Zm-16,0a84,84,0,0,0-168,0v84h84A84.09,84.09,0,0,0,216,124Z"/>
                     </svg>
                   </div>
                   <div>
@@ -340,8 +340,8 @@ export const LoadDetailPage: React.FC<LoadDetailPageProps> = ({
                     <div style={{ fontFamily:"'Barlow',sans-serif", fontSize:11, color:muted }}>{t.msgSubtitle}</div>
                   </div>
                 </div>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill={muted} style={{ transform: msgOpen ? "rotate(180deg)" : "none", transition:"transform 0.3s" }}>
-                  <path d="M7 10l5 5 5-5z"/>
+                <svg width="20" height="20" viewBox="0 0 256 256" fill={muted} style={{ transform: msgOpen ? "rotate(180deg)" : "none", transition:"transform 0.3s" }}>
+                  <path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"/>
                 </svg>
               </div>
 
@@ -351,8 +351,8 @@ export const LoadDetailPage: React.FC<LoadDetailPageProps> = ({
                   {msgSent ? (
                     <div style={{ textAlign:"center", padding:"32px 0", animation:"detailFadeUp 0.4s ease" }}>
                       <div style={{ width:56, height:56, borderRadius:"50%", background:"linear-gradient(135deg,#00b050,#00d060)", display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto 14px" }}>
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-                          <path d="M5 13l4 4L19 7" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        <svg width="28" height="28" viewBox="0 0 256 256" fill="#fff">
+                          <path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"/>
                         </svg>
                       </div>
                       <div style={{ fontFamily:"'Oswald',sans-serif", fontWeight:700, fontSize:18, color:text, marginBottom:6 }}>{t.msgSent}</div>
@@ -488,7 +488,7 @@ export const LoadDetailPage: React.FC<LoadDetailPageProps> = ({
                     onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor="#CC0000"; (e.currentTarget as HTMLElement).style.color="#CC0000"; }}
                     onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor=bord; (e.currentTarget as HTMLElement).style.color=text; }}
                   >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+                    <svg width="14" height="14" viewBox="0 0 256 256" fill="currentColor"><path d="M222.37,158.46l-47.11-21.11-.13-.06a16,16,0,0,0-15.17,1.4,8.12,8.12,0,0,0-.75.56L134.87,160c-15.42-7.49-31.34-23.29-38.83-38.51l20.78-24.71c.2-.25.39-.5.57-.77a16,16,0,0,0,1.32-15.06l0-.12L97.54,33.64a16,16,0,0,0-16.62-9.52A56.26,56.26,0,0,0,32,80c0,79.4,64.6,144,144,144a56.26,56.26,0,0,0,55.88-48.92A16,16,0,0,0,222.37,158.46ZM176,208A128.14,128.14,0,0,1,48,80,40.2,40.2,0,0,1,82.87,40a.61.61,0,0,0,0,.12l21,47L83.2,111.86a6.13,6.13,0,0,0-.57.77,16,16,0,0,0-1,15.7c9.06,18.53,27.73,37.06,46.46,46.11a16,16,0,0,0,15.75-1.14,8.44,8.44,0,0,0,.74-.56L168.89,152l47,21.05h0s.08,0,.11,0A40.21,40.21,0,0,1,176,208Z"/></svg>
                     {t.call}
                   </a>
 
@@ -517,8 +517,8 @@ export const LoadDetailPage: React.FC<LoadDetailPageProps> = ({
                       @keyframes msgDot3 { 0%,40%,100%{transform:scale(0);opacity:0} 80%{transform:scale(1);opacity:1} }
                     `}</style>
                     <span style={{ display:"flex", alignItems:"center", gap:2, animation:"msgPulse 2s ease infinite" }}>
-                      <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
+                      <svg width="15" height="15" viewBox="0 0 256 256" fill="currentColor">
+                        <path d="M172,112a8,8,0,0,1-8,8H96a8,8,0,0,1,0-16h68A8,8,0,0,1,172,112Zm-8,24H96a8,8,0,0,0,0,16h68a8,8,0,0,0,0-16Zm68-12A100.11,100.11,0,0,1,132,224H48a16,16,0,0,1-16-16V124a100,100,0,0,1,200,0Zm-16,0a84,84,0,0,0-168,0v84h84A84.09,84.09,0,0,0,216,124Z"/>
                       </svg>
                       <span style={{ display:"flex", gap:2, marginLeft:2 }}>
                         <span style={{ width:3, height:3, borderRadius:"50%", background:"currentColor", display:"inline-block", animation:"msgDot1 1.4s ease infinite" }} />

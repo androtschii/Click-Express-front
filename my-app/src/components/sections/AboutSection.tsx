@@ -1,6 +1,5 @@
 import React from "react";
 import { CELogo } from "../ui/Logo";
-import { Phone, Mail } from "lucide-react";
 import { useLanguage } from "../../context/LanguageContext";
 import { translations } from "../../i18n/translations";
 
@@ -10,45 +9,45 @@ interface AboutSectionProps {
 }
 
 const InstagramIcon = () => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-    <defs>
-      <radialGradient id="ig1" cx="30%" cy="107%" r="150%">
-        <stop offset="0%" stopColor="#fdf497"/>
-        <stop offset="5%" stopColor="#fdf497"/>
-        <stop offset="45%" stopColor="#fd5949"/>
-        <stop offset="60%" stopColor="#d6249f"/>
-        <stop offset="90%" stopColor="#285AEB"/>
-      </radialGradient>
-    </defs>
-    <rect x="2" y="2" width="20" height="20" rx="5" ry="5" fill="url(#ig1)"/>
-    <circle cx="12" cy="12" r="4.5" stroke="#fff" strokeWidth="1.8" fill="none"/>
-    <circle cx="17.5" cy="6.5" r="1.2" fill="#fff"/>
+  <svg width="22" height="22" viewBox="0 0 256 256" fill="#E1306C">
+    <path d="M128,80a48,48,0,1,0,48,48A48.05,48.05,0,0,0,128,80Zm0,80a32,32,0,1,1,32-32A32,32,0,0,1,128,160ZM176,24H80A56.06,56.06,0,0,0,24,80v96a56.06,56.06,0,0,0,56,56h96a56.06,56.06,0,0,0,56-56V80A56.06,56.06,0,0,0,176,24Zm40,152a40,40,0,0,1-40,40H80a40,40,0,0,1-40-40V80A40,40,0,0,1,80,40h96a40,40,0,0,1,40,40ZM192,76a12,12,0,1,1-12-12A12,12,0,0,1,192,76Z"/>
   </svg>
 );
 
 const LinkedInIcon = () => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="#0A66C2">
-    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+  <svg width="22" height="22" viewBox="0 0 256 256" fill="#0A66C2">
+    <path d="M216,24H40A16,16,0,0,0,24,40V216a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V40A16,16,0,0,0,216,24Zm0,192H40V40H216V216ZM96,112v64a8,8,0,0,1-16,0V112a8,8,0,0,1,16,0Zm88,28v36a8,8,0,0,1-16,0V140a20,20,0,0,0-40,0v36a8,8,0,0,1-16,0V112a8,8,0,0,1,15.79-1.78A36,36,0,0,1,184,140ZM100,84A12,12,0,1,1,88,72,12,12,0,0,1,100,84Z"/>
   </svg>
 );
 
 const FacebookIcon = () => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="#1877F2">
-    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+  <svg width="22" height="22" viewBox="0 0 256 256" fill="#1877F2">
+    <path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm8,191.63V152h24a8,8,0,0,0,0-16H136V112a16,16,0,0,1,16-16h16a8,8,0,0,0,0-16H152a32,32,0,0,0-32,32v24H96a8,8,0,0,0,0,16h24v63.63a88,88,0,1,1,16,0Z"/>
   </svg>
 );
 
 const MapIcon = () => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="#CC0000"/>
-    <circle cx="12" cy="9" r="2.5" fill="#fff"/>
+  <svg width="22" height="22" viewBox="0 0 256 256" fill="#CC0000">
+    <path d="M128,64a40,40,0,1,0,40,40A40,40,0,0,0,128,64Zm0,64a24,24,0,1,1,24-24A24,24,0,0,1,128,128Zm0-112a88.1,88.1,0,0,0-88,88c0,31.4,14.51,64.68,42,96.25a254.19,254.19,0,0,0,41.45,38.3,8,8,0,0,0,9.18,0A254.19,254.19,0,0,0,174,200.25c27.45-31.57,42-64.85,42-96.25A88.1,88.1,0,0,0,128,16Zm0,206c-16.53-13-72-60.75-72-118a72,72,0,0,1,144,0C200,161.23,144.53,209,128,222Z"/>
+  </svg>
+);
+
+const PhoneIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 256 256" fill="#22C55E">
+    <path d="M222.37,158.46l-47.11-21.11-.13-.06a16,16,0,0,0-15.17,1.4,8.12,8.12,0,0,0-.75.56L134.87,160c-15.42-7.49-31.34-23.29-38.83-38.51l20.78-24.71c.2-.25.39-.5.57-.77a16,16,0,0,0,1.32-15.06l0-.12L97.54,33.64a16,16,0,0,0-16.62-9.52A56.26,56.26,0,0,0,32,80c0,79.4,64.6,144,144,144a56.26,56.26,0,0,0,55.88-48.92A16,16,0,0,0,222.37,158.46ZM176,208A128.14,128.14,0,0,1,48,80,40.2,40.2,0,0,1,82.87,40a.61.61,0,0,0,0,.12l21,47L83.2,111.86a6.13,6.13,0,0,0-.57.77,16,16,0,0,0-1,15.7c9.06,18.53,27.73,37.06,46.46,46.11a16,16,0,0,0,15.75-1.14,8.44,8.44,0,0,0,.74-.56L168.89,152l47,21.05h0s.08,0,.11,0A40.21,40.21,0,0,1,176,208Z"/>
+  </svg>
+);
+
+const MailIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 256 256" fill="#60A5FA">
+    <path d="M224,48H32a8,8,0,0,0-8,8V192a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A8,8,0,0,0,224,48ZM203.43,64,128,133.15,52.57,64ZM216,192H40V74.19l82.59,75.71a8,8,0,0,0,10.82,0L216,74.19V192Z"/>
   </svg>
 );
 
 const contactsBase = [
   { icon: <MapIcon />, iconBg: "rgba(204,0,0,0.15)", key: "Address" as const, value: "Hallandale Beach, FL, United States, 33009", href: "https://maps.google.com/?q=Hallandale+Beach+FL+33009", highlight: false },
-  { icon: <Phone size={20} color="#22C55E" strokeWidth={2} />, iconBg: "rgba(34,197,94,0.15)", key: "Phone" as const, value: "+1 786-202-6599", href: "tel:+17862026599", highlight: true },
-  { icon: <Mail size={20} color="#60A5FA" strokeWidth={2} />, iconBg: "rgba(96,165,250,0.15)", key: "Email" as const, value: "clickexpress.inc@gmail.com", href: "mailto:clickexpress.inc@gmail.com", highlight: false },
+  { icon: <PhoneIcon />, iconBg: "rgba(34,197,94,0.15)", key: "Phone" as const, value: "+1 786-202-6599", href: "tel:+17862026599", highlight: true },
+  { icon: <MailIcon />, iconBg: "rgba(96,165,250,0.15)", key: "Email" as const, value: "clickexpress.inc@gmail.com", href: "mailto:clickexpress.inc@gmail.com", highlight: false },
   { icon: <LinkedInIcon />, iconBg: "rgba(10,102,194,0.15)", key: "LinkedIn" as const, value: "Click Express Inc", href: "https://www.linkedin.com/company/clickexpressinc", highlight: false },
   { icon: <FacebookIcon />, iconBg: "rgba(24,119,242,0.15)", key: "Facebook" as const, value: "Click Express Inc", href: "https://www.facebook.com/share/1FP9dJ2L4i/", highlight: false },
   { icon: <InstagramIcon />, iconBg: "rgba(214,36,159,0.15)", key: "Instagram" as const, value: "@clickexpress.official", href: "https://www.instagram.com/clickexpress.official", highlight: false },

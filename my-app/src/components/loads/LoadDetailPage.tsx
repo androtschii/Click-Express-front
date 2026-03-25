@@ -173,14 +173,14 @@ export const LoadDetailPage: React.FC<LoadDetailPageProps> = ({
       </div>
 
       {/* ── Hero banner ── */}
-      <div style={{ position: "relative", height: "clamp(260px,35vw,420px)", overflow: "hidden" }}>
+      <div style={{ position: "relative", height: "clamp(380px,48vw,540px)", overflow: "hidden" }}>
         <img
           src={load.image} alt={load.route}
-          style={{ width:"100%", height:"100%", objectFit:"cover", filter:"brightness(0.45)" }}
+          style={{ width:"100%", height:"100%", objectFit:"cover", objectPosition:"center 72%", filter:"brightness(0.52) blur(2px)", transform:"scale(1.03)" }}
         />
         <div style={{
           position:"absolute", inset:0,
-          background:"linear-gradient(to bottom, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.6) 60%, rgba(8,8,8,1) 100%)",
+          background:"linear-gradient(160deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.55) 50%, rgba(8,8,8,1) 100%)",
         }} />
 
         <div style={{

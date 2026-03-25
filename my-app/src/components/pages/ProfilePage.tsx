@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import type { Session } from "../../services/authService";
-import { getUserById, updateUser, logout } from "../../services/authService";
+import { getUserById, updateUser } from "../../services/authService";
 import { useLanguage } from "../../context/LanguageContext";
 import { translations } from "../../i18n/translations";
 

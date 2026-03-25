@@ -50,57 +50,67 @@ function FavoritesPanel({ loads, theme, onClose, onDetails, onRemove }: { loads:
   const bord = isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.08)";
   const { lang } = useLanguage();
   const t = translations[lang].favorites;
+  useEffect(() => { document.body.style.overflow = "hidden"; return () => { document.body.style.overflow = ""; }; }, []);
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 2000, background: "rgba(0,0,0,0.7)", backdropFilter: "blur(6px)" }} onClick={onClose}>
-      <div onClick={e => e.stopPropagation()} style={{ position: "absolute", right: 0, top: 0, bottom: 0, width: "min(420px, 100vw)", background: isDark ? "#0f0f0f" : "#fff", borderLeft: "2px solid #CC0000", display: "flex", flexDirection: "column", boxShadow: "-20px 0 60px rgba(0,0,0,0.5)" }}>
+      <div onClick={e => e.stopPropagation()} style={{ position: "absolute", right: 0, top: 0, bottom: 0, width: "min(480px, 100vw)", background: isDark ? "#0a0a0a" : "#fff", borderLeft: "2px solid #CC0000", display: "flex", flexDirection: "column", boxShadow: "-20px 0 60px rgba(0,0,0,0.6)" }}>
         <div style={{ padding: "24px 24px 16px", borderBottom: `1px solid ${bord}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <div>
             <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 10, color: "#CC0000", letterSpacing: 3, textTransform: "uppercase", marginBottom: 4 }}>{t.saved}</div>
-            <h3 style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 22, color: isDark ? "#fff" : "#1a1a1a", textTransform: "uppercase" }}>{t.title} <span style={{ color: "#CC0000" }}>({loads.length})</span></h3>
+            <h3 style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 24, color: isDark ? "#fff" : "#1a1a1a", textTransform: "uppercase" }}>{t.title} <span style={{ color: "#CC0000" }}>({loads.length})</span></h3>
           </div>
-          <button onClick={onClose} style={{ background: "rgba(255,255,255,0.07)", border: "none", borderRadius: "50%", width: 36, height: 36, color: isDark ? "rgba(255,255,255,0.5)" : "#666", fontSize: 18, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
+          <button onClick={onClose} style={{ background: "rgba(255,255,255,0.07)", border: "none", borderRadius: "50%", width: 38, height: 38, color: isDark ? "rgba(255,255,255,0.5)" : "#666", fontSize: 18, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
         </div>
-        <div style={{ flex: 1, overflowY: "auto", padding: "16px 24px", display: "flex", flexDirection: "column", gap: 12 }}>
+        <div style={{ flex: 1, overflowY: "auto", overscrollBehavior: "contain", padding: "16px 20px" }}>
           {loads.length === 0 ? (
-            <div style={{ textAlign: "center", padding: "60px 0" }}>
-              <div style={{ fontSize: 48, marginBottom: 12 }}>🤍</div>
-              <p style={{ fontFamily: "'Barlow',sans-serif", color: isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.4)", fontSize: 14 }}>{t.empty}</p>
+            <div style={{ textAlign: "center", padding: "80px 0" }}>
+              <div style={{ fontSize: 56, marginBottom: 14 }}>🤍</div>
+              <p style={{ fontFamily: "'Barlow',sans-serif", color: isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.4)", fontSize: 15 }}>{t.empty}</p>
             </div>
-          ) : loads.map(l => (
-            <div key={l.id} onClick={() => { onClose(); setTimeout(() => onDetails && onDetails(l), 120); }}
-              style={{ background: isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)", border: `1px solid ${bord}`, borderRadius: 10, overflow: "hidden", cursor: "pointer", transition: "all 0.2s" }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = "#CC0000"; (e.currentTarget as HTMLElement).style.transform = "translateY(-2px)"; (e.currentTarget as HTMLElement).style.boxShadow = "0 8px 24px rgba(0,0,0,0.4)"; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = bord; (e.currentTarget as HTMLElement).style.transform = "none"; (e.currentTarget as HTMLElement).style.boxShadow = "none"; }}
-            >
-              <div style={{ position: "relative", height: 110 }}>
-                <img src={l.image} alt={l.route} style={{ width: "100%", height: "100%", objectFit: "cover", filter: "brightness(0.65)" }} />
-                <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, transparent 30%, rgba(0,0,0,0.85))" }} />
-                <div style={{ position: "absolute", top: 8, right: 8, background: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 12, padding: "3px 8px", fontFamily: "'Barlow',sans-serif", fontSize: 9, color: "rgba(255,255,255,0.7)", letterSpacing: 1, backdropFilter: "blur(4px)" }}>VIEW →</div>
-                <div style={{ position: "absolute", bottom: 8, left: 12 }}>
-                  <div style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 20, color: "#fff" }}>${l.price.toLocaleString()} <span style={{ fontSize: 11, color: "rgba(255,255,255,0.5)" }}>/ {l.miles.toLocaleString()} mi</span></div>
-                  <div style={{ display: "inline-block", background: "#CC0000", color: "#fff", fontFamily: "'Barlow',sans-serif", fontWeight: 800, fontSize: 7, letterSpacing: 2, textTransform: "uppercase", padding: "2px 8px", borderRadius: 2, marginTop: 2 }}>{l.type}</div>
+          ) : (
+            <>
+              {loads.map(l => (
+                <div key={l.id} onClick={() => { onClose(); setTimeout(() => onDetails && onDetails(l), 120); }}
+                  style={{ background: isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)", border: `1px solid ${bord}`, borderRadius: 12, overflow: "hidden", cursor: "pointer", transition: "all 0.2s", marginBottom: 14 }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = "#CC0000"; (e.currentTarget as HTMLElement).style.transform = "translateY(-3px)"; (e.currentTarget as HTMLElement).style.boxShadow = "0 12px 32px rgba(0,0,0,0.5)"; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = bord; (e.currentTarget as HTMLElement).style.transform = "none"; (e.currentTarget as HTMLElement).style.boxShadow = "none"; }}
+                >
+                  <div style={{ position: "relative", height: 260 }}>
+                    <img src={l.image} alt={l.route} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 72%", filter: "brightness(0.62)" }} />
+                    <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, transparent 35%, rgba(0,0,0,0.88))" }} />
+                    {l.tag && (
+                      <div style={{ position: "absolute", top: 10, left: 10, background: l.tag === "Military Load" ? "#1a3a6b" : "#CC0000", color: "#fff", padding: "4px 10px", fontFamily: "'Barlow',sans-serif", fontWeight: 800, fontSize: 8, letterSpacing: 2, textTransform: "uppercase", borderRadius: 4 }}>
+                        {l.tag === "Best Load of the Week" ? "★ " : "✈ "}{l.tag}
+                      </div>
+                    )}
+                    <div style={{ position: "absolute", top: 10, right: 10, background: "rgba(0,0,0,0.55)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 12, padding: "3px 10px", fontFamily: "'Barlow',sans-serif", fontSize: 9, color: "rgba(255,255,255,0.8)", letterSpacing: 1, backdropFilter: "blur(4px)" }}>VIEW →</div>
+                    <div style={{ position: "absolute", bottom: 12, left: 14 }}>
+                      <div style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 26, color: "#fff", lineHeight: 1 }}>${l.price.toLocaleString()}</div>
+                      <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 11, color: "rgba(255,255,255,0.55)", marginTop: 2 }}>{l.miles.toLocaleString()} mi · ${(l.price / l.miles).toFixed(2)}/mi</div>
+                      <div style={{ display: "inline-block", background: "#CC0000", color: "#fff", fontFamily: "'Barlow',sans-serif", fontWeight: 800, fontSize: 8, letterSpacing: 2, textTransform: "uppercase", padding: "2px 8px", borderRadius: 2, marginTop: 4 }}>{l.type}</div>
+                    </div>
+                  </div>
+                  <div style={{ padding: "10px 14px 12px" }}>
+                    <div style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 13, color: isDark ? "rgba(255,255,255,0.9)" : "#1a1a1a", marginBottom: 2, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{l.route} → {l.dest}</div>
+                    <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 10, color: isDark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.45)", textTransform: "uppercase", letterSpacing: 1, marginBottom: 10 }}>{l.cargo}</div>
+                    <div style={{ display: "flex", gap: 8 }} onClick={e => e.stopPropagation()}>
+                      <button onClick={() => { onClose(); setTimeout(() => onDetails && onDetails(l), 120); }} style={{ flex: 1, padding: "8px", background: "rgba(204,0,0,0.1)", border: "1px solid rgba(204,0,0,0.3)", borderRadius: 6, color: "#CC0000", fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 10, letterSpacing: 1, textTransform: "uppercase", cursor: "pointer", transition: "all 0.15s" }}
+                        onMouseEnter={e => { e.currentTarget.style.background = "#CC0000"; e.currentTarget.style.color = "#fff"; }}
+                        onMouseLeave={e => { e.currentTarget.style.background = "rgba(204,0,0,0.1)"; e.currentTarget.style.color = "#CC0000"; }}>
+                        {t.viewDetails}
+                      </button>
+                      <button onClick={() => onRemove && onRemove(l)} style={{ padding: "8px 16px", background: "rgba(255,77,109,0.12)", border: "1px solid rgba(255,77,109,0.4)", borderRadius: 6, color: "#ff4d6d", fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 10, letterSpacing: 1, cursor: "pointer", display: "flex", alignItems: "center", gap: 5, transition: "all 0.15s", flexShrink: 0 }}
+                        onMouseEnter={e => { e.currentTarget.style.background = "#ff4d6d"; e.currentTarget.style.color = "#fff"; }}
+                        onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,77,109,0.12)"; e.currentTarget.style.color = "#ff4d6d"; }}>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                        {t.unlike}
+                      </button>
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <div style={{ padding: "8px 12px 10px" }}>
-                <div style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 12, color: isDark ? "rgba(255,255,255,0.85)" : "#1a1a1a", marginBottom: 2 }}>{l.route} → {l.dest}</div>
-                <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 10, color: isDark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.45)", textTransform: "uppercase", letterSpacing: 1, marginBottom: 8 }}>{l.cargo}</div>
-                {/* Action buttons */}
-                <div style={{ display: "flex", gap: 8 }} onClick={e => e.stopPropagation()}>
-                  <button onClick={() => { onClose(); setTimeout(() => onDetails && onDetails(l), 120); }} style={{ flex: 1, padding: "6px", background: "rgba(204,0,0,0.1)", border: "1px solid rgba(204,0,0,0.3)", borderRadius: 6, color: "#CC0000", fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 10, letterSpacing: 1, textTransform: "uppercase", cursor: "pointer", transition: "all 0.15s" }}
-                    onMouseEnter={e => { e.currentTarget.style.background = "#CC0000"; e.currentTarget.style.color = "#fff"; }}
-                    onMouseLeave={e => { e.currentTarget.style.background = "rgba(204,0,0,0.1)"; e.currentTarget.style.color = "#CC0000"; }}>
-                    {t.viewDetails}
-                  </button>
-                  <button onClick={() => onRemove && onRemove(l)} style={{ padding: "6px 12px", background: "rgba(255,255,255,0.05)", border: `1px solid ${bord}`, borderRadius: 6, color: isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.4)", fontFamily: "'Barlow',sans-serif", fontSize: 10, cursor: "pointer", display: "flex", alignItems: "center", gap: 4, transition: "all 0.15s" }}
-                    onMouseEnter={e => { e.currentTarget.style.borderColor = "#ff4d6d"; e.currentTarget.style.color = "#ff4d6d"; e.currentTarget.style.background = "rgba(255,77,109,0.1)"; }}
-                    onMouseLeave={e => { e.currentTarget.style.borderColor = bord; e.currentTarget.style.color = isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.4)"; e.currentTarget.style.background = "rgba(255,255,255,0.05)"; }}>
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-                    {t.unlike}
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
+              ))}
+            </>
+          )}
         </div>
         {loads.length > 0 && (
           <div style={{ padding: "14px 24px", borderTop: `1px solid ${bord}`, display: "flex", alignItems: "center", gap: 8 }}>
@@ -120,71 +130,66 @@ function RequestsPanel({ loads, theme, onClose, onDetails, onCancel }: { loads: 
   const bord = isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.08)";
   const { lang } = useLanguage();
   const t = translations[lang].requests;
+  useEffect(() => { document.body.style.overflow = "hidden"; return () => { document.body.style.overflow = ""; }; }, []);
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 2000, background: "rgba(0,0,0,0.7)", backdropFilter: "blur(6px)" }} onClick={onClose}>
-      <div onClick={e => e.stopPropagation()} style={{ position: "absolute", right: 0, top: 0, bottom: 0, width: "min(480px, 100vw)", background: isDark ? "#0f0f0f" : "#fff", borderLeft: "2px solid #CC0000", display: "flex", flexDirection: "column", boxShadow: "-20px 0 60px rgba(0,0,0,0.5)" }}>
-        {/* Заголовок */}
+      <div onClick={e => e.stopPropagation()} style={{ position: "absolute", right: 0, top: 0, bottom: 0, width: "min(480px, 100vw)", background: isDark ? "#0a0a0a" : "#fff", borderLeft: "2px solid #CC0000", display: "flex", flexDirection: "column", boxShadow: "-20px 0 60px rgba(0,0,0,0.6)" }}>
         <div style={{ padding: "24px 24px 16px", borderBottom: `1px solid ${bord}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <div>
             <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 10, color: "#CC0000", letterSpacing: 3, textTransform: "uppercase", marginBottom: 4 }}>{t.booked}</div>
-            <h3 style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 22, color: isDark ? "#fff" : "#1a1a1a", textTransform: "uppercase" }}>{t.title} <span style={{ color: "#CC0000" }}>({loads.length})</span></h3>
+            <h3 style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 26, color: isDark ? "#fff" : "#1a1a1a", textTransform: "uppercase" }}>{t.title} <span style={{ color: "#CC0000" }}>({loads.length})</span></h3>
           </div>
-          <button onClick={onClose} style={{ background: "rgba(204,0,0,0.1)", border: "1px solid rgba(204,0,0,0.3)", borderRadius: "50%", width: 36, height: 36, color: "#CC0000", fontSize: 16, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
+          <button onClick={onClose} style={{ background: "rgba(204,0,0,0.1)", border: "1px solid rgba(204,0,0,0.3)", borderRadius: "50%", width: 40, height: 40, color: "#CC0000", fontSize: 18, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
         </div>
 
-        {/* Список */}
-        <div style={{ flex: 1, overflowY: "auto", padding: "16px 20px", display: "flex", flexDirection: "column", gap: 14 }}>
+        <div style={{ flex: 1, overflowY: "auto", overscrollBehavior: "contain", padding: "16px 20px" }}>
           {loads.length === 0 ? (
-            <div style={{ textAlign: "center", padding: "60px 0" }}>
-              <div style={{ fontSize: 52, marginBottom: 14 }}>📋</div>
-              <p style={{ fontFamily: "'Barlow',sans-serif", color: isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.4)", fontSize: 14 }}>{t.empty}</p>
+            <div style={{ textAlign: "center", padding: "80px 0" }}>
+              <div style={{ fontSize: 56, marginBottom: 14 }}>📋</div>
+              <p style={{ fontFamily: "'Barlow',sans-serif", color: isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.4)", fontSize: 15 }}>{t.empty}</p>
               <p style={{ fontFamily: "'Barlow',sans-serif", color: isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.25)", fontSize: 12, marginTop: 6 }}>{t.emptyHint}</p>
             </div>
           ) : loads.map((l, idx) => (
-            <div key={`${l.id}-${idx}`}
-              onClick={() => { onClose(); setTimeout(() => onDetails && onDetails(l), 120); }}
-              style={{ background: isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)", border: "1px solid rgba(0,180,80,0.25)", borderRadius: 10, overflow: "hidden", cursor: "pointer", transition: "all 0.2s" }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = "#CC0000"; (e.currentTarget as HTMLElement).style.transform = "translateY(-2px)"; (e.currentTarget as HTMLElement).style.boxShadow = "0 8px 24px rgba(0,0,0,0.4)"; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(0,180,80,0.25)"; (e.currentTarget as HTMLElement).style.transform = "none"; (e.currentTarget as HTMLElement).style.boxShadow = "none"; }}
-            >
-              <div style={{ position: "relative", height: 120 }}>
-                <img src={l.image} alt={l.route} style={{ width: "100%", height: "100%", objectFit: "cover", filter: "brightness(0.6)" }} />
-                <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, transparent 20%, rgba(0,0,0,0.9))" }} />
-                <div style={{ position: "absolute", top: 10, right: 10, display: "flex", gap: 6 }}>
-                  <div style={{ background: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.15)", color: "rgba(255,255,255,0.8)", borderRadius: 12, padding: "3px 8px", fontFamily: "'Barlow',sans-serif", fontSize: 9, letterSpacing: 1, backdropFilter: "blur(4px)" }}>VIEW →</div>
-                  <div style={{ background: "rgba(0,180,80,0.9)", color: "#fff", borderRadius: 20, padding: "4px 12px", fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 10, letterSpacing: 1 }}>✓ REQUESTED</div>
-                </div>
-                <div style={{ position: "absolute", bottom: 8, left: 12 }}>
-                  <div style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 22, color: "#fff", lineHeight: 1 }}>
-                    ${l.price.toLocaleString()} <span style={{ fontSize: 11, color: "rgba(255,255,255,0.5)" }}>/ {l.miles.toLocaleString()} mi</span>
+                <div key={`${l.id}-${idx}`}
+                  onClick={() => { onClose(); setTimeout(() => onDetails && onDetails(l), 120); }}
+                  style={{ background: isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)", border: "1px solid rgba(0,180,80,0.3)", borderRadius: 12, overflow: "hidden", cursor: "pointer", transition: "all 0.2s", marginBottom: 14 }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = "#CC0000"; (e.currentTarget as HTMLElement).style.transform = "translateY(-3px)"; (e.currentTarget as HTMLElement).style.boxShadow = "0 12px 32px rgba(0,0,0,0.5)"; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(0,180,80,0.3)"; (e.currentTarget as HTMLElement).style.transform = "none"; (e.currentTarget as HTMLElement).style.boxShadow = "none"; }}
+                >
+                  <div style={{ position: "relative", height: 260 }}>
+                    <img src={l.image} alt={l.route} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 72%", filter: "brightness(0.62)" }} />
+                    <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, transparent 35%, rgba(0,0,0,0.88))" }} />
+                    <div style={{ position: "absolute", top: 10, right: 10, display: "flex", gap: 6 }}>
+                      <div style={{ background: "rgba(0,180,80,0.9)", color: "#fff", borderRadius: 20, padding: "5px 12px", fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 9, letterSpacing: 1 }}>✓ REQUESTED</div>
+                    </div>
+                    {l.tag && (
+                      <div style={{ position: "absolute", top: 10, left: 10, background: l.tag === "Military Load" ? "#1a3a6b" : "#CC0000", color: "#fff", padding: "4px 10px", fontFamily: "'Barlow',sans-serif", fontWeight: 800, fontSize: 8, letterSpacing: 2, textTransform: "uppercase", borderRadius: 4 }}>
+                        {l.tag === "Best Load of the Week" ? "★ " : "✈ "}{l.tag}
+                      </div>
+                    )}
+                    <div style={{ position: "absolute", bottom: 12, left: 14 }}>
+                      <div style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 26, color: "#fff", lineHeight: 1 }}>${l.price.toLocaleString()}</div>
+                      <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 11, color: "rgba(255,255,255,0.55)", marginTop: 2 }}>{l.miles.toLocaleString()} mi · ${(l.price / l.miles).toFixed(2)}/mi</div>
+                      <div style={{ display: "inline-block", background: "#CC0000", color: "#fff", fontFamily: "'Barlow',sans-serif", fontWeight: 800, fontSize: 8, letterSpacing: 2, textTransform: "uppercase", padding: "2px 8px", borderRadius: 2, marginTop: 4 }}>{l.type}</div>
+                    </div>
                   </div>
-                  <div style={{ display: "inline-block", background: "#CC0000", color: "#fff", fontFamily: "'Barlow',sans-serif", fontWeight: 800, fontSize: 7, letterSpacing: 2, textTransform: "uppercase", padding: "2px 8px", borderRadius: 2, marginTop: 3 }}>{l.type}</div>
+                  <div style={{ padding: "10px 14px 12px" }}>
+                    <div style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 13, color: isDark ? "rgba(255,255,255,0.9)" : "#1a1a1a", marginBottom: 2, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{l.route} → {l.dest}</div>
+                    <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 10, color: isDark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.45)", textTransform: "uppercase", letterSpacing: 1, marginBottom: 10 }}>{l.cargo}</div>
+                    <div style={{ display: "flex", gap: 8 }} onClick={e => e.stopPropagation()}>
+                      <button onClick={() => { onClose(); setTimeout(() => onDetails && onDetails(l), 120); }} style={{ flex: 1, padding: "8px", background: "rgba(204,0,0,0.1)", border: "1px solid rgba(204,0,0,0.3)", borderRadius: 6, color: "#CC0000", fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 10, letterSpacing: 1, textTransform: "uppercase", cursor: "pointer", transition: "all 0.15s" }}
+                        onMouseEnter={e => { e.currentTarget.style.background = "#CC0000"; e.currentTarget.style.color = "#fff"; }}
+                        onMouseLeave={e => { e.currentTarget.style.background = "rgba(204,0,0,0.1)"; e.currentTarget.style.color = "#CC0000"; }}>
+                        {t.viewDetails}
+                      </button>
+                      <button onClick={() => onCancel && onCancel(l)} style={{ padding: "8px 14px", background: "rgba(255,255,255,0.04)", border: `1px solid ${bord}`, borderRadius: 6, color: isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.4)", fontFamily: "'Barlow',sans-serif", fontSize: 10, cursor: "pointer", display: "flex", alignItems: "center", gap: 4, transition: "all 0.15s" }}
+                        onMouseEnter={e => { e.currentTarget.style.borderColor = "#CC0000"; e.currentTarget.style.color = "#CC0000"; e.currentTarget.style.background = "rgba(204,0,0,0.08)"; }}
+                        onMouseLeave={e => { e.currentTarget.style.borderColor = bord; e.currentTarget.style.color = isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.4)"; e.currentTarget.style.background = "rgba(255,255,255,0.04)"; }}>
+                        {t.cancel}
+                      </button>
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <div style={{ padding: "10px 14px 12px" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 5, marginBottom: 4 }}>
-                  <div style={{ width: 6, height: 6, borderRadius: "50%", border: "2px solid #CC0000", flexShrink: 0 }} />
-                  <span style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 12, color: isDark ? "rgba(255,255,255,0.9)" : "#1a1a1a" }}>{l.route}</span>
-                  <span style={{ color: "#CC0000", fontSize: 10 }}>→</span>
-                  <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#CC0000", flexShrink: 0 }} />
-                  <span style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 12, color: isDark ? "rgba(255,255,255,0.9)" : "#1a1a1a" }}>{l.dest}</span>
-                </div>
-                <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 10, color: isDark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.45)", textTransform: "uppercase", letterSpacing: 1, marginBottom: 8 }}>{l.cargo}</div>
-                {/* Action buttons */}
-                <div style={{ display: "flex", gap: 8 }} onClick={e => e.stopPropagation()}>
-                  <button onClick={() => { onClose(); setTimeout(() => onDetails && onDetails(l), 120); }} style={{ flex: 1, padding: "6px", background: "rgba(204,0,0,0.1)", border: "1px solid rgba(204,0,0,0.3)", borderRadius: 6, color: "#CC0000", fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 10, letterSpacing: 1, textTransform: "uppercase", cursor: "pointer", transition: "all 0.15s" }}
-                    onMouseEnter={e => { e.currentTarget.style.background = "#CC0000"; e.currentTarget.style.color = "#fff"; }}
-                    onMouseLeave={e => { e.currentTarget.style.background = "rgba(204,0,0,0.1)"; e.currentTarget.style.color = "#CC0000"; }}>
-                    {t.viewDetails}
-                  </button>
-                  <button onClick={() => onCancel && onCancel(l)} style={{ padding: "6px 12px", background: "rgba(255,255,255,0.04)", border: `1px solid ${bord}`, borderRadius: 6, color: isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.4)", fontFamily: "'Barlow',sans-serif", fontSize: 10, cursor: "pointer", display: "flex", alignItems: "center", gap: 4, transition: "all 0.15s" }}
-                    onMouseEnter={e => { e.currentTarget.style.borderColor = "#CC0000"; e.currentTarget.style.color = "#CC0000"; e.currentTarget.style.background = "rgba(204,0,0,0.08)"; }}
-                    onMouseLeave={e => { e.currentTarget.style.borderColor = bord; e.currentTarget.style.color = isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.4)"; e.currentTarget.style.background = "rgba(255,255,255,0.04)"; }}>
-                    {t.cancel}
-                  </button>
-                </div>
-              </div>
-            </div>
           ))}
         </div>
 
@@ -516,8 +521,8 @@ function AppContent() {
 
                           <WeeklyHeartBtn saved={isSaved} onClick={() => handleSave(l, !isSaved)} />
 
-                          <div style={{ position:"relative", height:185 }}>
-                            <img src={l.image} alt={l.route} style={{ width:"100%", height:"100%", objectFit:"cover", filter:"brightness(0.6)" }} />
+                          <div style={{ position:"relative", height:210 }}>
+                            <img src={l.image} alt={l.route} style={{ width:"100%", height:"100%", objectFit:"cover", objectPosition:"center 72%", filter:"brightness(0.6)" }} />
                             <div style={{ position:"absolute", inset:0, background:"linear-gradient(to bottom,transparent 30%,rgba(0,0,0,0.9))" }} />
                             <div style={{ position:"absolute", bottom:12, left:14 }}>
                               <div style={{ fontFamily:"'Oswald',sans-serif", fontWeight:700, fontSize:28, color:"#fff", lineHeight:1, textShadow:"0 2px 8px rgba(0,0,0,0.8)" }}>${l.price.toLocaleString()}</div>

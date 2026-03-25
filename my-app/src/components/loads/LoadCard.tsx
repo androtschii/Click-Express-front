@@ -64,6 +64,7 @@ export const LoadCard: React.FC<LoadCardProps> = ({ load, onBook, onCancelBook, 
       setBooked(false);
       if (onCancelBook) onCancelBook(load);
     }
+
   };
 
   const handleSaveClick = () => {
@@ -78,47 +79,90 @@ export const LoadCard: React.FC<LoadCardProps> = ({ load, onBook, onCancelBook, 
   const cardBg        = isDark ? "#0f0f0f" : "#fff";
   const cardBorder    = isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.1)";
 
+  const ratePerMile = (load.price / load.miles).toFixed(2);
+  const driveH = Math.floor(load.miles / 55);
+  const driveM = Math.round(((load.miles / 55) - driveH) * 60);
+
   return (
-    <div onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)} style={{ background:cardBg, border:`1px solid ${hov?"#CC0000":cardBorder}`, borderRadius:6, overflow:"hidden", transform:hov?"translateY(-5px)":"none", boxShadow:hov?"0 24px 50px rgba(0,0,0,0.6), 0 0 0 1px rgba(204,0,0,0.2)":"none", transition:"all 0.25s ease" }}>
-      <div onClick={() => onDetails && onDetails(load)} style={{ position:"relative", height:190, overflow:"hidden", cursor: onDetails ? "pointer" : "default" }}>
-        <img src={load.image} alt={load.route} style={{ width:"100%", height:"100%", objectFit:"cover", objectPosition:"center 75%", transform:hov?"scale(1.06)":"scale(1)", filter:"brightness(0.68)", transition:"transform 0.4s ease" }} />
-        {onDetails && (
-          <div style={{ position:"absolute", bottom:14, right:14, background:"rgba(0,0,0,0.55)", border:"1px solid rgba(255,255,255,0.2)", borderRadius:20, padding:"4px 12px", fontFamily:"'Barlow',sans-serif", fontWeight:600, fontSize:10, color:"rgba(255,255,255,0.8)", letterSpacing:1, backdropFilter:"blur(4px)" }}>
-            {t.viewDetails}
-          </div>
-        )}
-        <div style={{ position:"absolute", inset:0, background:"linear-gradient(to bottom,transparent 30%,rgba(0,0,0,0.85))" }} />
+    <div onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)} style={{ background:cardBg, border:`1px solid ${hov?"#CC0000":cardBorder}`, borderRadius:8, overflow:"hidden", transform:hov?"translateY(-5px)":"none", boxShadow:hov?"0 24px 50px rgba(0,0,0,0.6), 0 0 0 1px rgba(204,0,0,0.2)":"0 2px 12px rgba(0,0,0,0.2)", transition:"all 0.25s ease" }}>
+
+      {/* ── Фото с блюром ── */}
+      <div onClick={() => onDetails && onDetails(load)} style={{ position:"relative", height:300, overflow:"hidden", cursor: onDetails ? "pointer" : "default" }}>
+        <img src={load.image} alt={load.route} style={{
+          width:"100%", height:"100%", objectFit:"cover", objectPosition:"center 72%",
+          filter:"brightness(0.55)",
+          transition:"filter 0.4s ease, transform 0.4s ease",
+        }} />
+        <div style={{ position:"absolute", inset:0, background:"linear-gradient(160deg,rgba(0,0,0,0.25) 0%,rgba(0,0,0,0.65) 60%,rgba(0,0,0,0.92) 100%)" }} />
+
+        {/* Тег */}
         {load.tag && (
           <div style={{ position:"absolute", top:0, left:0, background:load.tag==="Military Load"?"#1a3a6b":"#CC0000", color:"#fff", padding:"5px 14px", fontFamily:"'Barlow',sans-serif", fontWeight:800, fontSize:9, letterSpacing:2, textTransform:"uppercase", borderBottomRightRadius:6 }}>
             {load.tag==="Best Load of the Week"?"★ ":"✈ "}{load.tag}
           </div>
         )}
-        <div style={{ position:"absolute", bottom:14, left:14 }}>
-          <div style={{ fontFamily:"'Oswald',sans-serif", fontWeight:700, fontSize:32, color:"#fff", lineHeight:1, textShadow:"0 2px 8px rgba(0,0,0,0.8)" }}>
-            ${load.price.toLocaleString()}
-            <span style={{ fontSize:14, color:"rgba(255,255,255,0.6)", marginLeft:6 }}>/ {load.miles.toLocaleString()} Miles</span>
+
+        {/* Кнопка деталей */}
+        {onDetails && (
+          <div style={{ position:"absolute", top:10, right:52, background:"rgba(0,0,0,0.55)", border:"1px solid rgba(255,255,255,0.2)", borderRadius:20, padding:"4px 12px", fontFamily:"'Barlow',sans-serif", fontWeight:600, fontSize:10, color:"rgba(255,255,255,0.8)", letterSpacing:1, backdropFilter:"blur(4px)" }}>
+            {t.viewDetails}
           </div>
-          <div style={{ display:"inline-block", background:"#CC0000", color:"#fff", fontFamily:"'Barlow',sans-serif", fontWeight:800, fontSize:9, letterSpacing:2.5, textTransform:"uppercase", padding:"3px 10px", borderRadius:2, marginTop:5 }}>{load.type}</div>
-        </div>
+        )}
+
         <HeartIcon saved={saved} onClick={handleSaveClick} />
+
+        {/* Цена + маршрут поверх фото */}
+        <div style={{ position:"absolute", bottom:0, left:0, right:0, padding:"14px 16px" }}>
+          <div style={{ display:"flex", alignItems:"flex-end", justifyContent:"space-between", gap:8 }}>
+            <div>
+              <div style={{ fontFamily:"'Oswald',sans-serif", fontWeight:700, fontSize:34, color:"#fff", lineHeight:1, textShadow:"0 2px 12px rgba(0,0,0,0.9)" }}>
+                ${load.price.toLocaleString()}
+              </div>
+              <div style={{ display:"flex", alignItems:"center", gap:8, marginTop:4, flexWrap:"wrap" }}>
+                <div style={{ background:"#CC0000", color:"#fff", fontFamily:"'Barlow',sans-serif", fontWeight:800, fontSize:9, letterSpacing:2.5, textTransform:"uppercase", padding:"3px 10px", borderRadius:2 }}>{load.type}</div>
+                <span style={{ fontFamily:"'Barlow',sans-serif", fontSize:11, color:"rgba(255,255,255,0.6)" }}>{load.miles.toLocaleString()} mi · ${ratePerMile}/mi</span>
+              </div>
+            </div>
+            <div style={{ textAlign:"right", flexShrink:0 }}>
+              <div style={{ fontFamily:"'Barlow',sans-serif", fontSize:9, color:"rgba(255,255,255,0.45)", letterSpacing:1, textTransform:"uppercase" }}>ETA</div>
+              <div style={{ fontFamily:"'Oswald',sans-serif", fontWeight:600, fontSize:14, color:"rgba(255,255,255,0.75)" }}>{driveH}h {driveM}m</div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div style={{ padding:"16px 18px 18px" }}>
-        <div style={{ display:"flex", alignItems:"center", gap:6, marginBottom:10 }}>
-          <div style={{ width:8, height:8, borderRadius:"50%", border:"2px solid #CC0000", flexShrink:0 }} />
-          <span style={{ fontFamily:"'Barlow',sans-serif", fontWeight:700, fontSize:13, color:textPrimary }}>{load.route}</span>
-          <div style={{ flex:1, height:1, background:"rgba(204,0,0,0.35)", position:"relative" }}>
-            <span style={{ position:"absolute", left:"50%", top:-5, transform:"translateX(-50%)", fontSize:8, color:"#CC0000" }}>→</span>
-          </div>
-          <div style={{ width:8, height:8, borderRadius:"50%", background:"#CC0000", flexShrink:0 }} />
-          <span style={{ fontFamily:"'Barlow',sans-serif", fontWeight:700, fontSize:13, color:textPrimary }}>{load.dest}</span>
-        </div>
-        <div style={{ fontFamily:"'Barlow',sans-serif", fontSize:11, color:textSecondary, letterSpacing:1, textTransform:"uppercase", marginBottom:14 }}>{load.cargo}</div>
-        <div style={{ height:1, background:dividerColor, margin:"0 0 14px" }} />
+      {/* ── Тело карточки ── */}
+      <div style={{ padding:"14px 16px 16px" }}>
 
+        {/* Маршрут */}
+        <div style={{ display:"flex", alignItems:"center", gap:5, marginBottom:8 }}>
+          <div style={{ width:7, height:7, borderRadius:"50%", border:"2px solid #CC0000", flexShrink:0 }} />
+          <span style={{ fontFamily:"'Barlow',sans-serif", fontWeight:700, fontSize:12, color:textPrimary, flex:1, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{load.route}</span>
+          <span style={{ color:"#CC0000", fontSize:10, flexShrink:0 }}>→</span>
+          <div style={{ width:7, height:7, borderRadius:"50%", background:"#CC0000", flexShrink:0 }} />
+          <span style={{ fontFamily:"'Barlow',sans-serif", fontWeight:700, fontSize:12, color:textPrimary, flex:1, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", textAlign:"right" }}>{load.dest}</span>
+        </div>
+
+        <div style={{ fontFamily:"'Barlow',sans-serif", fontSize:10, color:textSecondary, letterSpacing:1, textTransform:"uppercase", marginBottom:12 }}>{load.cargo}</div>
+
+        {/* Мини-статы */}
+        <div style={{ display:"flex", borderRadius:5, overflow:"hidden", border:`1px solid ${dividerColor}`, marginBottom:14 }}>
+          {[
+            { label:"RATE/MI", value:`$${ratePerMile}`, color:"#00b450" },
+            { label:"DISTANCE", value:`${load.miles.toLocaleString()} mi`, color:textPhone },
+            { label:"DRIVE TIME", value:`${driveH}h ${driveM}m`, color:textPhone },
+          ].map((s, i) => (
+            <div key={i} style={{ flex:1, padding:"7px 4px", textAlign:"center", borderRight: i < 2 ? `1px solid ${dividerColor}` : "none", background: isDark ? "rgba(255,255,255,0.02)" : "rgba(0,0,0,0.02)" }}>
+              <div style={{ fontFamily:"'Barlow',sans-serif", fontSize:7.5, color:textMuted, letterSpacing:1.2, textTransform:"uppercase", marginBottom:2 }}>{s.label}</div>
+              <div style={{ fontFamily:"'Oswald',sans-serif", fontWeight:600, fontSize:13, color:s.color }}>{s.value}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Диспетчер + кнопка */}
         <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:10 }}>
           <div>
-            <div style={{ fontSize:9, color:textMuted, fontFamily:"'Barlow',sans-serif", letterSpacing:1.5, textTransform:"uppercase" }}>{t.dispatch}</div>
+            <div style={{ fontSize:8.5, color:textMuted, fontFamily:"'Barlow',sans-serif", letterSpacing:1.5, textTransform:"uppercase" }}>{t.dispatch}</div>
             <div style={{ fontSize:13, color:textPhone, fontFamily:"'Barlow',sans-serif", fontWeight:600 }}>+1 786-202-6599</div>
           </div>
           <button

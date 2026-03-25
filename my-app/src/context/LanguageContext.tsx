@@ -8,6 +8,7 @@ interface LanguageContextType {
   toggleLang: () => void;
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const LanguageContext = createContext<LanguageContextType>({
   lang: 'en',
   toggleLang: () => {},

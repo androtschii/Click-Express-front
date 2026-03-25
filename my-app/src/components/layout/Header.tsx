@@ -168,34 +168,28 @@ export const Header: React.FC<HeaderProps> = ({
       </button>
 
       {savedCount > 0 && (
-        <div onClick={handleSavedClick} style={{
-          display: "flex", alignItems: "center", gap: 6,
-          background: "linear-gradient(135deg, rgba(204,0,0,0.2), rgba(255,77,109,0.15))",
-          border: "1px solid rgba(204,0,0,0.45)",
-          borderRadius: 20, padding: "5px 14px 5px 8px",
-          cursor: "pointer", flexShrink: 0, position: "relative",
-          boxShadow: "0 0 12px rgba(204,0,0,0.2)",
-          transition: "all 0.2s",
-        }}
-          onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 0 20px rgba(204,0,0,0.5)"; e.currentTarget.style.background = "linear-gradient(135deg, rgba(204,0,0,0.35), rgba(255,77,109,0.25))"; }}
-          onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 0 12px rgba(204,0,0,0.2)"; e.currentTarget.style.background = "linear-gradient(135deg, rgba(204,0,0,0.2), rgba(255,77,109,0.15))"; }}
-        >
-          {heartBurst && (
-            <div style={{ position: "absolute", left: "18px", top: "50%", width: 28, height: 28, borderRadius: "50%", border: "2px solid #ff4d6d", animation: "ringOut 0.5s ease-out forwards", pointerEvents: "none" }} />
-          )}
-          <div style={{ animation: heartBurst ? "heartPulse 0.6s ease" : "none", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div onClick={handleSavedClick} style={{ position: "relative", cursor: "pointer", flexShrink: 0 }}>
+          <div style={{
+            width: 40, height: 40, borderRadius: "50%",
+            background: "linear-gradient(135deg, #CC0000, #ff4d6d)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            boxShadow: heartBurst ? "0 0 24px rgba(204,0,0,0.8)" : "0 0 14px rgba(204,0,0,0.45)",
+            animation: heartBurst ? "heartPulse 0.6s ease" : "none",
+            transition: "box-shadow 0.2s",
+          }}
+            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.boxShadow = "0 0 28px rgba(204,0,0,0.9)"; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.boxShadow = heartBurst ? "0 0 24px rgba(204,0,0,0.8)" : "0 0 14px rgba(204,0,0,0.45)"; }}
+          >
+            {heartBurst && (
+              <div style={{ position: "absolute", left: "50%", top: "50%", width: 40, height: 40, borderRadius: "50%", border: "2px solid #ff4d6d", animation: "ringOut 0.5s ease-out forwards", pointerEvents: "none" }} />
+            )}
             <svg width="18" height="18" viewBox="0 0 24 24">
-              <defs>
-                <linearGradient id="hg" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#ff4d6d"/>
-                  <stop offset="100%" stopColor="#CC0000"/>
-                </linearGradient>
-              </defs>
-              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
-                fill="url(#hg)" style={{ filter: "drop-shadow(0 0 4px rgba(255,77,109,0.8))" }} />
+              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="#fff" style={{ filter: "drop-shadow(0 0 3px rgba(0,0,0,0.4))" }} />
             </svg>
           </div>
-          <span style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 800, fontSize: 13, color: "#fff" }}>{savedCount}</span>
+          <div style={{ position: "absolute", top: -4, right: -4, width: 18, height: 18, borderRadius: "50%", background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Barlow',sans-serif", fontWeight: 900, fontSize: 10, color: "#CC0000", boxShadow: "0 2px 6px rgba(0,0,0,0.4)" }}>
+            {savedCount}
+          </div>
         </div>
       )}
 

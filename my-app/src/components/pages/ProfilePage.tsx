@@ -11,6 +11,7 @@ interface ProfilePageProps {
   savedLoads?: Load[];
   bookedLoads?: Load[];
   onBack?: () => void;
+  onBrowseLoads?: () => void;
   onLogout?: () => void;
   onSessionUpdate?: (name: string) => void;
   onDetails?: (load: Load) => void;
@@ -23,7 +24,7 @@ type Tab = "overview" | "orders" | "saved" | "payment" | "settings";
 export const ProfilePage: React.FC<ProfilePageProps> = ({
   session, theme = "dark",
   savedLoads = [], bookedLoads = [],
-  onBack, onLogout, onSessionUpdate,
+  onBack, onBrowseLoads, onLogout, onSessionUpdate,
   onDetails, onSaveRemove, onOrderCancel,
 }) => {
   const isDark = theme === "dark";
@@ -288,7 +289,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
               <div style={{ textAlign:"center", padding:"80px 0" }}>
                 <div style={{ fontSize:56, marginBottom:14 }}>📦</div>
                 <div style={{ fontFamily:"'Barlow',sans-serif", fontSize:15, color:muted, marginBottom:24 }}>{lang==="ru"?"Заказов пока нет":"No orders yet"}</div>
-                <button onClick={onBack} style={{ display:"inline-flex", alignItems:"center", gap:10, padding:"14px 32px", background:"linear-gradient(135deg,#CC0000,#ff3333)", border:"none", borderRadius:10, color:"#fff", fontFamily:"'Oswald',sans-serif", fontWeight:700, fontSize:15, letterSpacing:2, textTransform:"uppercase", cursor:"pointer", boxShadow:"0 6px 24px rgba(204,0,0,0.4)", transition:"all 0.15s" }}
+                <button onClick={onBrowseLoads ?? onBack} style={{ display:"inline-flex", alignItems:"center", gap:10, padding:"14px 32px", background:"linear-gradient(135deg,#CC0000,#ff3333)", border:"none", borderRadius:10, color:"#fff", fontFamily:"'Oswald',sans-serif", fontWeight:700, fontSize:15, letterSpacing:2, textTransform:"uppercase", cursor:"pointer", boxShadow:"0 6px 24px rgba(204,0,0,0.4)", transition:"all 0.15s" }}
                   onMouseEnter={e => { e.currentTarget.style.transform="translateY(-2px)"; e.currentTarget.style.boxShadow="0 10px 32px rgba(204,0,0,0.55)"; }}
                   onMouseLeave={e => { e.currentTarget.style.transform="none"; e.currentTarget.style.boxShadow="0 6px 24px rgba(204,0,0,0.4)"; }}>
                   <span style={{ fontSize:20, lineHeight:1 }}>+</span>
@@ -352,7 +353,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
               <div style={{ textAlign:"center", padding:"80px 0" }}>
                 <div style={{ fontSize:56, marginBottom:14 }}>❤️</div>
                 <div style={{ fontFamily:"'Barlow',sans-serif", fontSize:15, color:muted, marginBottom:24 }}>{lang==="ru"?"Нет сохранённых грузов":"No saved loads"}</div>
-                <button onClick={onBack} style={{ display:"inline-flex", alignItems:"center", gap:10, padding:"14px 32px", background:"linear-gradient(135deg,#CC0000,#ff3333)", border:"none", borderRadius:10, color:"#fff", fontFamily:"'Oswald',sans-serif", fontWeight:700, fontSize:15, letterSpacing:2, textTransform:"uppercase", cursor:"pointer", boxShadow:"0 6px 24px rgba(204,0,0,0.4)", transition:"all 0.15s" }}
+                <button onClick={onBrowseLoads ?? onBack} style={{ display:"inline-flex", alignItems:"center", gap:10, padding:"14px 32px", background:"linear-gradient(135deg,#CC0000,#ff3333)", border:"none", borderRadius:10, color:"#fff", fontFamily:"'Oswald',sans-serif", fontWeight:700, fontSize:15, letterSpacing:2, textTransform:"uppercase", cursor:"pointer", boxShadow:"0 6px 24px rgba(204,0,0,0.4)", transition:"all 0.15s" }}
                   onMouseEnter={e => { e.currentTarget.style.transform="translateY(-2px)"; e.currentTarget.style.boxShadow="0 10px 32px rgba(204,0,0,0.55)"; }}
                   onMouseLeave={e => { e.currentTarget.style.transform="none"; e.currentTarget.style.boxShadow="0 6px 24px rgba(204,0,0,0.4)"; }}>
                   <span style={{ fontSize:20, lineHeight:1 }}>+</span>

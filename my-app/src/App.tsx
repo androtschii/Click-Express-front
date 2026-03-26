@@ -374,6 +374,7 @@ function AppContent() {
             savedLoads={savedLoads}
             bookedLoads={bookedLoads}
             onBack={() => { setShowProfile(false); window.scrollTo({ top: 0 }); }}
+            onBrowseLoads={() => { setShowProfile(false); setTimeout(() => scrollTo(catalogRef), 80); }}
             onLogout={() => { logout(); setSession(null); setShowProfile(false); }}
             onSessionUpdate={(name) => setSession(s => s ? { ...s, name } : s)}
             onDetails={(l) => { setShowProfile(false); setDetailLoad(l); window.scrollTo({ top: 0 }); }}

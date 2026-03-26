@@ -7,6 +7,7 @@ interface OrdersPageProps {
   orders: Load[];
   theme?: "dark" | "light";
   onBack?: () => void;
+  onBrowseLoads?: () => void;
   onCancel?: (load: Load) => void;
   onDetails?: (load: Load) => void;
 }
@@ -15,6 +16,7 @@ export const OrdersPage: React.FC<OrdersPageProps> = ({
   orders,
   theme = "dark",
   onBack,
+  onBrowseLoads,
   onCancel,
   onDetails,
 }) => {
@@ -64,7 +66,13 @@ export const OrdersPage: React.FC<OrdersPageProps> = ({
           <div style={{ textAlign: "center", padding: "80px 20px", border: `1px dashed ${border}`, borderRadius: 12 }}>
             <div style={{ fontSize: 56, marginBottom: 16 }}>📭</div>
             <p style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 600, fontSize: 20, color: text, marginBottom: 8 }}>{t.empty}</p>
-            <p style={{ fontFamily: "'Barlow',sans-serif", fontSize: 14, color: muted }}>{t.emptyHint}</p>
+            <p style={{ fontFamily: "'Barlow',sans-serif", fontSize: 14, color: muted, marginBottom: 28 }}>{t.emptyHint}</p>
+            <button onClick={onBrowseLoads ?? onBack} style={{ display:"inline-flex", alignItems:"center", gap:10, padding:"14px 32px", background:"linear-gradient(135deg,#CC0000,#ff3333)", border:"none", borderRadius:10, color:"#fff", fontFamily:"'Oswald',sans-serif", fontWeight:700, fontSize:15, letterSpacing:2, textTransform:"uppercase", cursor:"pointer", boxShadow:"0 6px 24px rgba(204,0,0,0.4)", transition:"all 0.15s" }}
+              onMouseEnter={e => { e.currentTarget.style.transform="translateY(-2px)"; e.currentTarget.style.boxShadow="0 10px 32px rgba(204,0,0,0.55)"; }}
+              onMouseLeave={e => { e.currentTarget.style.transform="none"; e.currentTarget.style.boxShadow="0 6px 24px rgba(204,0,0,0.4)"; }}>
+              <span style={{ fontSize:20, lineHeight:1 }}>+</span>
+              {lang === "ru" ? "Найти груз" : "Find a Load"}
+            </button>
           </div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>

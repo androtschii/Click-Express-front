@@ -400,6 +400,7 @@ function AppContent() {
             orders={bookedLoads}
             theme={theme}
             onBack={() => { setShowOrders(false); window.scrollTo({ top: 0 }); }}
+            onBrowseLoads={() => { setShowOrders(false); setTimeout(() => scrollTo(catalogRef), 80); }}
             onCancel={(load) => { handleCancelBook(load); }}
             onDetails={(load) => { setShowOrders(false); setDetailLoad(load); window.scrollTo({ top: 0 }); }}
           />

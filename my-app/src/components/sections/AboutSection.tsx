@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useRef, useState } from "react";
 import { CELogo } from "../ui/Logo";
 import { useLanguage } from "../../context/LanguageContext";
 import { translations } from "../../i18n/translations";
+import companyVideo from "../../assets/Recap 2025.One of the best loads this year🤝Dear customer, contact us to get more information ab.mp4";
 
 interface AboutSectionProps {
   onContactClick?: () => void;
@@ -57,10 +58,27 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onContactClick, them
   const isDark = theme === 'dark';
   const { lang } = useLanguage();
   const t = translations[lang].about;
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const videoWrapRef = useRef<HTMLDivElement>(null);
+
+  // Auto-play when visible, pause when out of view
+  React.useEffect(() => {
+    const el = videoRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) { el.play().catch(() => {}); }
+        else { el.pause(); }
+      },
+      { threshold: 0.4 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <section style={{ background: isDark ? "#0a0a0a" : "#ffffff", padding: "80px clamp(20px,5vw,64px)" }}>
-      <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+      <div style={{ maxWidth: 1300, margin: "0 auto" }}>
 
         <div style={{ marginBottom: 60, display: "flex", alignItems: "flex-end", justifyContent: "space-between", flexWrap: "wrap", gap: 20 }}>
           <div>
@@ -76,8 +94,10 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onContactClick, them
           </button>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 48, alignItems: "start" }}>
+        {/* 3-column: company info | vertical video | contacts */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 260px 1fr", gap: 40, alignItems: "start" }}>
 
+          {/* LEFT — company info */}
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: 20, marginBottom: 32 }}>
               <div style={{ width: 110, height: 110, borderRadius: "50%", border: "3px solid #CC0000", padding: 6, background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 0 40px rgba(204,0,0,0.3)", flexShrink: 0 }}>
@@ -118,6 +138,28 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onContactClick, them
             </div>
           </div>
 
+          {/* CENTER — vertical video */}
+          <div ref={videoWrapRef} style={{ position: "sticky", top: 90 }}>
+            <div style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 9, color: "#CC0000", letterSpacing: 3, textTransform: "uppercase", textAlign: "center", marginBottom: 10 }}>
+              ● {lang === "ru" ? "РЕКАП 2025" : "RECAP 2025"}
+            </div>
+            {/* Phone frame */}
+            <div style={{ position: "relative", borderRadius: 24, overflow: "hidden", border: "3px solid rgba(204,0,0,0.4)", boxShadow: "0 0 0 6px rgba(204,0,0,0.08), 0 24px 60px rgba(0,0,0,0.6)", aspectRatio: "9/16", width: "100%" }}>
+              <video
+                ref={videoRef}
+                src={companyVideo}
+                muted
+                loop
+                playsInline
+                preload="metadata"
+                style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+              />
+              {/* Subtle red glow top */}
+              <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 40, background: "linear-gradient(to bottom, rgba(204,0,0,0.15), transparent)", pointerEvents: "none" }} />
+            </div>
+          </div>
+
+          {/* RIGHT — contacts */}
           <div>
             <div style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 600, fontSize: 13, color: "#CC0000", letterSpacing: 2.5, textTransform: "uppercase", marginBottom: 24 }}>
               {t.contactInfo}
@@ -148,6 +190,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onContactClick, them
               ))}
             </div>
           </div>
+
         </div>
       </div>
     </section>

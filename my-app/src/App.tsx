@@ -125,7 +125,7 @@ function FavoritesPanel({ loads, theme, onClose, onDetails, onRemove }: { loads:
 }
 
 // ── Панель заявок ─────────────────────────────────────────────────────────
-function RequestsPanel({ loads, theme, onClose, onDetails, onCancel }: { loads: Load[]; theme: string; onClose: () => void; onDetails?: (l: Load) => void; onCancel?: (l: Load) => void }) {
+function RequestsPanel({ loads, theme, onClose, onDetails, onCancel, onBrowseLoads }: { loads: Load[]; theme: string; onClose: () => void; onDetails?: (l: Load) => void; onCancel?: (l: Load) => void; onBrowseLoads?: () => void }) {
   const isDark = theme === "dark";
   const bord = isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.08)";
   const { lang } = useLanguage();
@@ -147,7 +147,13 @@ function RequestsPanel({ loads, theme, onClose, onDetails, onCancel }: { loads: 
             <div style={{ textAlign: "center", padding: "80px 0" }}>
               <div style={{ fontSize: 56, marginBottom: 14 }}>📋</div>
               <p style={{ fontFamily: "'Barlow',sans-serif", color: isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.4)", fontSize: 15 }}>{t.empty}</p>
-              <p style={{ fontFamily: "'Barlow',sans-serif", color: isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.25)", fontSize: 12, marginTop: 6 }}>{t.emptyHint}</p>
+              <p style={{ fontFamily: "'Barlow',sans-serif", color: isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.25)", fontSize: 12, marginTop: 6, marginBottom: 28 }}>{t.emptyHint}</p>
+              <button onClick={() => { onClose(); setTimeout(() => onBrowseLoads?.(), 80); }} style={{ display:"inline-flex", alignItems:"center", gap:10, padding:"13px 28px", background:"linear-gradient(135deg,#CC0000,#ff3333)", border:"none", borderRadius:10, color:"#fff", fontFamily:"'Oswald',sans-serif", fontWeight:700, fontSize:14, letterSpacing:2, textTransform:"uppercase", cursor:"pointer", boxShadow:"0 6px 24px rgba(204,0,0,0.4)", transition:"all 0.15s" }}
+                onMouseEnter={e => { e.currentTarget.style.transform="translateY(-2px)"; e.currentTarget.style.boxShadow="0 10px 32px rgba(204,0,0,0.55)"; }}
+                onMouseLeave={e => { e.currentTarget.style.transform="none"; e.currentTarget.style.boxShadow="0 6px 24px rgba(204,0,0,0.4)"; }}>
+                <span style={{ fontSize:18, lineHeight:1 }}>+</span>
+                {lang === "ru" ? "Найти груз" : "Find a Load"}
+              </button>
             </div>
           ) : loads.map((l, idx) => (
                 <div key={`${l.id}-${idx}`}
@@ -315,7 +321,7 @@ function AppContent() {
   const sharedPanels = (
     <>
       {showFavorites && <FavoritesPanel loads={savedLoads} theme={theme} onClose={() => setShowFavorites(false)} onDetails={(l) => { setShowFavorites(false); setDetailLoad(l); window.scrollTo({ top: 0 }); }} onRemove={(l) => { handleSave(l, false); notify(tn.removedFromFavorites); }} />}
-      {showRequests && <RequestsPanel loads={bookedLoads} theme={theme} onClose={() => setShowRequests(false)} onDetails={(l) => { setShowRequests(false); setDetailLoad(l); window.scrollTo({ top: 0 }); }} onCancel={(l) => handleCancelBook(l)} />}
+      {showRequests && <RequestsPanel loads={bookedLoads} theme={theme} onClose={() => setShowRequests(false)} onDetails={(l) => { setShowRequests(false); setDetailLoad(l); window.scrollTo({ top: 0 }); }} onCancel={(l) => handleCancelBook(l)} onBrowseLoads={() => { setShowRequests(false); setTimeout(() => scrollTo(catalogRef), 80); }} />}
     </>
   );
 
@@ -620,7 +626,7 @@ function AppContent() {
       {showAuth && <AuthModal onClose={() => setShowAuth(false)} theme={theme} onSuccess={(s) => { setSession(s); setShowAuth(false); }} />}
       {showQuote && <QuoteModal onClose={() => setShowQuote(false)} theme={theme} />}
       {showFavorites && <FavoritesPanel loads={savedLoads} theme={theme} onClose={() => setShowFavorites(false)} onDetails={(l) => { setShowFavorites(false); setDetailLoad(l); window.scrollTo({ top: 0 }); }} onRemove={(l) => { handleSave(l, false); notify(tn.removedFromFavorites); }} />}
-      {showRequests && <RequestsPanel loads={bookedLoads} theme={theme} onClose={() => setShowRequests(false)} onDetails={(l) => { setShowRequests(false); setDetailLoad(l); window.scrollTo({ top: 0 }); }} onCancel={(l) => handleCancelBook(l)} />}
+      {showRequests && <RequestsPanel loads={bookedLoads} theme={theme} onClose={() => setShowRequests(false)} onDetails={(l) => { setShowRequests(false); setDetailLoad(l); window.scrollTo({ top: 0 }); }} onCancel={(l) => handleCancelBook(l)} onBrowseLoads={() => { setShowRequests(false); setTimeout(() => scrollTo(catalogRef), 80); }} />}
       {notifications.map((msg, idx) => (
         <Notification key={idx} text={msg} onClose={() => setNotifications(n => n.filter((_, i) => i !== idx))} />
       ))}

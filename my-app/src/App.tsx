@@ -17,6 +17,7 @@ import { CareersPage } from "./components/pages/CareersPage";
 import { ProfilePage } from "./components/pages/ProfilePage";
 import { OrdersPage } from "./components/pages/OrdersPage";
 import { Notification } from "./components/ui/Notification";
+import { ChatBot } from "./components/ui/ChatBot";
 import { PhoneIcon } from "./components/ui/PhoneIcon";
 import { LOADS } from "./utils/data";
 import type { Load } from "./types/index";
@@ -630,6 +631,7 @@ function AppContent() {
       {notifications.map((msg, idx) => (
         <Notification key={idx} text={msg} onClose={() => setNotifications(n => n.filter((_, i) => i !== idx))} />
       ))}
+      <ChatBot theme={theme} />
     </div>
   );
 }

@@ -16,6 +16,7 @@ import { LoadDetailPage } from "./components/loads/LoadDetailPage";
 import { CareersPage } from "./components/pages/CareersPage";
 import { ProfilePage } from "./components/pages/ProfilePage";
 import { OrdersPage } from "./components/pages/OrdersPage";
+import { TrackingPage } from "./components/pages/TrackingPage";
 import { Notification } from "./components/ui/Notification";
 import { ChatBot } from "./components/ui/ChatBot";
 import { PhoneIcon } from "./components/ui/PhoneIcon";
@@ -233,6 +234,7 @@ function AppContent() {
   const [showCareers, setShowCareers] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [showOrders, setShowOrders] = useState(false);
+  const [trackLoad, setTrackLoad] = useState<Load | null>(null);
   const [notifications, setNotifications] = useState<string[]>([]);
 
   const catalogRef = useRef<HTMLDivElement>(null);
@@ -387,6 +389,27 @@ function AppContent() {
             onDetails={(l) => { setShowProfile(false); setDetailLoad(l); window.scrollTo({ top: 0 }); }}
             onSaveRemove={(l) => handleSave(l, false)}
             onOrderCancel={(l) => handleCancelBook(l)}
+            onTrack={(l) => { setShowProfile(false); setTrackLoad(l); window.scrollTo({ top: 0 }); }}
+          />
+        </div>
+        {showAuth && <AuthModal onClose={() => setShowAuth(false)} theme={theme} onSuccess={(s) => { setSession(s); setShowAuth(false); }} />}
+        {showQuote && <QuoteModal onClose={() => setShowQuote(false)} theme={theme} />}
+        {sharedPanels}
+      </div>
+    );
+  }
+
+  // ── Tracking page ──────────────────────────────────────────────────────
+  if (trackLoad) {
+    return (
+      <div style={{ background: bgColor, minHeight: "100vh", color: textColor }}>
+        {sharedStyle}
+        {sharedHeader}
+        <div style={{ paddingTop: 70 }}>
+          <TrackingPage
+            load={trackLoad}
+            theme={theme}
+            onBack={() => setTrackLoad(null)}
           />
         </div>
         {showAuth && <AuthModal onClose={() => setShowAuth(false)} theme={theme} onSuccess={(s) => { setSession(s); setShowAuth(false); }} />}
@@ -410,6 +433,7 @@ function AppContent() {
             onBrowseLoads={() => { setShowOrders(false); setTimeout(() => scrollTo(catalogRef), 80); }}
             onCancel={(load) => { handleCancelBook(load); }}
             onDetails={(load) => { setShowOrders(false); setDetailLoad(load); window.scrollTo({ top: 0 }); }}
+            onTrack={(load) => { setShowOrders(false); setTrackLoad(load); window.scrollTo({ top: 0 }); }}
           />
         </div>
         {showAuth && <AuthModal onClose={() => setShowAuth(false)} theme={theme} onSuccess={(s) => { setSession(s); setShowAuth(false); }} />}

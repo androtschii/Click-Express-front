@@ -10,6 +10,7 @@ interface OrdersPageProps {
   onBrowseLoads?: () => void;
   onCancel?: (load: Load) => void;
   onDetails?: (load: Load) => void;
+  onTrack?: (load: Load) => void;
 }
 
 export const OrdersPage: React.FC<OrdersPageProps> = ({
@@ -19,6 +20,7 @@ export const OrdersPage: React.FC<OrdersPageProps> = ({
   onBrowseLoads,
   onCancel,
   onDetails,
+  onTrack,
 }) => {
   const isDark = theme === "dark";
   const { lang } = useLanguage();
@@ -111,6 +113,11 @@ export const OrdersPage: React.FC<OrdersPageProps> = ({
 
                     {/* Actions */}
                     <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                      <button onClick={() => onTrack?.(load)} style={{ padding: "7px 16px", background: "#CC0000", border: "none", borderRadius: 5, color: "#fff", fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 11, letterSpacing: 1, textTransform: "uppercase", cursor: "pointer", transition: "all 0.15s", display:"flex", alignItems:"center", gap:6 }}
+                        onMouseEnter={e => { e.currentTarget.style.background = "#aa0000"; e.currentTarget.style.transform="translateY(-1px)"; }}
+                        onMouseLeave={e => { e.currentTarget.style.background = "#CC0000"; e.currentTarget.style.transform="none"; }}>
+                        🛣️ {lang === "ru" ? "Трекинг" : "Track"}
+                      </button>
                       <button onClick={() => onDetails?.(load)} style={{ padding: "7px 16px", background: "transparent", border: "1px solid rgba(204,0,0,0.35)", borderRadius: 5, color: "#CC0000", fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 11, letterSpacing: 1, textTransform: "uppercase", cursor: "pointer", transition: "all 0.15s" }}
                         onMouseEnter={e => { e.currentTarget.style.background = "rgba(204,0,0,0.1)"; }}
                         onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}>

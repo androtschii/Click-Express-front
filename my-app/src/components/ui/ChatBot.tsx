@@ -306,6 +306,70 @@ const KB: Record<string, KBEntry> = {
       ru: "До свидания! 👋 Хорошего дня и удачных рейсов! 🚛",
     },
   },
+
+  permits: {
+    keywords: [
+      { word: "разрешение", weight: 10 }, { word: "разрешения", weight: 10 }, { word: "permit", weight: 10 },
+      { word: "permits", weight: 10 }, { word: "документы", weight: 8 }, { word: "documents", weight: 8 },
+      { word: "paperwork", weight: 9 }, { word: "clearance", weight: 8 }, { word: "допуск", weight: 9 },
+      { word: "oversize permit", weight: 10 }, { word: "негабарит разреш", weight: 10 },
+    ],
+    answer: {
+      en: "📄 **Required Permits & Documents:**\n\n• **DOT number** — mandatory for all shipments\n• **Oversize permit** — for loads exceeding 8.5 ft width or 13.6 ft height\n• **Pilot car** — required for loads over 14 ft wide\n• **TWIC card** — for military/federal loads\n• **CDL-A** — Class A license with flatbed endorsement\n\nWe handle all permit paperwork. Contact dispatch: **+1 786-202-6599**",
+      ru: "📄 **Необходимые разрешения и документы:**\n\n• **Номер DOT** — обязателен для всех перевозок\n• **Разрешение на негабарит** — для грузов шире 8.5 фт или выше 13.6 фт\n• **Сопровождение** — обязательно для грузов шире 14 фт\n• **Карта TWIC** — для военных/государственных грузов\n• **CDL-A** — права класса A с допуском на flatbed\n\nМы оформляем все разрешения. Диспетчер: **+1 786-202-6599**",
+    },
+  },
+
+  hours: {
+    keywords: [
+      { word: "часы работы", weight: 10 }, { word: "режим работы", weight: 10 }, { word: "когда работаете", weight: 10 },
+      { word: "рабочее время", weight: 9 }, { word: "working hours", weight: 10 }, { word: "open hours", weight: 10 },
+      { word: "when are you open", weight: 10 }, { word: "schedule", weight: 7 }, { word: "расписание", weight: 8 },
+      { word: "выходные", weight: 7 }, { word: "weekend", weight: 7 }, { word: "график", weight: 7 },
+    ],
+    answer: {
+      en: "🕐 **Working Hours:**\n\n• **Dispatch:** 24 / 7, Mon–Sun (always available)\n• **Office:** Mon–Fri, 9:00 AM – 6:00 PM EST\n• **Emergency line:** 24 / 7\n\n📱 **+1 786-202-6599** — call anytime!\n📧 clickexpress.inc@gmail.com",
+      ru: "🕐 **Режим работы:**\n\n• **Диспетчеры:** 24 / 7, Пн–Вс (всегда на связи)\n• **Офис:** Пн–Пт, 9:00–18:00 EST\n• **Экстренная линия:** 24 / 7\n\n📱 **+1 786-202-6599** — звоните в любое время!\n📧 clickexpress.inc@gmail.com",
+    },
+  },
+
+  oversized: {
+    keywords: [
+      { word: "негабаритный", weight: 10 }, { word: "негабарит", weight: 10 }, { word: "oversized", weight: 10 },
+      { word: "oversize", weight: 10 }, { word: "wide load", weight: 10 }, { word: "тяжёлый груз", weight: 9 },
+      { word: "heavy load", weight: 9 }, { word: "heavy haul", weight: 10 }, { word: "lowboy", weight: 9 },
+      { word: "stepdeck", weight: 9 }, { word: "flatbed oversized", weight: 10 }, { word: "крупногабаритный", weight: 10 },
+    ],
+    answer: {
+      en: "🏗️ **Oversized & Heavy Haul:**\n\nWe specialize in oversized freight:\n• Max width: up to **16 ft** with permits\n• Max height: up to **16 ft** with route survey\n• Max weight: up to **200,000 lbs** (multi-axle)\n\nEquipment available:\n• **Flatbed** — standard & extended\n• **Stepdeck** — height-sensitive cargo\n• **Lowboy** — heavy machinery & construction equip.\n\nCall for custom heavy haul quote: **+1 786-202-6599**",
+      ru: "🏗️ **Негабаритные и тяжёлые грузы:**\n\nСпециализируемся на негабаритных грузах:\n• Макс. ширина: до **16 фт** с разрешениями\n• Макс. высота: до **16 фт** с обследованием маршрута\n• Макс. вес: до **200 000 фунтов** (многоосные прицепы)\n\nДоступное оборудование:\n• **Flatbed** — стандартный и удлинённый\n• **Stepdeck** — для высотного груза\n• **Lowboy** — тяжёлая техника и строительное оборудование\n\nЗвоните для расчёта: **+1 786-202-6599**",
+    },
+  },
+
+  timeline: {
+    keywords: [
+      { word: "сроки", weight: 9 }, { word: "срок доставки", weight: 10 }, { word: "сколько дней", weight: 10 },
+      { word: "когда доставят", weight: 10 }, { word: "transit time", weight: 10 }, { word: "delivery time", weight: 10 },
+      { word: "how long", weight: 8 }, { word: "eta", weight: 10 }, { word: "expected", weight: 6 },
+      { word: "days", weight: 5 }, { word: "дней", weight: 6 }, { word: "время доставки", weight: 10 },
+    ],
+    answer: {
+      en: "⏱️ **Delivery Timelines:**\n\nTypical transit times:\n• **Short haul** (< 500 mi): 1–2 days\n• **Medium haul** (500–1500 mi): 2–4 days\n• **Long haul** (1500–2500 mi): 3–6 days\n• **Cross-country** (2500+ mi): 5–8 days\n\nFactors: permits, weather, fuel stops, DOT hours.\n\nExact ETA provided by dispatcher after booking.",
+      ru: "⏱️ **Сроки доставки:**\n\nОриентировочное время в пути:\n• **Короткий маршрут** (< 500 миль): 1–2 дня\n• **Средний маршрут** (500–1500 миль): 2–4 дня\n• **Длинный маршрут** (1500–2500 миль): 3–6 дней\n• **Через всю страну** (2500+ миль): 5–8 дней\n\nВлияет: разрешения, погода, остановки, нормы DOT.\n\nТочный срок — диспетчер сообщит после бронирования.",
+    },
+  },
+
+  greencard: {
+    keywords: [
+      { word: "грин карта", weight: 10 }, { word: "green card", weight: 10 }, { word: "green-card", weight: 10 },
+      { word: "иммиграция", weight: 8 }, { word: "immigration", weight: 8 }, { word: "водители с грин", weight: 10 },
+      { word: "drivers green card", weight: 10 }, { word: "pr driver", weight: 9 },
+    ],
+    answer: {
+      en: "🟢 **Green Card Drivers Program:**\n\nClick Express actively hires drivers with **Permanent Resident** status:\n• Full-time positions available\n• Competitive pay: **$0.55–$0.75/mile**\n• Benefits: health insurance, paid time off\n• No English exam required for driving role\n\nApply via **Careers** page or email: clickexpress.inc@gmail.com",
+      ru: "🟢 **Программа для водителей с грин-картой:**\n\nClick Express активно нанимает водителей со статусом **Permanent Resident**:\n• Постоянные позиции\n• Конкурентная оплата: **$0.55–$0.75/миля**\n• Льготы: медстраховка, оплачиваемый отпуск\n• Экзамен по английскому не требуется\n\nПодать заявку — раздел **Careers** или email: clickexpress.inc@gmail.com",
+    },
+  },
 };
 
 // ── Score-based matching ──────────────────────────────────────────────────────
@@ -349,8 +413,16 @@ function getBotAnswer(input: string, lang: Lang): string {
     : "Not sure I understood 🤔 Try rephrasing.\n\nI can answer about:\n• Loads & booking\n• Pricing & routes\n• Careers & contacts\n• **Math calculations** (e.g. `2500 * 3.73`)\n\nOr call: **+1 786-202-6599**";
 }
 
-const QUICK_EN = ["What loads do you have?", "How to book?", "Pricing info", "Calculate 2500 * 3.73", "Contact details"];
-const QUICK_RU = ["Какие грузы есть?", "Как забронировать?", "Стоимость перевозки", "Посчитай 2500 * 3.73", "Контакты"];
+const QUICK_EN = [
+  "What loads do you have?", "How to book?", "Pricing info",
+  "Oversized freight", "Delivery timeline", "Required permits",
+  "Working hours", "Careers & jobs", "Calculate 2500 * 3.73", "Contact details",
+];
+const QUICK_RU = [
+  "Какие грузы есть?", "Как забронировать?", "Стоимость перевозки",
+  "Негабаритные грузы", "Сроки доставки", "Разрешения и документы",
+  "Часы работы", "Вакансии", "Посчитай 2500 * 3.73", "Контакты",
+];
 
 function now() {
   return new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
@@ -392,6 +464,7 @@ export const ChatBot: React.FC<ChatBotProps> = ({ theme = "dark" }) => {
   const [typing, setTyping] = useState(false);
   const [unread, setUnread] = useState(0);
   const [pulse, setPulse] = useState(true);
+  const [showQuick, setShowQuick] = useState(true);
   const endRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const msgId = useRef(0);
@@ -414,7 +487,7 @@ export const ChatBot: React.FC<ChatBotProps> = ({ theme = "dark" }) => {
           : "Hey! 👋 I'm the **Click Express** assistant.\n\nI can answer about loads, pricing, booking, careers — and I can **calculate** 🧮\n\nWhat do you need?",
       }]);
     }
-    if (open) { setUnread(0); setTimeout(() => inputRef.current?.focus(), 200); }
+    if (open) { setUnread(0); setShowQuick(true); setTimeout(() => inputRef.current?.focus(), 200); }
   }, [open]);
 
   useEffect(() => { endRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages, typing]);
@@ -511,12 +584,15 @@ export const ChatBot: React.FC<ChatBotProps> = ({ theme = "dark" }) => {
             <div ref={endRef} />
           </div>
 
-          {/* Quick replies — shown initially */}
-          {messages.length <= 1 && !typing && (
-            <div style={{ background:bg, borderTop:`1px solid ${border}`, padding:"10px 14px", display:"flex", gap:7, flexWrap:"wrap" }}>
+          {/* Quick replies panel */}
+          {showQuick && (
+            <div style={{ background:bg, borderTop:`1px solid ${border}`, padding:"10px 14px 8px", display:"flex", gap:6, flexWrap:"wrap" }}>
+              <div style={{ width:"100%", fontFamily:"'Barlow',sans-serif", fontSize:10, color:mutedColor, letterSpacing:1, textTransform:"uppercase", marginBottom:4 }}>
+                {lang === "ru" ? "💡 Быстрые вопросы" : "💡 Quick questions"}
+              </div>
               {quickReplies.map(q => (
-                <button key={q} className="chat-quick" onClick={() => sendMessage(q)}
-                  style={{ padding:"6px 11px", background:"transparent", border:`1px solid ${border}`, borderRadius:20, fontFamily:"'Barlow',sans-serif", fontWeight:600, fontSize:11, color:mutedColor, cursor:"pointer", transition:"all 0.15s", whiteSpace:"nowrap" }}>
+                <button key={q} className="chat-quick" onClick={() => { sendMessage(q); setShowQuick(false); }}
+                  style={{ padding:"5px 10px", background:"transparent", border:`1px solid ${border}`, borderRadius:20, fontFamily:"'Barlow',sans-serif", fontWeight:600, fontSize:11, color:mutedColor, cursor:"pointer", transition:"all 0.15s", whiteSpace:"nowrap" }}>
                   {q}
                 </button>
               ))}
@@ -524,13 +600,21 @@ export const ChatBot: React.FC<ChatBotProps> = ({ theme = "dark" }) => {
           )}
 
           {/* Input row */}
-          <div style={{ background:bg, borderTop:`1px solid ${border}`, padding:"12px 14px", display:"flex", gap:10, alignItems:"center" }}>
+          <div style={{ background:bg, borderTop: showQuick ? "none" : `1px solid ${border}`, padding:"10px 14px", display:"flex", gap:8, alignItems:"center" }}>
+            {messages.length > 1 && (
+              <button
+                onClick={() => setShowQuick(v => !v)}
+                title={lang === "ru" ? "Быстрые вопросы" : "Quick questions"}
+                style={{ width:36, height:36, borderRadius:"50%", background: showQuick ? "rgba(204,0,0,0.15)" : (isDark?"#1a1a1a":"#f0f0f0"), border:`1px solid ${showQuick ? "#CC0000" : border}`, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, transition:"all 0.15s", fontSize:16 }}>
+                💡
+              </button>
+            )}
             <input ref={inputRef} className="chat-input" value={input} onChange={e => setInput(e.target.value)} onKeyDown={handleKey}
               placeholder={lang === "ru" ? "Вопрос или выражение: 1500*3.5..." : "Question or expression: 1500*3.5..."}
-              style={{ flex:1, padding:"10px 14px", background:inputBg, border:`1px solid ${border}`, borderRadius:10, color:textColor, fontFamily:"'Barlow',sans-serif", fontSize:13, transition:"border-color 0.2s, box-shadow 0.2s" }} />
+              style={{ flex:1, padding:"9px 14px", background:inputBg, border:`1px solid ${border}`, borderRadius:10, color:textColor, fontFamily:"'Barlow',sans-serif", fontSize:13, transition:"border-color 0.2s, box-shadow 0.2s" }} />
             <button className="chat-send-btn" onClick={() => sendMessage(input)} disabled={!input.trim()}
-              style={{ width:40, height:40, borderRadius:"50%", background: input.trim() ? "#CC0000" : (isDark?"#222":"#e0e0e0"), border:"none", cursor: input.trim()?"pointer":"default", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, transition:"all 0.15s" }}>
-              <svg width="18" height="18" viewBox="0 0 256 256" fill={input.trim()?"#fff":(isDark?"#444":"#aaa")}>
+              style={{ width:36, height:36, borderRadius:"50%", background: input.trim() ? "#CC0000" : (isDark?"#222":"#e0e0e0"), border:"none", cursor: input.trim()?"pointer":"default", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, transition:"all 0.15s" }}>
+              <svg width="17" height="17" viewBox="0 0 256 256" fill={input.trim()?"#fff":(isDark?"#444":"#aaa")}>
                 <path d="M231.87,114l-168-95.89A16,16,0,0,0,40.92,37.34L71.55,128,40.92,218.67A16,16,0,0,0,56,240a16.15,16.15,0,0,0,7.93-2.1l167.92-96.05a16,16,0,0,0,.05-27.89ZM56,224a.56.56,0,0,0,0-.12L85.74,136H144a8,8,0,0,0,0-16H85.74L56.06,32.16A.46.46,0,0,0,56,32l168,95.83Z"/>
               </svg>
             </button>

@@ -100,7 +100,7 @@ export const Header: React.FC<HeaderProps> = ({
       `}</style>
 
       <div onClick={onLogoClick || (() => window.scrollTo({ top: 0, behavior: "smooth" }))} style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", flexShrink: 0 }}>
-        <CELogo size={42} />
+        <CELogo size={42} theme={theme} />
         <div style={{ lineHeight: 1 }}>
           <div style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 19, color: "#fff", letterSpacing: 1, textTransform: "uppercase" }}>
             <span style={{ color: "#CC0000" }}>CLICK</span> EXPRESS

@@ -9,9 +9,9 @@ export const TrustStrip: React.FC<TrustStripProps> = ({ theme = 'dark' }) => {
   return (
     <div
       style={{
-        background: isDark ? "#0a0a0a" : "#f0f0f0",
-        borderTop: isDark ? "1px solid rgba(255,255,255,0.06)" : "1px solid rgba(0,0,0,0.08)",
-        borderBottom: isDark ? "1px solid rgba(255,255,255,0.06)" : "1px solid rgba(0,0,0,0.08)",
+        background: isDark ? "#0a0a0a" : "#fff",
+        borderTop: isDark ? "1px solid rgba(255,255,255,0.06)" : "1px solid rgba(0,0,0,0.1)",
+        borderBottom: isDark ? "1px solid rgba(255,255,255,0.06)" : "1px solid rgba(0,0,0,0.1)",
         padding: "20px clamp(20px,5vw,64px)",
         display: "flex",
         flexWrap: "wrap",
@@ -41,9 +41,9 @@ export const TrustStrip: React.FC<TrustStripProps> = ({ theme = 'dark' }) => {
           <span
             style={{
               fontFamily: "'Barlow',sans-serif",
-              fontWeight: 700,
+              fontWeight: 800,
               fontSize: 11,
-              color: isDark ? "rgba(255,255,255,0.45)" : "rgba(0,0,0,0.5)",
+              color: isDark ? "rgba(255,255,255,0.55)" : "#1a1a1a",
               letterSpacing: 1.5,
               textTransform: "uppercase",
             }}

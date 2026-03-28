@@ -18,7 +18,7 @@ export const Ticker: React.FC = () => {
   return (
     <div
       style={{
-        background: theme === 'dark' ? "#CC0000" : "#aa0000",
+        background: "#CC0000",
         overflow: "hidden",
         padding: "13px 0",
         borderTop: "2px solid #aa0000",
@@ -33,7 +33,7 @@ export const Ticker: React.FC = () => {
           fontFamily: "'Oswald',sans-serif",
           fontWeight: 700,
           fontSize: 13,
-          color: theme === 'dark' ? "#fff" : "#000",
+          color: "#fff",
           letterSpacing: 3,
           textTransform: "uppercase",
         }}

@@ -617,11 +617,18 @@ function AppContent() {
       })()}
 
       <section ref={catalogRef} style={{ maxWidth: 1240, margin: "0 auto", padding: "56px clamp(20px,4vw,56px) 80px" }}>
-        <div style={{ marginBottom: 36 }}>
-          <div style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 10, color: "#CC0000", letterSpacing: 4, textTransform: "uppercase", marginBottom: 10 }}>— Available Now</div>
+        <style>{`
+          @keyframes catalogSlideIn { from { opacity:0; transform:translateY(22px); } to { opacity:1; transform:translateY(0); } }
+          @keyframes catalogBadgePop { from { opacity:0; transform:scale(0.8); } to { opacity:1; transform:scale(1); } }
+        `}</style>
+        <div style={{ marginBottom: 36, animation: "catalogSlideIn 0.5s ease both" }}>
+          <div style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 800, fontSize: 11, color: "#CC0000", letterSpacing: 4, textTransform: "uppercase", marginBottom: 10, display: "flex", alignItems: "center", gap: 8 }}>
+            <span style={{ width: 20, height: 2, background: "#CC0000", display: "inline-block" }} />
+            Available Now
+          </div>
           <h2 style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: "clamp(34px,5.5vw,56px)", color: textColor, textTransform: "uppercase", lineHeight: 1 }}>
             THE BEST <span style={{ color: "#CC0000" }}>LOADS</span>{" "}
-            <span style={{ color: "transparent", WebkitTextStroke: `1.5px ${theme === "dark" ? "rgba(255,255,255,0.18)" : "rgba(0,0,0,0.12)"}` } as React.CSSProperties}>OF THE WEEK</span>
+            <span style={{ color: "transparent", WebkitTextStroke: `2px ${theme === "dark" ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.22)"}` } as React.CSSProperties}>OF THE WEEK</span>
           </h2>
         </div>
 

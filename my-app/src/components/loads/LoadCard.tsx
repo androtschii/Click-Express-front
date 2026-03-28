@@ -90,12 +90,12 @@ export const LoadCard: React.FC<LoadCardProps> = ({ load, onBook, onCancelBook, 
       <div onClick={() => onDetails && onDetails(load)} style={{ position:"relative", height:300, overflow:"hidden", cursor: onDetails ? "pointer" : "default" }}>
         <img src={load.image} alt={load.route} style={{
           width:"100%", height:"100%", objectFit:"cover", objectPosition:"center 72%",
-          filter: isDark ? "brightness(0.55)" : "brightness(0.72)",
+          filter: isDark ? "brightness(0.55)" : "brightness(1.0) saturate(1.12) contrast(1.05)",
           transition:"filter 0.4s ease, transform 0.4s ease",
         }} />
         <div style={{ position:"absolute", inset:0, background: isDark
           ? "linear-gradient(160deg,rgba(0,0,0,0.25) 0%,rgba(0,0,0,0.65) 60%,rgba(0,0,0,0.92) 100%)"
-          : "linear-gradient(160deg,rgba(0,0,0,0.08) 0%,rgba(0,0,0,0.42) 55%,rgba(0,0,0,0.72) 100%)"
+          : "linear-gradient(160deg,rgba(0,0,0,0.0) 0%,rgba(0,0,0,0.22) 50%,rgba(0,0,0,0.68) 100%)"
         }} />
 
         {/* Тег */}

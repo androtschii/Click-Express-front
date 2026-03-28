@@ -31,11 +31,12 @@ theme = 'dark', onSearchChange, onFilterChange, onBook, onCancelBook, onSave, on
   const isDark = theme === 'dark';
   const { lang } = useLanguage();
   const t = translations[lang];
-  const searchBg    = isDark ? "#0d0d0d"                : "#f0f0f0";
-  const searchBorder= isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.1)";
-  const emptyBorder = isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.1)";
-  const emptyText   = isDark ? "rgba(255,255,255,0.3)"  : "rgba(0,0,0,0.4)";
-  const loadingText = isDark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.4)";
+  const searchBg    = isDark ? "#0d0d0d"                : "#ffffff";
+  const searchBorder= isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.14)";
+  const searchShadow= isDark ? "none"                   : "0 2px 16px rgba(0,0,0,0.07)";
+  const emptyBorder = isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.12)";
+  const emptyText   = isDark ? "rgba(255,255,255,0.3)"  : "rgba(0,0,0,0.6)";
+  const loadingText = isDark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.55)";
 
   if (loading) return (
     <div style={{ textAlign: "center", padding: "90px 0" }}>
@@ -53,7 +54,7 @@ theme = 'dark', onSearchChange, onFilterChange, onBook, onCancelBook, onSave, on
 
   return (
     <div>
-      <div style={{ background: searchBg, border: `1px solid ${searchBorder}`, borderRadius: 6, padding: "16px 20px", display: "flex", gap: 14, alignItems: "center", flexWrap: "wrap", marginBottom: 18 }}>
+      <div style={{ background: searchBg, border: `1px solid ${searchBorder}`, borderRadius: 8, padding: "16px 20px", display: "flex", gap: 14, alignItems: "center", flexWrap: "wrap", marginBottom: 18, boxShadow: searchShadow }}>
         <SearchBar value={search} onChange={onSearchChange} theme={theme} />
         <FilterButtons active={filter} onChange={onFilterChange} theme={theme} />
       </div>

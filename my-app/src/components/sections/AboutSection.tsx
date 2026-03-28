@@ -10,48 +10,48 @@ interface AboutSectionProps {
 }
 
 const InstagramIcon = () => (
-  <svg width="22" height="22" viewBox="0 0 256 256" fill="#E1306C">
+  <svg width="22" height="22" viewBox="0 0 256 256" fill="#fff">
     <path d="M128,80a48,48,0,1,0,48,48A48.05,48.05,0,0,0,128,80Zm0,80a32,32,0,1,1,32-32A32,32,0,0,1,128,160ZM176,24H80A56.06,56.06,0,0,0,24,80v96a56.06,56.06,0,0,0,56,56h96a56.06,56.06,0,0,0,56-56V80A56.06,56.06,0,0,0,176,24Zm40,152a40,40,0,0,1-40,40H80a40,40,0,0,1-40-40V80A40,40,0,0,1,80,40h96a40,40,0,0,1,40,40ZM192,76a12,12,0,1,1-12-12A12,12,0,0,1,192,76Z"/>
   </svg>
 );
 
 const LinkedInIcon = () => (
-  <svg width="22" height="22" viewBox="0 0 256 256" fill="#0A66C2">
+  <svg width="22" height="22" viewBox="0 0 256 256" fill="#fff">
     <path d="M216,24H40A16,16,0,0,0,24,40V216a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V40A16,16,0,0,0,216,24Zm0,192H40V40H216V216ZM96,112v64a8,8,0,0,1-16,0V112a8,8,0,0,1,16,0Zm88,28v36a8,8,0,0,1-16,0V140a20,20,0,0,0-40,0v36a8,8,0,0,1-16,0V112a8,8,0,0,1,15.79-1.78A36,36,0,0,1,184,140ZM100,84A12,12,0,1,1,88,72,12,12,0,0,1,100,84Z"/>
   </svg>
 );
 
 const FacebookIcon = () => (
-  <svg width="22" height="22" viewBox="0 0 256 256" fill="#1877F2">
+  <svg width="22" height="22" viewBox="0 0 256 256" fill="#fff">
     <path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm8,191.63V152h24a8,8,0,0,0,0-16H136V112a16,16,0,0,1,16-16h16a8,8,0,0,0,0-16H152a32,32,0,0,0-32,32v24H96a8,8,0,0,0,0,16h24v63.63a88,88,0,1,1,16,0Z"/>
   </svg>
 );
 
 const MapIcon = () => (
-  <svg width="22" height="22" viewBox="0 0 256 256" fill="#CC0000">
+  <svg width="22" height="22" viewBox="0 0 256 256" fill="#fff">
     <path d="M128,64a40,40,0,1,0,40,40A40,40,0,0,0,128,64Zm0,64a24,24,0,1,1,24-24A24,24,0,0,1,128,128Zm0-112a88.1,88.1,0,0,0-88,88c0,31.4,14.51,64.68,42,96.25a254.19,254.19,0,0,0,41.45,38.3,8,8,0,0,0,9.18,0A254.19,254.19,0,0,0,174,200.25c27.45-31.57,42-64.85,42-96.25A88.1,88.1,0,0,0,128,16Zm0,206c-16.53-13-72-60.75-72-118a72,72,0,0,1,144,0C200,161.23,144.53,209,128,222Z"/>
   </svg>
 );
 
 const PhoneIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 256 256" fill="#22C55E">
+  <svg width="20" height="20" viewBox="0 0 256 256" fill="#fff">
     <path d="M222.37,158.46l-47.11-21.11-.13-.06a16,16,0,0,0-15.17,1.4,8.12,8.12,0,0,0-.75.56L134.87,160c-15.42-7.49-31.34-23.29-38.83-38.51l20.78-24.71c.2-.25.39-.5.57-.77a16,16,0,0,0,1.32-15.06l0-.12L97.54,33.64a16,16,0,0,0-16.62-9.52A56.26,56.26,0,0,0,32,80c0,79.4,64.6,144,144,144a56.26,56.26,0,0,0,55.88-48.92A16,16,0,0,0,222.37,158.46ZM176,208A128.14,128.14,0,0,1,48,80,40.2,40.2,0,0,1,82.87,40a.61.61,0,0,0,0,.12l21,47L83.2,111.86a6.13,6.13,0,0,0-.57.77,16,16,0,0,0-1,15.7c9.06,18.53,27.73,37.06,46.46,46.11a16,16,0,0,0,15.75-1.14,8.44,8.44,0,0,0,.74-.56L168.89,152l47,21.05h0s.08,0,.11,0A40.21,40.21,0,0,1,176,208Z"/>
   </svg>
 );
 
 const MailIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 256 256" fill="#60A5FA">
+  <svg width="20" height="20" viewBox="0 0 256 256" fill="#fff">
     <path d="M224,48H32a8,8,0,0,0-8,8V192a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A8,8,0,0,0,224,48ZM203.43,64,128,133.15,52.57,64ZM216,192H40V74.19l82.59,75.71a8,8,0,0,0,10.82,0L216,74.19V192Z"/>
   </svg>
 );
 
 const contactsBase = [
-  { icon: <MapIcon />, iconBg: "rgba(204,0,0,0.15)", key: "Address" as const, value: "Hallandale Beach, FL, United States, 33009", href: "https://maps.google.com/?q=Hallandale+Beach+FL+33009", highlight: false },
-  { icon: <PhoneIcon />, iconBg: "rgba(34,197,94,0.15)", key: "Phone" as const, value: "+1 786-202-6599", href: "tel:+17862026599", highlight: true },
-  { icon: <MailIcon />, iconBg: "rgba(96,165,250,0.15)", key: "Email" as const, value: "clickexpress.inc@gmail.com", href: "mailto:clickexpress.inc@gmail.com", highlight: false },
-  { icon: <LinkedInIcon />, iconBg: "rgba(10,102,194,0.15)", key: "LinkedIn" as const, value: "Click Express Inc", href: "https://www.linkedin.com/company/clickexpressinc", highlight: false },
-  { icon: <FacebookIcon />, iconBg: "rgba(24,119,242,0.15)", key: "Facebook" as const, value: "Click Express Inc", href: "https://www.facebook.com/share/1FP9dJ2L4i/", highlight: false },
-  { icon: <InstagramIcon />, iconBg: "rgba(214,36,159,0.15)", key: "Instagram" as const, value: "@clickexpress.official", href: "https://www.instagram.com/clickexpress.official", highlight: false },
+  { icon: <MapIcon />, iconBg: "linear-gradient(135deg,#CC0000,#ff3333)", key: "Address" as const, value: "Hallandale Beach, FL, United States, 33009", href: "https://maps.google.com/?q=Hallandale+Beach+FL+33009", highlight: false },
+  { icon: <PhoneIcon />, iconBg: "linear-gradient(135deg,#16a34a,#22c55e)", key: "Phone" as const, value: "+1 786-202-6599", href: "tel:+17862026599", highlight: true },
+  { icon: <MailIcon />, iconBg: "linear-gradient(135deg,#2563eb,#60a5fa)", key: "Email" as const, value: "clickexpress.inc@gmail.com", href: "mailto:clickexpress.inc@gmail.com", highlight: false },
+  { icon: <LinkedInIcon />, iconBg: "linear-gradient(135deg,#0a66c2,#2490d8)", key: "LinkedIn" as const, value: "Click Express Inc", href: "https://www.linkedin.com/company/clickexpressinc", highlight: false },
+  { icon: <FacebookIcon />, iconBg: "linear-gradient(135deg,#1877f2,#42a5f5)", key: "Facebook" as const, value: "Click Express Inc", href: "https://www.facebook.com/share/1FP9dJ2L4i/", highlight: false },
+  { icon: <InstagramIcon />, iconBg: "linear-gradient(135deg,#833ab4,#E1306C,#F77737)", key: "Instagram" as const, value: "@clickexpress.official", href: "https://www.instagram.com/clickexpress.official", highlight: false },
 ];
 
 export const AboutSection: React.FC<AboutSectionProps> = ({ onContactClick, theme = 'dark' }) => {
@@ -175,7 +175,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onContactClick, them
                   onMouseEnter={e => { e.currentTarget.style.borderColor = "#CC0000"; e.currentTarget.style.background = "rgba(204,0,0,0.06)"; e.currentTarget.style.transform = "translateX(4px)"; }}
                   onMouseLeave={e => { e.currentTarget.style.borderColor = isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.06)"; e.currentTarget.style.background = isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.02)"; e.currentTarget.style.transform = "translateX(0)"; }}
                 >
-                  <div style={{ width: 42, height: 42, background: item.iconBg, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                  <div style={{ width: 44, height: 44, background: item.iconBg, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, boxShadow: "0 4px 14px rgba(0,0,0,0.22)" }}>
                     {item.icon}
                   </div>
                   <div>

@@ -26,19 +26,19 @@ const FilterBtn: React.FC<FilterBtnProps> = ({ label, active, onClick, theme = '
         borderRadius: 4,
         border: active
           ? "none"
-          : `1px solid ${hov ? "#CC0000" : isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.15)"}`,
+          : `1px solid ${hov ? "#CC0000" : isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.22)"}`,
         background: active
           ? "#CC0000"
           : hov
-          ? "rgba(204,0,0,0.1)"
-          : isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.04)",
+          ? "rgba(204,0,0,0.08)"
+          : isDark ? "rgba(255,255,255,0.04)" : "#fff",
         color: active
           ? "#fff"
           : hov
-          ? isDark ? "#fff" : "#CC0000"
-          : isDark ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.5)",
+          ? "#CC0000"
+          : isDark ? "rgba(255,255,255,0.55)" : "#1a1a1a",
         fontFamily: "'Barlow',sans-serif",
-        fontWeight: 700,
+        fontWeight: 800,
         fontSize: 12,
         letterSpacing: 1.2,
         textTransform: "uppercase",

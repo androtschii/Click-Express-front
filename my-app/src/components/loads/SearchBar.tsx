@@ -38,15 +38,17 @@ export const SearchBar: React.FC<SearchBarProps> = ({ value, onChange, theme = '
         style={{
           width: "100%",
           padding: "12px 14px 12px 42px",
-          background: isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)",
-          border: `1px solid ${focused ? "#CC0000" : isDark ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.15)"}`,
+          background: isDark ? "rgba(255,255,255,0.05)" : "#fff",
+          border: `1px solid ${focused ? "#CC0000" : isDark ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.2)"}`,
           borderRadius: 4,
           color: isDark ? "#fff" : "#1a1a1a",
           fontSize: 14,
           fontFamily: "'Barlow',sans-serif",
+          fontWeight: 600,
           outline: "none",
           boxSizing: "border-box",
-          transition: "border-color 0.2s",
+          transition: "border-color 0.2s, box-shadow 0.2s",
+          boxShadow: focused && !isDark ? "0 0 0 3px rgba(204,0,0,0.1)" : "none",
         }}
       />
     </div>

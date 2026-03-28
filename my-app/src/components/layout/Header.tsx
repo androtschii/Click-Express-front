@@ -24,16 +24,22 @@ interface HeaderProps {
   onOrdersClick?: () => void;
 }
 
-const NavLink: React.FC<{ children: React.ReactNode; onClick?: () => void }> = ({ children, onClick }) => {
+const NavLink: React.FC<{ children: React.ReactNode; onClick?: () => void; isLight?: boolean }> = ({ children, onClick, isLight }) => {
   const [hov, setHov] = useState(false);
   return (
     <span onClick={onClick} onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
-      style={{ color: hov ? "#fff" : "rgba(255,255,255,0.65)", background: hov ? "rgba(204,0,0,0.14)" : "transparent", fontSize: 12, fontFamily: "'Barlow', sans-serif", fontWeight: 600, letterSpacing: 1.8, textTransform: "uppercase", padding: "6px 14px", borderRadius: 4, transition: "all 0.15s", cursor: "pointer", whiteSpace: "nowrap", display: "inline-block" }}
+      style={{
+        color: hov ? "#fff" : (isLight ? "rgba(20,20,20,0.7)" : "rgba(255,255,255,0.65)"),
+        background: hov ? "#CC0000" : "transparent",
+        fontSize: 12, fontFamily: "'Barlow', sans-serif", fontWeight: 700, letterSpacing: 1.8,
+        textTransform: "uppercase", padding: "6px 14px", borderRadius: 4,
+        transition: "all 0.15s", cursor: "pointer", whiteSpace: "nowrap", display: "inline-block"
+      }}
     >{children}</span>
   );
 };
 
-const PhoneLink: React.FC = () => {
+const PhoneLink: React.FC<{ isLight?: boolean }> = ({ isLight }) => {
   const [hov, setHov] = useState(false);
   return (
     <a href="tel:+17862026599" onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
@@ -41,19 +47,17 @@ const PhoneLink: React.FC = () => {
     >
       <div style={{
         width: 32, height: 32, borderRadius: "50%",
-        background: hov
-          ? "linear-gradient(135deg, #CC0000, #ff4d4d)"
-          : "linear-gradient(135deg, rgba(204,0,0,0.3), rgba(204,0,0,0.1))",
+        background: hov ? "linear-gradient(135deg,#CC0000,#ff4d4d)" : (isLight ? "rgba(204,0,0,0.12)" : "linear-gradient(135deg,rgba(204,0,0,0.3),rgba(204,0,0,0.1))"),
         border: `1px solid ${hov ? "#CC0000" : "rgba(204,0,0,0.4)"}`,
         display: "flex", alignItems: "center", justifyContent: "center",
-        boxShadow: hov ? "0 0 12px rgba(204,0,0,0.5)" : "none",
+        boxShadow: hov ? "0 0 14px rgba(204,0,0,0.6)" : "none",
         transition: "all 0.2s", flexShrink: 0,
       }}>
         <svg width="15" height="15" viewBox="0 0 256 256" fill={hov ? "#fff" : "#CC0000"} style={{ transition: "fill 0.2s" }}>
           <path d="M222.37,158.46l-47.11-21.11-.13-.06a16,16,0,0,0-15.17,1.4,8.12,8.12,0,0,0-.75.56L134.87,160c-15.42-7.49-31.34-23.29-38.83-38.51l20.78-24.71c.2-.25.39-.5.57-.77a16,16,0,0,0,1.32-15.06l0-.12L97.54,33.64a16,16,0,0,0-16.62-9.52A56.26,56.26,0,0,0,32,80c0,79.4,64.6,144,144,144a56.26,56.26,0,0,0,55.88-48.92A16,16,0,0,0,222.37,158.46ZM176,208A128.14,128.14,0,0,1,48,80,40.2,40.2,0,0,1,82.87,40a.61.61,0,0,0,0,.12l21,47L83.2,111.86a6.13,6.13,0,0,0-.57.77,16,16,0,0,0-1,15.7c9.06,18.53,27.73,37.06,46.46,46.11a16,16,0,0,0,15.75-1.14,8.44,8.44,0,0,0,.74-.56L168.89,152l47,21.05h0s.08,0,.11,0A40.21,40.21,0,0,1,176,208Z"/>
         </svg>
       </div>
-      <span style={{ color: hov ? "#fff" : "rgba(255,255,255,0.6)", fontSize: 13, fontFamily: "'Barlow',sans-serif", fontWeight: 600, transition: "color 0.2s" }}>
+      <span style={{ color: hov ? "#CC0000" : (isLight ? "rgba(20,20,20,0.75)" : "rgba(255,255,255,0.6)"), fontSize: 13, fontFamily: "'Barlow',sans-serif", fontWeight: 600, transition: "color 0.2s" }}>
         +1 786-202-6599
       </span>
     </a>
@@ -84,16 +88,30 @@ export const Header: React.FC<HeaderProps> = ({
     if (onSavedClick) onSavedClick();
   };
 
+  const isLight = theme === 'light';
+
   return (
     <header style={{
       position: "fixed", top: 0, left: 0, right: 0, zIndex: 999, height: 70,
-      background: scrolled ? "rgba(8,0,0,0.38)" : "linear-gradient(180deg,rgba(0,0,0,0.32) 0%,transparent 100%)",
-      backdropFilter: "blur(24px)",
-      WebkitBackdropFilter: "blur(24px)",
-      borderBottom: scrolled ? "1px solid rgba(204,0,0,0.3)" : "none",
-      transition: "background 0.3s, border 0.3s",
+      background: isLight
+        ? (scrolled ? "rgba(255,255,255,0.97)" : "rgba(255,255,255,0.92)")
+        : (scrolled ? "rgba(8,0,0,0.92)" : "linear-gradient(180deg,rgba(0,0,0,0.75) 0%,rgba(0,0,0,0.3) 100%)"),
+      backdropFilter: "blur(20px)",
+      WebkitBackdropFilter: "blur(20px)",
+      borderBottom: isLight
+        ? (scrolled ? "1px solid rgba(204,0,0,0.18)" : "1px solid rgba(204,0,0,0.1)")
+        : (scrolled ? "1px solid rgba(204,0,0,0.3)" : "none"),
+      boxShadow: isLight
+        ? (scrolled ? "0 4px 24px rgba(0,0,0,0.1)" : "0 2px 12px rgba(0,0,0,0.06)")
+        : "none",
+      transition: "background 0.3s, border 0.3s, box-shadow 0.3s",
       display: "flex", alignItems: "center", padding: "0 28px", gap: 24,
     }}>
+      {/* Red glow line at top */}
+      <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: "linear-gradient(90deg,transparent 0%,#CC0000 30%,#ff3333 60%,#CC0000 80%,transparent 100%)", opacity: isLight ? 1 : (scrolled ? 1 : 0.6), transition: "opacity 0.3s" }} />
+      {/* Subtle red glow under top line */}
+      <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 16, background: "linear-gradient(180deg,rgba(204,0,0,0.18) 0%,transparent 100%)", pointerEvents: "none" }} />
+
       <style>{`
         @keyframes heartPulse { 0%{transform:scale(1)} 25%{transform:scale(1.4)} 50%{transform:scale(1.1)} 75%{transform:scale(1.25)} 100%{transform:scale(1)} }
         @keyframes ringOut { 0%{transform:translate(-50%,-50%) scale(0.3);opacity:1} 100%{transform:translate(-50%,-50%) scale(2.5);opacity:0} }
@@ -102,26 +120,26 @@ export const Header: React.FC<HeaderProps> = ({
       <div onClick={onLogoClick || (() => window.scrollTo({ top: 0, behavior: "smooth" }))} style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", flexShrink: 0 }}>
         <CELogo size={42} />
         <div style={{ lineHeight: 1 }}>
-          <div style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 19, color: "#fff", letterSpacing: 1, textTransform: "uppercase" }}>
+          <div style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 19, color: isLight ? "#1a1a1a" : "#fff", letterSpacing: 1, textTransform: "uppercase" }}>
             <span style={{ color: "#CC0000" }}>CLICK</span> EXPRESS
           </div>
-          <div style={{ fontSize: 8, color: "rgba(255,255,255,0.38)", fontFamily: "'Barlow',sans-serif", letterSpacing: 2.5, textTransform: "uppercase", marginTop: 2 }}>
+          <div style={{ fontSize: 8, color: isLight ? "rgba(0,0,0,0.4)" : "rgba(255,255,255,0.38)", fontFamily: "'Barlow',sans-serif", letterSpacing: 2.5, textTransform: "uppercase", marginTop: 2 }}>
             Inc · Heavy Freight
           </div>
         </div>
       </div>
 
-      <div style={{ width: 1, height: 30, background: "rgba(255,255,255,0.1)", flexShrink: 0 }} />
+      <div style={{ width: 1, height: 30, background: isLight ? "rgba(0,0,0,0.1)" : "rgba(255,255,255,0.1)", flexShrink: 0 }} />
 
       <nav style={{ display: "flex", gap: 2, flex: 1 }}>
-        <NavLink onClick={onCatalogClick}>{t.nav.catalog}</NavLink>
-        <NavLink onClick={onQuoteClick}>{t.nav.getQuote}</NavLink>
-        <NavLink onClick={onAboutClick}>{t.nav.aboutUs}</NavLink>
-        <NavLink onClick={onContactClick}>{t.nav.contact}</NavLink>
-        <NavLink onClick={onCareersClick}>{t.nav.careers}</NavLink>
+        <NavLink onClick={onCatalogClick} isLight={isLight}>{t.nav.catalog}</NavLink>
+        <NavLink onClick={onQuoteClick} isLight={isLight}>{t.nav.getQuote}</NavLink>
+        <NavLink onClick={onAboutClick} isLight={isLight}>{t.nav.aboutUs}</NavLink>
+        <NavLink onClick={onContactClick} isLight={isLight}>{t.nav.contact}</NavLink>
+        <NavLink onClick={onCareersClick} isLight={isLight}>{t.nav.careers}</NavLink>
       </nav>
 
-      <PhoneLink />
+      <PhoneLink isLight={isLight} />
 
       {onThemeToggle && (
         <div onClick={onThemeToggle} style={{
@@ -149,7 +167,7 @@ export const Header: React.FC<HeaderProps> = ({
         onClick={toggleLang}
         style={{
           display: "flex", alignItems: "center", gap: 0,
-          background: "transparent", border: "1px solid rgba(255,255,255,0.15)",
+          background: "transparent", border: `1px solid ${isLight ? "rgba(0,0,0,0.15)" : "rgba(255,255,255,0.15)"}`,
           borderRadius: 4, overflow: "hidden", cursor: "pointer", flexShrink: 0,
           padding: 0,
         }}
@@ -160,7 +178,7 @@ export const Header: React.FC<HeaderProps> = ({
             fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 11,
             letterSpacing: 1, textTransform: "uppercase",
             background: lang === l ? "#CC0000" : "transparent",
-            color: lang === l ? "#fff" : "rgba(255,255,255,0.45)",
+            color: lang === l ? "#fff" : (isLight ? "rgba(0,0,0,0.45)" : "rgba(255,255,255,0.45)"),
             transition: "all 0.15s",
           }}>{l}</span>
         ))}
@@ -204,34 +222,34 @@ export const Header: React.FC<HeaderProps> = ({
                 {session.name.charAt(0).toUpperCase()}
               </div>
             )}
-            <span style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 600, fontSize: 12, color: "rgba(255,255,255,0.85)", maxWidth: 90, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+            <span style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 600, fontSize: 12, color: isLight ? "#1a1a1a" : "rgba(255,255,255,0.85)", maxWidth: 90, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
               {session.name.split(" ")[0]}
             </span>
-            <svg width="10" height="10" viewBox="0 0 256 256" fill="rgba(255,255,255,0.5)" style={{ transform: userMenuOpen ? "rotate(180deg)" : "none", transition: "transform 0.2s" }}>
+            <svg width="10" height="10" viewBox="0 0 256 256" fill={isLight ? "rgba(0,0,0,0.4)" : "rgba(255,255,255,0.5)"} style={{ transform: userMenuOpen ? "rotate(180deg)" : "none", transition: "transform 0.2s" }}>
               <path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"/>
             </svg>
           </div>
 
           {userMenuOpen && (
-            <div onClick={() => setUserMenuOpen(false)} style={{ position: "absolute", top: "calc(100% + 8px)", right: 0, minWidth: 180, background: "#0f0f0f", border: "1px solid rgba(204,0,0,0.3)", borderRadius: 10, overflow: "hidden", boxShadow: "0 16px 40px rgba(0,0,0,0.7)", zIndex: 100 }}>
-              <div style={{ padding: "12px 14px", borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
-                <div style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 13, color: "#fff" }}>{session.name}</div>
-                <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 11, color: "rgba(255,255,255,0.35)", marginTop: 2 }}>{session.email}</div>
+            <div onClick={() => setUserMenuOpen(false)} style={{ position: "absolute", top: "calc(100% + 8px)", right: 0, minWidth: 190, background: isLight ? "#fff" : "#0f0f0f", border: `1px solid ${isLight ? "rgba(204,0,0,0.2)" : "rgba(204,0,0,0.3)"}`, borderRadius: 10, overflow: "hidden", boxShadow: isLight ? "0 8px 40px rgba(0,0,0,0.15)" : "0 16px 40px rgba(0,0,0,0.7)", zIndex: 100 }}>
+              <div style={{ padding: "12px 14px", borderBottom: `1px solid ${isLight ? "rgba(0,0,0,0.07)" : "rgba(255,255,255,0.07)"}` }}>
+                <div style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 13, color: isLight ? "#1a1a1a" : "#fff" }}>{session.name}</div>
+                <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 11, color: isLight ? "rgba(0,0,0,0.4)" : "rgba(255,255,255,0.35)", marginTop: 2 }}>{session.email}</div>
               </div>
               <div style={{ padding: "6px 0" }}>
                 {[
                   { label: t.header.myProfile, icon: "👤", onClick: onProfileClick },
                   { label: t.header.myOrders, icon: "📋", onClick: onOrdersClick },
                 ].map(item => (
-                  <div key={item.label} onClick={() => { setUserMenuOpen(false); item.onClick?.(); }} style={{ padding: "9px 14px", display: "flex", alignItems: "center", gap: 10, cursor: "pointer", fontFamily: "'Barlow',sans-serif", fontSize: 13, color: "rgba(255,255,255,0.7)", transition: "all 0.15s" }}
-                    onMouseEnter={e => { e.currentTarget.style.background = "rgba(204,0,0,0.1)"; e.currentTarget.style.color = "#fff"; }}
-                    onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "rgba(255,255,255,0.7)"; }}>
+                  <div key={item.label} onClick={() => { setUserMenuOpen(false); item.onClick?.(); }} style={{ padding: "9px 14px", display: "flex", alignItems: "center", gap: 10, cursor: "pointer", fontFamily: "'Barlow',sans-serif", fontSize: 13, color: isLight ? "rgba(0,0,0,0.7)" : "rgba(255,255,255,0.7)", transition: "all 0.15s" }}
+                    onMouseEnter={e => { e.currentTarget.style.background = "rgba(204,0,0,0.08)"; e.currentTarget.style.color = "#CC0000"; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = isLight ? "rgba(0,0,0,0.7)" : "rgba(255,255,255,0.7)"; }}>
                     <span>{item.icon}</span>{item.label}
                   </div>
                 ))}
-                <div style={{ margin: "6px 0", height: 1, background: "rgba(255,255,255,0.07)" }} />
-                <div onClick={onLogout} style={{ padding: "9px 14px", display: "flex", alignItems: "center", gap: 10, cursor: "pointer", fontFamily: "'Barlow',sans-serif", fontSize: 13, color: "#ff6b6b", transition: "all 0.15s" }}
-                  onMouseEnter={e => { e.currentTarget.style.background = "rgba(204,0,0,0.15)"; }}
+                <div style={{ margin: "6px 0", height: 1, background: isLight ? "rgba(0,0,0,0.07)" : "rgba(255,255,255,0.07)" }} />
+                <div onClick={onLogout} style={{ padding: "9px 14px", display: "flex", alignItems: "center", gap: 10, cursor: "pointer", fontFamily: "'Barlow',sans-serif", fontSize: 13, color: "#CC0000", transition: "all 0.15s" }}
+                  onMouseEnter={e => { e.currentTarget.style.background = "rgba(204,0,0,0.08)"; }}
                   onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}>
                   <span>🚪</span> {t.header.signOut}
                 </div>
@@ -240,9 +258,9 @@ export const Header: React.FC<HeaderProps> = ({
           )}
         </div>
       ) : (
-        <button onClick={onLoginClick} style={{ background: "transparent", border: "1px solid rgba(255,255,255,0.2)", borderRadius: 20, padding: "7px 18px", color: "rgba(255,255,255,0.7)", fontFamily: "'Barlow',sans-serif", fontWeight: 600, fontSize: 12, letterSpacing: 1.5, textTransform: "uppercase", cursor: "pointer", flexShrink: 0, transition: "all 0.15s" }}
-          onMouseEnter={e => { e.currentTarget.style.borderColor = "#CC0000"; e.currentTarget.style.color = "#fff"; }}
-          onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.2)"; e.currentTarget.style.color = "rgba(255,255,255,0.7)"; }}>
+        <button onClick={onLoginClick} style={{ background: "transparent", border: `1px solid ${isLight ? "rgba(0,0,0,0.2)" : "rgba(255,255,255,0.2)"}`, borderRadius: 20, padding: "7px 18px", color: isLight ? "rgba(0,0,0,0.65)" : "rgba(255,255,255,0.7)", fontFamily: "'Barlow',sans-serif", fontWeight: 600, fontSize: 12, letterSpacing: 1.5, textTransform: "uppercase", cursor: "pointer", flexShrink: 0, transition: "all 0.15s" }}
+          onMouseEnter={e => { e.currentTarget.style.borderColor = "#CC0000"; e.currentTarget.style.color = "#CC0000"; }}
+          onMouseLeave={e => { e.currentTarget.style.borderColor = isLight ? "rgba(0,0,0,0.2)" : "rgba(255,255,255,0.2)"; e.currentTarget.style.color = isLight ? "rgba(0,0,0,0.65)" : "rgba(255,255,255,0.7)"; }}>
           {t.header.login}
         </button>
       )}

@@ -14,6 +14,7 @@ interface HeaderProps {
   onContactClick: () => void;
   onQuoteClick: () => void;
   onCareersClick?: () => void;
+  onNewsClick?: () => void;
   onSavedClick?: () => void;
   onRequestsClick?: () => void;
   onLoginClick?: () => void;
@@ -66,7 +67,7 @@ const PhoneLink: React.FC<{ isLight?: boolean }> = ({ isLight }) => {
 
 export const Header: React.FC<HeaderProps> = ({
   cartCount, savedCount = 0, theme = 'dark', onThemeToggle,
-  onCatalogClick, onAboutClick, onContactClick, onQuoteClick, onCareersClick, onSavedClick, onRequestsClick, onLoginClick,
+  onCatalogClick, onAboutClick, onContactClick, onQuoteClick, onCareersClick, onNewsClick, onSavedClick, onRequestsClick, onLoginClick,
   session, onLogout, onLogoClick, onProfileClick, onOrdersClick,
 }) => {
   const [scrolled, setScrolled] = useState(false);
@@ -137,6 +138,7 @@ export const Header: React.FC<HeaderProps> = ({
         <NavLink onClick={onAboutClick} isLight={isLight}>{t.nav.aboutUs}</NavLink>
         <NavLink onClick={onContactClick} isLight={isLight}>{t.nav.contact}</NavLink>
         <NavLink onClick={onCareersClick} isLight={isLight}>{t.nav.careers}</NavLink>
+        <NavLink onClick={onNewsClick} isLight={isLight}>{t.nav.news}</NavLink>
       </nav>
 
       <PhoneLink isLight={isLight} />

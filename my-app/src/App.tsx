@@ -17,6 +17,7 @@ import { CareersPage } from "./components/pages/CareersPage";
 import { ProfilePage } from "./components/pages/ProfilePage";
 import { OrdersPage } from "./components/pages/OrdersPage";
 import { TrackingPage } from "./components/pages/TrackingPage";
+import { NewsPage } from "./components/pages/NewsPage";
 import { Notification } from "./components/ui/Notification";
 import { ChatBot } from "./components/ui/ChatBot";
 import { PhoneIcon } from "./components/ui/PhoneIcon";
@@ -232,6 +233,7 @@ function AppContent() {
   const [session, setSession] = useState<Session | null>(() => getSession());
   const [detailLoad, setDetailLoad] = useState<Load | null>(null);
   const [showCareers, setShowCareers] = useState(false);
+  const [showNews, setShowNews] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [showOrders, setShowOrders] = useState(false);
   const [trackLoad, setTrackLoad] = useState<Load | null>(null);
@@ -305,19 +307,20 @@ function AppContent() {
       savedCount={savedLoads.length}
       theme={theme}
       onThemeToggle={toggleTheme}
-      onCatalogClick={() => { setDetailLoad(null); setShowCareers(false); setTimeout(() => scrollTo(catalogRef), 50); }}
-      onAboutClick={() => { setDetailLoad(null); setShowCareers(false); setTimeout(() => scrollTo(aboutRef), 50); }}
-      onContactClick={() => { setDetailLoad(null); setShowCareers(false); setTimeout(() => scrollTo(contactRef), 50); }}
+      onCatalogClick={() => { setDetailLoad(null); setShowCareers(false); setShowNews(false); setTimeout(() => scrollTo(catalogRef), 50); }}
+      onAboutClick={() => { setDetailLoad(null); setShowCareers(false); setShowNews(false); setTimeout(() => scrollTo(aboutRef), 50); }}
+      onContactClick={() => { setDetailLoad(null); setShowCareers(false); setShowNews(false); setTimeout(() => scrollTo(contactRef), 50); }}
       onQuoteClick={() => setShowQuote(true)}
-      onCareersClick={() => { setDetailLoad(null); setShowCareers(true); setShowProfile(false); setShowOrders(false); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+      onCareersClick={() => { setDetailLoad(null); setShowCareers(true); setShowNews(false); setShowProfile(false); setShowOrders(false); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+      onNewsClick={() => { setDetailLoad(null); setShowNews(true); setShowCareers(false); setShowProfile(false); setShowOrders(false); window.scrollTo({ top: 0, behavior: "smooth" }); }}
       onSavedClick={() => setShowFavorites(true)}
       onRequestsClick={() => setShowRequests(true)}
       onLoginClick={() => setShowAuth(true)}
       session={session}
       onLogout={() => { logout(); setSession(null); setShowProfile(false); setShowOrders(false); }}
-      onLogoClick={() => { setDetailLoad(null); setShowCareers(false); setShowProfile(false); setShowOrders(false); window.scrollTo({ top: 0, behavior: "smooth" }); }}
-      onProfileClick={() => { setDetailLoad(null); setShowCareers(false); setShowOrders(false); setShowProfile(true); window.scrollTo({ top: 0, behavior: "smooth" }); }}
-      onOrdersClick={() => { setDetailLoad(null); setShowCareers(false); setShowProfile(false); setShowOrders(true); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+      onLogoClick={() => { setDetailLoad(null); setShowCareers(false); setShowNews(false); setShowProfile(false); setShowOrders(false); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+      onProfileClick={() => { setDetailLoad(null); setShowCareers(false); setShowNews(false); setShowOrders(false); setShowProfile(true); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+      onOrdersClick={() => { setDetailLoad(null); setShowCareers(false); setShowNews(false); setShowProfile(false); setShowOrders(true); window.scrollTo({ top: 0, behavior: "smooth" }); }}
     />
   );
 
@@ -350,6 +353,22 @@ function AppContent() {
         {notifications.map((msg, idx) => (
           <Notification key={idx} text={msg} onClose={() => setNotifications(n => n.filter((_, i) => i !== idx))} />
         ))}
+      </div>
+    );
+  }
+
+  // ── News page ─────────────────────────────────────────────────────────
+  if (showNews) {
+    return (
+      <div style={{ background: bgColor, minHeight: "100vh", color: textColor }}>
+        {sharedStyle}
+        {sharedHeader}
+        <div style={{ paddingTop: 70 }}>
+          <NewsPage theme={theme} onBack={() => { setShowNews(false); window.scrollTo({ top: 0 }); }} />
+        </div>
+        {showAuth && <AuthModal onClose={() => setShowAuth(false)} theme={theme} onSuccess={(s) => { setSession(s); setShowAuth(false); }} />}
+        {showQuote && <QuoteModal onClose={() => setShowQuote(false)} theme={theme} />}
+        {sharedPanels}
       </div>
     );
   }

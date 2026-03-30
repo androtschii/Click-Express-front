@@ -381,9 +381,13 @@ export const NewsPage: React.FC<NewsPageProps> = ({ theme = "dark", onBack, onVi
       {selectedId !== null ? null : <>
 
       {/* ── HERO BANNER ── */}
-      <div style={{ position: "relative", background: isDark ? "linear-gradient(160deg,#0a0000 0%,#110000 40%,#0d0d0d 100%)" : "linear-gradient(160deg,#fff 0%,#f8f0f0 40%,#f5f5f5 100%)", padding: "90px clamp(20px,5vw,64px) 56px", overflow: "hidden" }}>
+      <div style={{ position: "relative", background: isDark ? "#080000" : "#f0ecec", padding: "90px clamp(20px,5vw,64px) 56px", overflow: "hidden" }}>
+        {/* Background photo */}
+        <img src="/images/real7.jpg" alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 40%", filter: isDark ? "brightness(0.18) saturate(0.7)" : "brightness(0.55) saturate(0.5)", pointerEvents: "none" }} />
+        {/* Dark gradient overlay */}
+        <div style={{ position: "absolute", inset: 0, background: isDark ? "linear-gradient(105deg,rgba(10,0,0,0.92) 0%,rgba(20,0,0,0.75) 50%,rgba(10,0,0,0.88) 100%)" : "linear-gradient(105deg,rgba(255,240,240,0.88) 0%,rgba(240,220,220,0.72) 100%)", pointerEvents: "none" }} />
         {/* BG grid lines */}
-        <div style={{ position: "absolute", inset: 0, backgroundImage: `repeating-linear-gradient(0deg,${isDark?"rgba(255,255,255,0.02)":"rgba(0,0,0,0.02)"} 0px,transparent 1px,transparent 60px),repeating-linear-gradient(90deg,${isDark?"rgba(255,255,255,0.02)":"rgba(0,0,0,0.02)"} 0px,transparent 1px,transparent 60px)`, pointerEvents: "none" }} />
+        <div style={{ position: "absolute", inset: 0, backgroundImage: `repeating-linear-gradient(0deg,${isDark?"rgba(255,255,255,0.025)":"rgba(0,0,0,0.025)"} 0px,transparent 1px,transparent 60px),repeating-linear-gradient(90deg,${isDark?"rgba(255,255,255,0.025)":"rgba(0,0,0,0.025)"} 0px,transparent 1px,transparent 60px)`, pointerEvents: "none" }} />
         {/* Red left line */}
         <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 4, background: "#CC0000" }} />
         {/* Top glow */}

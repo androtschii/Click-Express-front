@@ -304,11 +304,16 @@ export const ReviewsPage: React.FC<ReviewsPageProps> = ({ theme = "dark", onBack
       {/* ── HERO ── */}
       <div style={{
         position: "relative",
-        background: isDark ? "linear-gradient(160deg,#0a0000 0%,#110000 40%,#0d0d0d 100%)" : "linear-gradient(160deg,#fff 0%,#fffbf0 40%,#f5f5f5 100%)",
+        background: isDark ? "#060400" : "#f5f0e8",
         padding: "90px clamp(20px,5vw,64px) 56px",
         overflow: "hidden",
       }}>
-        <div style={{ position: "absolute", inset: 0, backgroundImage: `repeating-linear-gradient(0deg,${isDark?"rgba(255,255,255,0.02)":"rgba(0,0,0,0.02)"} 0px,transparent 1px,transparent 60px),repeating-linear-gradient(90deg,${isDark?"rgba(255,255,255,0.02)":"rgba(0,0,0,0.02)"} 0px,transparent 1px,transparent 60px)`, pointerEvents: "none" }} />
+        {/* Background photo */}
+        <img src="/images/real1.jpg" alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 55%", filter: isDark ? "brightness(0.15) saturate(0.5) sepia(0.4)" : "brightness(0.5) saturate(0.4) sepia(0.3)", pointerEvents: "none" }} />
+        {/* Dark gradient overlay */}
+        <div style={{ position: "absolute", inset: 0, background: isDark ? "linear-gradient(110deg,rgba(6,4,0,0.94) 0%,rgba(20,14,0,0.78) 50%,rgba(6,4,0,0.9) 100%)" : "linear-gradient(110deg,rgba(255,252,230,0.9) 0%,rgba(245,240,200,0.75) 100%)", pointerEvents: "none" }} />
+        {/* BG grid lines */}
+        <div style={{ position: "absolute", inset: 0, backgroundImage: `repeating-linear-gradient(0deg,${isDark?"rgba(255,220,0,0.025)":"rgba(0,0,0,0.025)"} 0px,transparent 1px,transparent 60px),repeating-linear-gradient(90deg,${isDark?"rgba(255,220,0,0.025)":"rgba(0,0,0,0.025)"} 0px,transparent 1px,transparent 60px)`, pointerEvents: "none" }} />
         <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 4, background: "#eab308" }} />
         <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: "linear-gradient(90deg,transparent,#eab308 30%,#fde047 60%,#eab308 80%,transparent)" }} />
 

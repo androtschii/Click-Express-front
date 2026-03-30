@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import { useLanguage } from "../../context/LanguageContext";
+import type { Load } from "../../types/index";
 
 interface NewsPageProps {
   theme?: "dark" | "light";
   onBack?: () => void;
   onViewLoads?: () => void;
+  onLoadDetail?: (load: Load) => void;
 }
 
 type Category = "all" | "loads" | "reviews" | "company" | "freight" | "safety" | "drivers";
@@ -26,6 +28,7 @@ interface Article {
   stops?: { name: string; rating: number; noteEn: string; noteRu: string }[];
   author?: string;
   authorInitial?: string;
+  load?: Load;
 }
 
 const CAT_COLOR: Record<Exclude<Category, "all">, string> = {
@@ -49,6 +52,7 @@ const ARTICLES: Article[] = [
     excerptRu: "1,780 миль на платформе. Негабаритная стальная конструкция, требует сопровождения. Ставка: $4.72/ми — один из лучших лотов 2025.",
     highlightEn: "$8,400 / 1,780 mi", highlightRu: "$8,400 / 1,780 ми",
     date: "Mar 24, 2025", readTime: "2 min",
+    load: { id: 101, route: "Connellsville, PA", dest: "Denver, CO", price: 8400, miles: 1780, type: "Full Load", cargo: "Flatbed / Oversized Steel Structure", image: "/images/real7.jpg", tag: "Best Load of the Week" },
   },
   {
     id: 2, category: "loads",
@@ -59,6 +63,7 @@ const ARTICLES: Article[] = [
     excerptRu: "HVAC блоки, 1,374 мили, $3.73/ми. Чистый груз, без тарпинга. Забронировано за 2 часа после публикации.",
     highlightEn: "$5,120 / 1,374 mi", highlightRu: "$5,120 / 1,374 ми",
     date: "Mar 21, 2025", readTime: "2 min",
+    load: { id: 102, route: "Madera, CA", dest: "Fort Collins, CO", price: 5120, miles: 1374, type: "Full Load", cargo: "Flatbed / HVAC Units", image: "/images/real2.jpg", tag: "Best Load of the Week" },
   },
   {
     id: 3, category: "loads",
@@ -69,6 +74,7 @@ const ARTICLES: Article[] = [
     excerptRu: "Сертифицированный груз DOD. Специальные разрешения оформлены. 720 миль, $9.44/ми — премиальная ставка.",
     highlightEn: "$6,800 / 720 mi", highlightRu: "$6,800 / 720 ми",
     date: "Mar 18, 2025", readTime: "3 min",
+    load: { id: 103, route: "Deer Park, WA", dest: "Jackson, WY", price: 6800, miles: 720, type: "Full Load", cargo: "Flatbed / Military Equipment DOD", image: "/images/real3.jpg", tag: "Military Load" },
   },
   {
     id: 4, category: "loads",
@@ -79,6 +85,7 @@ const ARTICLES: Article[] = [
     excerptRu: "Техника на маршруте 1,447 миль через юг. $2.76/ми, без проблем. Водитель выполнил за 28ч.",
     highlightEn: "$4,000 / 1,447 mi", highlightRu: "$4,000 / 1,447 ми",
     date: "Mar 15, 2025", readTime: "2 min",
+    load: { id: 104, route: "Key Largo, FL", dest: "Lake Ozark, MO", price: 4000, miles: 1447, type: "Full Load", cargo: "Flatbed / Equipment", image: "/images/real5.jpg", tag: "Best Load of the Week" },
   },
 
   /* ─── REVIEWS ─── */
@@ -290,10 +297,10 @@ function StarRating({ n }: { n: number }) {
   );
 }
 
-export const NewsPage: React.FC<NewsPageProps> = ({ theme = "dark", onBack, onViewLoads }) => {
+export const NewsPage: React.FC<NewsPageProps> = ({ theme = "dark", onBack, onViewLoads, onLoadDetail }) => {
   const { lang } = useLanguage();
   const [activecat, setActivecat] = useState<Category>("all");
-  const [expanded, setExpanded] = useState<number | null>(null);
+  const [selectedId, setSelectedId] = useState<number | null>(null);
   const isDark = theme === "dark";
 
   const bg         = isDark ? "#080808" : "#f5f5f5";
@@ -320,6 +327,92 @@ export const NewsPage: React.FC<NewsPageProps> = ({ theme = "dark", onBack, onVi
         .cat-tab:hover { background: rgba(204,0,0,0.12) !important; color: #CC0000 !important; }
       `}</style>
 
+      {/* ── ARTICLE DETAIL PAGE ── */}
+      {(() => {
+        if (selectedId === null) return null;
+        const article = ARTICLES.find(a => a.id === selectedId);
+        if (!article) return null;
+        const catLabel = lang === "ru" ? CATS.find(c => c.key === article.category)?.ru : CATS.find(c => c.key === article.category)?.en;
+        return (
+          <div style={{ minHeight: "100vh", background: bg, padding: "90px clamp(20px,5vw,64px) 60px", animation: "newsSlideUp 0.4s ease both" }}>
+            <div style={{ maxWidth: 760, margin: "0 auto" }}>
+              <button onClick={() => { setSelectedId(null); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+                style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "transparent", border: "none", color: isDark ? "rgba(255,255,255,0.45)" : "rgba(0,0,0,0.45)", fontFamily: "'Barlow',sans-serif", fontWeight: 600, fontSize: 13, letterSpacing: 1, cursor: "pointer", padding: "0 0 24px", transition: "color 0.15s" }}
+                onMouseEnter={e => { e.currentTarget.style.color = "#CC0000"; }}
+                onMouseLeave={e => { e.currentTarget.style.color = isDark ? "rgba(255,255,255,0.45)" : "rgba(0,0,0,0.45)"; }}>
+                ← {lang === "ru" ? "Все новости" : "All news"}
+              </button>
+
+              {/* Category tag + date */}
+              <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
+                <span style={{ background: `${article.accentColor}18`, color: article.accentColor, border: `1px solid ${article.accentColor}40`, padding: "4px 12px", borderRadius: 3, fontFamily: "'Barlow',sans-serif", fontWeight: 800, fontSize: 10, letterSpacing: 2, textTransform: "uppercase" }}>
+                  {article.icon} {catLabel}
+                </span>
+                <span style={{ fontFamily: "'Barlow',sans-serif", fontSize: 12, color: textSubtle }}>{article.date}</span>
+                <span style={{ fontFamily: "'Barlow',sans-serif", fontSize: 12, color: textSubtle }}>{article.readTime} {lang === "ru" ? "мин" : "min"}</span>
+              </div>
+
+              {/* Highlight (loads) */}
+              {article.category === "loads" && article.highlightEn && (
+                <div style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 36, color: "#CC0000", lineHeight: 1, marginBottom: 14 }}>
+                  {lang === "ru" ? article.highlightRu : article.highlightEn}
+                </div>
+              )}
+
+              {/* Author (reviews) */}
+              {article.category === "reviews" && article.authorInitial && (
+                <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 18 }}>
+                  <div style={{ width: 48, height: 48, borderRadius: "50%", background: "linear-gradient(135deg,#22c55e,#16a34a)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 20, color: "#fff", flexShrink: 0 }}>
+                    {article.authorInitial}
+                  </div>
+                  <span style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 16, color: textPrimary }}>{article.author}</span>
+                </div>
+              )}
+
+              {/* Title */}
+              <h1 style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: "clamp(22px,4vw,36px)", color: textPrimary, textTransform: article.category === "reviews" ? "none" : "uppercase", lineHeight: 1.2, marginBottom: 24 }}>
+                {lang === "ru" ? article.titleRu : article.titleEn}
+              </h1>
+
+              <div style={{ width: 60, height: 4, background: article.accentColor, borderRadius: 2, marginBottom: 28 }} />
+
+              {/* Body text */}
+              <p style={{ fontFamily: "'Barlow',sans-serif", fontSize: 16, color: isDark ? "rgba(255,255,255,0.75)" : "rgba(0,0,0,0.7)", lineHeight: 1.85, marginBottom: 28, whiteSpace: "pre-line" }}>
+                {lang === "ru" ? article.excerptRu : article.excerptEn}
+              </p>
+
+              {/* Driver stops */}
+              {article.stops && article.stops.length > 0 && (
+                <div style={{ marginTop: 8 }}>
+                  <div style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 800, fontSize: 11, letterSpacing: 2, textTransform: "uppercase", color: "#a855f7", marginBottom: 14 }}>
+                    {lang === "ru" ? "ОСТАНОВКИ" : "STOPS"}
+                  </div>
+                  {article.stops.map((stop, si) => (
+                    <div key={si} style={{ background: isDark ? "rgba(168,85,247,0.07)" : "rgba(168,85,247,0.05)", border: "1px solid rgba(168,85,247,0.18)", borderRadius: 8, padding: "12px 16px", marginBottom: 10 }}>
+                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
+                        <span style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 14, color: textPrimary }}>{stop.name}</span>
+                        <StarRating n={stop.rating} />
+                      </div>
+                      <span style={{ fontFamily: "'Barlow',sans-serif", fontSize: 13, color: textSubtle }}>{lang === "ru" ? stop.noteRu : stop.noteEn}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* CTA for loads */}
+              {article.category === "loads" && (
+                <button onClick={() => { setSelectedId(null); onViewLoads?.(); }}
+                  style={{ marginTop: 20, display: "inline-flex", alignItems: "center", gap: 10, background: "#CC0000", color: "#fff", border: "none", borderRadius: 6, padding: "14px 32px", fontFamily: "'Barlow',sans-serif", fontWeight: 800, fontSize: 13, letterSpacing: 1.5, textTransform: "uppercase", cursor: "pointer", boxShadow: "0 4px 20px rgba(204,0,0,0.4)", transition: "all 0.15s" }}
+                  onMouseEnter={e => { e.currentTarget.style.background = "#aa0000"; e.currentTarget.style.transform = "translateY(-1px)"; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = "#CC0000"; e.currentTarget.style.transform = "none"; }}>
+                  {lang === "ru" ? "СМОТРЕТЬ ГРУЗЫ →" : "VIEW LOADS →"}
+                </button>
+              )}
+            </div>
+          </div>
+        );
+      })()}
+      {selectedId !== null ? null : <>
 
       {/* ── HERO BANNER ── */}
       <div style={{ position: "relative", background: isDark ? "linear-gradient(160deg,#0a0000 0%,#110000 40%,#0d0d0d 100%)" : "linear-gradient(160deg,#fff 0%,#f8f0f0 40%,#f5f5f5 100%)", padding: "90px clamp(20px,5vw,64px) 56px", overflow: "hidden" }}>
@@ -385,7 +478,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({ theme = "dark", onBack, onVi
         {/* ── FEATURED CARD ── */}
         {featured && (
           <div style={{ background: featured.category === "loads" ? `linear-gradient(135deg, #1a0000 0%, #2d0000 50%, #1a0000 100%)` : cardBg, border: `1px solid ${featured.accentColor}40`, borderRadius: 14, padding: "40px 44px", marginBottom: 44, position: "relative", overflow: "hidden", animation: "newsSlideUp 0.5s ease both", cursor: "pointer", boxShadow: `0 8px 48px ${featured.accentColor}20` }}
-            onClick={() => featured.category === "loads" ? onViewLoads?.() : setExpanded(expanded === featured.id ? null : featured.id)}>
+            onClick={() => { if (featured.load && onLoadDetail) { onLoadDetail(featured.load); } else { setSelectedId(featured.id); window.scrollTo({ top: 0, behavior: "smooth" }); } }}>
             {/* Accent line top */}
             <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 4, background: `linear-gradient(90deg, ${featured.accentColor}, ${featured.accentColor}80, transparent)` }} />
             <div style={{ position: "absolute", right: 40, top: "50%", transform: "translateY(-50%)", fontSize: 140, opacity: 0.05, pointerEvents: "none" }}>{featured.icon}</div>
@@ -424,7 +517,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({ theme = "dark", onBack, onVi
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(340px,1fr))", gap: 22 }}>
           {rest.map((article, idx) => (
             <div key={article.id} className="news-card"
-              onClick={() => article.category === "loads" ? onViewLoads?.() : setExpanded(expanded === article.id ? null : article.id)}
+              onClick={() => { if (article.load && onLoadDetail) { onLoadDetail(article.load); } else { setSelectedId(article.id); window.scrollTo({ top: 0, behavior: "smooth" }); } }}
               style={{ background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 12, overflow: "hidden", cursor: "pointer", animation: `newsSlideUp 0.4s ease ${idx * 0.04}s both` }}>
 
               {/* Colored top bar */}
@@ -467,12 +560,12 @@ export const NewsPage: React.FC<NewsPageProps> = ({ theme = "dark", onBack, onVi
                 )}
 
                 {/* Excerpt */}
-                <p style={{ fontFamily: "'Barlow',sans-serif", fontSize: 13, color: textMuted, lineHeight: 1.7, marginBottom: 14, display: "-webkit-box", WebkitLineClamp: expanded === article.id ? undefined : 3, WebkitBoxOrient: "vertical" as const, overflow: expanded === article.id ? "visible" : "hidden" }}>
+                <p style={{ fontFamily: "'Barlow',sans-serif", fontSize: 13, color: textMuted, lineHeight: 1.7, marginBottom: 14, display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical" as const, overflow: "hidden" }}>
                   {lang === "ru" ? article.excerptRu : article.excerptEn}
                 </p>
 
                 {/* Driver Stops list */}
-                {article.stops && (expanded === article.id ? article.stops : article.stops.slice(0, 2)).map((stop, si) => (
+                {article.stops && article.stops.slice(0, 2).map((stop, si) => (
                   <div key={si} style={{ background: isDark ? "rgba(168,85,247,0.07)" : "rgba(168,85,247,0.05)", border: `1px solid rgba(168,85,247,0.18)`, borderRadius: 6, padding: "8px 12px", marginBottom: 6 }}>
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 2 }}>
                       <span style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 12, color: textPrimary }}>{stop.name}</span>
@@ -481,7 +574,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({ theme = "dark", onBack, onVi
                     <span style={{ fontFamily: "'Barlow',sans-serif", fontSize: 11, color: textSubtle }}>{lang === "ru" ? stop.noteRu : stop.noteEn}</span>
                   </div>
                 ))}
-                {article.stops && article.stops.length > 2 && expanded !== article.id && (
+                {article.stops && article.stops.length > 2 && (
                   <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 11, color: "#a855f7", marginBottom: 8 }}>
                     +{article.stops.length - 2} {lang === "ru" ? "ещё остановок" : "more stops"}
                   </div>
@@ -490,7 +583,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({ theme = "dark", onBack, onVi
                 {/* Footer */}
                 <div style={{ borderTop: `1px solid ${divider}`, paddingTop: 12, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                   <span style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 800, fontSize: 11, color: article.accentColor, letterSpacing: 1.5, textTransform: "uppercase" }}>
-                    {expanded === article.id ? (lang === "ru" ? "СВЕРНУТЬ ↑" : "COLLAPSE ↑") : (lang === "ru" ? "ЧИТАТЬ →" : "READ MORE →")}
+                    {lang === "ru" ? "ЧИТАТЬ →" : "READ MORE →"}
                   </span>
                   <span style={{ fontFamily: "'Barlow',sans-serif", fontSize: 10, color: textSubtle }}>
                     {article.readTime} {lang === "ru" ? "мин" : "min"}
@@ -524,6 +617,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({ theme = "dark", onBack, onVi
         </div>
 
       </div>
+    </>}
     </div>
   );
 };

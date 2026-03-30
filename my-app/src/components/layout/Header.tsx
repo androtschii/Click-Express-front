@@ -32,8 +32,8 @@ const NavLink: React.FC<{ children: React.ReactNode; onClick?: () => void; isLig
       style={{
         color: hov ? "#fff" : (isLight ? "rgba(20,20,20,0.7)" : "rgba(255,255,255,0.65)"),
         background: hov ? "#CC0000" : "transparent",
-        fontSize: 12, fontFamily: "'Barlow', sans-serif", fontWeight: 700, letterSpacing: 1.8,
-        textTransform: "uppercase", padding: "6px 14px", borderRadius: 4,
+        fontSize: 11, fontFamily: "'Barlow', sans-serif", fontWeight: 700, letterSpacing: 1,
+        textTransform: "uppercase", padding: "6px 10px", borderRadius: 4,
         transition: "all 0.15s", cursor: "pointer", whiteSpace: "nowrap", display: "inline-block"
       }}
     >{children}</span>
@@ -106,7 +106,7 @@ export const Header: React.FC<HeaderProps> = ({
         ? (scrolled ? "0 4px 24px rgba(0,0,0,0.1)" : "0 2px 12px rgba(0,0,0,0.06)")
         : "none",
       transition: "background 0.3s, border 0.3s, box-shadow 0.3s",
-      display: "flex", alignItems: "center", padding: "0 28px", gap: 24,
+      display: "flex", alignItems: "center", padding: "0 20px", gap: 14,
     }}>
       {/* Red glow line at top */}
       <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: "linear-gradient(90deg,transparent 0%,#CC0000 30%,#ff3333 60%,#CC0000 80%,transparent 100%)", opacity: isLight ? 1 : (scrolled ? 1 : 0.6), transition: "opacity 0.3s" }} />

@@ -364,7 +364,7 @@ function AppContent() {
         {sharedStyle}
         {sharedHeader}
         <div style={{ paddingTop: 70 }}>
-          <NewsPage theme={theme} onBack={() => { setShowNews(false); window.scrollTo({ top: 0 }); }} />
+          <NewsPage theme={theme} onBack={() => { setShowNews(false); window.scrollTo({ top: 0 }); }} onViewLoads={() => { setShowNews(false); setTimeout(() => scrollTo(catalogRef), 80); }} />
         </div>
         {showAuth && <AuthModal onClose={() => setShowAuth(false)} theme={theme} onSuccess={(s) => { setSession(s); setShowAuth(false); }} />}
         {showQuote && <QuoteModal onClose={() => setShowQuote(false)} theme={theme} />}

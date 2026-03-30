@@ -66,21 +66,11 @@ export const Hero: React.FC<HeroProps> = ({ onViewLoads, onQuoteClick }) => {
         style={{
           position: "absolute",
           inset: 0,
-          backgroundImage: "url(/images/hero-bg.jpg)",
+          backgroundImage: theme === 'dark'
+            ? "url(/images/red%20freightliner%20cascadia%202026%20night.png)"
+            : "url(/images/red%20freightliner%20cascadia%202026.PNG)",
           backgroundSize: "cover",
-          backgroundPosition: "center 40%",
-          filter: theme === 'light' ? 'brightness(1.05) contrast(1.08) saturate(1.2)' : 'none',
-        }}
-      />
-      {/* Main gradient overlay */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          background:
-            theme === 'light'
-              ? "linear-gradient(105deg,rgba(255,255,255,0.78) 0%,rgba(255,255,255,0.28) 42%,rgba(255,255,255,0.0) 62%)"
-              : "linear-gradient(105deg,rgba(0,0,0,0.93) 0%,rgba(0,0,0,0.72) 55%,rgba(8,0,0,0.45) 100%)",
+          backgroundPosition: "center 50%",
         }}
       />
       {/* Red accent on right side (light theme only) */}
@@ -161,12 +151,12 @@ export const Hero: React.FC<HeroProps> = ({ onViewLoads, onQuoteClick }) => {
             fontFamily: "'Oswald',sans-serif",
             fontWeight: 700,
             fontSize: "clamp(52px,8vw,100px)",
-            color: "transparent",
-            WebkitTextStroke: theme === 'dark' ? "2px rgba(255,255,255,0.2)" : "2px rgba(0,0,0,0.2)",
+            color: theme === 'dark' ? "rgba(255,255,255,0.85)" : "rgba(0,0,0,0.82)",
             lineHeight: 0.9,
             margin: "0 0 8px",
             textTransform: "uppercase",
             animation: "heroFadeUp 0.6s ease 0.35s both",
+            textShadow: theme === 'dark' ? "0 2px 16px rgba(0,0,0,0.9), 0 0 40px rgba(0,0,0,0.7)" : "0 2px 12px rgba(255,255,255,0.9), 0 0 30px rgba(255,255,255,0.7)",
           }}
         >
           {t.line2}
@@ -190,11 +180,12 @@ export const Hero: React.FC<HeroProps> = ({ onViewLoads, onQuoteClick }) => {
           style={{
             fontFamily: "'Barlow',sans-serif",
             fontSize: 16,
-            color: theme === 'dark' ? "rgba(255,255,255,0.55)" : "rgba(0,0,0,0.55)",
+            color: theme === 'dark' ? "rgba(255,255,255,0.92)" : "rgba(0,0,0,0.88)",
             lineHeight: 1.8,
             maxWidth: 500,
             marginBottom: 40,
             animation: "heroFadeUp 0.6s ease 0.65s both",
+            textShadow: theme === 'dark' ? "0 1px 8px rgba(0,0,0,0.95), 0 2px 24px rgba(0,0,0,0.8)" : "0 1px 6px rgba(255,255,255,0.95), 0 2px 16px rgba(255,255,255,0.8)",
           }}
         >
           {t.desc}

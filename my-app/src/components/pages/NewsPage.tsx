@@ -4,6 +4,7 @@ import { useLanguage } from "../../context/LanguageContext";
 interface NewsPageProps {
   theme?: "dark" | "light";
   onBack?: () => void;
+  onViewLoads?: () => void;
 }
 
 type Category = "all" | "loads" | "reviews" | "company" | "freight" | "safety" | "drivers";
@@ -289,7 +290,7 @@ function StarRating({ n }: { n: number }) {
   );
 }
 
-export const NewsPage: React.FC<NewsPageProps> = ({ theme = "dark", onBack }) => {
+export const NewsPage: React.FC<NewsPageProps> = ({ theme = "dark", onBack, onViewLoads }) => {
   const { lang } = useLanguage();
   const [activecat, setActivecat] = useState<Category>("all");
   const [expanded, setExpanded] = useState<number | null>(null);
@@ -319,14 +320,6 @@ export const NewsPage: React.FC<NewsPageProps> = ({ theme = "dark", onBack }) =>
         .cat-tab:hover { background: rgba(204,0,0,0.12) !important; color: #CC0000 !important; }
       `}</style>
 
-      {/* ── BACK BUTTON ── */}
-      <div style={{ position: "fixed", top: 18, left: 18, zIndex: 999 }}>
-        <button onClick={onBack} style={{ display: "flex", alignItems: "center", gap: 8, background: isDark ? "rgba(0,0,0,0.75)" : "rgba(255,255,255,0.9)", border: "1px solid rgba(204,0,0,0.35)", borderRadius: 8, padding: "9px 18px", color: textPrimary, fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 13, letterSpacing: 1, cursor: "pointer", backdropFilter: "blur(12px)", boxShadow: "0 4px 20px rgba(0,0,0,0.25)", transition: "all 0.15s" }}
-          onMouseEnter={e => { e.currentTarget.style.borderColor="#CC0000"; e.currentTarget.style.color="#CC0000"; }}
-          onMouseLeave={e => { e.currentTarget.style.borderColor="rgba(204,0,0,0.35)"; e.currentTarget.style.color=textPrimary; }}>
-          ← {lang === "ru" ? "Назад" : "Back"}
-        </button>
-      </div>
 
       {/* ── HERO BANNER ── */}
       <div style={{ position: "relative", background: isDark ? "linear-gradient(160deg,#0a0000 0%,#110000 40%,#0d0d0d 100%)" : "linear-gradient(160deg,#fff 0%,#f8f0f0 40%,#f5f5f5 100%)", padding: "90px clamp(20px,5vw,64px) 56px", overflow: "hidden" }}>
@@ -338,6 +331,12 @@ export const NewsPage: React.FC<NewsPageProps> = ({ theme = "dark", onBack }) =>
         <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: "linear-gradient(90deg,transparent,#CC0000 30%,#ff3333 60%,#CC0000 80%,transparent)" }} />
 
         <div style={{ maxWidth: 900, animation: "newsSlideUp 0.6s ease both" }}>
+          {/* Back button */}
+          <button onClick={onBack} style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "transparent", border: "none", color: isDark ? "rgba(255,255,255,0.45)" : "rgba(0,0,0,0.45)", fontFamily: "'Barlow',sans-serif", fontWeight: 600, fontSize: 13, letterSpacing: 1, cursor: "pointer", padding: "0 0 20px", transition: "color 0.15s" }}
+            onMouseEnter={e => { e.currentTarget.style.color = "#CC0000"; }}
+            onMouseLeave={e => { e.currentTarget.style.color = isDark ? "rgba(255,255,255,0.45)" : "rgba(0,0,0,0.45)"; }}>
+            ← {lang === "ru" ? "Назад" : "Back"}
+          </button>
           {/* Live badge */}
           <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(204,0,0,0.1)", border: "1px solid rgba(204,0,0,0.35)", borderRadius: 20, padding: "5px 14px", marginBottom: 24, animation: "newsBadgePop 0.5s ease 0.1s both" }}>
             <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#CC0000", animation: "newsHeroPulse 1.4s ease infinite", display: "inline-block" }} />
@@ -386,7 +385,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({ theme = "dark", onBack }) =>
         {/* ── FEATURED CARD ── */}
         {featured && (
           <div style={{ background: featured.category === "loads" ? `linear-gradient(135deg, #1a0000 0%, #2d0000 50%, #1a0000 100%)` : cardBg, border: `1px solid ${featured.accentColor}40`, borderRadius: 14, padding: "40px 44px", marginBottom: 44, position: "relative", overflow: "hidden", animation: "newsSlideUp 0.5s ease both", cursor: "pointer", boxShadow: `0 8px 48px ${featured.accentColor}20` }}
-            onClick={() => setExpanded(expanded === featured.id ? null : featured.id)}>
+            onClick={() => featured.category === "loads" ? onViewLoads?.() : setExpanded(expanded === featured.id ? null : featured.id)}>
             {/* Accent line top */}
             <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 4, background: `linear-gradient(90deg, ${featured.accentColor}, ${featured.accentColor}80, transparent)` }} />
             <div style={{ position: "absolute", right: 40, top: "50%", transform: "translateY(-50%)", fontSize: 140, opacity: 0.05, pointerEvents: "none" }}>{featured.icon}</div>
@@ -425,7 +424,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({ theme = "dark", onBack }) =>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(340px,1fr))", gap: 22 }}>
           {rest.map((article, idx) => (
             <div key={article.id} className="news-card"
-              onClick={() => setExpanded(expanded === article.id ? null : article.id)}
+              onClick={() => article.category === "loads" ? onViewLoads?.() : setExpanded(expanded === article.id ? null : article.id)}
               style={{ background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 12, overflow: "hidden", cursor: "pointer", animation: `newsSlideUp 0.4s ease ${idx * 0.04}s both` }}>
 
               {/* Colored top bar */}

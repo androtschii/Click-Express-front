@@ -17,6 +17,7 @@ interface ProfilePageProps {
   onDetails?: (load: Load) => void;
   onSaveRemove?: (load: Load) => void;
   onOrderCancel?: (load: Load) => void;
+  onTrack?: (load: Load) => void;
 }
 
 type Tab = "overview" | "orders" | "saved" | "payment" | "settings";
@@ -25,7 +26,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
   session, theme = "dark",
   savedLoads = [], bookedLoads = [],
   onBack, onBrowseLoads, onLogout, onSessionUpdate,
-  onDetails, onSaveRemove, onOrderCancel,
+  onDetails, onSaveRemove, onOrderCancel, onTrack,
 }) => {
   const isDark = theme === "dark";
   const { lang } = useLanguage();
@@ -324,14 +325,19 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                         </div>
                         <div style={{ fontFamily:"'Barlow',sans-serif", fontSize:10, color:muted, textTransform:"uppercase", letterSpacing:0.8, marginBottom:10 }}>{l.cargo}</div>
                         <div style={{ display:"flex", gap:8 }}>
-                          <button onClick={() => onDetails?.(l)} style={{ flex:1, padding:"7px 0", background:"#CC0000", border:"none", borderRadius:5, color:"#fff", fontFamily:"'Barlow',sans-serif", fontWeight:700, fontSize:10, letterSpacing:1, textTransform:"uppercase", cursor:"pointer" }}>
+                          <button onClick={() => onTrack?.(l)} style={{ padding:"7px 10px", background:"linear-gradient(135deg,#CC0000,#ff3333)", border:"none", borderRadius:5, color:"#fff", fontFamily:"'Barlow',sans-serif", fontWeight:700, fontSize:10, letterSpacing:1, textTransform:"uppercase", cursor:"pointer", display:"flex", alignItems:"center", gap:4 }}>
+                            🛣️ {lang==="ru"?"Трек":"Track"}
+                          </button>
+                          <button onClick={() => onDetails?.(l)} style={{ flex:1, padding:"7px 0", background:"transparent", border:`1px solid ${border}`, borderRadius:5, color:muted, fontFamily:"'Barlow',sans-serif", fontWeight:700, fontSize:10, letterSpacing:1, textTransform:"uppercase", cursor:"pointer", transition:"all 0.15s" }}
+                            onMouseEnter={e => { e.currentTarget.style.borderColor="#CC0000"; e.currentTarget.style.color="#CC0000"; }}
+                            onMouseLeave={e => { e.currentTarget.style.borderColor=border; e.currentTarget.style.color=muted; }}>
                             {lang==="ru"?"Подробнее":"Details"}
                           </button>
                           <button onClick={() => { onOrderCancel?.(l); notify(lang==="ru"?"Заявка отменена":"Request cancelled"); }}
-                            style={{ padding:"7px 12px", background:"rgba(204,0,0,0.08)", border:"1px solid rgba(204,0,0,0.25)", borderRadius:5, color:"#CC0000", fontFamily:"'Barlow',sans-serif", fontWeight:700, fontSize:10, cursor:"pointer", transition:"all 0.15s" }}
+                            style={{ padding:"7px 10px", background:"rgba(204,0,0,0.08)", border:"1px solid rgba(204,0,0,0.25)", borderRadius:5, color:"#CC0000", fontFamily:"'Barlow',sans-serif", fontWeight:700, fontSize:10, cursor:"pointer", transition:"all 0.15s" }}
                             onMouseEnter={e => { e.currentTarget.style.background="#CC0000"; e.currentTarget.style.color="#fff"; }}
                             onMouseLeave={e => { e.currentTarget.style.background="rgba(204,0,0,0.08)"; e.currentTarget.style.color="#CC0000"; }}>
-                            ✕ {lang==="ru"?"Отменить":"Cancel"}
+                            ✕
                           </button>
                         </div>
                       </div>

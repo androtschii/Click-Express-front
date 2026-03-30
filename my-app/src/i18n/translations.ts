@@ -6,6 +6,7 @@ export const translations = {
       aboutUs: "About Us",
       contact: "Contact",
       careers: "Careers",
+      news: "News",
     },
     header: {
       login: "LOGIN",
@@ -180,6 +181,7 @@ export const translations = {
       aboutUs: "О нас",
       contact: "Контакты",
       careers: "Вакансии",
+      news: "Новости",
     },
     header: {
       login: "ВОЙТИ",

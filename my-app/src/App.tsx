@@ -16,6 +16,8 @@ import { LoadDetailPage } from "./components/loads/LoadDetailPage";
 import { CareersPage } from "./components/pages/CareersPage";
 import { ProfilePage } from "./components/pages/ProfilePage";
 import { OrdersPage } from "./components/pages/OrdersPage";
+import { TrackingPage } from "./components/pages/TrackingPage";
+import { NewsPage } from "./components/pages/NewsPage";
 import { Notification } from "./components/ui/Notification";
 import { ChatBot } from "./components/ui/ChatBot";
 import { PhoneIcon } from "./components/ui/PhoneIcon";
@@ -231,8 +233,10 @@ function AppContent() {
   const [session, setSession] = useState<Session | null>(() => getSession());
   const [detailLoad, setDetailLoad] = useState<Load | null>(null);
   const [showCareers, setShowCareers] = useState(false);
+  const [showNews, setShowNews] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [showOrders, setShowOrders] = useState(false);
+  const [trackLoad, setTrackLoad] = useState<Load | null>(null);
   const [notifications, setNotifications] = useState<string[]>([]);
 
   const catalogRef = useRef<HTMLDivElement>(null);
@@ -303,19 +307,20 @@ function AppContent() {
       savedCount={savedLoads.length}
       theme={theme}
       onThemeToggle={toggleTheme}
-      onCatalogClick={() => { setDetailLoad(null); setShowCareers(false); setTimeout(() => scrollTo(catalogRef), 50); }}
-      onAboutClick={() => { setDetailLoad(null); setShowCareers(false); setTimeout(() => scrollTo(aboutRef), 50); }}
-      onContactClick={() => { setDetailLoad(null); setShowCareers(false); setTimeout(() => scrollTo(contactRef), 50); }}
+      onCatalogClick={() => { setDetailLoad(null); setShowCareers(false); setShowNews(false); setTimeout(() => scrollTo(catalogRef), 50); }}
+      onAboutClick={() => { setDetailLoad(null); setShowCareers(false); setShowNews(false); setTimeout(() => scrollTo(aboutRef), 50); }}
+      onContactClick={() => { setDetailLoad(null); setShowCareers(false); setShowNews(false); setTimeout(() => scrollTo(contactRef), 50); }}
       onQuoteClick={() => setShowQuote(true)}
-      onCareersClick={() => { setDetailLoad(null); setShowCareers(true); setShowProfile(false); setShowOrders(false); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+      onCareersClick={() => { setDetailLoad(null); setShowCareers(true); setShowNews(false); setShowProfile(false); setShowOrders(false); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+      onNewsClick={() => { setDetailLoad(null); setShowNews(true); setShowCareers(false); setShowProfile(false); setShowOrders(false); window.scrollTo({ top: 0, behavior: "smooth" }); }}
       onSavedClick={() => setShowFavorites(true)}
       onRequestsClick={() => setShowRequests(true)}
       onLoginClick={() => setShowAuth(true)}
       session={session}
       onLogout={() => { logout(); setSession(null); setShowProfile(false); setShowOrders(false); }}
-      onLogoClick={() => { setDetailLoad(null); setShowCareers(false); setShowProfile(false); setShowOrders(false); window.scrollTo({ top: 0, behavior: "smooth" }); }}
-      onProfileClick={() => { setDetailLoad(null); setShowCareers(false); setShowOrders(false); setShowProfile(true); window.scrollTo({ top: 0, behavior: "smooth" }); }}
-      onOrdersClick={() => { setDetailLoad(null); setShowCareers(false); setShowProfile(false); setShowOrders(true); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+      onLogoClick={() => { setDetailLoad(null); setShowCareers(false); setShowNews(false); setShowProfile(false); setShowOrders(false); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+      onProfileClick={() => { setDetailLoad(null); setShowCareers(false); setShowNews(false); setShowOrders(false); setShowProfile(true); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+      onOrdersClick={() => { setDetailLoad(null); setShowCareers(false); setShowNews(false); setShowProfile(false); setShowOrders(true); window.scrollTo({ top: 0, behavior: "smooth" }); }}
     />
   );
 
@@ -348,6 +353,22 @@ function AppContent() {
         {notifications.map((msg, idx) => (
           <Notification key={idx} text={msg} onClose={() => setNotifications(n => n.filter((_, i) => i !== idx))} />
         ))}
+      </div>
+    );
+  }
+
+  // ── News page ─────────────────────────────────────────────────────────
+  if (showNews) {
+    return (
+      <div style={{ background: bgColor, minHeight: "100vh", color: textColor }}>
+        {sharedStyle}
+        {sharedHeader}
+        <div style={{ paddingTop: 70 }}>
+          <NewsPage theme={theme} onBack={() => { setShowNews(false); window.scrollTo({ top: 0 }); }} />
+        </div>
+        {showAuth && <AuthModal onClose={() => setShowAuth(false)} theme={theme} onSuccess={(s) => { setSession(s); setShowAuth(false); }} />}
+        {showQuote && <QuoteModal onClose={() => setShowQuote(false)} theme={theme} />}
+        {sharedPanels}
       </div>
     );
   }
@@ -387,6 +408,27 @@ function AppContent() {
             onDetails={(l) => { setShowProfile(false); setDetailLoad(l); window.scrollTo({ top: 0 }); }}
             onSaveRemove={(l) => handleSave(l, false)}
             onOrderCancel={(l) => handleCancelBook(l)}
+            onTrack={(l) => { setShowProfile(false); setTrackLoad(l); window.scrollTo({ top: 0 }); }}
+          />
+        </div>
+        {showAuth && <AuthModal onClose={() => setShowAuth(false)} theme={theme} onSuccess={(s) => { setSession(s); setShowAuth(false); }} />}
+        {showQuote && <QuoteModal onClose={() => setShowQuote(false)} theme={theme} />}
+        {sharedPanels}
+      </div>
+    );
+  }
+
+  // ── Tracking page ──────────────────────────────────────────────────────
+  if (trackLoad) {
+    return (
+      <div style={{ background: bgColor, minHeight: "100vh", color: textColor }}>
+        {sharedStyle}
+        {sharedHeader}
+        <div style={{ paddingTop: 70 }}>
+          <TrackingPage
+            load={trackLoad}
+            theme={theme}
+            onBack={() => setTrackLoad(null)}
           />
         </div>
         {showAuth && <AuthModal onClose={() => setShowAuth(false)} theme={theme} onSuccess={(s) => { setSession(s); setShowAuth(false); }} />}
@@ -410,6 +452,7 @@ function AppContent() {
             onBrowseLoads={() => { setShowOrders(false); setTimeout(() => scrollTo(catalogRef), 80); }}
             onCancel={(load) => { handleCancelBook(load); }}
             onDetails={(load) => { setShowOrders(false); setDetailLoad(load); window.scrollTo({ top: 0 }); }}
+            onTrack={(load) => { setShowOrders(false); setTrackLoad(load); window.scrollTo({ top: 0 }); }}
           />
         </div>
         {showAuth && <AuthModal onClose={() => setShowAuth(false)} theme={theme} onSuccess={(s) => { setSession(s); setShowAuth(false); }} />}
@@ -593,11 +636,18 @@ function AppContent() {
       })()}
 
       <section ref={catalogRef} style={{ maxWidth: 1240, margin: "0 auto", padding: "56px clamp(20px,4vw,56px) 80px" }}>
-        <div style={{ marginBottom: 36 }}>
-          <div style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 10, color: "#CC0000", letterSpacing: 4, textTransform: "uppercase", marginBottom: 10 }}>— Available Now</div>
+        <style>{`
+          @keyframes catalogSlideIn { from { opacity:0; transform:translateY(22px); } to { opacity:1; transform:translateY(0); } }
+          @keyframes catalogBadgePop { from { opacity:0; transform:scale(0.8); } to { opacity:1; transform:scale(1); } }
+        `}</style>
+        <div style={{ marginBottom: 36, animation: "catalogSlideIn 0.5s ease both" }}>
+          <div style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 800, fontSize: 11, color: "#CC0000", letterSpacing: 4, textTransform: "uppercase", marginBottom: 10, display: "flex", alignItems: "center", gap: 8 }}>
+            <span style={{ width: 20, height: 2, background: "#CC0000", display: "inline-block" }} />
+            Available Now
+          </div>
           <h2 style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: "clamp(34px,5.5vw,56px)", color: textColor, textTransform: "uppercase", lineHeight: 1 }}>
             THE BEST <span style={{ color: "#CC0000" }}>LOADS</span>{" "}
-            <span style={{ color: "transparent", WebkitTextStroke: `1.5px ${theme === "dark" ? "rgba(255,255,255,0.18)" : "rgba(0,0,0,0.12)"}` } as React.CSSProperties}>OF THE WEEK</span>
+            <span style={{ color: "transparent", WebkitTextStroke: `2px ${theme === "dark" ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.22)"}` } as React.CSSProperties}>OF THE WEEK</span>
           </h2>
         </div>
 

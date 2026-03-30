@@ -11,6 +11,9 @@ interface HeroBtnProps {
 
 export const HeroBtn: React.FC<HeroBtnProps> = ({ children, primary, onClick }) => {
   const [hov, setHov] = useState(false);
+  const ctx = useContext(ThemeContext) as { theme?: 'dark' | 'light' };
+  const btnTheme = ctx.theme || 'dark';
+  const isLight = btnTheme === 'light';
   return (
     <button
       onClick={onClick}
@@ -18,8 +21,8 @@ export const HeroBtn: React.FC<HeroBtnProps> = ({ children, primary, onClick }) 
       onMouseLeave={() => setHov(false)}
       style={{
         background: primary ? (hov ? "#aa0000" : "#CC0000") : "transparent",
-        color: primary ? "#fff" : hov ? "#CC0000" : "#fff",
-        border: primary ? "none" : `1px solid ${hov ? "#CC0000" : "rgba(255,255,0.22)"}`,
+        color: primary ? "#fff" : hov ? "#CC0000" : isLight ? "#1a1a1a" : "#fff",
+        border: primary ? "none" : `1px solid ${hov ? "#CC0000" : isLight ? "rgba(0,0,0,0.35)" : "rgba(255,255,255,0.22)"}`,
         borderRadius: 4,
         padding: "16px 36px",
         fontFamily: "'Oswald',sans-serif",
@@ -63,23 +66,31 @@ export const Hero: React.FC<HeroProps> = ({ onViewLoads, onQuoteClick }) => {
         style={{
           position: "absolute",
           inset: 0,
-          backgroundImage:
-            "url(/images/hero-bg.jpg)",
+          backgroundImage: "url(/images/hero-bg.jpg)",
           backgroundSize: "cover",
           backgroundPosition: "center 40%",
-          filter: theme === 'light' ? 'brightness(1.2) contrast(0.8)' : 'none',
+          filter: theme === 'light' ? 'brightness(1.05) contrast(1.08) saturate(1.2)' : 'none',
         }}
       />
+      {/* Main gradient overlay */}
       <div
         style={{
           position: "absolute",
           inset: 0,
           background:
             theme === 'light'
-              ? "linear-gradient(105deg,rgba(255,255,255,0.93) 0%,rgba(255,255,255,0.72) 55%,rgba(255,255,255,0.45) 100%)"
+              ? "linear-gradient(105deg,rgba(255,255,255,0.78) 0%,rgba(255,255,255,0.28) 42%,rgba(255,255,255,0.0) 62%)"
               : "linear-gradient(105deg,rgba(0,0,0,0.93) 0%,rgba(0,0,0,0.72) 55%,rgba(8,0,0,0.45) 100%)",
         }}
       />
+      {/* Red accent on right side (light theme only) */}
+      {theme === 'light' && (
+        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to left, rgba(204,0,0,0.18) 0%, rgba(204,0,0,0.06) 40%, transparent 65%)" }} />
+      )}
+      {/* Bottom red glow strip (light theme) */}
+      {theme === 'light' && (
+        <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: 120, background: "linear-gradient(to top, rgba(204,0,0,0.07) 0%, transparent 100%)" }} />
+      )}
       <div
         style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 5, background: "#CC0000" }}
       />

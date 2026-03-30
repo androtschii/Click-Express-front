@@ -12,7 +12,6 @@ export const LOADS: Load[] = [
   { id:8, route:"Las Vegas, NV",        dest:"Carnesville, GA",    price:6350,  miles:2047, type:"Partial",   cargo:"Flatbed / Construction Equipment",   image:"/images/real8.jpg", tag:"Best Load of the Week" },
   { id:9,  route:"Houston, TX",              dest:"Jackson, WY",            price:14900, miles:4201, type:"Full Load", cargo:"Flatbed / Multi-Stop Steel",        image:"/images/real1.jpg", tag:"Best Load of the Week" },
   { id:10, route:"Fort Lupton, CO",          dest:"Houston, TX",            price:7700,  miles:1031, type:"Full Load", cargo:"Stepdeck / Oversized Load",          image:"/images/real4.jpg", tag:"Best Load of the Week" },
-  { id:11, route:"Clinton, IA",              dest:"Fort Johnson South, LA", price:4296,  miles:961,  type:"Full Load", cargo:"Flatbed / Military Equipment",        image:"/images/real6.jpg", tag:"Military Load" },
   { id:12, route:"Charleston, SC",           dest:"Canfield, OH",           price:1800,  miles:708,  type:"Full Load", cargo:"Flatbed / Steel Pipes",               image:"/images/real3.jpg", tag:"Best Load of the Week" },
 ];
 

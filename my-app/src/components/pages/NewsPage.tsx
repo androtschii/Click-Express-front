@@ -9,7 +9,7 @@ interface NewsPageProps {
   onLoadDetail?: (load: Load) => void;
 }
 
-type Category = "all" | "loads" | "reviews" | "company" | "freight" | "safety" | "drivers";
+type Category = "all" | "loads" | "company" | "freight" | "safety" | "drivers";
 
 interface Article {
   id: number;
@@ -33,7 +33,6 @@ interface Article {
 
 const CAT_COLOR: Record<Exclude<Category, "all">, string> = {
   loads:   "#CC0000",
-  reviews: "#22c55e",
   company: "#3b82f6",
   freight: "#f97316",
   safety:  "#eab308",
@@ -86,38 +85,6 @@ const ARTICLES: Article[] = [
     highlightEn: "$4,000 / 1,447 mi", highlightRu: "$4,000 / 1,447 ми",
     date: "Mar 15, 2025", readTime: "2 min",
     load: { id: 104, route: "Key Largo, FL", dest: "Lake Ozark, MO", price: 4000, miles: 1447, type: "Full Load", cargo: "Flatbed / Equipment", image: "/images/real5.jpg", tag: "Best Load of the Week" },
-  },
-
-  /* ─── REVIEWS ─── */
-  {
-    id: 5, category: "reviews",
-    accentColor: "#22c55e", icon: "💬",
-    titleEn: "Marcus T., Owner-Operator",
-    titleRu: "Маркус Т., Независимый перевозчик",
-    excerptEn: "\"Click Express set me up with 3 back-to-back loads in Florida. Dispatcher was available at 2am when I had a breakdown. This is the real deal — not just another dispatch company.\"",
-    excerptRu: "\"Click Express обеспечил меня 3 загрузками подряд во Флориде. Диспетчер был доступен в 2 ночи когда сломался. Это серьёзная компания — не очередной диспетчерский сервис.\"",
-    author: "Marcus T.", authorInitial: "M",
-    date: "Mar 20, 2025", readTime: "1 min",
-  },
-  {
-    id: 6, category: "reviews",
-    accentColor: "#22c55e", icon: "💬",
-    titleEn: "Dmitri K., CDL-A Driver",
-    titleRu: "Дмитрий К., Водитель CDL-A",
-    excerptEn: "\"Работаем с Click Express уже 8 месяцев. Лоты всегда хорошие, ставки честные, диспетчер всегда на связи. Рекомендую всем owner-операторам!\"",
-    excerptRu: "\"Работаем с Click Express уже 8 месяцев. Лоты всегда хорошие, ставки честные, диспетчер всегда на связи. Рекомендую всем owner-операторам!\"",
-    author: "Dmitri K.", authorInitial: "Д",
-    date: "Mar 14, 2025", readTime: "1 min",
-  },
-  {
-    id: 7, category: "reviews",
-    accentColor: "#22c55e", icon: "💬",
-    titleEn: "James W., Fleet Owner",
-    titleRu: "Джеймс У., Владелец автопарка",
-    excerptEn: "\"Switched from 2 other dispatch companies. Night and day difference. Click Express actually hustles for their drivers — negotiates rates, fights for good loads, answers every call.\"",
-    excerptRu: "\"Перешёл от 2 других диспетчерских. Небо и земля. Click Express реально работает за своих водителей — ведёт переговоры, борется за хорошие лоты.\"",
-    author: "James W.", authorInitial: "J",
-    date: "Mar 10, 2025", readTime: "1 min",
   },
 
   /* ─── COMPANY NEWS ─── */
@@ -280,7 +247,6 @@ const ARTICLES: Article[] = [
 const CATS: { key: Category; en: string; ru: string; icon: string }[] = [
   { key: "all",     en: "All News",       ru: "Все новости",       icon: "📰" },
   { key: "loads",   en: "Best Loads",     ru: "Лучшие лоты",       icon: "🏆" },
-  { key: "reviews", en: "Reviews",        ru: "Отзывы",            icon: "💬" },
   { key: "company", en: "Company",        ru: "Компания",          icon: "🏢" },
   { key: "freight", en: "Industry",       ru: "Индустрия",         icon: "📦" },
   { key: "safety",  en: "Road Safety",    ru: "Безопасность",      icon: "⚠️" },

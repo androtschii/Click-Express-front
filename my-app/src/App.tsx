@@ -662,11 +662,11 @@ function AppContent() {
         <div style={{ marginBottom: 36, animation: "catalogSlideIn 0.5s ease both" }}>
           <div style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 800, fontSize: 11, color: "#CC0000", letterSpacing: 4, textTransform: "uppercase", marginBottom: 10, display: "flex", alignItems: "center", gap: 8 }}>
             <span style={{ width: 20, height: 2, background: "#CC0000", display: "inline-block" }} />
-            Available Now
+            {lang === "ru" ? "Доступно сейчас" : "Available Now"}
           </div>
           <h2 style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: "clamp(34px,5.5vw,56px)", color: textColor, textTransform: "uppercase", lineHeight: 1 }}>
-            THE BEST <span style={{ color: "#CC0000" }}>LOADS</span>{" "}
-            <span style={{ color: "transparent", WebkitTextStroke: `2px ${theme === "dark" ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.22)"}` } as React.CSSProperties}>OF THE WEEK</span>
+            {lang === "ru" ? "ЛУЧШИЕ " : "THE BEST "}<span style={{ color: "#CC0000" }}>{lang === "ru" ? "ГРУЗЫ" : "LOADS"}</span>{" "}
+            <span style={{ color: "transparent", WebkitTextStroke: `2px ${theme === "dark" ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.22)"}` } as React.CSSProperties}>{lang === "ru" ? "НЕДЕЛИ" : "OF THE WEEK"}</span>
           </h2>
         </div>
 

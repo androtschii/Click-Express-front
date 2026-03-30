@@ -59,18 +59,18 @@ function getETA(load: Load, currentStep: number): string {
 }
 
 // ── Mini map progress bar ─────────────────────────────────────────────────────
-function RouteProgress({ load, progress, isDark }: { load: Load; progress: number; isDark: boolean }) {
+function RouteProgress({ load, progress, isDark, lang }: { load: Load; progress: number; isDark: boolean; lang: string }) {
   const dotCount = 8;
   return (
     <div style={{ position: "relative", padding: "32px 0 16px" }}>
       {/* City labels */}
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 10 }}>
         <div style={{ textAlign: "left" }}>
-          <div style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 11, color: "#CC0000", letterSpacing: 1.5, textTransform: "uppercase" }}>FROM</div>
+          <div style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 11, color: "#CC0000", letterSpacing: 1.5, textTransform: "uppercase" }}>{lang === "ru" ? "ОТКУДА" : "FROM"}</div>
           <div style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 16, color: isDark ? "#fff" : "#1a1a1a" }}>{load.route}</div>
         </div>
         <div style={{ textAlign: "right" }}>
-          <div style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 11, color: "#CC0000", letterSpacing: 1.5, textTransform: "uppercase" }}>TO</div>
+          <div style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 11, color: "#CC0000", letterSpacing: 1.5, textTransform: "uppercase" }}>{lang === "ru" ? "КУДА" : "TO"}</div>
           <div style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 16, color: isDark ? "#fff" : "#1a1a1a" }}>{load.dest}</div>
         </div>
       </div>
@@ -103,10 +103,10 @@ function RouteProgress({ load, progress, isDark }: { load: Load; progress: numbe
       {/* Miles info */}
       <div style={{ display: "flex", justifyContent: "space-between", marginTop: 10 }}>
         <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 11, color: isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.4)" }}>
-          {Math.round(load.miles * progress / 100).toLocaleString()} mi traveled
+          {Math.round(load.miles * progress / 100).toLocaleString()} {lang === "ru" ? "миль пройдено" : "mi traveled"}
         </div>
         <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 11, color: isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.4)" }}>
-          {load.miles.toLocaleString()} mi total
+          {load.miles.toLocaleString()} {lang === "ru" ? "миль всего" : "mi total"}
         </div>
       </div>
     </div>
@@ -179,7 +179,7 @@ export const TrackingPage: React.FC<TrackingPageProps> = ({ load, theme = "dark"
           </div>
           {!isDelivered && (
             <div style={{ textAlign:"right", flexShrink:0 }}>
-              <div style={{ fontFamily:"'Barlow',sans-serif", fontSize:10, color:muted, letterSpacing:1.5, textTransform:"uppercase", marginBottom:3 }}>ETA</div>
+              <div style={{ fontFamily:"'Barlow',sans-serif", fontSize:10, color:muted, letterSpacing:1.5, textTransform:"uppercase", marginBottom:3 }}>{lang === "ru" ? "ПРИБЫТИЕ" : "ETA"}</div>
               <div style={{ fontFamily:"'Oswald',sans-serif", fontWeight:700, fontSize:15, color:text }}>{eta}</div>
             </div>
           )}
@@ -187,7 +187,7 @@ export const TrackingPage: React.FC<TrackingPageProps> = ({ load, theme = "dark"
 
         {/* Route progress map */}
         <div style={{ background:card, border:`1px solid ${border}`, borderRadius:12, padding:"20px 24px", marginBottom:20 }}>
-          <RouteProgress load={load} progress={animProgress} isDark={isDark} />
+          <RouteProgress load={load} progress={animProgress} isDark={isDark} lang={lang} />
         </div>
 
         {/* Load info strip */}

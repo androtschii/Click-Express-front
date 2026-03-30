@@ -52,7 +52,7 @@ export const OrdersPage: React.FC<OrdersPageProps> = ({
         <div style={{ marginBottom: 32 }}>
           <div style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 10, color: "#CC0000", letterSpacing: 4, textTransform: "uppercase", marginBottom: 6 }}>● {lang === "ru" ? "ЗАКАЗЫ" : "ORDERS"}</div>
           <h1 style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: "clamp(28px,4vw,44px)", color: text, textTransform: "uppercase", lineHeight: 1 }}>
-            MY <span style={{ color: "#CC0000" }}>ORDERS</span>
+            {lang === "ru" ? "МОИ " : "MY "}<span style={{ color: "#CC0000" }}>{lang === "ru" ? "ЗАКАЗЫ" : "ORDERS"}</span>
           </h1>
         </div>
 

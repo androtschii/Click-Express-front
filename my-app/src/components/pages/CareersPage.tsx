@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import { PhoneIcon } from "../ui/PhoneIcon";
+import { useLanguage } from "../../context/LanguageContext";
 
 interface CareersPageProps {
   theme?: "dark" | "light";
   onBack?: () => void;
 }
 
-const JOBS = [
+const JOBS_EN = [
   {
     id: 1,
     title: "Freight Dispatcher",
@@ -53,13 +54,69 @@ const JOBS = [
   },
 ];
 
-const PERKS = [
+const JOBS_RU = [
+  {
+    id: 1,
+    title: "Диспетчер грузов",
+    type: "Полная занятость",
+    location: "Удалённо / Hallandale Beach, FL",
+    salary: "$55,000 – $85,000 / год",
+    badge: "🔥 Горячая",
+    badgeColor: "#CC0000",
+    desc: "Координация грузов между брокерами и водителями. Переговоры о ставках, выстраивание отношений, обеспечение своевременной доставки по 48 штатам.",
+    requirements: ["Английский B2+", "Навыки переговоров", "Стрессоустойчивость", "Уверенный пользователь ПК"],
+  },
+  {
+    id: 2,
+    title: "Водитель CDL-A Flatbed",
+    type: "Полная занятость",
+    location: "OTR · Все 48 штатов",
+    salary: "$0.55 – $0.75 / миля",
+    badge: "★ Лучшая оплата",
+    badgeColor: "#f59e0b",
+    desc: "Перевозка грузов на открытых платформах по континентальной части США. Специализированные грузы: негабаритные, сталь, тяжёлое оборудование.",
+    requirements: ["Права CDL-A", "Опыт OTR 1+ год", "Чистая история вождения", "Опыт работы с Flatbed"],
+  },
+  {
+    id: 3,
+    title: "Владелец-оператор",
+    type: "Независимый подрядчик",
+    location: "OTR · Все 48 штатов",
+    salary: "$8,000 – $20,000 / мес. валовой",
+    badge: "💰 Высокий доход",
+    badgeColor: "#10b981",
+    desc: "Партнёрство с Click Express как владелец-оператор. Мы обеспечиваем стабильный поток грузов, скидки на топливо и поддержку персонального диспетчера.",
+    requirements: ["Собственный грузовик и прицеп", "CDL-A", "Собственное разрешение или аренда", "Опыт 2+ лет"],
+  },
+  {
+    id: 4,
+    title: "Менеджер по продажам",
+    type: "Полная занятость",
+    location: "Удалённо",
+    salary: "$60,000 – $100,000 + бонус",
+    badge: "📈 Рост",
+    badgeColor: "#8b5cf6",
+    desc: "Развитие и управление отношениями с брокерами. Привлечение новых клиентов, руководство командой диспетчеров, увеличение выручки компании.",
+    requirements: ["Опыт продаж 2+ лет", "Знание логистики/грузоперевозок", "Лидерские качества", "Свободный английский"],
+  },
+];
+
+const PERKS_EN = [
   { icon: "💰", title: "Competitive Pay", desc: "Above-market salaries + performance bonuses" },
   { icon: "🌍", title: "100% Remote", desc: "Dispatcher roles are fully remote worldwide" },
   { icon: "📈", title: "Career Growth", desc: "Clear path from dispatcher to team lead" },
   { icon: "🕒", title: "Flexible Hours", desc: "We work around your schedule" },
   { icon: "🤝", title: "Team Support", desc: "Mentorship from experienced dispatchers" },
   { icon: "⭐", title: "4.9 Rating", desc: "Top-rated carrier on CarrierSource" },
+];
+
+const PERKS_RU = [
+  { icon: "💰", title: "Высокая оплата", desc: "Зарплата выше рынка + бонусы за результат" },
+  { icon: "🌍", title: "100% Удалённо", desc: "Должности диспетчеров полностью удалённые" },
+  { icon: "📈", title: "Карьерный рост", desc: "Чёткий путь от диспетчера до руководителя" },
+  { icon: "🕒", title: "Гибкий график", desc: "Работаем под ваш распорядок дня" },
+  { icon: "🤝", title: "Поддержка команды", desc: "Наставничество от опытных диспетчеров" },
+  { icon: "⭐", title: "Рейтинг 4.9", desc: "Лучший перевозчик на CarrierSource" },
 ];
 
 export const CareersPage: React.FC<CareersPageProps> = ({ theme = "dark", onBack }) => {
@@ -69,6 +126,10 @@ export const CareersPage: React.FC<CareersPageProps> = ({ theme = "dark", onBack
   const text = isDark ? "#fff" : "#1a1a1a";
   const sub = isDark ? "rgba(255,255,255,0.55)" : "rgba(0,0,0,0.6)";
   const bord = isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.09)";
+  const { lang } = useLanguage();
+  const isRu = lang === "ru";
+  const JOBS = isRu ? JOBS_RU : JOBS_EN;
+  const PERKS = isRu ? PERKS_RU : PERKS_EN;
 
   const [applied, setApplied] = useState<number | null>(null);
   const [name, setName] = useState("");
@@ -109,20 +170,20 @@ export const CareersPage: React.FC<CareersPageProps> = ({ theme = "dark", onBack
         <button onClick={onBack} style={{ position: "absolute", top: 90, left: 32, display: "flex", alignItems: "center", gap: 8, background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.2)", borderRadius: 24, padding: "8px 18px", color: "#fff", fontFamily: "'Barlow',sans-serif", fontWeight: 600, fontSize: 12, letterSpacing: 1.5, textTransform: "uppercase", cursor: "pointer", backdropFilter: "blur(8px)", transition: "all 0.2s" }}
           onMouseEnter={e => { e.currentTarget.style.background = "rgba(204,0,0,0.4)"; e.currentTarget.style.borderColor = "#CC0000"; }}
           onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.1)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.2)"; }}>
-          ← Back
+          {isRu ? "← Назад" : "← Back"}
         </button>
 
         <div style={{ position: "relative", maxWidth: 1200, margin: "0 auto", padding: "0 clamp(20px,5vw,64px)", animation: "careersIn 0.6s ease" }}>
-          <div style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 10, color: "#CC0000", letterSpacing: 4, textTransform: "uppercase", marginBottom: 14 }}>— Join Our Team</div>
+          <div style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 10, color: "#CC0000", letterSpacing: 4, textTransform: "uppercase", marginBottom: 14 }}>— {isRu ? "Присоединяйтесь к нам" : "Join Our Team"}</div>
           <h1 style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: "clamp(40px,6vw,72px)", color: "#fff", textTransform: "uppercase", lineHeight: 1, marginBottom: 16 }}>
-            BUILD YOUR<br /><span style={{ color: "#CC0000" }}>CAREER</span> WITH US
+            {isRu ? <>ПОСТРОЙТЕ СВОЮ<br /><span style={{ color: "#CC0000" }}>КАРЬЕРУ</span> С НАМИ</> : <>BUILD YOUR<br /><span style={{ color: "#CC0000" }}>CAREER</span> WITH US</>}
           </h1>
           <p style={{ fontFamily: "'Barlow',sans-serif", fontSize: 16, color: "rgba(255,255,255,0.65)", maxWidth: 520, lineHeight: 1.7, marginBottom: 28 }}>
-            Click Express Inc is a growing freight company with 4.9★ rating. We're hiring dispatchers, drivers, and operators across the US.
+            {isRu ? "Click Express Inc — растущая транспортная компания с рейтингом 4.9★. Мы нанимаем диспетчеров, водителей и операторов по всей США." : "Click Express Inc is a growing freight company with 4.9★ rating. We're hiring dispatchers, drivers, and operators across the US."}
           </p>
           <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
             <a href="#jobs" style={{ background: "#CC0000", color: "#fff", border: "none", borderRadius: 4, padding: "13px 28px", fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 14, letterSpacing: 2, textTransform: "uppercase", cursor: "pointer", textDecoration: "none", boxShadow: "0 6px 24px rgba(204,0,0,0.5)" }}>
-              View Open Positions
+              {isRu ? "Открытые вакансии" : "View Open Positions"}
             </a>
             <a href="https://www.carriersource.io/carriers/click-express-inc" target="_blank" rel="noreferrer"
               style={{ background: "transparent", color: "#fff", border: "1px solid rgba(255,255,255,0.3)", borderRadius: 4, padding: "13px 28px", fontFamily: "'Oswald',sans-serif", fontWeight: 600, fontSize: 14, letterSpacing: 2, textTransform: "uppercase", cursor: "pointer", textDecoration: "none" }}>
@@ -135,7 +196,10 @@ export const CareersPage: React.FC<CareersPageProps> = ({ theme = "dark", onBack
       {/* ── Stats bar ── */}
       <div style={{ background: "#CC0000", padding: "18px clamp(20px,5vw,64px)" }}>
         <div style={{ maxWidth: 1200, margin: "0 auto", display: "flex", gap: 40, flexWrap: "wrap", justifyContent: "center" }}>
-          {[["4.9★", "CarrierSource Rating"], ["11+", "Reviews"], ["48", "States Covered"], ["2019", "Founded"], ["24/7", "Dispatcher Support"]].map(([n, l]) => (
+          {(isRu
+            ? [["4.9★", "Рейтинг CarrierSource"], ["11+", "Отзывов"], ["48", "Штатов"], ["2019", "Основана"], ["24/7", "Поддержка диспетчера"]]
+            : [["4.9★", "CarrierSource Rating"], ["11+", "Reviews"], ["48", "States Covered"], ["2019", "Founded"], ["24/7", "Dispatcher Support"]]
+          ).map(([n, l]) => (
             <div key={l} style={{ textAlign: "center" }}>
               <div style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 22, color: "#fff" }}>{n}</div>
               <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 10, color: "rgba(255,255,255,0.75)", letterSpacing: 1.5, textTransform: "uppercase" }}>{l}</div>
@@ -147,9 +211,9 @@ export const CareersPage: React.FC<CareersPageProps> = ({ theme = "dark", onBack
       {/* ── Operating Area Map ── */}
       <section style={{ maxWidth: 1200, margin: "0 auto", padding: "64px clamp(20px,5vw,64px) 0" }}>
         <div style={{ marginBottom: 32 }}>
-          <div style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 10, color: "#CC0000", letterSpacing: 4, textTransform: "uppercase", marginBottom: 8 }}>— Where We Operate</div>
+          <div style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 10, color: "#CC0000", letterSpacing: 4, textTransform: "uppercase", marginBottom: 8 }}>— {isRu ? "Где мы работаем" : "Where We Operate"}</div>
           <h2 style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: "clamp(28px,4vw,42px)", color: text, textTransform: "uppercase" }}>
-            PRIMARY <span style={{ color: "#CC0000" }}>OPERATING AREA</span>
+            {isRu ? <>ОСНОВНАЯ <span style={{ color: "#CC0000" }}>ЗОНА РАБОТЫ</span></> : <>PRIMARY <span style={{ color: "#CC0000" }}>OPERATING AREA</span></>}
           </h2>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 32, alignItems: "start" }}>
@@ -165,12 +229,19 @@ export const CareersPage: React.FC<CareersPageProps> = ({ theme = "dark", onBack
           </div>
           {/* Legend */}
           <div style={{ minWidth: 220, background: card, border: `1px solid ${bord}`, borderRadius: 14, padding: "24px 20px" }}>
-            <div style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 15, color: text, textTransform: "uppercase", marginBottom: 16 }}>Coverage</div>
-            {[
-              { dot: "#CC0000", label: "Primary Zone", desc: "Midwest · East Coast · South" },
-              { dot: "#f59e0b", label: "Secondary Zone", desc: "West Coast · Mountain States" },
-              { dot: "#10b981", label: "HQ", desc: "Hallandale Beach, FL 33009" },
-            ].map(r => (
+            <div style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 15, color: text, textTransform: "uppercase", marginBottom: 16 }}>{isRu ? "Покрытие" : "Coverage"}</div>
+            {(isRu
+              ? [
+                  { dot: "#CC0000", label: "Основная зона", desc: "Средний Запад · Восточное побережье · Юг" },
+                  { dot: "#f59e0b", label: "Вторичная зона", desc: "Западное побережье · Горные штаты" },
+                  { dot: "#10b981", label: "Головной офис", desc: "Hallandale Beach, FL 33009" },
+                ]
+              : [
+                  { dot: "#CC0000", label: "Primary Zone", desc: "Midwest · East Coast · South" },
+                  { dot: "#f59e0b", label: "Secondary Zone", desc: "West Coast · Mountain States" },
+                  { dot: "#10b981", label: "HQ", desc: "Hallandale Beach, FL 33009" },
+                ]
+            ).map(r => (
               <div key={r.label} style={{ display: "flex", gap: 12, marginBottom: 16, alignItems: "flex-start" }}>
                 <div style={{ width: 12, height: 12, borderRadius: "50%", background: r.dot, flexShrink: 0, marginTop: 3 }} />
                 <div>
@@ -180,7 +251,7 @@ export const CareersPage: React.FC<CareersPageProps> = ({ theme = "dark", onBack
               </div>
             ))}
             <div style={{ marginTop: 20, padding: "12px 14px", background: "rgba(204,0,0,0.08)", border: "1px solid rgba(204,0,0,0.25)", borderRadius: 8 }}>
-              <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 11, color: sub, marginBottom: 4 }}>Carrier Profile</div>
+              <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 11, color: sub, marginBottom: 4 }}>{isRu ? "Профиль перевозчика" : "Carrier Profile"}</div>
               <a href="https://www.carriersource.io/carriers/click-express-inc" target="_blank" rel="noreferrer"
                 style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 12, color: "#CC0000", textDecoration: "none" }}>
                 carriersource.io →
@@ -193,9 +264,9 @@ export const CareersPage: React.FC<CareersPageProps> = ({ theme = "dark", onBack
       {/* ── Perks ── */}
       <section style={{ maxWidth: 1200, margin: "0 auto", padding: "64px clamp(20px,5vw,64px) 0" }}>
         <div style={{ marginBottom: 32 }}>
-          <div style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 10, color: "#CC0000", letterSpacing: 4, textTransform: "uppercase", marginBottom: 8 }}>— Why Join Us</div>
+          <div style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 10, color: "#CC0000", letterSpacing: 4, textTransform: "uppercase", marginBottom: 8 }}>— {isRu ? "Почему мы?" : "Why Join Us"}</div>
           <h2 style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: "clamp(28px,4vw,42px)", color: text, textTransform: "uppercase" }}>
-            WHAT WE <span style={{ color: "#CC0000" }}>OFFER</span>
+            {isRu ? <>ЧТО МЫ <span style={{ color: "#CC0000" }}>ПРЕДЛАГАЕМ</span></> : <>WHAT WE <span style={{ color: "#CC0000" }}>OFFER</span></>}
           </h2>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(280px,1fr))", gap: 16 }}>
@@ -214,9 +285,9 @@ export const CareersPage: React.FC<CareersPageProps> = ({ theme = "dark", onBack
       {/* ── Open Positions ── */}
       <section id="jobs" style={{ maxWidth: 1200, margin: "0 auto", padding: "64px clamp(20px,5vw,64px) 0" }}>
         <div style={{ marginBottom: 32 }}>
-          <div style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 10, color: "#CC0000", letterSpacing: 4, textTransform: "uppercase", marginBottom: 8 }}>— Now Hiring</div>
+          <div style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 10, color: "#CC0000", letterSpacing: 4, textTransform: "uppercase", marginBottom: 8 }}>— {isRu ? "Набор сотрудников" : "Now Hiring"}</div>
           <h2 style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: "clamp(28px,4vw,42px)", color: text, textTransform: "uppercase" }}>
-            OPEN <span style={{ color: "#CC0000" }}>POSITIONS</span>
+            {isRu ? <>ОТКРЫТЫЕ <span style={{ color: "#CC0000" }}>ВАКАНСИИ</span></> : <>OPEN <span style={{ color: "#CC0000" }}>POSITIONS</span></>}
           </h2>
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
@@ -248,7 +319,7 @@ export const CareersPage: React.FC<CareersPageProps> = ({ theme = "dark", onBack
                       e.currentTarget.style.background = "rgba(204,0,0,0.12)";
                       e.currentTarget.style.color = "#ff4d4d";
                       e.currentTarget.style.borderColor = "rgba(204,0,0,0.4)";
-                      e.currentTarget.textContent = "✕ Cancel";
+                      e.currentTarget.textContent = isRu ? "✕ Отменить" : "✕ Cancel";
                     } else {
                       e.currentTarget.style.background = "#aa0000";
                       e.currentTarget.style.transform = "translateY(-2px)";
@@ -259,13 +330,13 @@ export const CareersPage: React.FC<CareersPageProps> = ({ theme = "dark", onBack
                       e.currentTarget.style.background = "rgba(0,180,80,0.15)";
                       e.currentTarget.style.color = "#00b450";
                       e.currentTarget.style.borderColor = "rgba(0,180,80,0.4)";
-                      e.currentTarget.textContent = "✓ Selected";
+                      e.currentTarget.textContent = isRu ? "✓ Выбрано" : "✓ Selected";
                     } else {
                       e.currentTarget.style.background = "#CC0000";
                       e.currentTarget.style.transform = "none";
                     }
                   }}>
-                  {applied === job.id ? "✓ Selected" : "Apply Now"}
+                  {applied === job.id ? (isRu ? "✓ Выбрано" : "✓ Selected") : (isRu ? "Откликнуться" : "Apply Now")}
                 </button>
               </div>
             </div>
@@ -279,21 +350,21 @@ export const CareersPage: React.FC<CareersPageProps> = ({ theme = "dark", onBack
           {sent ? (
             <div style={{ textAlign: "center", padding: "40px 0" }}>
               <div style={{ fontSize: 56, marginBottom: 16 }}>🎉</div>
-              <h3 style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 28, color: text, textTransform: "uppercase", marginBottom: 10 }}>Application Sent!</h3>
-              <p style={{ fontFamily: "'Barlow',sans-serif", fontSize: 15, color: sub }}>Our HR team will contact you within 24 hours.</p>
+              <h3 style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 28, color: text, textTransform: "uppercase", marginBottom: 10 }}>{isRu ? "Заявка отправлена!" : "Application Sent!"}</h3>
+              <p style={{ fontFamily: "'Barlow',sans-serif", fontSize: 15, color: sub }}>{isRu ? "Наша HR-команда свяжется с вами в течение 24 часов." : "Our HR team will contact you within 24 hours."}</p>
               <a href="tel:+17862026599" style={{ display: "inline-flex", alignItems: "center", gap: 8, marginTop: 20, background: "#CC0000", color: "#fff", borderRadius: 6, padding: "12px 28px", fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 14, letterSpacing: 2, textTransform: "uppercase", textDecoration: "none" }}>
-                <PhoneIcon size={16} color="#fff" /> Call Us Now
+                <PhoneIcon size={16} color="#fff" /> {isRu ? "Позвонить нам" : "Call Us Now"}
               </a>
             </div>
           ) : (
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 48, alignItems: "start" }}>
               <div>
-                <div style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 10, color: "#CC0000", letterSpacing: 4, textTransform: "uppercase", marginBottom: 10 }}>— Apply Today</div>
+                <div style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 10, color: "#CC0000", letterSpacing: 4, textTransform: "uppercase", marginBottom: 10 }}>— {isRu ? "Отклик сегодня" : "Apply Today"}</div>
                 <h2 style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: "clamp(28px,3.5vw,38px)", color: text, textTransform: "uppercase", lineHeight: 1.1, marginBottom: 16 }}>
-                  READY TO <span style={{ color: "#CC0000" }}>JOIN?</span>
+                  {isRu ? <>ГОТОВЫ <span style={{ color: "#CC0000" }}>ПРИСОЕДИНИТЬСЯ?</span></> : <>READY TO <span style={{ color: "#CC0000" }}>JOIN?</span></>}
                 </h2>
                 <p style={{ fontFamily: "'Barlow',sans-serif", fontSize: 14, color: sub, lineHeight: 1.8, marginBottom: 24 }}>
-                  Fill out the form and our hiring team will reach out within 24 hours. You can also contact us directly:
+                  {isRu ? "Заполните форму, и наша команда по найму свяжется с вами в течение 24 часов. Вы также можете связаться с нами напрямую:" : "Fill out the form and our hiring team will reach out within 24 hours. You can also contact us directly:"}
                 </p>
                 <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                   <a href="tel:+17862026599" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none", color: "#CC0000" }}>
@@ -301,7 +372,7 @@ export const CareersPage: React.FC<CareersPageProps> = ({ theme = "dark", onBack
                       <PhoneIcon size={16} color="#CC0000" />
                     </div>
                     <div>
-                      <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 10, color: sub, letterSpacing: 1.5, textTransform: "uppercase" }}>Call / WhatsApp</div>
+                      <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 10, color: sub, letterSpacing: 1.5, textTransform: "uppercase" }}>{isRu ? "Звонок / WhatsApp" : "Call / WhatsApp"}</div>
                       <div style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 15 }}>+1 786-202-6599</div>
                     </div>
                   </a>
@@ -319,13 +390,13 @@ export const CareersPage: React.FC<CareersPageProps> = ({ theme = "dark", onBack
               <div>
                 {applied && (
                   <div style={{ marginBottom: 14, padding: "10px 14px", background: "rgba(204,0,0,0.08)", border: "1px solid rgba(204,0,0,0.25)", borderRadius: 8, fontFamily: "'Barlow',sans-serif", fontSize: 12, color: "#CC0000" }}>
-                    Applying for: <strong>{JOBS.find(j => j.id === applied)?.title}</strong>
+                    {isRu ? "Отклик на:" : "Applying for:"} <strong>{JOBS.find(j => j.id === applied)?.title}</strong>
                   </div>
                 )}
                 <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                   {[
-                    { val: name, set: setName, ph: "Full Name", type: "text" },
-                    { val: email, set: setEmail, ph: "Email Address", type: "email" },
+                    { val: name, set: setName, ph: isRu ? "Полное имя" : "Full Name", type: "text" },
+                    { val: email, set: setEmail, ph: isRu ? "Адрес эл. почты" : "Email Address", type: "email" },
                   ].map(f => (
                     <input key={f.ph} value={f.val} onChange={e => f.set(e.target.value)} placeholder={f.ph} type={f.type}
                       style={{ padding: "12px 16px", background: isDark ? "rgba(255,255,255,0.05)" : "#f8f8f8", border: `1px solid ${bord}`, borderRadius: 8, color: text, fontSize: 14, fontFamily: "'Barlow',sans-serif", outline: "none" }}
@@ -337,10 +408,10 @@ export const CareersPage: React.FC<CareersPageProps> = ({ theme = "dark", onBack
                     style={{ padding: "12px 16px", background: isDark ? "#1a1a1a" : "#f8f8f8", border: `1px solid ${bord}`, borderRadius: 8, color: text, fontSize: 14, fontFamily: "'Barlow',sans-serif", outline: "none" }}
                     onFocus={e => e.currentTarget.style.borderColor = "#CC0000"}
                     onBlur={e => e.currentTarget.style.borderColor = bord}>
-                    <option value="" style={{ background: isDark ? "#1a1a1a" : "#fff", color: isDark ? "#fff" : "#1a1a1a" }}>Select Position</option>
+                    <option value="" style={{ background: isDark ? "#1a1a1a" : "#fff", color: isDark ? "#fff" : "#1a1a1a" }}>{isRu ? "Выберите вакансию" : "Select Position"}</option>
                     {JOBS.map(j => <option key={j.id} value={j.id} style={{ background: isDark ? "#1a1a1a" : "#fff", color: isDark ? "#fff" : "#1a1a1a" }}>{j.title}</option>)}
                   </select>
-                  <textarea value={msg} onChange={e => setMsg(e.target.value)} placeholder="Tell us about yourself (optional)" rows={3}
+                  <textarea value={msg} onChange={e => setMsg(e.target.value)} placeholder={isRu ? "Расскажите о себе (необязательно)" : "Tell us about yourself (optional)"} rows={3}
                     style={{ padding: "12px 16px", background: isDark ? "rgba(255,255,255,0.05)" : "#f8f8f8", border: `1px solid ${bord}`, borderRadius: 8, color: text, fontSize: 14, fontFamily: "'Barlow',sans-serif", outline: "none", resize: "vertical" }}
                     onFocus={e => e.target.style.borderColor = "#CC0000"}
                     onBlur={e => e.target.style.borderColor = bord}
@@ -348,7 +419,7 @@ export const CareersPage: React.FC<CareersPageProps> = ({ theme = "dark", onBack
                   <button onClick={handleSend} style={{ padding: "13px", background: "linear-gradient(135deg,#CC0000,#ff4d4d)", border: "none", borderRadius: 8, color: "#fff", fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 15, letterSpacing: 2, textTransform: "uppercase", cursor: "pointer", boxShadow: "0 6px 20px rgba(204,0,0,0.4)", transition: "all 0.2s" }}
                     onMouseEnter={e => e.currentTarget.style.transform = "translateY(-2px)"}
                     onMouseLeave={e => e.currentTarget.style.transform = "none"}>
-                    Send Application
+                    {isRu ? "Отправить заявку" : "Send Application"}
                   </button>
                 </div>
               </div>

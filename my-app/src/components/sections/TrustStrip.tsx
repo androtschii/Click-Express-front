@@ -1,4 +1,6 @@
 import React from "react";
+import { useLanguage } from "../../context/LanguageContext";
+import { translations } from "../../i18n/translations";
 
 interface TrustStripProps {
   theme?: 'dark' | 'light';
@@ -6,6 +8,9 @@ interface TrustStripProps {
 
 export const TrustStrip: React.FC<TrustStripProps> = ({ theme = 'dark' }) => {
   const isDark = theme === 'dark';
+  const { lang } = useLanguage();
+  const badges = translations[lang].trustStrip as readonly string[];
+  const icons = ["🏴", "🛡️", "📡", "⚡", "🇺🇸", "🏗️"];
   return (
     <div
       style={{
@@ -19,14 +24,9 @@ export const TrustStrip: React.FC<TrustStripProps> = ({ theme = 'dark' }) => {
         gap: "10px 0",
       }}
     >
-      {[
-        ["🏴", "DOT & FMCSA Certified"],
-        ["🛡️", "Fully Insured"],
-        ["📡", "GPS Tracked"],
-        ["⚡", "24/7 Dispatch"],
-        ["🇺🇸", "48 States"],
-        ["🏗️", "Oversized Loads OK"],
-      ].map(([icon, label], i) => (
+      {icons.map((icon, i) => {
+        const label = badges[i];
+        return (
         <div
           key={label as string}
           style={{
@@ -51,7 +51,8 @@ export const TrustStrip: React.FC<TrustStripProps> = ({ theme = 'dark' }) => {
             {label}
           </span>
         </div>
-      ))}
+        );
+      })}
     </div>
   );
 };

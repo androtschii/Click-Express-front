@@ -87,6 +87,24 @@ const ARTICLES: Article[] = [
     load: { id: 104, route: "Key Largo, FL", dest: "Lake Ozark, MO", price: 4000, miles: 1447, type: "Full Load", cargo: "Flatbed / Equipment", image: "/images/real5.jpg", tag: "Best Load of the Week" },
   },
 
+  {
+    id: 5, category: "loads",
+    accentColor: "#CC0000", icon: "🏗️",
+    titleEn: "Cross-Country Flatbed: $6,350 — Las Vegas, NV → Carnesville, GA",
+    titleRu: "Трансконтинентальная платформа: $6,350 — Лас-Вегас, NV → Карнесвилл, GA",
+    excerptEn: "2,047 miles coast to coast. Construction equipment on flatbed — full + partial combo load. $3.10/mi rate on one of the longest east-to-west runs of the season.",
+    excerptRu: "2,047 миль от побережья до побережья. Строительная техника на платформе — комбо полная+частичная загрузка. Ставка $3.10/ми на одном из самых длинных маршрутов сезона.",
+    highlightEn: "$6,350 / 2,047 mi", highlightRu: "$6,350 / 2,047 ми",
+    date: "Mar 28, 2025", readTime: "3 min",
+    stops: [
+      { name: "Kingman, AZ — I-40 East", rating: 5, noteEn: "First fuel stop after NV border, Love's with 24h service", noteRu: "Первая заправка после границы Невады, Love's, круглосуточно" },
+      { name: "Albuquerque, NM — I-40 / I-25", rating: 4, noteEn: "Major junction, Pilot Flying J, wide truck lot", noteRu: "Крупная развязка, Pilot Flying J, большая парковка" },
+      { name: "Oklahoma City, OK — I-40 / I-35", rating: 5, noteEn: "Midpoint rest, TA Petro, full restaurant & showers", noteRu: "Середина маршрута, TA Petro, ресторан и душевые" },
+      { name: "Memphis, TN — I-40 / I-55", rating: 4, noteEn: "Last major stop before GA, Flying J, laundry & fuel", noteRu: "Последняя крупная остановка перед Джорджией, Flying J, прачечная" },
+    ],
+    load: { id: 105, route: "Las Vegas, NV", dest: "Carnesville, GA", price: 6350, miles: 2047, type: "Partial", cargo: "Flatbed / Construction Equipment", image: "/images/real8.jpg", tag: "Best Load of the Week" },
+  },
+
   /* ─── COMPANY NEWS ─── */
   {
     id: 8, category: "company",
@@ -255,9 +273,9 @@ const CATS: { key: Category; en: string; ru: string; icon: string }[] = [
 
 function StarRating({ n }: { n: number }) {
   return (
-    <span>
+    <span style={{ letterSpacing: -1 }}>
       {[1,2,3,4,5].map(i => (
-        <span key={i} style={{ color: i <= n ? "#eab308" : "rgba(0,0,0,0.15)", fontSize: 12 }}>★</span>
+        <span key={i} style={{ color: i <= n ? "#FFB800" : "rgba(128,128,128,0.3)", fontSize: 11 }}>★</span>
       ))}
     </span>
   );
@@ -269,325 +287,339 @@ export const NewsPage: React.FC<NewsPageProps> = ({ theme = "dark", onBack, onVi
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const isDark = theme === "dark";
 
-  const bg         = isDark ? "#080808" : "#f5f5f5";
-  const cardBg     = isDark ? "#0f0f0f" : "#ffffff";
-  const cardBorder = isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.09)";
-  const textPrimary  = isDark ? "#ffffff"             : "#1a1a1a";
-  const textMuted    = isDark ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.5)";
-  const textSubtle   = isDark ? "rgba(255,255,255,0.28)" : "rgba(0,0,0,0.35)";
-  const divider      = isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.07)";
+  const bg           = isDark ? "#0a0a0a" : "#f4f0e8";
+  const surface      = isDark ? "#141414" : "#ffffff";
+  const textPrimary  = isDark ? "#f0ede8" : "#0d0d0d";
+  const textMuted    = isDark ? "rgba(240,237,232,0.5)"  : "rgba(13,13,13,0.5)";
+  const textSubtle   = isDark ? "rgba(240,237,232,0.28)" : "rgba(13,13,13,0.3)";
+  const border       = isDark ? "rgba(240,237,232,0.08)" : "rgba(13,13,13,0.1)";
+  const borderStrong = isDark ? "rgba(240,237,232,0.18)" : "rgba(13,13,13,0.2)";
 
   const filtered = activecat === "all" ? ARTICLES : ARTICLES.filter(a => a.category === activecat);
   const featured = filtered.find(a => a.featured) || filtered[0];
-  const rest = filtered.filter(a => a.id !== featured?.id);
+  const rest     = filtered.filter(a => a.id !== featured?.id);
+
+  const tickerItems = ARTICLES
+    .filter(a => a.category === "loads" && a.highlightEn && a.load)
+    .map(a => `${a.icon} ${lang === "ru" ? a.highlightRu : a.highlightEn} — ${a.load!.route} → ${a.load!.dest}`);
 
   return (
-    <div style={{ background: bg, minHeight: "100vh", color: textPrimary }}>
+    <div style={{ background: bg, minHeight: "100vh", color: textPrimary, fontFamily: "'DM Sans', sans-serif" }}>
       <style>{`
-        @keyframes newsSlideUp   { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
-        @keyframes newsHeroPulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
-        @keyframes newsBadgePop  { from{opacity:0;transform:scale(0.7)} to{opacity:1;transform:scale(1)} }
-        @keyframes newsGlow      { 0%,100%{box-shadow:0 0 18px rgba(204,0,0,0.3)} 50%{box-shadow:0 0 40px rgba(204,0,0,0.65)} }
-        .news-card:hover { transform:translateY(-5px) !important; border-color:#CC0000 !important; box-shadow:0 18px 48px rgba(0,0,0,0.35), 0 0 0 1px rgba(204,0,0,0.25) !important; }
-        .news-card { transition: all 0.22s ease !important; }
-        .cat-tab:hover { background: rgba(204,0,0,0.12) !important; color: #CC0000 !important; }
+        @import url('https://fonts.googleapis.com/css2?family=Anton&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,400&display=swap');
+        @keyframes slideUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes fadeIn  { from{opacity:0} to{opacity:1} }
+        @keyframes ticker  { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+        @keyframes pulse   { 0%,100%{opacity:1} 50%{opacity:0.35} }
+        .ncard { transition: all 0.2s cubic-bezier(0.22,1,0.36,1) !important; cursor:pointer; }
+        .ncard:hover { transform:translateY(-4px) !important; box-shadow:0 20px 60px rgba(0,0,0,0.28) !important; }
+        .catbtn { transition: all 0.15s ease !important; }
+        .backbtn { transition: color 0.15s !important; }
+        .backbtn:hover { color:#CC0000 !important; }
+        .ctabtn { transition: all 0.18s ease !important; }
+        .ctabtn:hover { transform:translateY(-2px) !important; box-shadow:0 12px 40px rgba(0,0,0,0.45) !important; }
+        * { box-sizing:border-box; }
+        ::-webkit-scrollbar { width:3px; height:3px; }
+        ::-webkit-scrollbar-thumb { background:#CC0000; border-radius:2px; }
       `}</style>
 
-      {/* ── ARTICLE DETAIL PAGE ── */}
-      {(() => {
-        if (selectedId === null) return null;
+      {/* ── DETAIL VIEW ── */}
+      {selectedId !== null && (() => {
         const article = ARTICLES.find(a => a.id === selectedId);
         if (!article) return null;
-        const catLabel = lang === "ru" ? CATS.find(c => c.key === article.category)?.ru : CATS.find(c => c.key === article.category)?.en;
+        const catInfo = CATS.find(c => c.key === article.category);
+        const ratePerMile = article.load ? (article.load.price / article.load.miles).toFixed(2) : null;
+        const stopAccent = article.category === "loads" ? "#CC0000" : "#a855f7";
         return (
-          <div style={{ minHeight: "100vh", background: bg, padding: "90px clamp(20px,5vw,64px) 60px", animation: "newsSlideUp 0.4s ease both" }}>
-            <div style={{ maxWidth: 760, margin: "0 auto" }}>
-              <button onClick={() => { setSelectedId(null); window.scrollTo({ top: 0, behavior: "smooth" }); }}
-                style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "transparent", border: "none", color: isDark ? "rgba(255,255,255,0.45)" : "rgba(0,0,0,0.45)", fontFamily: "'Barlow',sans-serif", fontWeight: 600, fontSize: 13, letterSpacing: 1, cursor: "pointer", padding: "0 0 24px", transition: "color 0.15s" }}
-                onMouseEnter={e => { e.currentTarget.style.color = "#CC0000"; }}
-                onMouseLeave={e => { e.currentTarget.style.color = isDark ? "rgba(255,255,255,0.45)" : "rgba(0,0,0,0.45)"; }}>
-                ← {lang === "ru" ? "Все новости" : "All news"}
-              </button>
-
-              {/* Category tag + date */}
-              <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
-                <span style={{ background: `${article.accentColor}18`, color: article.accentColor, border: `1px solid ${article.accentColor}40`, padding: "4px 12px", borderRadius: 3, fontFamily: "'Barlow',sans-serif", fontWeight: 800, fontSize: 10, letterSpacing: 2, textTransform: "uppercase" }}>
-                  {article.icon} {catLabel}
-                </span>
-                <span style={{ fontFamily: "'Barlow',sans-serif", fontSize: 12, color: textSubtle }}>{article.date}</span>
-                <span style={{ fontFamily: "'Barlow',sans-serif", fontSize: 12, color: textSubtle }}>{article.readTime} {lang === "ru" ? "мин" : "min"}</span>
+          <div style={{ minHeight: "100vh", background: bg, animation: "fadeIn 0.3s ease both" }}>
+            <div style={{ background: article.accentColor, padding: "6px 0", overflow: "hidden" }}>
+              <div style={{ fontFamily: "'Anton', sans-serif", fontSize: 10, letterSpacing: 4, color: "rgba(255,255,255,0.65)", textAlign: "center", textTransform: "uppercase" }}>
+                {article.icon} {lang === "ru" ? catInfo?.ru : catInfo?.en} &nbsp;·&nbsp; {article.date} &nbsp;·&nbsp; {article.readTime} {lang === "ru" ? "МИН" : "MIN"} &nbsp;·&nbsp; CLICK EXPRESS
               </div>
-
-              {/* Highlight (loads) */}
+            </div>
+            <div style={{ maxWidth: 740, margin: "0 auto", padding: "48px clamp(20px,5vw,48px) 80px", animation: "slideUp 0.4s ease both" }}>
+              <button className="backbtn" onClick={() => { setSelectedId(null); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+                style={{ background: "transparent", border: "none", color: textMuted, fontFamily: "'Anton', sans-serif", fontSize: 11, letterSpacing: 3, cursor: "pointer", padding: "0 0 36px", textTransform: "uppercase", display: "flex", alignItems: "center", gap: 8 }}>
+                ← {lang === "ru" ? "ВСЕ НОВОСТИ" : "ALL NEWS"}
+              </button>
+              <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: `${article.accentColor}15`, border: `1px solid ${article.accentColor}35`, borderLeft: `3px solid ${article.accentColor}`, padding: "5px 14px 5px 12px", marginBottom: 28 }}>
+                <span style={{ fontSize: 14 }}>{article.icon}</span>
+                <span style={{ fontFamily: "'Anton', sans-serif", fontSize: 10, letterSpacing: 3, color: article.accentColor, textTransform: "uppercase" }}>{lang === "ru" ? catInfo?.ru : catInfo?.en}</span>
+              </div>
               {article.category === "loads" && article.highlightEn && (
-                <div style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 36, color: "#CC0000", lineHeight: 1, marginBottom: 14 }}>
+                <div style={{ fontFamily: "'Anton', sans-serif", fontSize: "clamp(56px,10vw,88px)", color: "#CC0000", lineHeight: 0.85, letterSpacing: -1, marginBottom: 8 }}>
                   {lang === "ru" ? article.highlightRu : article.highlightEn}
                 </div>
               )}
-
-              {/* Author (reviews) */}
-              {article.category === "reviews" && article.authorInitial && (
-                <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 18 }}>
-                  <div style={{ width: 48, height: 48, borderRadius: "50%", background: "linear-gradient(135deg,#22c55e,#16a34a)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 20, color: "#fff", flexShrink: 0 }}>
-                    {article.authorInitial}
-                  </div>
-                  <span style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 16, color: textPrimary }}>{article.author}</span>
-                </div>
-              )}
-
-              {/* Title */}
-              <h1 style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: "clamp(22px,4vw,36px)", color: textPrimary, textTransform: article.category === "reviews" ? "none" : "uppercase", lineHeight: 1.2, marginBottom: 24 }}>
+              <h1 style={{ fontFamily: "'Anton', sans-serif", fontSize: "clamp(26px,5vw,44px)", color: textPrimary, textTransform: "uppercase", lineHeight: 1.05, letterSpacing: 0.5, marginBottom: 24, marginTop: article.category === "loads" ? 12 : 0 }}>
                 {lang === "ru" ? article.titleRu : article.titleEn}
               </h1>
-
-              <div style={{ width: 60, height: 4, background: article.accentColor, borderRadius: 2, marginBottom: 28 }} />
-
-              {/* Body text */}
-              <p style={{ fontFamily: "'Barlow',sans-serif", fontSize: 16, color: isDark ? "rgba(255,255,255,0.75)" : "rgba(0,0,0,0.7)", lineHeight: 1.85, marginBottom: 28, whiteSpace: "pre-line" }}>
-                {lang === "ru" ? article.excerptRu : article.excerptEn}
-              </p>
-
-              {/* Driver stops */}
-              {article.stops && article.stops.length > 0 && (
-                <div style={{ marginTop: 8 }}>
-                  <div style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 800, fontSize: 11, letterSpacing: 2, textTransform: "uppercase", color: "#a855f7", marginBottom: 14 }}>
-                    {lang === "ru" ? "ОСТАНОВКИ" : "STOPS"}
-                  </div>
-                  {article.stops.map((stop, si) => (
-                    <div key={si} style={{ background: isDark ? "rgba(168,85,247,0.07)" : "rgba(168,85,247,0.05)", border: "1px solid rgba(168,85,247,0.18)", borderRadius: 8, padding: "12px 16px", marginBottom: 10 }}>
-                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
-                        <span style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 14, color: textPrimary }}>{stop.name}</span>
-                        <StarRating n={stop.rating} />
+              <div style={{ height: 2, background: `linear-gradient(90deg, ${article.accentColor}, transparent)`, marginBottom: 32 }} />
+              {article.load && (
+                <div style={{ background: surface, border: `1px solid ${border}`, borderLeft: "4px solid #CC0000", padding: "18px 24px", marginBottom: 32 }}>
+                  <div style={{ fontFamily: "'Anton', sans-serif", fontSize: 8, letterSpacing: 4, color: textSubtle, textTransform: "uppercase", marginBottom: 10 }}>FREIGHT TICKET — CLICK EXPRESS INC</div>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
+                    <div>
+                      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
+                        <span style={{ fontFamily: "'Anton', sans-serif", fontSize: 17, color: textPrimary }}>{article.load.route}</span>
+                        <span style={{ color: "#CC0000", fontSize: 15 }}>→</span>
+                        <span style={{ fontFamily: "'Anton', sans-serif", fontSize: 17, color: textPrimary }}>{article.load.dest}</span>
                       </div>
-                      <span style={{ fontFamily: "'Barlow',sans-serif", fontSize: 13, color: textSubtle }}>{lang === "ru" ? stop.noteRu : stop.noteEn}</span>
+                      <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: textMuted }}>
+                        {article.load.cargo} · {article.load.miles.toLocaleString()} {lang === "ru" ? "миль" : "mi"}
+                        {ratePerMile && <span> · <span style={{ color: "#00b450", fontWeight: 700 }}>${ratePerMile}/mi</span></span>}
+                      </div>
                     </div>
-                  ))}
+                    <div style={{ fontFamily: "'Anton', sans-serif", fontSize: 30, color: "#CC0000", lineHeight: 1 }}>${article.load.price.toLocaleString()}</div>
+                  </div>
                 </div>
               )}
-
-              {/* CTA for loads */}
+              <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: isDark ? "rgba(240,237,232,0.75)" : "rgba(13,13,13,0.72)", lineHeight: 1.9, marginBottom: 36, letterSpacing: 0.1 }}>
+                {lang === "ru" ? article.excerptRu : article.excerptEn}
+              </p>
+              {article.stops && article.stops.length > 0 && (
+                <div style={{ marginBottom: 36 }}>
+                  <div style={{ fontFamily: "'Anton', sans-serif", fontSize: 10, letterSpacing: 4, textTransform: "uppercase", color: stopAccent, marginBottom: 20 }}>
+                    {article.category === "loads" ? (lang === "ru" ? "МАРШРУТ" : "ROUTE") : (lang === "ru" ? "ОСТАНОВКИ" : "STOPS")}
+                  </div>
+                  <div style={{ position: "relative", paddingLeft: 32 }}>
+                    <div style={{ position: "absolute", left: 9, top: 8, bottom: 8, width: 2, background: isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)" }} />
+                    {article.stops.map((stop, si) => (
+                      <div key={si} style={{ position: "relative", marginBottom: si < (article.stops?.length ?? 0) - 1 ? 16 : 0 }}>
+                        <div style={{ position: "absolute", left: -29, top: 12, width: 18, height: 18, borderRadius: "50%", background: surface, border: `2px solid ${stopAccent}`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                          <div style={{ width: 6, height: 6, borderRadius: "50%", background: stopAccent }} />
+                        </div>
+                        <div style={{ background: surface, border: `1px solid ${border}`, borderLeft: `3px solid ${stopAccent}`, padding: "12px 16px" }}>
+                          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
+                            <span style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 700, fontSize: 14, color: textPrimary }}>{stop.name}</span>
+                            <StarRating n={stop.rating} />
+                          </div>
+                          <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: textMuted }}>{lang === "ru" ? stop.noteRu : stop.noteEn}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
               {article.category === "loads" && (
-                <button onClick={() => { setSelectedId(null); onViewLoads?.(); }}
-                  style={{ marginTop: 20, display: "inline-flex", alignItems: "center", gap: 10, background: "#CC0000", color: "#fff", border: "none", borderRadius: 6, padding: "14px 32px", fontFamily: "'Barlow',sans-serif", fontWeight: 800, fontSize: 13, letterSpacing: 1.5, textTransform: "uppercase", cursor: "pointer", boxShadow: "0 4px 20px rgba(204,0,0,0.4)", transition: "all 0.15s" }}
-                  onMouseEnter={e => { e.currentTarget.style.background = "#aa0000"; e.currentTarget.style.transform = "translateY(-1px)"; }}
-                  onMouseLeave={e => { e.currentTarget.style.background = "#CC0000"; e.currentTarget.style.transform = "none"; }}>
-                  {lang === "ru" ? "СМОТРЕТЬ ГРУЗЫ →" : "VIEW LOADS →"}
+                <button className="ctabtn" onClick={() => { setSelectedId(null); onViewLoads?.(); }}
+                  style={{ display: "inline-flex", alignItems: "center", gap: 12, background: "#CC0000", color: "#fff", border: "none", padding: "16px 36px", fontFamily: "'Anton', sans-serif", fontSize: 13, letterSpacing: 3, textTransform: "uppercase", cursor: "pointer", boxShadow: "0 4px 24px rgba(204,0,0,0.4)" }}>
+                  {lang === "ru" ? "СМОТРЕТЬ ВСЕ ГРУЗЫ →" : "VIEW ALL LOADS →"}
                 </button>
               )}
             </div>
           </div>
         );
       })()}
-      {selectedId !== null ? null : <>
 
-      {/* ── HERO BANNER ── */}
-      <div style={{ position: "relative", background: isDark ? "#080000" : "#f0ecec", padding: "90px clamp(20px,5vw,64px) 56px", overflow: "hidden" }}>
-        {/* Background photo */}
-        <img src="/images/real7.jpg" alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 40%", filter: isDark ? "brightness(0.18) saturate(0.7)" : "brightness(0.55) saturate(0.5)", pointerEvents: "none" }} />
-        {/* Dark gradient overlay */}
-        <div style={{ position: "absolute", inset: 0, background: isDark ? "linear-gradient(105deg,rgba(10,0,0,0.92) 0%,rgba(20,0,0,0.75) 50%,rgba(10,0,0,0.88) 100%)" : "linear-gradient(105deg,rgba(255,240,240,0.88) 0%,rgba(240,220,220,0.72) 100%)", pointerEvents: "none" }} />
-        {/* BG grid lines */}
-        <div style={{ position: "absolute", inset: 0, backgroundImage: `repeating-linear-gradient(0deg,${isDark?"rgba(255,255,255,0.025)":"rgba(0,0,0,0.025)"} 0px,transparent 1px,transparent 60px),repeating-linear-gradient(90deg,${isDark?"rgba(255,255,255,0.025)":"rgba(0,0,0,0.025)"} 0px,transparent 1px,transparent 60px)`, pointerEvents: "none" }} />
-        {/* Red left line */}
-        <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 4, background: "#CC0000" }} />
-        {/* Top glow */}
-        <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: "linear-gradient(90deg,transparent,#CC0000 30%,#ff3333 60%,#CC0000 80%,transparent)" }} />
-
-        <div style={{ maxWidth: 900, animation: "newsSlideUp 0.6s ease both" }}>
-          {/* Back button */}
-          <button onClick={onBack} style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "transparent", border: "none", color: isDark ? "rgba(255,255,255,0.45)" : "rgba(0,0,0,0.45)", fontFamily: "'Barlow',sans-serif", fontWeight: 600, fontSize: 13, letterSpacing: 1, cursor: "pointer", padding: "0 0 20px", transition: "color 0.15s" }}
-            onMouseEnter={e => { e.currentTarget.style.color = "#CC0000"; }}
-            onMouseLeave={e => { e.currentTarget.style.color = isDark ? "rgba(255,255,255,0.45)" : "rgba(0,0,0,0.45)"; }}>
-            ← {lang === "ru" ? "Назад" : "Back"}
-          </button>
-          {/* Live badge */}
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(204,0,0,0.1)", border: "1px solid rgba(204,0,0,0.35)", borderRadius: 20, padding: "5px 14px", marginBottom: 24, animation: "newsBadgePop 0.5s ease 0.1s both" }}>
-            <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#CC0000", animation: "newsHeroPulse 1.4s ease infinite", display: "inline-block" }} />
-            <span style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 800, fontSize: 10, color: "#CC0000", letterSpacing: 3, textTransform: "uppercase" }}>
-              {lang === "ru" ? "Актуально сейчас" : "Live Updates"}
-            </span>
+      {selectedId === null && <>
+        {/* ── TICKER ── */}
+        <div style={{ background: "#CC0000", padding: "7px 0", overflow: "hidden", position: "relative" }}>
+          <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 60, background: "linear-gradient(90deg,#CC0000,transparent)", zIndex: 2, pointerEvents: "none" }} />
+          <div style={{ position: "absolute", right: 0, top: 0, bottom: 0, width: 60, background: "linear-gradient(270deg,#CC0000,transparent)", zIndex: 2, pointerEvents: "none" }} />
+          <div style={{ display: "flex", whiteSpace: "nowrap", animation: "ticker 30s linear infinite" }}>
+            {[...tickerItems, ...tickerItems].map((item, i) => (
+              <span key={i} style={{ fontFamily: "'Anton', sans-serif", fontSize: 11, letterSpacing: 3, color: "rgba(255,255,255,0.9)", textTransform: "uppercase", paddingRight: 64 }}>{item}</span>
+            ))}
           </div>
-
-          <h1 style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: "clamp(42px,7vw,88px)", textTransform: "uppercase", lineHeight: 0.9, margin: "0 0 16px", color: textPrimary }}>
-            {lang === "ru" ? (
-              <><span style={{ color: "#CC0000" }}>CLICK EXPRESS</span><br />НОВОСТИ</>
-            ) : (
-              <><span style={{ color: "#CC0000" }}>CLICK EXPRESS</span><br />NEWS HUB</>
-            )}
-          </h1>
-
-          <p style={{ fontFamily: "'Barlow',sans-serif", fontSize: 16, color: textMuted, maxWidth: 520, lineHeight: 1.75, margin: 0 }}>
-            {lang === "ru"
-              ? "Лучшие лоты, отзывы водителей, новости компании, безопасность на дорогах и стоянки для дальнобойщиков — всё в одном месте."
-              : "Best loads of the week, driver reviews, company updates, road safety and truck stop guides — all in one place."}
-          </p>
         </div>
 
-        {/* Big decorative truck emoji */}
-        <div style={{ position: "absolute", right: "5%", top: "50%", transform: "translateY(-50%)", fontSize: 160, opacity: isDark ? 0.05 : 0.06, userSelect: "none", pointerEvents: "none" }}>🚛</div>
-      </div>
-
-      {/* ── CATEGORY TABS ── */}
-      <div style={{ position: "sticky", top: 0, zIndex: 100, background: isDark ? "rgba(8,0,0,0.95)" : "rgba(245,245,245,0.97)", backdropFilter: "blur(16px)", borderBottom: `1px solid ${divider}`, boxShadow: isDark ? "0 4px 24px rgba(0,0,0,0.5)" : "0 4px 20px rgba(0,0,0,0.08)" }}>
-        <div style={{ maxWidth: 1240, margin: "0 auto", padding: "0 clamp(20px,4vw,56px)", display: "flex", gap: 4, overflowX: "auto", scrollbarWidth: "none" }}>
-          {CATS.map(c => {
-            const isActive = activecat === c.key;
-            return (
-              <button key={c.key} className="cat-tab" onClick={() => setActivecat(c.key)} style={{ display: "flex", alignItems: "center", gap: 7, padding: "14px 16px", border: "none", background: isActive ? "#CC0000" : "transparent", color: isActive ? "#fff" : textMuted, fontFamily: "'Barlow',sans-serif", fontWeight: 800, fontSize: 12, letterSpacing: 1.2, textTransform: "uppercase", cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0, borderRadius: 0, borderBottom: isActive ? "3px solid #ff3333" : "3px solid transparent", transition: "all 0.15s" }}>
-                <span style={{ fontSize: 14 }}>{c.icon}</span>
-                {lang === "ru" ? c.ru : c.en}
+        {/* ── HERO ── */}
+        <div style={{ position: "relative", overflow: "hidden" }}>
+          <img src="/images/real7.jpg" alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 35%", filter: isDark ? "brightness(0.1) saturate(0.4)" : "brightness(0.3) saturate(0.3)", pointerEvents: "none" }} />
+          <div style={{ position: "absolute", inset: 0, background: isDark ? "linear-gradient(115deg,rgba(10,10,10,0.98) 55%,rgba(20,0,0,0.82) 100%)" : "linear-gradient(115deg,rgba(244,240,232,0.97) 55%,rgba(204,0,0,0.12) 100%)", pointerEvents: "none" }} />
+          <div style={{ position: "absolute", inset: 0, backgroundImage: isDark ? "radial-gradient(circle,rgba(255,255,255,0.04) 1px,transparent 1px)" : "radial-gradient(circle,rgba(0,0,0,0.05) 1px,transparent 1px)", backgroundSize: "28px 28px", pointerEvents: "none" }} />
+          <div style={{ position: "relative", padding: "0 clamp(20px,5vw,64px)" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: 18, paddingBottom: 18, borderBottom: `1px solid ${borderStrong}`, marginBottom: 48 }}>
+              <button className="backbtn" onClick={onBack} style={{ background: "transparent", border: "none", color: textMuted, fontFamily: "'Anton', sans-serif", fontSize: 11, letterSpacing: 3, cursor: "pointer", textTransform: "uppercase", display: "flex", alignItems: "center", gap: 8 }}>
+                ← {lang === "ru" ? "НАЗАД" : "BACK"}
               </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* ── CONTENT ── */}
-      <div style={{ maxWidth: 1240, margin: "0 auto", padding: "44px clamp(20px,4vw,56px) 80px" }}>
-
-        {/* ── FEATURED CARD ── */}
-        {featured && (
-          <div style={{ background: featured.category === "loads" ? `linear-gradient(135deg, #1a0000 0%, #2d0000 50%, #1a0000 100%)` : cardBg, border: `1px solid ${featured.accentColor}40`, borderRadius: 14, padding: "40px 44px", marginBottom: 44, position: "relative", overflow: "hidden", animation: "newsSlideUp 0.5s ease both", cursor: "pointer", boxShadow: `0 8px 48px ${featured.accentColor}20` }}
-            onClick={() => { if (featured.load && onLoadDetail) { onLoadDetail(featured.load); } else { setSelectedId(featured.id); window.scrollTo({ top: 0, behavior: "smooth" }); } }}>
-            {/* Accent line top */}
-            <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 4, background: `linear-gradient(90deg, ${featured.accentColor}, ${featured.accentColor}80, transparent)` }} />
-            <div style={{ position: "absolute", right: 40, top: "50%", transform: "translateY(-50%)", fontSize: 140, opacity: 0.05, pointerEvents: "none" }}>{featured.icon}</div>
-
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
-              <span style={{ background: featured.accentColor, color: "#fff", padding: "4px 12px", borderRadius: 3, fontFamily: "'Barlow',sans-serif", fontWeight: 800, fontSize: 10, letterSpacing: 2, textTransform: "uppercase" }}>
-                ★ {lang === "ru" ? "ИЗБРАННОЕ" : "FEATURED"}
-              </span>
-              <span style={{ fontFamily: "'Barlow',sans-serif", fontSize: 11, color: featured.accentColor, letterSpacing: 1 }}>{featured.date}</span>
-            </div>
-
-            {featured.highlightEn && (
-              <div style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: "clamp(36px,5vw,64px)", color: featured.accentColor, lineHeight: 1, marginBottom: 12 }}>
-                {lang === "ru" ? featured.highlightRu : featured.highlightEn}
+              <div style={{ fontFamily: "'Anton', sans-serif", fontSize: 10, letterSpacing: 3, color: textSubtle, textTransform: "uppercase" }}>US DOT 3159368 · MC 110572 · +1 786-202-6599</div>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, background: "rgba(204,0,0,0.1)", border: "1px solid rgba(204,0,0,0.3)", borderRadius: 20, padding: "4px 12px" }}>
+                <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#CC0000", animation: "pulse 1.6s ease infinite" }} />
+                <span style={{ fontFamily: "'Anton', sans-serif", fontSize: 9, letterSpacing: 3, color: "#CC0000", textTransform: "uppercase" }}>{lang === "ru" ? "АКТУАЛЬНО" : "LIVE"}</span>
               </div>
-            )}
-
-            <h2 style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: "clamp(22px,3vw,34px)", color: featured.category === "loads" ? "#fff" : textPrimary, textTransform: "uppercase", lineHeight: 1.15, marginBottom: 16, maxWidth: 680 }}>
-              {lang === "ru" ? featured.titleRu : featured.titleEn}
-            </h2>
-            <p style={{ fontFamily: "'Barlow',sans-serif", fontSize: 15, color: featured.category === "loads" ? "rgba(255,255,255,0.65)" : textMuted, lineHeight: 1.75, maxWidth: 580 }}>
-              {lang === "ru" ? featured.excerptRu : featured.excerptEn}
-            </p>
-            <div style={{ marginTop: 20, display: "flex", alignItems: "center", gap: 16 }}>
-              <span style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 800, fontSize: 12, color: featured.accentColor, letterSpacing: 2, textTransform: "uppercase", cursor: "pointer" }}>
-                {lang === "ru" ? "ЧИТАТЬ ДАЛЕЕ →" : "READ MORE →"}
-              </span>
-              <span style={{ fontFamily: "'Barlow',sans-serif", fontSize: 11, color: featured.category === "loads" ? "rgba(255,255,255,0.35)" : textSubtle }}>
-                {featured.readTime} {lang === "ru" ? "чтения" : "read"}
-              </span>
             </div>
-          </div>
-        )}
-
-        {/* ── NEWS GRID ── */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(340px,1fr))", gap: 22 }}>
-          {rest.map((article, idx) => (
-            <div key={article.id} className="news-card"
-              onClick={() => { if (article.load && onLoadDetail) { onLoadDetail(article.load); } else { setSelectedId(article.id); window.scrollTo({ top: 0, behavior: "smooth" }); } }}
-              style={{ background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 12, overflow: "hidden", cursor: "pointer", animation: `newsSlideUp 0.4s ease ${idx * 0.04}s both` }}>
-
-              {/* Colored top bar */}
-              <div style={{ height: 4, background: `linear-gradient(90deg, ${article.accentColor}, ${article.accentColor}60)` }} />
-
-              <div style={{ padding: "22px 24px 20px" }}>
-                {/* Tag + date row */}
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
-                  <span style={{ background: `${article.accentColor}18`, color: article.accentColor, border: `1px solid ${article.accentColor}40`, padding: "3px 10px", borderRadius: 3, fontFamily: "'Barlow',sans-serif", fontWeight: 800, fontSize: 9, letterSpacing: 2, textTransform: "uppercase" }}>
-                    {article.icon} {lang === "ru" ? CATS.find(c => c.key === article.category)?.ru : CATS.find(c => c.key === article.category)?.en}
-                  </span>
-                  <span style={{ fontFamily: "'Barlow',sans-serif", fontSize: 10, color: textSubtle }}>{article.date}</span>
-                </div>
-
-                {/* Review author circle */}
-                {article.category === "reviews" && article.authorInitial && (
-                  <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-                    <div style={{ width: 36, height: 36, borderRadius: "50%", background: "linear-gradient(135deg,#22c55e,#16a34a)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 16, color: "#fff", flexShrink: 0 }}>
-                      {article.authorInitial}
-                    </div>
-                    <span style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 13, color: textPrimary }}>{article.author}</span>
-                  </div>
-                )}
-
-                {/* Load highlight */}
-                {article.category === "loads" && article.highlightEn && (
-                  <div style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 26, color: "#CC0000", lineHeight: 1, marginBottom: 8 }}>
-                    {lang === "ru" ? article.highlightRu : article.highlightEn}
-                  </div>
-                )}
-
-                {/* Title */}
-                <h3 style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: article.category === "reviews" ? 15 : 18, color: textPrimary, textTransform: article.category === "reviews" ? "none" : "uppercase", lineHeight: 1.2, marginBottom: 10 }}>
-                  {lang === "ru" ? article.titleRu : article.titleEn}
-                </h3>
-
-                {/* Quote icon for reviews */}
-                {article.category === "reviews" && (
-                  <div style={{ fontSize: 32, color: `${article.accentColor}30`, fontFamily: "Georgia,serif", lineHeight: 0.5, marginBottom: 6 }}>"</div>
-                )}
-
-                {/* Excerpt */}
-                <p style={{ fontFamily: "'Barlow',sans-serif", fontSize: 13, color: textMuted, lineHeight: 1.7, marginBottom: 14, display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical" as const, overflow: "hidden" }}>
-                  {lang === "ru" ? article.excerptRu : article.excerptEn}
+            <div style={{ paddingBottom: 64, animation: "slideUp 0.6s ease both" }}>
+              <div style={{ fontFamily: "'Anton', sans-serif", fontSize: 9, letterSpacing: 6, color: "#CC0000", textTransform: "uppercase", marginBottom: 14 }}>
+                {lang === "ru" ? "ОФИЦИАЛЬНЫЕ НОВОСТИ КОМПАНИИ" : "OFFICIAL COMPANY DISPATCH"}
+              </div>
+              <h1 style={{ fontFamily: "'Anton', sans-serif", fontSize: "clamp(60px,10vw,120px)", textTransform: "uppercase", lineHeight: 0.88, letterSpacing: -1, color: textPrimary, margin: "0 0 24px" }}>
+                <span style={{ color: "#CC0000" }}>CLICK</span><br />EXPRESS<br /><span style={{ color: "#CC0000" }}>{lang === "ru" ? "НОВОСТИ" : "DISPATCH"}</span>
+              </h1>
+              <div style={{ display: "flex", alignItems: "center", gap: 32, flexWrap: "wrap" }}>
+                <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 15, color: textMuted, lineHeight: 1.75, maxWidth: 440, margin: 0 }}>
+                  {lang === "ru" ? "Лучшие лоты, маршруты, новости компании, безопасность дорог и гид по стоянкам." : "Best loads of the week, routes, company news, road safety & the trucker's guide to stops."}
                 </p>
-
-                {/* Driver Stops list */}
-                {article.stops && article.stops.slice(0, 2).map((stop, si) => (
-                  <div key={si} style={{ background: isDark ? "rgba(168,85,247,0.07)" : "rgba(168,85,247,0.05)", border: `1px solid rgba(168,85,247,0.18)`, borderRadius: 6, padding: "8px 12px", marginBottom: 6 }}>
-                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 2 }}>
-                      <span style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 12, color: textPrimary }}>{stop.name}</span>
-                      <StarRating n={stop.rating} />
+                <div style={{ display: "flex", gap: 28 }}>
+                  {[{ v: "500+", l: lang === "ru" ? "Грузов" : "Loads" }, { v: "48", l: lang === "ru" ? "Штатов" : "States" }, { v: "24/7", l: lang === "ru" ? "Работа" : "Service" }].map(({ v, l }) => (
+                    <div key={v} style={{ textAlign: "center" }}>
+                      <div style={{ fontFamily: "'Anton', sans-serif", fontSize: 30, color: "#CC0000", lineHeight: 1 }}>{v}</div>
+                      <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 10, color: textSubtle, letterSpacing: 2, textTransform: "uppercase" }}>{l}</div>
                     </div>
-                    <span style={{ fontFamily: "'Barlow',sans-serif", fontSize: 11, color: textSubtle }}>{lang === "ru" ? stop.noteRu : stop.noteEn}</span>
-                  </div>
-                ))}
-                {article.stops && article.stops.length > 2 && (
-                  <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 11, color: "#a855f7", marginBottom: 8 }}>
-                    +{article.stops.length - 2} {lang === "ru" ? "ещё остановок" : "more stops"}
-                  </div>
-                )}
-
-                {/* Footer */}
-                <div style={{ borderTop: `1px solid ${divider}`, paddingTop: 12, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                  <span style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 800, fontSize: 11, color: article.accentColor, letterSpacing: 1.5, textTransform: "uppercase" }}>
-                    {lang === "ru" ? "ЧИТАТЬ →" : "READ MORE →"}
-                  </span>
-                  <span style={{ fontFamily: "'Barlow',sans-serif", fontSize: 10, color: textSubtle }}>
-                    {article.readTime} {lang === "ru" ? "мин" : "min"}
-                  </span>
+                  ))}
                 </div>
               </div>
             </div>
-          ))}
-        </div>
-
-        {/* ── BOTTOM CTA ── */}
-        <div style={{ marginTop: 60, background: "linear-gradient(135deg,#CC0000,#880000)", borderRadius: 14, padding: "44px 48px", position: "relative", overflow: "hidden", textAlign: "center" }}>
-          <div style={{ position: "absolute", inset: 0, backgroundImage: "repeating-linear-gradient(90deg,rgba(255,255,255,0.04) 0px,rgba(255,255,255,0.04) 1px,transparent 1px,transparent 80px)", pointerEvents: "none" }} />
-          <div style={{ position: "absolute", right: "3%", top: "50%", transform: "translateY(-50%)", fontSize: 100, opacity: 0.07, pointerEvents: "none" }}>🚛</div>
-          <div style={{ position: "relative", zIndex: 1 }}>
-            <div style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 800, fontSize: 11, color: "rgba(255,255,255,0.7)", letterSpacing: 3, textTransform: "uppercase", marginBottom: 10 }}>
-              {lang === "ru" ? "ГОТОВ К РАБОТЕ?" : "READY TO ROLL?"}
-            </div>
-            <h3 style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: "clamp(26px,4vw,42px)", color: "#fff", textTransform: "uppercase", lineHeight: 1, marginBottom: 14 }}>
-              {lang === "ru" ? "НАЙДИ СВОЙ СЛЕДУЮЩИЙ ГРУЗ" : "FIND YOUR NEXT LOAD"}
-            </h3>
-            <p style={{ fontFamily: "'Barlow',sans-serif", fontSize: 14, color: "rgba(255,255,255,0.7)", marginBottom: 28 }}>
-              {lang === "ru" ? "Свяжись с диспетчером прямо сейчас — 24/7" : "Contact our dispatcher right now — available 24/7"}
-            </p>
-            <a href="tel:+17862026599" style={{ display: "inline-flex", alignItems: "center", gap: 10, background: "#fff", color: "#CC0000", borderRadius: 6, padding: "14px 32px", fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 16, letterSpacing: 2, textTransform: "uppercase", textDecoration: "none", boxShadow: "0 6px 24px rgba(0,0,0,0.3)", transition: "all 0.15s" }}
-              onMouseEnter={e => { e.currentTarget.style.transform="translateY(-2px)"; e.currentTarget.style.boxShadow="0 12px 40px rgba(0,0,0,0.4)"; }}
-              onMouseLeave={e => { e.currentTarget.style.transform="none"; e.currentTarget.style.boxShadow="0 6px 24px rgba(0,0,0,0.3)"; }}>
-              📞 +1 786-202-6599
-            </a>
           </div>
         </div>
 
-      </div>
-    </>}
+        {/* ── CATEGORY NAV ── */}
+        <div style={{ position: "sticky", top: 0, zIndex: 100, background: isDark ? "rgba(10,10,10,0.97)" : "rgba(244,240,232,0.97)", backdropFilter: "blur(20px)", borderBottom: `2px solid ${border}` }}>
+          <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 clamp(20px,4vw,56px)", display: "flex", gap: 0, overflowX: "auto", scrollbarWidth: "none" }}>
+            {CATS.map(c => {
+              const isActive = activecat === c.key;
+              const accent = c.key === "all" ? "#CC0000" : CAT_COLOR[c.key as Exclude<Category,"all">] ?? "#CC0000";
+              return (
+                <button key={c.key} className="catbtn" onClick={() => setActivecat(c.key)}
+                  style={{ padding: "15px 18px", border: "none", background: "transparent", borderBottom: isActive ? `3px solid ${accent}` : "3px solid transparent", color: isActive ? accent : textMuted, fontFamily: "'Anton', sans-serif", fontSize: 11, letterSpacing: 2.5, textTransform: "uppercase", cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0, display: "flex", alignItems: "center", gap: 6 }}>
+                  <span style={{ fontSize: 13 }}>{c.icon}</span>
+                  {lang === "ru" ? c.ru : c.en}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* ── CONTENT ── */}
+        <div style={{ maxWidth: 1280, margin: "0 auto", padding: "44px clamp(20px,4vw,56px) 100px" }}>
+
+          {/* FEATURED */}
+          {featured && (
+            <div className="ncard" onClick={() => { if (featured.load && onLoadDetail) onLoadDetail(featured.load); else { setSelectedId(featured.id); window.scrollTo({ top: 0, behavior: "smooth" }); } }}
+              style={{ display: "grid", gridTemplateColumns: featured.load ? "1fr 1fr" : "1fr", marginBottom: 44, border: `1px solid ${border}`, background: surface, overflow: "hidden", position: "relative", animation: "slideUp 0.5s ease both" }}>
+              <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: `linear-gradient(90deg,${featured.accentColor},${featured.accentColor}50,transparent)` }} />
+              <div style={{ padding: "40px 44px", background: featured.category === "loads" ? (isDark ? "#0e0000" : "#fff8f8") : surface }}>
+                <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "#CC0000", color: "#fff", padding: "4px 12px", marginBottom: 22, fontFamily: "'Anton', sans-serif", fontSize: 9, letterSpacing: 4, textTransform: "uppercase" }}>
+                  ★ {lang === "ru" ? "ИЗБРАННОЕ" : "FEATURED"}
+                </div>
+                <div style={{ fontFamily: "'Anton', sans-serif", fontSize: 10, letterSpacing: 3, color: featured.accentColor, textTransform: "uppercase", marginBottom: 14, display: "flex", alignItems: "center", gap: 8 }}>
+                  <span>{featured.icon}</span>{lang === "ru" ? CATS.find(c => c.key === featured.category)?.ru : CATS.find(c => c.key === featured.category)?.en} · {featured.date}
+                </div>
+                {featured.highlightEn && (
+                  <div style={{ fontFamily: "'Anton', sans-serif", fontSize: "clamp(40px,6vw,68px)", color: "#CC0000", lineHeight: 0.88, marginBottom: 14 }}>
+                    {lang === "ru" ? featured.highlightRu : featured.highlightEn}
+                  </div>
+                )}
+                <h2 style={{ fontFamily: "'Anton', sans-serif", fontSize: "clamp(20px,2.5vw,28px)", color: textPrimary, textTransform: "uppercase", lineHeight: 1.1, marginBottom: 16, letterSpacing: 0.5 }}>
+                  {lang === "ru" ? featured.titleRu : featured.titleEn}
+                </h2>
+                <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: textMuted, lineHeight: 1.8, marginBottom: 24, maxWidth: 420 }}>
+                  {lang === "ru" ? featured.excerptRu : featured.excerptEn}
+                </p>
+                <span style={{ fontFamily: "'Anton', sans-serif", fontSize: 10, letterSpacing: 3, color: featured.accentColor, textTransform: "uppercase" }}>
+                  {lang === "ru" ? "ЧИТАТЬ →" : "READ MORE →"}
+                </span>
+              </div>
+              {featured.load && (
+                <div style={{ padding: "40px 44px", background: isDark ? "linear-gradient(135deg,#180000,#0d0000)" : "linear-gradient(135deg,#fff0f0,#ffe6e6)", display: "flex", flexDirection: "column", justifyContent: "center", position: "relative", overflow: "hidden" }}>
+                  <div style={{ position: "absolute", right: -20, bottom: -20, fontSize: 160, opacity: 0.04, pointerEvents: "none", lineHeight: 1 }}>🚛</div>
+                  <div style={{ fontFamily: "'Anton', sans-serif", fontSize: 8, letterSpacing: 4, color: "rgba(204,0,0,0.5)", textTransform: "uppercase", marginBottom: 18 }}>FREIGHT DETAILS</div>
+                  {[
+                    { label: lang === "ru" ? "МАРШРУТ" : "ROUTE", value: `${featured.load.route} → ${featured.load.dest}`, big: false },
+                    { label: lang === "ru" ? "РАССТОЯНИЕ" : "DISTANCE", value: `${featured.load.miles.toLocaleString()} mi`, big: false },
+                    { label: lang === "ru" ? "СТАВКА/МИ" : "RATE/MILE", value: `$${(featured.load.price / featured.load.miles).toFixed(2)}/mi`, big: true },
+                    { label: lang === "ru" ? "ТИП" : "CARGO", value: featured.load.cargo, big: false },
+                  ].map(({ label, value, big }) => (
+                    <div key={label} style={{ marginBottom: 18 }}>
+                      <div style={{ fontFamily: "'Anton', sans-serif", fontSize: 8, letterSpacing: 3, color: "rgba(204,0,0,0.55)", textTransform: "uppercase", marginBottom: 3 }}>{label}</div>
+                      <div style={{ fontFamily: big ? "'Anton', sans-serif" : "'DM Sans', sans-serif", fontWeight: big ? undefined : 700, fontSize: big ? 26 : 14, color: big ? "#00b450" : textPrimary, lineHeight: 1.1 }}>{value}</div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* GRID */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(310px,1fr))", gap: 20 }}>
+            {rest.map((article, idx) => {
+              const isLoad = article.category === "loads";
+              const ratePerMile = article.load ? (article.load.price / article.load.miles).toFixed(2) : null;
+              return (
+                <div key={article.id} className="ncard"
+                  onClick={() => { if (article.load && onLoadDetail) onLoadDetail(article.load); else { setSelectedId(article.id); window.scrollTo({ top: 0, behavior: "smooth" }); } }}
+                  style={{ background: isLoad ? (isDark ? "#0e0000" : "#fff8f8") : surface, border: `1px solid ${border}`, borderTop: `3px solid ${article.accentColor}`, overflow: "hidden", position: "relative", animation: `slideUp 0.4s ease ${idx * 0.04}s both` }}>
+                  <div style={{ padding: "22px 24px 20px" }}>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+                      <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: `${article.accentColor}14`, border: `1px solid ${article.accentColor}30`, padding: "3px 10px" }}>
+                        <span style={{ fontSize: 11 }}>{article.icon}</span>
+                        <span style={{ fontFamily: "'Anton', sans-serif", fontSize: 9, letterSpacing: 2.5, color: article.accentColor, textTransform: "uppercase" }}>
+                          {lang === "ru" ? CATS.find(c => c.key === article.category)?.ru : CATS.find(c => c.key === article.category)?.en}
+                        </span>
+                      </div>
+                      <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11, color: textSubtle }}>{article.date}</span>
+                    </div>
+                    {isLoad && article.highlightEn && (
+                      <div style={{ fontFamily: "'Anton', sans-serif", fontSize: "clamp(30px,5vw,42px)", color: "#CC0000", lineHeight: 0.88, marginBottom: 8, letterSpacing: -0.5 }}>
+                        {lang === "ru" ? article.highlightRu : article.highlightEn}
+                      </div>
+                    )}
+                    {isLoad && ratePerMile && (
+                      <div style={{ display: "inline-flex", alignItems: "center", background: isDark ? "rgba(0,180,80,0.12)" : "rgba(0,180,80,0.08)", border: "1px solid rgba(0,180,80,0.25)", padding: "2px 8px", marginBottom: 10, fontFamily: "'Anton', sans-serif", fontSize: 9, letterSpacing: 2, color: "#00b450", textTransform: "uppercase" }}>
+                        ${ratePerMile}/MI
+                      </div>
+                    )}
+                    <h3 style={{ fontFamily: "'Anton', sans-serif", fontSize: 17, color: textPrimary, textTransform: "uppercase", lineHeight: 1.2, letterSpacing: 0.3, marginBottom: 10 }}>
+                      {lang === "ru" ? article.titleRu : article.titleEn}
+                    </h3>
+                    <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: textMuted, lineHeight: 1.75, marginBottom: 14, display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical" as const, overflow: "hidden" }}>
+                      {lang === "ru" ? article.excerptRu : article.excerptEn}
+                    </p>
+                    {isLoad && article.load && (
+                      <div style={{ background: isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.04)", border: `1px solid ${border}`, padding: "8px 12px", marginBottom: 14, display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                        <span style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 700, fontSize: 12, color: textPrimary }}>{article.load.route}</span>
+                        <span style={{ color: "#CC0000" }}>→</span>
+                        <span style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 700, fontSize: 12, color: textPrimary }}>{article.load.dest}</span>
+                      </div>
+                    )}
+                    {article.stops?.slice(0, 2).map((stop, si) => (
+                      <div key={si} style={{ borderLeft: `2px solid ${article.accentColor}50`, padding: "5px 10px", marginBottom: 6, background: isDark ? "rgba(255,255,255,0.02)" : "rgba(0,0,0,0.02)" }}>
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                          <span style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 700, fontSize: 12, color: textPrimary }}>{stop.name}</span>
+                          <StarRating n={stop.rating} />
+                        </div>
+                      </div>
+                    ))}
+                    {article.stops && article.stops.length > 2 && (
+                      <div style={{ fontFamily: "'Anton', sans-serif", fontSize: 9, letterSpacing: 2, color: article.accentColor, textTransform: "uppercase", marginBottom: 10 }}>
+                        +{article.stops.length - 2} {lang === "ru" ? "ЕЩЁ" : "MORE"}
+                      </div>
+                    )}
+                    <div style={{ borderTop: `1px solid ${border}`, paddingTop: 12, marginTop: 4, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                      <span style={{ fontFamily: "'Anton', sans-serif", fontSize: 10, letterSpacing: 2.5, color: article.accentColor, textTransform: "uppercase" }}>
+                        {lang === "ru" ? "ПОДРОБНЕЕ →" : "READ MORE →"}
+                      </span>
+                      <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11, color: textSubtle }}>{article.readTime} {lang === "ru" ? "мин" : "min"}</span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* CTA */}
+          <div style={{ marginTop: 64, background: "#CC0000", padding: "48px clamp(24px,5vw,64px)", position: "relative", overflow: "hidden", display: "grid", gridTemplateColumns: "1fr auto", gap: 40, alignItems: "center" }}>
+            <div style={{ position: "absolute", inset: 0, backgroundImage: "repeating-linear-gradient(45deg,rgba(0,0,0,0.05) 0px,rgba(0,0,0,0.05) 1px,transparent 1px,transparent 20px)", pointerEvents: "none" }} />
+            <div style={{ position: "relative", zIndex: 1 }}>
+              <div style={{ fontFamily: "'Anton', sans-serif", fontSize: 9, letterSpacing: 4, color: "rgba(255,255,255,0.6)", textTransform: "uppercase", marginBottom: 10 }}>
+                {lang === "ru" ? "ГОТОВ К РАБОТЕ?" : "READY TO ROLL?"}
+              </div>
+              <h3 style={{ fontFamily: "'Anton', sans-serif", fontSize: "clamp(30px,5vw,52px)", color: "#fff", textTransform: "uppercase", lineHeight: 0.9, letterSpacing: -0.5, marginBottom: 12 }}>
+                {lang === "ru" ? "НАЙДИ СВОЙ СЛЕДУЮЩИЙ ГРУЗ" : "FIND YOUR NEXT LOAD"}
+              </h3>
+              <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: "rgba(255,255,255,0.75)", margin: 0 }}>
+                {lang === "ru" ? "Свяжись с диспетчером прямо сейчас — 24/7" : "Contact our dispatcher right now — available 24/7"}
+              </p>
+            </div>
+            <div style={{ position: "relative", zIndex: 1, flexShrink: 0 }}>
+              <a href="tel:+17862026599" className="ctabtn" style={{ display: "block", background: "#fff", color: "#CC0000", padding: "16px 36px", fontFamily: "'Anton', sans-serif", fontSize: 17, letterSpacing: 2, textTransform: "uppercase", textDecoration: "none", boxShadow: "0 4px 24px rgba(0,0,0,0.25)", whiteSpace: "nowrap", textAlign: "center" }}>
+                📞 +1 786-202-6599
+              </a>
+            </div>
+          </div>
+        </div>
+      </>}
     </div>
   );
 };

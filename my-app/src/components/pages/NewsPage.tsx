@@ -425,41 +425,69 @@ export const NewsPage: React.FC<NewsPageProps> = ({ theme = "dark", onBack, onVi
         </div>
 
         {/* ── HERO ── */}
-        <div style={{ position: "relative", overflow: "hidden" }}>
-          <img src="/images/real7.jpg" alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 35%", filter: isDark ? "brightness(0.1) saturate(0.4)" : "brightness(0.3) saturate(0.3)", pointerEvents: "none" }} />
-          <div style={{ position: "absolute", inset: 0, background: isDark ? "linear-gradient(115deg,rgba(10,10,10,0.98) 55%,rgba(20,0,0,0.82) 100%)" : "linear-gradient(115deg,rgba(244,240,232,0.97) 55%,rgba(204,0,0,0.12) 100%)", pointerEvents: "none" }} />
-          <div style={{ position: "absolute", inset: 0, backgroundImage: isDark ? "radial-gradient(circle,rgba(255,255,255,0.04) 1px,transparent 1px)" : "radial-gradient(circle,rgba(0,0,0,0.05) 1px,transparent 1px)", backgroundSize: "28px 28px", pointerEvents: "none" }} />
-          <div style={{ position: "relative", padding: "0 clamp(20px,5vw,64px)" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: 18, paddingBottom: 18, borderBottom: `1px solid ${borderStrong}`, marginBottom: 48 }}>
+        <div style={{ position: "relative", overflow: "hidden", minHeight: "72vh", display: "flex", flexDirection: "column" }}>
+          {/* Фото главной фуры */}
+          <img
+            src={isDark ? "/images/red%20freightliner%20cascadia%202026%20night.png" : "/images/red%20freightliner%20cascadia%202026.PNG"}
+            alt=""
+            style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 50%", filter: isDark ? "brightness(0.6) saturate(0.85)" : "brightness(0.9) saturate(0.9)", pointerEvents: "none" }}
+          />
+          {/* Градиент — тёмный слева, прозрачный справа */}
+          <div style={{ position: "absolute", inset: 0, background: isDark ? "linear-gradient(100deg,rgba(10,10,10,0.97) 0%,rgba(10,10,10,0.88) 45%,rgba(10,10,10,0.45) 70%,rgba(10,10,10,0.1) 100%)" : "linear-gradient(100deg,rgba(244,240,232,0.97) 0%,rgba(244,240,232,0.88) 45%,rgba(244,240,232,0.4) 70%,rgba(244,240,232,0.05) 100%)", pointerEvents: "none" }} />
+          {/* Снизу затемнение */}
+          <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: 120, background: isDark ? "linear-gradient(to top,rgba(10,10,10,1),transparent)" : "linear-gradient(to top,rgba(244,240,232,1),transparent)", pointerEvents: "none" }} />
+          {/* Точечная сетка */}
+          <div style={{ position: "absolute", inset: 0, backgroundImage: isDark ? "radial-gradient(circle,rgba(255,255,255,0.035) 1px,transparent 1px)" : "radial-gradient(circle,rgba(0,0,0,0.05) 1px,transparent 1px)", backgroundSize: "28px 28px", pointerEvents: "none" }} />
+          {/* Красная линия слева */}
+          <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 4, background: "linear-gradient(to bottom,#CC0000,#880000)" }} />
+
+          <div style={{ position: "relative", flex: 1, display: "flex", flexDirection: "column", padding: "0 clamp(24px,5vw,72px)" }}>
+            {/* Top bar */}
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: 20, paddingBottom: 20, borderBottom: `1px solid ${borderStrong}`, marginBottom: 52 }}>
               <button className="backbtn" onClick={onBack} style={{ background: "transparent", border: "none", color: textMuted, fontFamily: "'Anton', sans-serif", fontSize: 11, letterSpacing: 3, cursor: "pointer", textTransform: "uppercase", display: "flex", alignItems: "center", gap: 8 }}>
                 ← {lang === "ru" ? "НАЗАД" : "BACK"}
               </button>
               <div style={{ fontFamily: "'Anton', sans-serif", fontSize: 10, letterSpacing: 3, color: textSubtle, textTransform: "uppercase" }}>US DOT 3159368 · MC 110572 · +1 786-202-6599</div>
-              <div style={{ display: "flex", alignItems: "center", gap: 8, background: "rgba(204,0,0,0.1)", border: "1px solid rgba(204,0,0,0.3)", borderRadius: 20, padding: "4px 12px" }}>
-                <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#CC0000", animation: "pulse 1.6s ease infinite" }} />
+              <div style={{ display: "flex", alignItems: "center", gap: 8, background: "rgba(204,0,0,0.12)", border: "1px solid rgba(204,0,0,0.35)", borderRadius: 20, padding: "5px 14px" }}>
+                <div style={{ width: 7, height: 7, borderRadius: "50%", background: "#CC0000", animation: "pulse 1.6s ease infinite" }} />
                 <span style={{ fontFamily: "'Anton', sans-serif", fontSize: 9, letterSpacing: 3, color: "#CC0000", textTransform: "uppercase" }}>{lang === "ru" ? "АКТУАЛЬНО" : "LIVE"}</span>
               </div>
             </div>
-            <div style={{ paddingBottom: 64, animation: "slideUp 0.6s ease both" }}>
-              <div style={{ fontFamily: "'Anton', sans-serif", fontSize: 9, letterSpacing: 6, color: "#CC0000", textTransform: "uppercase", marginBottom: 14 }}>
-                {lang === "ru" ? "ОФИЦИАЛЬНЫЕ НОВОСТИ КОМПАНИИ" : "OFFICIAL COMPANY DISPATCH"}
-              </div>
-              <h1 style={{ fontFamily: "'Anton', sans-serif", fontSize: "clamp(60px,10vw,120px)", textTransform: "uppercase", lineHeight: 0.88, letterSpacing: -1, color: textPrimary, margin: "0 0 24px" }}>
-                <span style={{ color: "#CC0000" }}>CLICK</span><br />EXPRESS<br /><span style={{ color: "#CC0000" }}>{lang === "ru" ? "НОВОСТИ" : "DISPATCH"}</span>
-              </h1>
-              <div style={{ display: "flex", alignItems: "center", gap: 32, flexWrap: "wrap" }}>
-                <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 15, color: textMuted, lineHeight: 1.75, maxWidth: 440, margin: 0 }}>
+
+            {/* Основной контент — две колонки */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 60, alignItems: "center", paddingBottom: 72, animation: "slideUp 0.6s ease both" }}>
+              {/* Левая: текст */}
+              <div>
+                <div style={{ fontFamily: "'Anton', sans-serif", fontSize: 9, letterSpacing: 6, color: "#CC0000", textTransform: "uppercase", marginBottom: 18 }}>
+                  {lang === "ru" ? "ОФИЦИАЛЬНЫЕ НОВОСТИ КОМПАНИИ" : "OFFICIAL COMPANY DISPATCH"}
+                </div>
+                <h1 style={{ fontFamily: "'Anton', sans-serif", fontSize: "clamp(56px,8vw,110px)", textTransform: "uppercase", lineHeight: 0.9, letterSpacing: -1, color: textPrimary, margin: "0 0 28px", whiteSpace: "nowrap" }}>
+                  <span style={{ color: "#CC0000" }}>CLICK</span><br />
+                  EXPRESS<br />
+                  <span style={{ color: "#CC0000" }}>{lang === "ru" ? "НОВОСТИ" : "DISPATCH"}</span>
+                </h1>
+                <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 15, color: textMuted, lineHeight: 1.8, maxWidth: 420, margin: "0 0 36px" }}>
                   {lang === "ru" ? "Лучшие лоты, маршруты, новости компании, безопасность дорог и гид по стоянкам." : "Best loads of the week, routes, company news, road safety & the trucker's guide to stops."}
                 </p>
-                <div style={{ display: "flex", gap: 28 }}>
-                  {[{ v: "500+", l: lang === "ru" ? "Грузов" : "Loads" }, { v: "48", l: lang === "ru" ? "Штатов" : "States" }, { v: "24/7", l: lang === "ru" ? "Работа" : "Service" }].map(({ v, l }) => (
-                    <div key={v} style={{ textAlign: "center" }}>
-                      <div style={{ fontFamily: "'Anton', sans-serif", fontSize: 30, color: "#CC0000", lineHeight: 1 }}>{v}</div>
-                      <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 10, color: textSubtle, letterSpacing: 2, textTransform: "uppercase" }}>{l}</div>
+                {/* Статы */}
+                <div style={{ display: "flex", gap: 36 }}>
+                  {[
+                    { v: "500+", l: lang === "ru" ? "Грузов" : "Loads" },
+                    { v: "48",   l: lang === "ru" ? "Штатов" : "States" },
+                    { v: "24/7", l: lang === "ru" ? "Сервис" : "Service" },
+                    { v: "6+",   l: lang === "ru" ? "Лет" : "Years" },
+                  ].map(({ v, l }, i) => (
+                    <div key={v} style={{ position: "relative" }}>
+                      {i > 0 && <div style={{ position: "absolute", left: -18, top: "10%", bottom: "10%", width: 1, background: isDark ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.12)" }} />}
+                      <div style={{ fontFamily: "'Anton', sans-serif", fontSize: "clamp(26px,3.5vw,40px)", color: "#CC0000", lineHeight: 1, textShadow: "0 0 20px rgba(204,0,0,0.35)" }}>{v}</div>
+                      <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 9, color: textSubtle, letterSpacing: 2.5, textTransform: "uppercase", marginTop: 4 }}>{l}</div>
                     </div>
                   ))}
                 </div>
               </div>
+
+              {/* Правая: пусто — фура видна сквозь градиент */}
+              <div />
             </div>
           </div>
         </div>

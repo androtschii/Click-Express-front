@@ -55,6 +55,7 @@ export const LoadCard: React.FC<LoadCardProps> = ({ load, onBook, onCancelBook, 
   useEffect(() => { setSaved(isSaved); }, [isSaved]);
   const [hov, setHov] = useState(false);
   const [bookHov, setBookHov] = useState(false);
+  const [imgLoaded, setImgLoaded] = useState(false);
 
   const handleBook = () => {
     if (!booked) {
@@ -84,51 +85,57 @@ export const LoadCard: React.FC<LoadCardProps> = ({ load, onBook, onCancelBook, 
   const driveM = Math.round(((load.miles / 55) - driveH) * 60);
 
   return (
-    <div onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)} style={{ background:cardBg, border:`1px solid ${hov?"#CC0000":cardBorder}`, borderRadius:8, overflow:"hidden", transform:hov?"translateY(-5px)":"none", boxShadow:hov?"0 24px 50px rgba(0,0,0,0.6), 0 0 0 1px rgba(204,0,0,0.2)":"0 2px 12px rgba(0,0,0,0.2)", transition:"all 0.25s ease" }}>
+    <div onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
+      style={{ background:cardBg, border:`1px solid ${hov?"#CC0000":cardBorder}`, borderRadius:6, overflow:"hidden", transform:hov?"translateY(-6px)":"none", boxShadow:hov?"0 28px 56px rgba(0,0,0,0.65), 0 0 0 1px rgba(204,0,0,0.25)":"0 2px 14px rgba(0,0,0,0.22)", transition:"all 0.22s cubic-bezier(0.22,1,0.36,1)" }}>
 
-      {/* ── Фото с блюром ── */}
-      <div onClick={() => onDetails && onDetails(load)} style={{ position:"relative", height:300, overflow:"hidden", cursor: onDetails ? "pointer" : "default" }}>
-        <img src={load.image} alt={load.route} style={{
+      {/* ── Фото ── */}
+      <div onClick={() => onDetails && onDetails(load)} style={{ position:"relative", height:280, overflow:"hidden", cursor: onDetails ? "pointer" : "default" }}>
+        {/* Skeleton */}
+        {!imgLoaded && <div style={{ position:"absolute", inset:0, background: isDark ? "#1a1a1a" : "#e8e8e8", animation:"shimmer 1.4s ease infinite" }} />}
+        <img src={load.image} alt={load.route} onLoad={() => setImgLoaded(true)} style={{
           width:"100%", height:"100%", objectFit:"cover", objectPosition:"center 72%",
-          filter: isDark ? "brightness(0.55)" : "brightness(1.0) saturate(1.12) contrast(1.05)",
-          transition:"filter 0.4s ease, transform 0.4s ease",
+          filter: isDark ? "brightness(0.52)" : "brightness(1.0) saturate(1.1) contrast(1.04)",
+          transform: hov ? "scale(1.04)" : "scale(1)",
+          transition:"filter 0.3s ease, transform 0.5s cubic-bezier(0.22,1,0.36,1)",
+          opacity: imgLoaded ? 1 : 0,
         }} />
         <div style={{ position:"absolute", inset:0, background: isDark
-          ? "linear-gradient(160deg,rgba(0,0,0,0.25) 0%,rgba(0,0,0,0.65) 60%,rgba(0,0,0,0.92) 100%)"
-          : "linear-gradient(160deg,rgba(0,0,0,0.0) 0%,rgba(0,0,0,0.22) 50%,rgba(0,0,0,0.68) 100%)"
+          ? "linear-gradient(170deg,rgba(0,0,0,0.15) 0%,rgba(0,0,0,0.58) 55%,rgba(0,0,0,0.95) 100%)"
+          : "linear-gradient(170deg,rgba(0,0,0,0.0) 0%,rgba(0,0,0,0.18) 50%,rgba(0,0,0,0.72) 100%)"
         }} />
 
         {/* Тег */}
         {load.tag && (
-          <div style={{ position:"absolute", top:0, left:0, background:load.tag==="Military Load"?"#1a3a6b":"#CC0000", color:"#fff", padding:"5px 14px", fontFamily:"'Barlow',sans-serif", fontWeight:800, fontSize:9, letterSpacing:2, textTransform:"uppercase", borderBottomRightRadius:6 }}>
-            {load.tag==="Best Load of the Week"?"★ ":"✈ "}{load.tag}
+          <div style={{ position:"absolute", top:0, left:0, background: load.tag==="Military Load" ? "linear-gradient(135deg,#1a3a6b,#0f2347)" : "linear-gradient(135deg,#CC0000,#990000)", color:"#fff", padding:"5px 14px", fontFamily:"'Anton',sans-serif", fontSize:9, letterSpacing:2.5, textTransform:"uppercase" }}>
+            {load.tag==="Best Load of the Week" ? "★ " : "✈ "}{load.tag}
           </div>
         )}
 
-        {/* Кнопка деталей */}
+        {/* View details pill */}
         {onDetails && (
-          <div style={{ position:"absolute", top:10, right:52, background:"rgba(0,0,0,0.55)", border:"1px solid rgba(255,255,255,0.2)", borderRadius:20, padding:"4px 12px", fontFamily:"'Barlow',sans-serif", fontWeight:600, fontSize:10, color:"rgba(255,255,255,0.8)", letterSpacing:1, backdropFilter:"blur(4px)" }}>
+          <div style={{ position:"absolute", top:10, right:54, background:"rgba(0,0,0,0.6)", border:"1px solid rgba(255,255,255,0.18)", borderRadius:20, padding:"4px 12px", fontFamily:"'Anton',sans-serif", fontSize:9, color:"rgba(255,255,255,0.85)", letterSpacing:2, backdropFilter:"blur(6px)", textTransform:"uppercase", opacity: hov ? 1 : 0, transform: hov ? "translateY(0)" : "translateY(-4px)", transition:"all 0.2s ease" }}>
             {t.viewDetails}
           </div>
         )}
 
         <HeartIcon saved={saved} onClick={handleSaveClick} />
 
-        {/* Цена + маршрут поверх фото */}
-        <div style={{ position:"absolute", bottom:0, left:0, right:0, padding:"14px 16px" }}>
+        {/* Цена + тип */}
+        <div style={{ position:"absolute", bottom:0, left:0, right:0, padding:"16px 16px 14px" }}>
           <div style={{ display:"flex", alignItems:"flex-end", justifyContent:"space-between", gap:8 }}>
             <div>
-              <div style={{ fontFamily:"'Oswald',sans-serif", fontWeight:700, fontSize:34, color:"#fff", lineHeight:1, textShadow:"0 2px 12px rgba(0,0,0,0.9)" }}>
+              <div style={{ fontFamily:"'Anton',sans-serif", fontSize:42, color:"#fff", lineHeight:0.88, textShadow:"0 2px 16px rgba(0,0,0,0.95)", letterSpacing:-1 }}>
                 ${load.price.toLocaleString()}
               </div>
-              <div style={{ display:"flex", alignItems:"center", gap:8, marginTop:4, flexWrap:"wrap" }}>
-                <div style={{ background:"#CC0000", color:"#fff", fontFamily:"'Barlow',sans-serif", fontWeight:800, fontSize:9, letterSpacing:2.5, textTransform:"uppercase", padding:"3px 10px", borderRadius:2 }}>{load.type}</div>
-                <span style={{ fontFamily:"'Barlow',sans-serif", fontSize:11, color:"rgba(255,255,255,0.6)" }}>{load.miles.toLocaleString()} mi · ${ratePerMile}/mi</span>
+              <div style={{ display:"flex", alignItems:"center", gap:8, marginTop:6, flexWrap:"wrap" }}>
+                <div style={{ background:"#CC0000", color:"#fff", fontFamily:"'Anton',sans-serif", fontSize:9, letterSpacing:2.5, textTransform:"uppercase", padding:"3px 10px" }}>{load.type}</div>
+                <span style={{ fontFamily:"'DM Sans',sans-serif", fontWeight:600, fontSize:12, color:"rgba(255,255,255,0.65)" }}>{load.miles.toLocaleString()} mi</span>
+                <span style={{ fontFamily:"'Anton',sans-serif", fontSize:11, color:"#00b450", letterSpacing:1 }}>${ratePerMile}/mi</span>
               </div>
             </div>
-            <div style={{ textAlign:"right", flexShrink:0 }}>
-              <div style={{ fontFamily:"'Barlow',sans-serif", fontSize:9, color:"rgba(255,255,255,0.45)", letterSpacing:1, textTransform:"uppercase" }}>ETA</div>
-              <div style={{ fontFamily:"'Oswald',sans-serif", fontWeight:600, fontSize:14, color:"rgba(255,255,255,0.75)" }}>{driveH}h {driveM}m</div>
+            <div style={{ textAlign:"right", flexShrink:0, background:"rgba(0,0,0,0.5)", backdropFilter:"blur(6px)", padding:"6px 10px", borderLeft:"2px solid rgba(204,0,0,0.5)" }}>
+              <div style={{ fontFamily:"'Anton',sans-serif", fontSize:8, color:"rgba(255,255,255,0.45)", letterSpacing:2, textTransform:"uppercase" }}>ETA</div>
+              <div style={{ fontFamily:"'Anton',sans-serif", fontSize:16, color:"rgba(255,255,255,0.85)", letterSpacing:0.5, marginTop:1 }}>{driveH}h {driveM}m</div>
             </div>
           </div>
         </div>
@@ -137,27 +144,37 @@ export const LoadCard: React.FC<LoadCardProps> = ({ load, onBook, onCancelBook, 
       {/* ── Тело карточки ── */}
       <div style={{ padding:"14px 16px 16px" }}>
 
-        {/* Маршрут */}
-        <div style={{ display:"flex", alignItems:"center", gap:5, marginBottom:8 }}>
-          <div style={{ width:7, height:7, borderRadius:"50%", border:"2px solid #CC0000", flexShrink:0 }} />
-          <span style={{ fontFamily:"'Barlow',sans-serif", fontWeight:700, fontSize:12, color:textPrimary, flex:1, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{load.route}</span>
-          <span style={{ color:"#CC0000", fontSize:10, flexShrink:0 }}>→</span>
-          <div style={{ width:7, height:7, borderRadius:"50%", background:"#CC0000", flexShrink:0 }} />
-          <span style={{ fontFamily:"'Barlow',sans-serif", fontWeight:700, fontSize:12, color:textPrimary, flex:1, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", textAlign:"right" }}>{load.dest}</span>
+        {/* Роут визуальный */}
+        <div style={{ marginBottom:10, padding:"10px 12px", background: isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.03)", border:`1px solid ${dividerColor}`, borderRadius:4 }}>
+          <div style={{ display:"flex", alignItems:"center", gap:0 }}>
+            <div style={{ flexShrink:0 }}>
+              <div style={{ width:8, height:8, borderRadius:"50%", border:"2px solid #CC0000" }} />
+            </div>
+            <div style={{ flex:1, display:"flex", alignItems:"center", padding:"0 6px" }}>
+              <div style={{ flex:1, height:1, background:`repeating-linear-gradient(90deg,#CC0000 0px,#CC0000 4px,transparent 4px,transparent 8px)`, opacity:0.5 }} />
+              <span style={{ fontFamily:"'Anton',sans-serif", fontSize:10, color:"#CC0000", padding:"0 4px", letterSpacing:1 }}>→</span>
+              <div style={{ flex:1, height:1, background:`repeating-linear-gradient(90deg,#CC0000 0px,#CC0000 4px,transparent 4px,transparent 8px)`, opacity:0.5 }} />
+            </div>
+            <div style={{ width:8, height:8, borderRadius:"50%", background:"#CC0000", flexShrink:0 }} />
+          </div>
+          <div style={{ display:"flex", justifyContent:"space-between", marginTop:5 }}>
+            <span style={{ fontFamily:"'DM Sans',sans-serif", fontWeight:700, fontSize:11, color:textPrimary, maxWidth:"45%", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{load.route}</span>
+            <span style={{ fontFamily:"'DM Sans',sans-serif", fontWeight:700, fontSize:11, color:textPrimary, maxWidth:"45%", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", textAlign:"right" }}>{load.dest}</span>
+          </div>
         </div>
 
-        <div style={{ fontFamily:"'Barlow',sans-serif", fontSize:10, color:textSecondary, letterSpacing:1, textTransform:"uppercase", marginBottom:12 }}>{load.cargo}</div>
+        <div style={{ fontFamily:"'Anton',sans-serif", fontSize:9, color:textSecondary, letterSpacing:2, textTransform:"uppercase", marginBottom:12 }}>{load.cargo}</div>
 
         {/* Мини-статы */}
-        <div style={{ display:"flex", borderRadius:5, overflow:"hidden", border:`1px solid ${dividerColor}`, marginBottom:14 }}>
+        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:1, marginBottom:14, background:dividerColor, borderRadius:4, overflow:"hidden" }}>
           {[
             { label:"RATE/MI", value:`$${ratePerMile}`, color:"#00b450" },
             { label:"DISTANCE", value:`${load.miles.toLocaleString()} mi`, color:textPhone },
             { label:"DRIVE TIME", value:`${driveH}h ${driveM}m`, color:textPhone },
           ].map((s, i) => (
-            <div key={i} style={{ flex:1, padding:"7px 4px", textAlign:"center", borderRight: i < 2 ? `1px solid ${dividerColor}` : "none", background: isDark ? "rgba(255,255,255,0.02)" : "rgba(0,0,0,0.02)" }}>
-              <div style={{ fontFamily:"'Barlow',sans-serif", fontSize:7.5, color:textMuted, letterSpacing:1.2, textTransform:"uppercase", marginBottom:2 }}>{s.label}</div>
-              <div style={{ fontFamily:"'Oswald',sans-serif", fontWeight:600, fontSize:13, color:s.color }}>{s.value}</div>
+            <div key={i} style={{ padding:"8px 4px", textAlign:"center", background: isDark ? "#0f0f0f" : "#fff" }}>
+              <div style={{ fontFamily:"'Anton',sans-serif", fontSize:7, color:textMuted, letterSpacing:1.5, textTransform:"uppercase", marginBottom:2 }}>{s.label}</div>
+              <div style={{ fontFamily:"'Anton',sans-serif", fontSize:14, color:s.color, letterSpacing:0.5 }}>{s.value}</div>
             </div>
           ))}
         </div>
@@ -165,8 +182,8 @@ export const LoadCard: React.FC<LoadCardProps> = ({ load, onBook, onCancelBook, 
         {/* Диспетчер + кнопка */}
         <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:10 }}>
           <div>
-            <div style={{ fontSize:8.5, color:textMuted, fontFamily:"'Barlow',sans-serif", letterSpacing:1.5, textTransform:"uppercase" }}>{t.dispatch}</div>
-            <div style={{ fontSize:13, color:textPhone, fontFamily:"'Barlow',sans-serif", fontWeight:600 }}>+1 786-202-6599</div>
+            <div style={{ fontSize:8, color:textMuted, fontFamily:"'Anton',sans-serif", letterSpacing:2, textTransform:"uppercase" }}>{t.dispatch}</div>
+            <div style={{ fontSize:13, color:textPhone, fontFamily:"'DM Sans',sans-serif", fontWeight:700, marginTop:1 }}>+1 786-202-6599</div>
           </div>
           <button
             onClick={handleBook}
@@ -176,11 +193,11 @@ export const LoadCard: React.FC<LoadCardProps> = ({ load, onBook, onCancelBook, 
               background: booked ? (bookHov ? "rgba(180,0,0,0.15)" : "rgba(0,180,80,0.1)") : bookHov ? "#aa0000" : "#CC0000",
               color: booked ? (bookHov ? "#CC0000" : "#00b450") : "#fff",
               border: booked ? `1px solid ${bookHov ? "rgba(204,0,0,0.4)" : "rgba(0,180,80,0.3)"}` : "none",
-              borderRadius:4, padding:"10px 22px",
-              fontFamily:"'Oswald',sans-serif", fontWeight:600, fontSize:13,
-              letterSpacing:1.5, textTransform:"uppercase", cursor:"pointer",
+              borderRadius:2, padding:"10px 22px",
+              fontFamily:"'Anton',sans-serif", fontSize:12,
+              letterSpacing:2, textTransform:"uppercase", cursor:"pointer",
               transform: bookHov ? "translateY(-1px)" : "none",
-              boxShadow: !booked ? "0 4px 16px rgba(204,0,0,0.35)" : "none",
+              boxShadow: !booked ? "0 4px 18px rgba(204,0,0,0.38)" : "none",
               transition:"all 0.15s",
             }}
           >
@@ -188,6 +205,7 @@ export const LoadCard: React.FC<LoadCardProps> = ({ load, onBook, onCancelBook, 
           </button>
         </div>
       </div>
+      <style>{`@keyframes shimmer{0%,100%{opacity:0.5}50%{opacity:1}}`}</style>
     </div>
   );
 };

@@ -104,7 +104,10 @@ export const LoadDetailPage: React.FC<LoadDetailPageProps> = ({
           from { opacity:0; transform:translateY(20px); }
           to   { opacity:1; transform:translateY(0); }
         }
-        @keyframes spin { to { transform:rotate(360deg); } }
+        @keyframes tireSpin { to { transform:rotate(360deg); } }
+        @keyframes tireSpinReverse { to { transform:rotate(-360deg); } }
+        @keyframes tirePulseGlow { 0%,100%{filter:drop-shadow(0 0 6px rgba(204,0,0,0.5))} 50%{filter:drop-shadow(0 0 16px rgba(204,0,0,0.9))} }
+        @keyframes mapFadeIn { from{opacity:0} to{opacity:1} }
         .stat-card { transition: all 0.2s; }
         .stat-card:hover { border-color: rgba(204,0,0,0.5) !important; transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
         .detail-scroll::-webkit-scrollbar { width: 5px; }
@@ -278,9 +281,49 @@ export const LoadDetailPage: React.FC<LoadDetailPageProps> = ({
               </div>
               <div style={{ position:"relative", height:340, background:isDark?"#1a1a1a":"#e8e8e8" }}>
                 {!mapLoaded && (
-                  <div style={{ position:"absolute", inset:0, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:10, zIndex:1 }}>
-                    <div style={{ width:32, height:32, border:"3px solid rgba(204,0,0,0.2)", borderTop:"3px solid #CC0000", borderRadius:"50%", animation:"spin 0.8s linear infinite" }} />
-                    <span style={{ fontFamily:"'Barlow',sans-serif", fontSize:12, color:muted }}>{t.loadingMap}</span>
+                  <div style={{ position:"absolute", inset:0, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:16, zIndex:1, background: isDark ? "rgba(10,10,10,0.97)" : "rgba(240,240,240,0.97)" }}>
+                    {/* Tire animation */}
+                    <div style={{ position:"relative", width:80, height:80, animation:"tirePulseGlow 2s ease infinite" }}>
+                      <svg width="80" height="80" viewBox="0 0 80 80" style={{ animation:"tireSpin 1.4s linear infinite", transformOrigin:"40px 40px" }}>
+                        {/* Outer tire rubber */}
+                        <circle cx="40" cy="40" r="38" fill={isDark?"#1a1a1a":"#2a2a2a"} stroke="#CC0000" strokeWidth="4"/>
+                        {/* Tire tread marks */}
+                        {[0,30,60,90,120,150,180,210,240,270,300,330].map((deg, i) => {
+                          const rad = deg * Math.PI / 180;
+                          const x1 = 40 + Math.cos(rad) * 30;
+                          const y1 = 40 + Math.sin(rad) * 30;
+                          const x2 = 40 + Math.cos(rad) * 36;
+                          const y2 = 40 + Math.sin(rad) * 36;
+                          return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="#CC0000" strokeWidth="2.5" strokeLinecap="round" opacity="0.6"/>;
+                        })}
+                        {/* Rim */}
+                        <circle cx="40" cy="40" r="26" fill={isDark?"#0d0d0d":"#1a1a1a"} stroke="#CC0000" strokeWidth="2.5"/>
+                        {/* Spokes — 5 */}
+                        {[0,72,144,216,288].map((deg, i) => {
+                          const rad = deg * Math.PI / 180;
+                          return <line key={i} x1="40" y1="40" x2={40 + Math.cos(rad) * 20} y2={40 + Math.sin(rad) * 20} stroke="#CC0000" strokeWidth="3" strokeLinecap="round"/>;
+                        })}
+                        {/* Hub */}
+                        <circle cx="40" cy="40" r="8" fill="#CC0000"/>
+                        <circle cx="40" cy="40" r="4" fill={isDark?"#0d0d0d":"#1a1a1a"}/>
+                        {/* Lug nuts */}
+                        {[0,72,144,216,288].map((deg, i) => {
+                          const rad = deg * Math.PI / 180;
+                          return <circle key={i} cx={40 + Math.cos(rad) * 16} cy={40 + Math.sin(rad) * 16} r="2.5" fill="#CC0000" opacity="0.9"/>;
+                        })}
+                      </svg>
+                      {/* Road shadow */}
+                      <div style={{ position:"absolute", bottom:-8, left:"50%", transform:"translateX(-50%)", width:50, height:6, background:"rgba(204,0,0,0.2)", borderRadius:"50%", filter:"blur(4px)" }}/>
+                    </div>
+                    <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:4 }}>
+                      <span style={{ fontFamily:"'Oswald',sans-serif", fontWeight:700, fontSize:13, color: isDark ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.6)", letterSpacing:2, textTransform:"uppercase" }}>{t.loadingMap}</span>
+                      {/* Animated dots */}
+                      <div style={{ display:"flex", gap:5 }}>
+                        {[0,1,2].map(i => (
+                          <div key={i} style={{ width:5, height:5, borderRadius:"50%", background:"#CC0000", animation:`tirePulseGlow 1s ease ${i*0.22}s infinite` }}/>
+                        ))}
+                      </div>
+                    </div>
                   </div>
                 )}
                 <iframe

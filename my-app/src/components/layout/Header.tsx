@@ -33,8 +33,8 @@ const NavLink: React.FC<{ children: React.ReactNode; onClick?: () => void; isLig
       style={{
         color: hov ? "#fff" : (isLight ? "rgba(20,20,20,0.7)" : "rgba(255,255,255,0.65)"),
         background: hov ? "#CC0000" : "transparent",
-        fontSize: 11, fontFamily: "'Barlow', sans-serif", fontWeight: 700, letterSpacing: 1,
-        textTransform: "uppercase", padding: "6px 10px", borderRadius: 4,
+        fontSize: 12.5, fontFamily: "'Barlow', sans-serif", fontWeight: 700, letterSpacing: 1.2,
+        textTransform: "uppercase", padding: "7px 11px", borderRadius: 4,
         transition: "all 0.15s", cursor: "pointer", whiteSpace: "nowrap", display: "inline-block"
       }}
     >{children}</span>

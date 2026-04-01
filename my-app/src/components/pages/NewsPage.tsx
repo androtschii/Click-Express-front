@@ -568,57 +568,57 @@ export const NewsPage: React.FC<NewsPageProps> = ({ theme = "dark", onBack, onVi
                 <div key={article.id} className="ncard"
                   onClick={() => { if (article.load && onLoadDetail) onLoadDetail(article.load); else { setSelectedId(article.id); window.scrollTo({ top: 0, behavior: "smooth" }); } }}
                   style={{ background: isLoad ? (isDark ? "#0e0000" : "#fff8f8") : surface, border: `1px solid ${border}`, borderTop: `3px solid ${article.accentColor}`, overflow: "hidden", position: "relative", animation: `slideUp 0.4s ease ${idx * 0.04}s both` }}>
-                  <div style={{ padding: "22px 24px 20px" }}>
-                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-                      <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: `${article.accentColor}14`, border: `1px solid ${article.accentColor}30`, padding: "3px 10px" }}>
-                        <span style={{ fontSize: 11 }}>{article.icon}</span>
-                        <span style={{ fontFamily: "'Anton', sans-serif", fontSize: 9, letterSpacing: 2.5, color: article.accentColor, textTransform: "uppercase" }}>
+                  <div style={{ padding: "28px 28px 24px" }}>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
+                      <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: `${article.accentColor}14`, border: `1px solid ${article.accentColor}30`, padding: "4px 12px" }}>
+                        <span style={{ fontSize: 12 }}>{article.icon}</span>
+                        <span style={{ fontFamily: "'Anton', sans-serif", fontSize: 10, letterSpacing: 2.5, color: article.accentColor, textTransform: "uppercase" }}>
                           {lang === "ru" ? CATS.find(c => c.key === article.category)?.ru : CATS.find(c => c.key === article.category)?.en}
                         </span>
                       </div>
-                      <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11, color: textSubtle }}>{article.date}</span>
+                      <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: textSubtle }}>{article.date}</span>
                     </div>
                     {isLoad && article.highlightEn && (
-                      <div style={{ fontFamily: "'Anton', sans-serif", fontSize: "clamp(30px,5vw,42px)", color: "#CC0000", lineHeight: 0.88, marginBottom: 8, letterSpacing: -0.5 }}>
+                      <div style={{ fontFamily: "'Anton', sans-serif", fontSize: "clamp(32px,5vw,44px)", color: "#CC0000", lineHeight: 0.9, marginBottom: 12, letterSpacing: -0.5 }}>
                         {lang === "ru" ? article.highlightRu : article.highlightEn}
                       </div>
                     )}
                     {isLoad && ratePerMile && (
-                      <div style={{ display: "inline-flex", alignItems: "center", background: isDark ? "rgba(0,180,80,0.12)" : "rgba(0,180,80,0.08)", border: "1px solid rgba(0,180,80,0.25)", padding: "2px 8px", marginBottom: 10, fontFamily: "'Anton', sans-serif", fontSize: 9, letterSpacing: 2, color: "#00b450", textTransform: "uppercase" }}>
+                      <div style={{ display: "inline-flex", alignItems: "center", background: isDark ? "rgba(0,180,80,0.15)" : "rgba(0,180,80,0.1)", border: "1px solid rgba(0,180,80,0.35)", padding: "4px 10px", marginBottom: 14, fontFamily: "'Anton', sans-serif", fontSize: 10, letterSpacing: 2, color: "#00b450", textTransform: "uppercase" }}>
                         ${ratePerMile}/MI
                       </div>
                     )}
-                    <h3 style={{ fontFamily: "'Anton', sans-serif", fontSize: 17, color: textPrimary, textTransform: "uppercase", lineHeight: 1.2, letterSpacing: 0.3, marginBottom: 10 }}>
+                    <h3 style={{ fontFamily: "'Anton', sans-serif", fontSize: 18, color: textPrimary, textTransform: "uppercase", lineHeight: 1.25, letterSpacing: 0.3, marginBottom: 14 }}>
                       {lang === "ru" ? article.titleRu : article.titleEn}
                     </h3>
-                    <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: textMuted, lineHeight: 1.75, marginBottom: 14, display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical" as const, overflow: "hidden" }}>
+                    <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: isDark ? "rgba(240,237,232,0.72)" : "rgba(13,13,13,0.65)", lineHeight: 1.85, marginBottom: 18, display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical" as const, overflow: "hidden" }}>
                       {lang === "ru" ? article.excerptRu : article.excerptEn}
                     </p>
                     {isLoad && article.load && (
-                      <div style={{ background: isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.04)", border: `1px solid ${border}`, padding: "8px 12px", marginBottom: 14, display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-                        <span style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 700, fontSize: 12, color: textPrimary }}>{article.load.route}</span>
-                        <span style={{ color: "#CC0000" }}>→</span>
-                        <span style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 700, fontSize: 12, color: textPrimary }}>{article.load.dest}</span>
+                      <div style={{ background: isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.05)", border: `1px solid ${isDark ? "rgba(204,0,0,0.25)" : "rgba(204,0,0,0.18)"}`, padding: "10px 14px", marginBottom: 18, display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+                        <span style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 700, fontSize: 13, color: textPrimary }}>{article.load.route}</span>
+                        <span style={{ color: "#CC0000", fontSize: 14 }}>→</span>
+                        <span style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 700, fontSize: 13, color: textPrimary }}>{article.load.dest}</span>
                       </div>
                     )}
                     {article.stops?.slice(0, 2).map((stop, si) => (
-                      <div key={si} style={{ borderLeft: `2px solid ${article.accentColor}50`, padding: "5px 10px", marginBottom: 6, background: isDark ? "rgba(255,255,255,0.02)" : "rgba(0,0,0,0.02)" }}>
+                      <div key={si} style={{ borderLeft: `2px solid ${article.accentColor}60`, padding: "7px 12px", marginBottom: 8, background: isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.03)" }}>
                         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                          <span style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 700, fontSize: 12, color: textPrimary }}>{stop.name}</span>
+                          <span style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 700, fontSize: 13, color: textPrimary }}>{stop.name}</span>
                           <StarRating n={stop.rating} />
                         </div>
                       </div>
                     ))}
                     {article.stops && article.stops.length > 2 && (
-                      <div style={{ fontFamily: "'Anton', sans-serif", fontSize: 9, letterSpacing: 2, color: article.accentColor, textTransform: "uppercase", marginBottom: 10 }}>
+                      <div style={{ fontFamily: "'Anton', sans-serif", fontSize: 10, letterSpacing: 2, color: article.accentColor, textTransform: "uppercase", marginBottom: 12 }}>
                         +{article.stops.length - 2} {lang === "ru" ? "ЕЩЁ" : "MORE"}
                       </div>
                     )}
-                    <div style={{ borderTop: `1px solid ${border}`, paddingTop: 12, marginTop: 4, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                      <span style={{ fontFamily: "'Anton', sans-serif", fontSize: 10, letterSpacing: 2.5, color: article.accentColor, textTransform: "uppercase" }}>
+                    <div style={{ borderTop: `1px solid ${border}`, paddingTop: 14, marginTop: 8, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                      <span style={{ fontFamily: "'Anton', sans-serif", fontSize: 11, letterSpacing: 2.5, color: article.accentColor, textTransform: "uppercase" }}>
                         {lang === "ru" ? "ПОДРОБНЕЕ →" : "READ MORE →"}
                       </span>
-                      <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11, color: textSubtle }}>{article.readTime} {lang === "ru" ? "мин" : "min"}</span>
+                      <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: textSubtle }}>{article.readTime} {lang === "ru" ? "мин" : "min"}</span>
                     </div>
                   </div>
                 </div>

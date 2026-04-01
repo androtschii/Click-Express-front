@@ -22,11 +22,12 @@ interface LoadListProps {
   onDetails?: (load: Load) => void;
   bookedIds?: number[];
   savedIds?: number[];
+  onFleetClick?: () => void;
 }
 
 export const LoadListView: React.FC<LoadListProps> = ({
   loads, loading, error, search, filter,
-theme = 'dark', onSearchChange, onFilterChange, onBook, onCancelBook, onSave, onDetails, bookedIds = [], savedIds = [],
+theme = 'dark', onSearchChange, onFilterChange, onBook, onCancelBook, onSave, onDetails, bookedIds = [], savedIds = [], onFleetClick,
 }) => {
   const isDark = theme === 'dark';
   const { lang } = useLanguage();
@@ -63,6 +64,13 @@ theme = 'dark', onSearchChange, onFilterChange, onBook, onCancelBook, onSave, on
         <div style={{ background: "rgba(204,0,0,0.08)", border: "1px solid rgba(204,0,0,0.22)", borderRadius: 4, padding: "7px 16px", fontFamily: "'Barlow',sans-serif", fontWeight: 600, fontSize: 12, color: "#CC0000", letterSpacing: 1 }}>
           📋 {loads.length} {loads.length !== 1 ? t.loadList.loads : t.loadList.load} — {t.loadList.available}
         </div>
+        {onFleetClick && (
+          <div onClick={onFleetClick} style={{ background: isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.04)", border: `1px solid ${isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.14)"}`, borderRadius: 4, padding: "7px 16px", fontFamily: "'Barlow',sans-serif", fontWeight: 600, fontSize: 12, color: isDark ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.5)", letterSpacing: 1, cursor: "pointer", transition: "all 0.15s", display: "flex", alignItems: "center", gap: 6 }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = "#CC0000"; e.currentTarget.style.color = "#CC0000"; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.14)"; e.currentTarget.style.color = isDark ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.5)"; }}>
+            🚛 {lang === "ru" ? "НАШ ФЛОТ →" : "OUR FLEET →"}
+          </div>
+        )}
       </div>
 
       {loads.length === 0 ? (

@@ -19,6 +19,7 @@ import { OrdersPage } from "./components/pages/OrdersPage";
 import { TrackingPage } from "./components/pages/TrackingPage";
 import { NewsPage } from "./components/pages/NewsPage";
 import { ReviewsPage } from "./components/pages/ReviewsPage";
+import { FleetPage } from "./components/pages/FleetPage";
 import { Notification } from "./components/ui/Notification";
 import { ChatBot } from "./components/ui/ChatBot";
 import { PhoneIcon } from "./components/ui/PhoneIcon";
@@ -238,6 +239,7 @@ function AppContent() {
   const [showReviews, setShowReviews] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [showOrders, setShowOrders] = useState(false);
+  const [showFleet, setShowFleet] = useState(false);
   const [trackLoad, setTrackLoad] = useState<Load | null>(null);
   const [notifications, setNotifications] = useState<string[]>([]);
 
@@ -315,13 +317,14 @@ function AppContent() {
       onQuoteClick={() => setShowQuote(true)}
       onCareersClick={() => { setDetailLoad(null); setShowCareers(true); setShowNews(false); setShowReviews(false); setShowProfile(false); setShowOrders(false); window.scrollTo({ top: 0, behavior: "smooth" }); }}
       onNewsClick={() => { setDetailLoad(null); setShowNews(true); setShowCareers(false); setShowReviews(false); setShowProfile(false); setShowOrders(false); window.scrollTo({ top: 0, behavior: "smooth" }); }}
-      onReviewsClick={() => { setDetailLoad(null); setShowReviews(true); setShowNews(false); setShowCareers(false); setShowProfile(false); setShowOrders(false); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+      onReviewsClick={() => { setDetailLoad(null); setShowReviews(true); setShowNews(false); setShowCareers(false); setShowFleet(false); setShowProfile(false); setShowOrders(false); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+      onFleetClick={() => { setDetailLoad(null); setShowFleet(true); setShowCareers(false); setShowNews(false); setShowReviews(false); setShowProfile(false); setShowOrders(false); window.scrollTo({ top: 0, behavior: "smooth" }); }}
       onSavedClick={() => setShowFavorites(true)}
       onRequestsClick={() => setShowRequests(true)}
       onLoginClick={() => setShowAuth(true)}
       session={session}
       onLogout={() => { logout(); setSession(null); setShowProfile(false); setShowOrders(false); }}
-      onLogoClick={() => { setDetailLoad(null); setShowCareers(false); setShowNews(false); setShowReviews(false); setShowProfile(false); setShowOrders(false); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+      onLogoClick={() => { setDetailLoad(null); setShowCareers(false); setShowNews(false); setShowReviews(false); setShowFleet(false); setShowProfile(false); setShowOrders(false); window.scrollTo({ top: 0, behavior: "smooth" }); }}
       onProfileClick={() => { setDetailLoad(null); setShowCareers(false); setShowNews(false); setShowReviews(false); setShowOrders(false); setShowProfile(true); window.scrollTo({ top: 0, behavior: "smooth" }); }}
       onOrdersClick={() => { setDetailLoad(null); setShowCareers(false); setShowNews(false); setShowReviews(false); setShowProfile(false); setShowOrders(true); window.scrollTo({ top: 0, behavior: "smooth" }); }}
     />
@@ -331,6 +334,23 @@ function AppContent() {
     <>
       {showFavorites && <FavoritesPanel loads={savedLoads} theme={theme} onClose={() => setShowFavorites(false)} onDetails={(l) => { setShowFavorites(false); setDetailLoad(l); window.scrollTo({ top: 0 }); }} onRemove={(l) => { handleSave(l, false); notify(tn.removedFromFavorites); }} />}
       {showRequests && <RequestsPanel loads={bookedLoads} theme={theme} onClose={() => setShowRequests(false)} onDetails={(l) => { setShowRequests(false); setDetailLoad(l); window.scrollTo({ top: 0 }); }} onCancel={(l) => handleCancelBook(l)} onBrowseLoads={() => { setShowRequests(false); setTimeout(() => scrollTo(catalogRef), 80); }} />}
+      {/* Apply Now floating button — visible on all pages */}
+      <div style={{ position: "fixed", bottom: 28, left: 28, zIndex: 1500 }}>
+        <style>{`
+          @keyframes applyPulse { 0%,100%{box-shadow:0 0 0 0 rgba(204,0,0,0.5),0 8px 28px rgba(204,0,0,0.4)} 50%{box-shadow:0 0 0 10px rgba(204,0,0,0),0 8px 28px rgba(204,0,0,0.4)} }
+        `}</style>
+        <button
+          onClick={() => { setShowCareers(true); setDetailLoad(null); setShowNews(false); setShowReviews(false); setShowFleet(false); setShowProfile(false); setShowOrders(false); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+          style={{ display: "flex", alignItems: "center", gap: 10, background: "linear-gradient(135deg,#CC0000,#ff3333)", color: "#fff", border: "none", borderRadius: 40, padding: "12px 22px 12px 16px", fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 13, letterSpacing: 1.5, textTransform: "uppercase", cursor: "pointer", animation: "applyPulse 2.5s ease infinite", whiteSpace: "nowrap" }}
+          onMouseEnter={e => { e.currentTarget.style.animation = "none"; e.currentTarget.style.transform = "translateY(-3px) scale(1.04)"; e.currentTarget.style.boxShadow = "0 14px 36px rgba(204,0,0,0.6)"; }}
+          onMouseLeave={e => { e.currentTarget.style.animation = "applyPulse 2.5s ease infinite"; e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = ""; }}
+        >
+          <svg width="18" height="18" viewBox="0 0 256 256" fill="white">
+            <path d="M216,40H40A16,16,0,0,0,24,56V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40ZM112,168H72a8,8,0,0,1,0-16h40a8,8,0,0,1,0,16Zm72-40H72a8,8,0,0,1,0-16H184a8,8,0,0,1,0,16Zm0-40H72a8,8,0,0,1,0-16H184a8,8,0,0,1,0,16Z"/>
+          </svg>
+          {lang === "ru" ? "ВАКАНСИИ" : "APPLY NOW"}
+        </button>
+      </div>
     </>
   );
 
@@ -457,6 +477,22 @@ function AppContent() {
     );
   }
 
+  // ── Fleet page ────────────────────────────────────────────────────────
+  if (showFleet) {
+    return (
+      <div style={{ background: bgColor, minHeight: "100vh", color: textColor }}>
+        {sharedStyle}
+        {sharedHeader}
+        <div style={{ paddingTop: 70 }}>
+          <FleetPage theme={theme} onBack={() => { setShowFleet(false); window.scrollTo({ top: 0 }); }} />
+        </div>
+        {showAuth && <AuthModal onClose={() => setShowAuth(false)} theme={theme} onSuccess={(s) => { setSession(s); setShowAuth(false); }} />}
+        {showQuote && <QuoteModal onClose={() => setShowQuote(false)} theme={theme} />}
+        {sharedPanels}
+      </div>
+    );
+  }
+
   // ── Orders page ────────────────────────────────────────────────────────
   if (showOrders) {
     return (
@@ -492,9 +528,6 @@ function AppContent() {
       <Hero onViewLoads={() => scrollTo(catalogRef)} onQuoteClick={() => setShowQuote(true)} />
       <Ticker />
       <TrustStrip theme={theme} />
-      <div ref={aboutRef}>
-        <AboutSection onContactClick={() => scrollTo(contactRef)} theme={theme} />
-      </div>
 
       {/* ── WEEKLY BEST CAROUSEL ─────────────────────────────────────────── */}
       {!loading && (() => {
@@ -684,13 +717,18 @@ function AppContent() {
           onCancelBook={(load?: Load) => handleCancelBook(load)}
           onSave={(saved: boolean, load?: Load) => { if (load) handleSave(load, saved); }}
           onDetails={(load: Load) => { setDetailLoad(load); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+          onFleetClick={() => { setShowFleet(true); window.scrollTo({ top: 0, behavior: "smooth" }); }}
           bookedIds={bookedLoads.map(l => l.id)}
           savedIds={savedLoads.map(l => l.id)}
         />
       </section>
 
+      <div ref={aboutRef}>
+        <AboutSection onContactClick={() => scrollTo(contactRef)} theme={theme} />
+      </div>
+
       <div ref={contactRef}>
-        <Footer theme={theme} onCatalogClick={() => scrollTo(catalogRef)} onAboutClick={() => scrollTo(aboutRef)} onQuoteClick={() => setShowQuote(true)} onContactClick={() => scrollTo(contactRef)} onCareersClick={() => { setShowCareers(true); window.scrollTo({ top: 0, behavior: "smooth" }); }} />
+        <Footer theme={theme} onCatalogClick={() => scrollTo(catalogRef)} onAboutClick={() => scrollTo(aboutRef)} onQuoteClick={() => setShowQuote(true)} onContactClick={() => scrollTo(contactRef)} onCareersClick={() => { setShowCareers(true); window.scrollTo({ top: 0, behavior: "smooth" }); }} onFleetClick={() => { setShowFleet(true); window.scrollTo({ top: 0, behavior: "smooth" }); }} />
       </div>
 
       {showAuth && <AuthModal onClose={() => setShowAuth(false)} theme={theme} onSuccess={(s) => { setSession(s); setShowAuth(false); }} />}

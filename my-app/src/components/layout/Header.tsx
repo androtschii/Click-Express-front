@@ -16,6 +16,7 @@ interface HeaderProps {
   onCareersClick?: () => void;
   onNewsClick?: () => void;
   onReviewsClick?: () => void;
+  onFleetClick?: () => void;
   onSavedClick?: () => void;
   onRequestsClick?: () => void;
   onLoginClick?: () => void;
@@ -33,8 +34,8 @@ const NavLink: React.FC<{ children: React.ReactNode; onClick?: () => void; isLig
       style={{
         color: hov ? "#fff" : (isLight ? "rgba(20,20,20,0.7)" : "rgba(255,255,255,0.65)"),
         background: hov ? "#CC0000" : "transparent",
-        fontSize: 12.5, fontFamily: "'Barlow', sans-serif", fontWeight: 700, letterSpacing: 1.2,
-        textTransform: "uppercase", padding: "7px 11px", borderRadius: 4,
+        fontSize: 11, fontFamily: "'Barlow', sans-serif", fontWeight: 700, letterSpacing: 0.8,
+        textTransform: "uppercase", padding: "6px 8px", borderRadius: 4,
         transition: "all 0.15s", cursor: "pointer", whiteSpace: "nowrap", display: "inline-block"
       }}
     >{children}</span>
@@ -44,8 +45,8 @@ const NavLink: React.FC<{ children: React.ReactNode; onClick?: () => void; isLig
 const PhoneLink: React.FC<{ isLight?: boolean }> = ({ isLight }) => {
   const [hov, setHov] = useState(false);
   return (
-    <a href="tel:+17862026599" onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
-      style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none", flexShrink: 0, whiteSpace: "nowrap", transition: "all 0.2s" }}
+    <a href="tel:+17862026599" title="+1 786-202-6599" onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
+      style={{ display: "flex", alignItems: "center", textDecoration: "none", flexShrink: 0, transition: "all 0.2s" }}
     >
       <div style={{
         width: 32, height: 32, borderRadius: "50%",
@@ -59,16 +60,13 @@ const PhoneLink: React.FC<{ isLight?: boolean }> = ({ isLight }) => {
           <path d="M222.37,158.46l-47.11-21.11-.13-.06a16,16,0,0,0-15.17,1.4,8.12,8.12,0,0,0-.75.56L134.87,160c-15.42-7.49-31.34-23.29-38.83-38.51l20.78-24.71c.2-.25.39-.5.57-.77a16,16,0,0,0,1.32-15.06l0-.12L97.54,33.64a16,16,0,0,0-16.62-9.52A56.26,56.26,0,0,0,32,80c0,79.4,64.6,144,144,144a56.26,56.26,0,0,0,55.88-48.92A16,16,0,0,0,222.37,158.46ZM176,208A128.14,128.14,0,0,1,48,80,40.2,40.2,0,0,1,82.87,40a.61.61,0,0,0,0,.12l21,47L83.2,111.86a6.13,6.13,0,0,0-.57.77,16,16,0,0,0-1,15.7c9.06,18.53,27.73,37.06,46.46,46.11a16,16,0,0,0,15.75-1.14,8.44,8.44,0,0,0,.74-.56L168.89,152l47,21.05h0s.08,0,.11,0A40.21,40.21,0,0,1,176,208Z"/>
         </svg>
       </div>
-      <span style={{ color: hov ? "#CC0000" : (isLight ? "rgba(20,20,20,0.75)" : "rgba(255,255,255,0.6)"), fontSize: 13, fontFamily: "'Barlow',sans-serif", fontWeight: 600, transition: "color 0.2s" }}>
-        +1 786-202-6599
-      </span>
     </a>
   );
 };
 
 export const Header: React.FC<HeaderProps> = ({
   cartCount, savedCount = 0, theme = 'dark', onThemeToggle,
-  onCatalogClick, onAboutClick, onContactClick, onQuoteClick, onCareersClick, onNewsClick, onReviewsClick, onSavedClick, onRequestsClick, onLoginClick,
+  onCatalogClick, onAboutClick, onContactClick, onQuoteClick, onCareersClick, onNewsClick, onReviewsClick, onFleetClick, onSavedClick, onRequestsClick, onLoginClick,
   session, onLogout, onLogoClick, onProfileClick, onOrdersClick,
 }) => {
   const [scrolled, setScrolled] = useState(false);
@@ -107,7 +105,7 @@ export const Header: React.FC<HeaderProps> = ({
         ? (scrolled ? "0 4px 24px rgba(0,0,0,0.1)" : "0 2px 12px rgba(0,0,0,0.06)")
         : "none",
       transition: "background 0.3s, border 0.3s, box-shadow 0.3s",
-      display: "flex", alignItems: "center", padding: "0 20px", gap: 14,
+      display: "flex", alignItems: "center", padding: "0 16px", gap: 8,
     }}>
       {/* Red glow line at top */}
       <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: "linear-gradient(90deg,transparent 0%,#CC0000 30%,#ff3333 60%,#CC0000 80%,transparent 100%)", opacity: isLight ? 1 : (scrolled ? 1 : 0.6), transition: "opacity 0.3s" }} />
@@ -125,7 +123,7 @@ export const Header: React.FC<HeaderProps> = ({
           <div style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 19, color: isLight ? "#1a1a1a" : "#fff", letterSpacing: 1, textTransform: "uppercase" }}>
             <span style={{ color: "#CC0000" }}>CLICK</span> EXPRESS
           </div>
-          <div style={{ fontSize: 8, color: isLight ? "rgba(0,0,0,0.4)" : "rgba(255,255,255,0.38)", fontFamily: "'Barlow',sans-serif", letterSpacing: 2.5, textTransform: "uppercase", marginTop: 2 }}>
+          <div style={{ fontSize: 7.5, color: isLight ? "rgba(0,0,0,0.35)" : "rgba(255,255,255,0.3)", fontFamily: "'Barlow',sans-serif", letterSpacing: 2, textTransform: "uppercase", marginTop: 1 }}>
             Inc · Heavy Freight
           </div>
         </div>
@@ -141,6 +139,7 @@ export const Header: React.FC<HeaderProps> = ({
         <NavLink onClick={onCareersClick} isLight={isLight}>{t.nav.careers}</NavLink>
         <NavLink onClick={onNewsClick} isLight={isLight}>{t.nav.news}</NavLink>
         <NavLink onClick={onReviewsClick} isLight={isLight}>{t.nav.reviews}</NavLink>
+        <NavLink onClick={onFleetClick} isLight={isLight}>{t.nav.fleet}</NavLink>
       </nav>
 
       <PhoneLink isLight={isLight} />

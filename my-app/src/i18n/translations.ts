@@ -8,6 +8,7 @@ export const translations = {
       careers: "Careers",
       news: "News",
       reviews: "Reviews",
+      fleet: "Our Fleet",
     },
     header: {
       login: "LOGIN",
@@ -208,6 +209,7 @@ export const translations = {
       careers: "Вакансии",
       news: "Новости",
       reviews: "Отзывы",
+      fleet: "Наш Флот",
     },
     header: {
       login: "ВОЙТИ",

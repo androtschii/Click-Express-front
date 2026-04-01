@@ -11,6 +11,7 @@ interface FooterProps {
   onQuoteClick?: () => void;
   onContactClick?: () => void;
   onCareersClick?: () => void;
+  onFleetClick?: () => void;
 }
 
 const FooterLink: React.FC<{
@@ -53,6 +54,7 @@ export const Footer: React.FC<FooterProps> = ({
   onQuoteClick,
   onContactClick,
   onCareersClick,
+  onFleetClick,
 }) => {
   const { lang } = useLanguage();
   const t = translations[lang].footer;
@@ -144,7 +146,7 @@ export const Footer: React.FC<FooterProps> = ({
               </div>
               {[
                 { label: t.companyItems[0], onClick: onAboutClick },
-                { label: t.companyItems[1], onClick: onAboutClick },
+                { label: t.companyItems[1], onClick: onFleetClick },
                 { label: t.companyItems[2], onClick: onAboutClick },
                 { label: t.companyItems[3], onClick: onCareersClick },
                 { label: t.companyItems[4], onClick: onContactClick },

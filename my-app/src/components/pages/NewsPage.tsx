@@ -313,7 +313,10 @@ export const NewsPage: React.FC<NewsPageProps> = ({ theme = "dark", onBack, onVi
         @keyframes pulse   { 0%,100%{opacity:1} 50%{opacity:0.35} }
         .ncard { transition: all 0.2s cubic-bezier(0.22,1,0.36,1) !important; cursor:pointer; }
         .ncard:hover { transform:translateY(-4px) !important; box-shadow:0 20px 60px rgba(0,0,0,0.28) !important; }
-        .catbtn { transition: all 0.15s ease !important; }
+        .catbtn { transition: all 0.15s ease !important; position: relative; }
+        .catbtn::after { content:''; position:absolute; bottom:0; left:50%; right:50%; height:3px; background:currentColor; opacity:0; transition: left 0.18s ease, right 0.18s ease, opacity 0.18s ease; }
+        .catbtn:hover::after { left:12%; right:12%; opacity:0.45; }
+        .catbtn:hover { background: rgba(204,0,0,0.07) !important; text-shadow: 0 0 18px rgba(204,0,0,0.55); }
         .backbtn { transition: color 0.15s !important; }
         .backbtn:hover { color:#CC0000 !important; }
         .ctabtn { transition: all 0.18s ease !important; }
@@ -351,7 +354,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({ theme = "dark", onBack, onVi
                   {lang === "ru" ? article.highlightRu : article.highlightEn}
                 </div>
               )}
-              <h1 style={{ fontFamily: "'Anton', sans-serif", fontSize: "clamp(26px,5vw,44px)", color: textPrimary, textTransform: "uppercase", lineHeight: 1.05, letterSpacing: 0.5, marginBottom: 24, marginTop: article.category === "loads" ? 12 : 0 }}>
+              <h1 style={{ fontFamily: "'Oswald', sans-serif", fontWeight: 700, fontSize: "clamp(26px,5vw,44px)", color: textPrimary, textTransform: "uppercase", lineHeight: 1.2, letterSpacing: 0.5, marginBottom: 24, marginTop: article.category === "loads" ? 14 : 0 }}>
                 {lang === "ru" ? article.titleRu : article.titleEn}
               </h1>
               <div style={{ height: 2, background: `linear-gradient(90deg, ${article.accentColor}, transparent)`, marginBottom: 32 }} />
@@ -461,9 +464,8 @@ export const NewsPage: React.FC<NewsPageProps> = ({ theme = "dark", onBack, onVi
                 <div style={{ fontFamily: "'Anton', sans-serif", fontSize: 9, letterSpacing: 6, color: "#CC0000", textTransform: "uppercase", marginBottom: 18 }}>
                   {lang === "ru" ? "ОФИЦИАЛЬНЫЕ НОВОСТИ КОМПАНИИ" : "OFFICIAL COMPANY DISPATCH"}
                 </div>
-                <h1 style={{ fontFamily: "'Anton', sans-serif", fontSize: "clamp(56px,8vw,110px)", textTransform: "uppercase", lineHeight: 0.9, letterSpacing: -1, color: textPrimary, margin: "0 0 28px", whiteSpace: "nowrap" }}>
-                  <span style={{ color: "#CC0000" }}>CLICK</span><br />
-                  EXPRESS<br />
+                <h1 style={{ fontFamily: "'Anton', sans-serif", fontSize: "clamp(52px,7.5vw,104px)", textTransform: "uppercase", lineHeight: 1.05, letterSpacing: -1, color: textPrimary, margin: "0 0 32px" }}>
+                  <span style={{ color: "#CC0000" }}>CLICK</span>{" "}EXPRESS<br />
                   <span style={{ color: "#CC0000" }}>{lang === "ru" ? "НОВОСТИ" : "DISPATCH"}</span>
                 </h1>
                 <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 15, color: textMuted, lineHeight: 1.8, maxWidth: 420, margin: "0 0 36px" }}>
@@ -529,7 +531,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({ theme = "dark", onBack, onVi
                     {lang === "ru" ? featured.highlightRu : featured.highlightEn}
                   </div>
                 )}
-                <h2 style={{ fontFamily: "'Anton', sans-serif", fontSize: "clamp(20px,2.5vw,28px)", color: textPrimary, textTransform: "uppercase", lineHeight: 1.1, marginBottom: 16, letterSpacing: 0.5 }}>
+                <h2 style={{ fontFamily: "'Oswald', sans-serif", fontWeight: 600, fontSize: "clamp(20px,2.5vw,30px)", color: textPrimary, textTransform: "uppercase", lineHeight: 1.25, marginBottom: 18, letterSpacing: 0.5 }}>
                   {lang === "ru" ? featured.titleRu : featured.titleEn}
                 </h2>
                 <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: textMuted, lineHeight: 1.8, marginBottom: 24, maxWidth: 420 }}>
@@ -588,7 +590,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({ theme = "dark", onBack, onVi
                         ${ratePerMile}/MI
                       </div>
                     )}
-                    <h3 style={{ fontFamily: "'Anton', sans-serif", fontSize: 18, color: textPrimary, textTransform: "uppercase", lineHeight: 1.25, letterSpacing: 0.3, marginBottom: 14 }}>
+                    <h3 style={{ fontFamily: "'Oswald', sans-serif", fontWeight: 600, fontSize: 17, color: textPrimary, textTransform: "uppercase", lineHeight: 1.35, letterSpacing: 0.5, marginBottom: 14 }}>
                       {lang === "ru" ? article.titleRu : article.titleEn}
                     </h3>
                     <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: isDark ? "rgba(240,237,232,0.72)" : "rgba(13,13,13,0.65)", lineHeight: 1.85, marginBottom: 18, display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical" as const, overflow: "hidden" }}>

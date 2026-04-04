@@ -26,6 +26,7 @@ import { PhoneIcon } from "./components/ui/PhoneIcon";
 import { LOADS } from "./utils/data";
 import type { Load } from "./types/index";
 import { filterLoads, fetchLoads } from "./services/loadService.ts";
+import { fetchUsers, healthCheck, type ApiUser } from "./services/userService";
 
 // ── Анимированное сердечко для секции "Лучшие грузы недели" ──────────────
 function WeeklyHeartBtn({ saved, onClick }: { saved: boolean; onClick: () => void }) {
@@ -235,6 +236,9 @@ function AppContent() {
   const [session, setSession] = useState<Session | null>(() => getSession());
   const [detailLoad, setDetailLoad] = useState<Load | null>(null);
   const [showCareers, setShowCareers] = useState(false);
+  const [backendUsers, setBackendUsers] = useState<ApiUser[]>([]);
+  const [apiHealthy, setApiHealthy] = useState<boolean | null>(null);
+  const [apiError, setApiError] = useState<string | null>(null);
   const [showNews, setShowNews] = useState(false);
   const [showReviews, setShowReviews] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
@@ -265,6 +269,22 @@ function AppContent() {
       }
     };
     run();
+  }, []);
+
+  useEffect(() => {
+    const checkBackend = async () => {
+      try {
+        await healthCheck();
+        const users = await fetchUsers();
+        setBackendUsers(users);
+        setApiHealthy(true);
+        setApiError(null);
+      } catch (err) {
+        setApiHealthy(false);
+        setApiError((err as Error).message);
+      }
+    };
+    checkBackend();
   }, []);
 
   const filtered = filterLoads(loads, search, filter);
@@ -305,29 +325,58 @@ function AppContent() {
     `}</style>
   );
 
+  const apiStatusBanner = (
+    <div style={{
+      position: "fixed",
+      top: 70,
+      right: 20,
+      zIndex: 1400,
+      background: theme === "dark" ? "rgba(10,10,10,0.92)" : "rgba(255,255,255,0.96)",
+      border: "1px solid " + (theme === "dark" ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.12)"),
+      color: theme === "dark" ? "#fff" : "#1a1a1a",
+      borderRadius: 18,
+      padding: "10px 16px",
+      fontFamily: "'Barlow',sans-serif",
+      fontSize: 12,
+      fontWeight: 600,
+      boxShadow: "0 16px 40px rgba(0,0,0,0.12)",
+      minWidth: 220,
+      pointerEvents: "none",
+    }}>
+      {apiHealthy === null
+        ? "API: проверка..."
+        : apiHealthy
+        ? `API online · ${backendUsers.length} users loaded`
+        : `API offline · ${apiError ?? "Ошибка соединения"}`}
+    </div>
+  );
+
   const sharedHeader = (
-    <Header
-      cartCount={bookedLoads.length}
-      savedCount={savedLoads.length}
-      theme={theme}
-      onThemeToggle={toggleTheme}
-      onCatalogClick={() => { setDetailLoad(null); setShowCareers(false); setShowNews(false); setShowReviews(false); setTimeout(() => scrollTo(catalogRef), 50); }}
-      onAboutClick={() => { setDetailLoad(null); setShowCareers(false); setShowNews(false); setShowReviews(false); setTimeout(() => scrollTo(aboutRef), 50); }}
-      onContactClick={() => { setDetailLoad(null); setShowCareers(false); setShowNews(false); setShowReviews(false); setTimeout(() => scrollTo(contactRef), 50); }}
-      onQuoteClick={() => setShowQuote(true)}
-      onCareersClick={() => { setDetailLoad(null); setShowCareers(true); setShowNews(false); setShowReviews(false); setShowProfile(false); setShowOrders(false); window.scrollTo({ top: 0, behavior: "smooth" }); }}
-      onNewsClick={() => { setDetailLoad(null); setShowNews(true); setShowCareers(false); setShowReviews(false); setShowProfile(false); setShowOrders(false); window.scrollTo({ top: 0, behavior: "smooth" }); }}
-      onReviewsClick={() => { setDetailLoad(null); setShowReviews(true); setShowNews(false); setShowCareers(false); setShowFleet(false); setShowProfile(false); setShowOrders(false); window.scrollTo({ top: 0, behavior: "smooth" }); }}
-      onFleetClick={() => { setDetailLoad(null); setShowFleet(true); setShowCareers(false); setShowNews(false); setShowReviews(false); setShowProfile(false); setShowOrders(false); window.scrollTo({ top: 0, behavior: "smooth" }); }}
-      onSavedClick={() => setShowFavorites(true)}
-      onRequestsClick={() => setShowRequests(true)}
-      onLoginClick={() => setShowAuth(true)}
-      session={session}
-      onLogout={() => { logout(); setSession(null); setShowProfile(false); setShowOrders(false); }}
-      onLogoClick={() => { setDetailLoad(null); setShowCareers(false); setShowNews(false); setShowReviews(false); setShowFleet(false); setShowProfile(false); setShowOrders(false); window.scrollTo({ top: 0, behavior: "smooth" }); }}
-      onProfileClick={() => { setDetailLoad(null); setShowCareers(false); setShowNews(false); setShowReviews(false); setShowOrders(false); setShowProfile(true); window.scrollTo({ top: 0, behavior: "smooth" }); }}
-      onOrdersClick={() => { setDetailLoad(null); setShowCareers(false); setShowNews(false); setShowReviews(false); setShowProfile(false); setShowOrders(true); window.scrollTo({ top: 0, behavior: "smooth" }); }}
-    />
+    <>
+      <Header
+        cartCount={bookedLoads.length}
+        savedCount={savedLoads.length}
+        theme={theme}
+        onThemeToggle={toggleTheme}
+        onCatalogClick={() => { setDetailLoad(null); setShowCareers(false); setShowNews(false); setShowReviews(false); setTimeout(() => scrollTo(catalogRef), 50); }}
+        onAboutClick={() => { setDetailLoad(null); setShowCareers(false); setShowNews(false); setShowReviews(false); setTimeout(() => scrollTo(aboutRef), 50); }}
+        onContactClick={() => { setDetailLoad(null); setShowCareers(false); setShowNews(false); setShowReviews(false); setTimeout(() => scrollTo(contactRef), 50); }}
+        onQuoteClick={() => setShowQuote(true)}
+        onCareersClick={() => { setDetailLoad(null); setShowCareers(true); setShowNews(false); setShowReviews(false); setShowProfile(false); setShowOrders(false); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+        onNewsClick={() => { setDetailLoad(null); setShowNews(true); setShowCareers(false); setShowReviews(false); setShowProfile(false); setShowOrders(false); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+        onReviewsClick={() => { setDetailLoad(null); setShowReviews(true); setShowNews(false); setShowCareers(false); setShowFleet(false); setShowProfile(false); setShowOrders(false); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+        onFleetClick={() => { setDetailLoad(null); setShowFleet(true); setShowCareers(false); setShowNews(false); setShowReviews(false); setShowProfile(false); setShowOrders(false); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+        onSavedClick={() => setShowFavorites(true)}
+        onRequestsClick={() => setShowRequests(true)}
+        onLoginClick={() => setShowAuth(true)}
+        session={session}
+        onLogout={() => { logout(); setSession(null); setShowProfile(false); setShowOrders(false); }}
+        onLogoClick={() => { setDetailLoad(null); setShowCareers(false); setShowNews(false); setShowReviews(false); setShowFleet(false); setShowProfile(false); setShowOrders(false); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+        onProfileClick={() => { setDetailLoad(null); setShowCareers(false); setShowNews(false); setShowReviews(false); setShowOrders(false); setShowProfile(true); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+        onOrdersClick={() => { setDetailLoad(null); setShowCareers(false); setShowNews(false); setShowReviews(false); setShowProfile(false); setShowOrders(true); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+      />
+      {apiStatusBanner}
+    </>
   );
 
   const sharedPanels = (

@@ -94,29 +94,48 @@ export function register(
   return { ok: true, user };
 }
 
-export function login(
-  email: string,
+export async function login(
+  username: string,
   password: string
-): { ok: boolean; error?: string; user?: User } {
-  if (!email.trim()) return { ok: false, error: "Email is required" };
+): Promise<{ ok: boolean; error?: string; user?: User }> {
+  if (!username.trim()) return { ok: false, error: "Username is required" };
   if (!password) return { ok: false, error: "Password is required" };
 
-  const users = getUsers();
-  const user = users.find(
-    (u) => u.email.toLowerCase() === email.toLowerCase().trim()
-  );
-  if (!user) {
-    return { ok: false, error: "No account found. Please register first." };
-  }
-  if (user.provider === "google") {
-    return { ok: false, error: "This account uses Google Sign-In." };
-  }
-  if (user.password !== password) {
-    return { ok: false, error: "Incorrect password." };
-  }
+  try {
+    const response = await fetch("http://localhost:5000/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password }),
+    });
 
-  createSession(user);
-  return { ok: true, user };
+    if (!response.ok) {
+      return { ok: false, error: "Неверный логин или пароль" };
+    }
+
+    const data = await response.json();
+
+    // Сохраняем сессию с JWT токеном от бэкенда
+    const session: Session = {
+      userId: data.username,
+      email: data.username,
+      name: data.username,
+      token: data.token,
+    };
+    localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+    setCookie(COOKIE_NAME, data.token, 1);
+
+    const fakeUser: User = {
+      id: data.username,
+      name: data.username,
+      email: data.username,
+      password: "",
+      createdAt: new Date().toISOString(),
+      provider: "local",
+    };
+    return { ok: true, user: fakeUser };
+  } catch {
+    return { ok: false, error: "Ошибка подключения к серверу" };
+  }
 }
 
 export function loginWithGoogle(): Promise<{

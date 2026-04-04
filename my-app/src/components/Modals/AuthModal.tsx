@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   login,
   register,
@@ -33,6 +33,16 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   onSuccess,
 }) => {
   const dark = theme === "dark";
+
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = ""; };
+  }, []);
+
+  const handleClose = () => {
+    document.body.style.overflow = "";
+    onClose();
+  };
   const [isLogin, setIsLogin] = useState(true);
   const [sliding, setSliding] = useState(false);
 
@@ -58,9 +68,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const handleSubmit = async () => {
     setError("");
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 300)); // small delay for UX
+    await new Promise((r) => setTimeout(r, 300));
     const result = isLogin
-      ? login(email, password)
+      ? await login(email, password)
       : register(name, email, password);
     setLoading(false);
     if (!result.ok) {
@@ -72,6 +82,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     // notify parent after short celebration
     setTimeout(() => {
       const session = getSession();
+      document.body.style.overflow = "";
       if (session && onSuccess) onSuccess(session);
       onClose();
     }, 1800);
@@ -90,6 +101,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     setDone(true);
     setTimeout(() => {
       const session = getSession();
+      document.body.style.overflow = "";
       if (session && onSuccess) onSuccess(session);
       onClose();
     }, 1800);
@@ -110,7 +122,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         justifyContent: "center",
         padding: 20,
       }}
-      onClick={onClose}
+      onClick={handleClose}
     >
       <style>{`
         @keyframes modalIn {
@@ -336,7 +348,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
         {/* Close button */}
         <button
-          onClick={onClose}
+          onClick={handleClose}
           style={{
             position: "absolute",
             top: 14,
@@ -490,8 +502,8 @@ const FormContent: React.FC<FormContentProps> = ({
           dark={dark}
           value={email}
           onChange={setEmail}
-          placeholder="Email"
-          type="email"
+          placeholder={isLogin ? "Username" : "Email"}
+          type={isLogin ? "text" : "email"}
           icon="email"
         />
         <InputField

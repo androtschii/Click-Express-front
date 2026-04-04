@@ -1,11 +1,8 @@
-import React, { useContext } from "react";
-import { ThemeContext } from "../../theme";
+import React from "react";
 import { useLanguage } from "../../context/LanguageContext";
 import { translations } from "../../i18n/translations";
 
 export const Ticker: React.FC = () => {
-  const context = useContext(ThemeContext) as { theme?: 'dark' | 'light'; toggleTheme?: () => void };
-  const theme = context.theme || 'dark';
   const { lang } = useLanguage();
   const items = translations[lang].ticker as readonly string[];
   const text = items.map(i => `${i}  ·  `).join("");

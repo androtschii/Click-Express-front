@@ -34,7 +34,6 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
 
   const bg      = isDark ? "#080808" : "#f0f0f0";
   const card    = isDark ? "#0d0d0d" : "#ffffff";
-  const card2   = isDark ? "#111" : "#fafafa";
   const border  = isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.09)";
   const text    = isDark ? "#fff" : "#1a1a1a";
   const muted   = isDark ? "rgba(255,255,255,0.38)" : "rgba(0,0,0,0.42)";

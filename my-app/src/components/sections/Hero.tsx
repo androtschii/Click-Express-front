@@ -89,16 +89,10 @@ export const Hero: React.FC<HeroProps> = ({ onViewLoads, onQuoteClick }) => {
       `}</style>
 
       {/* BG image with parallax */}
-      <div style={{ position: "absolute", inset: 0, backgroundImage: isDark ? "url(/images/red%20freightliner%20cascadia%202026%20night.png)" : "url(/images/red%20freightliner%20cascadia%202026.PNG)", backgroundSize: "cover", backgroundPosition: `center calc(50% + ${parallaxShift}px)`, transition: "background-position 0.05s linear" }} />
+      <div style={{ position: "absolute", inset: 0, backgroundImage: isDark ? "url(/images/red%20freightliner%20cascadia%202026.png)" : "url(/images/red%20freightliner%20cascadia.png)", backgroundSize: "cover", backgroundPosition: `center calc(50% + ${parallaxShift}px)`, transition: "background-position 0.05s linear" }} />
 
-      {/* Dot grid overlay */}
-      <div style={{ position: "absolute", inset: 0, backgroundImage: isDark ? "radial-gradient(circle, rgba(255,255,255,0.04) 1px, transparent 1px)" : "radial-gradient(circle, rgba(0,0,0,0.06) 1px, transparent 1px)", backgroundSize: "32px 32px", pointerEvents: "none" }} />
-
-      {/* Vignette */}
-      <div style={{ position: "absolute", inset: 0, background: isDark ? "radial-gradient(ellipse at 30% 50%, transparent 30%, rgba(0,0,0,0.6) 100%)" : "radial-gradient(ellipse at 30% 50%, transparent 25%, rgba(244,240,232,0.55) 100%)", pointerEvents: "none" }} />
-
-      {/* Light theme accents */}
-      {!isDark && <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to left, rgba(204,0,0,0.18) 0%, rgba(204,0,0,0.06) 40%, transparent 65%)", pointerEvents: "none" }} />}
+      {/* Left gradient for text readability — dark only */}
+      {isDark && <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.35) 55%, transparent 100%)", pointerEvents: "none" }} />}
 
       {/* Left red bar */}
       <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 5, background: "linear-gradient(to bottom, #CC0000, #880000)" }} />
@@ -119,10 +113,10 @@ export const Hero: React.FC<HeroProps> = ({ onViewLoads, onQuoteClick }) => {
 
         {/* Headline */}
         <h1 style={{ fontFamily: "'Anton', sans-serif", fontSize: "clamp(48px,7.5vw,96px)", color: isDark ? "#fff" : "#0d0d0d", lineHeight: 1.05, margin: "0 0 4px", textTransform: "uppercase", animation: "heroFadeUp 0.6s ease 0.2s both", letterSpacing: -1, whiteSpace: "nowrap" }}>{t.line1}</h1>
-        <h1 style={{ fontFamily: "'Anton', sans-serif", fontSize: "clamp(48px,7.5vw,96px)", color: isDark ? "rgba(255,255,255,0.82)" : "rgba(0,0,0,0.78)", lineHeight: 1.05, margin: "0 0 4px", textTransform: "uppercase", animation: "heroFadeUp 0.6s ease 0.32s both", letterSpacing: -1, whiteSpace: "nowrap", textShadow: isDark ? "0 2px 20px rgba(0,0,0,0.95)" : "0 2px 14px rgba(255,255,255,0.9)" }}>{t.line2}</h1>
+        <h1 style={{ fontFamily: "'Anton', sans-serif", fontSize: "clamp(48px,7.5vw,96px)", color: isDark ? "#fff" : "#0d0d0d", lineHeight: 1.05, margin: "0 0 4px", textTransform: "uppercase", animation: "heroFadeUp 0.6s ease 0.32s both", letterSpacing: -1, whiteSpace: "nowrap" }}>{t.line2}</h1>
         <h1 style={{ fontFamily: "'Anton', sans-serif", fontSize: "clamp(48px,7.5vw,96px)", color: "#CC0000", lineHeight: 1.05, margin: "0 0 36px", textTransform: "uppercase", animation: "heroFadeUp 0.6s ease 0.44s both", letterSpacing: -1, whiteSpace: "nowrap" }}>{t.line3}</h1>
 
-        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: isDark ? "rgba(255,255,255,0.88)" : "rgba(0,0,0,0.84)", lineHeight: 1.85, maxWidth: 480, marginBottom: 44, animation: "heroFadeUp 0.6s ease 0.58s both", textShadow: isDark ? "0 1px 8px rgba(0,0,0,0.95)" : "0 1px 6px rgba(255,255,255,0.9)" }}>{t.desc}</p>
+        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: isDark ? "rgba(255,255,255,0.9)" : "#0d0d0d", lineHeight: 1.85, maxWidth: 480, marginBottom: 44, animation: "heroFadeUp 0.6s ease 0.58s both" }}>{t.desc}</p>
 
         <div style={{ display: "flex", gap: 14, flexWrap: "wrap", animation: "heroFadeUp 0.6s ease 0.72s both" }}>
           <HeroBtn primary onClick={onViewLoads}>{t.viewLoads}</HeroBtn>
@@ -139,7 +133,7 @@ export const Hero: React.FC<HeroProps> = ({ onViewLoads, onQuoteClick }) => {
           ].map(({ val, label }, i) => (
             <div key={i} style={{ position: "relative" }}>
               {i > 0 && <div style={{ position: "absolute", left: -20, top: "10%", bottom: "10%", width: 1, background: isDark ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.12)" }} />}
-              <div style={{ fontFamily: "'Anton', sans-serif", fontSize: "clamp(28px,4vw,40px)", color: "#CC0000", lineHeight: 1, textShadow: "0 0 20px rgba(204,0,0,0.4)" }}>{val}</div>
+              <div style={{ fontFamily: "'Anton', sans-serif", fontSize: "clamp(28px,4vw,40px)", color: "#CC0000", lineHeight: 1 }}>{val}</div>
               <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 10, color: isDark ? "rgba(255,255,255,0.45)" : "rgba(0,0,0,0.45)", letterSpacing: 2, textTransform: "uppercase", marginTop: 4 }}>{label}</div>
             </div>
           ))}

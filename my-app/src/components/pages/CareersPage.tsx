@@ -160,9 +160,9 @@ export const CareersPage: React.FC<CareersPageProps> = ({ theme = "dark", onBack
       {/* ── Hero ── */}
       <div style={{ position: "relative", height: 420, overflow: "hidden", display: "flex", alignItems: "center" }}>
         <img
-          src="/images/hero-bg.jpg"
+          src={isDark ? "/images/red freightliner cascadia 2026.png" : "/images/red freightliner cascadia.png"}
           alt="careers"
-          style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", filter: "brightness(0.25)" }}
+          style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 40%", filter: isDark ? "brightness(0.3)" : "brightness(0.55)" }}
         />
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(135deg,rgba(204,0,0,0.4) 0%,rgba(0,0,0,0.8) 100%)" }} />
 

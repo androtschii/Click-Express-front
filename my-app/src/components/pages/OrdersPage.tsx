@@ -99,7 +99,7 @@ export const OrdersPage: React.FC<OrdersPageProps> = ({
                         </div>
                         <div style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 18, color: text, lineHeight: 1.2 }}>{load.route}</div>
                         <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 12, color: muted, marginTop: 4 }}>
-                          {load.miles.toLocaleString()} {t.miles} · {load.weight}
+                          {load.miles.toLocaleString()} {t.miles} · {load.cargo}
                         </div>
                       </div>
                       <div style={{ textAlign: "right" }}>

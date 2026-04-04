@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef } from "react";
 import { CELogo } from "../ui/Logo";
 import { useLanguage } from "../../context/LanguageContext";
 import { translations } from "../../i18n/translations";

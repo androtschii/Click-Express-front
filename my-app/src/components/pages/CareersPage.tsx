@@ -158,13 +158,17 @@ export const CareersPage: React.FC<CareersPageProps> = ({ theme = "dark", onBack
       `}</style>
 
       {/* ── Hero ── */}
-      <div style={{ position: "relative", height: 420, overflow: "hidden", display: "flex", alignItems: "center" }}>
+      <div style={{ position: "relative", height: 520, overflow: "hidden", display: "flex", alignItems: "center" }}>
         <img
-          src={isDark ? "/images/red freightliner cascadia 2026.png" : "/images/red freightliner cascadia.png"}
+          src={isDark ? "/images/red freightliner cascadia night.PNG" : "/images/red freightliner cascadia light.png"}
           alt="careers"
-          style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 40%", filter: isDark ? "brightness(0.3)" : "brightness(0.55)" }}
+          style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "20% center", filter: isDark ? "brightness(0.38)" : "none" }}
         />
-        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(135deg,rgba(204,0,0,0.4) 0%,rgba(0,0,0,0.8) 100%)" }} />
+        {/* Gradient: dark on left for text, transparent on right for truck */}
+        <div style={{ position: "absolute", inset: 0, background: isDark
+          ? "linear-gradient(to right, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.6) 38%, rgba(0,0,0,0.1) 65%, transparent 100%)"
+          : "linear-gradient(to right, rgba(255,255,255,0.88) 0%, rgba(255,255,255,0.6) 38%, rgba(255,255,255,0.05) 65%, transparent 100%)"
+        }} />
 
         {/* Back button */}
         <button onClick={onBack} style={{ position: "absolute", top: 90, left: 32, display: "flex", alignItems: "center", gap: 8, background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.2)", borderRadius: 24, padding: "8px 18px", color: "#fff", fontFamily: "'Barlow',sans-serif", fontWeight: 600, fontSize: 12, letterSpacing: 1.5, textTransform: "uppercase", cursor: "pointer", backdropFilter: "blur(8px)", transition: "all 0.2s" }}
@@ -173,22 +177,25 @@ export const CareersPage: React.FC<CareersPageProps> = ({ theme = "dark", onBack
           {isRu ? "← Назад" : "← Back"}
         </button>
 
-        <div style={{ position: "relative", maxWidth: 1200, margin: "0 auto", padding: "0 clamp(20px,5vw,64px)", animation: "careersIn 0.6s ease" }}>
-          <div style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 10, color: "#CC0000", letterSpacing: 4, textTransform: "uppercase", marginBottom: 14 }}>— {isRu ? "Присоединяйтесь к нам" : "Join Our Team"}</div>
-          <h1 style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: "clamp(40px,6vw,72px)", color: "#fff", textTransform: "uppercase", lineHeight: 1, marginBottom: 16 }}>
-            {isRu ? <>ПОСТРОЙТЕ СВОЮ<br /><span style={{ color: "#CC0000" }}>КАРЬЕРУ</span> С НАМИ</> : <>BUILD YOUR<br /><span style={{ color: "#CC0000" }}>CAREER</span> WITH US</>}
-          </h1>
-          <p style={{ fontFamily: "'Barlow',sans-serif", fontSize: 16, color: "rgba(255,255,255,0.65)", maxWidth: 520, lineHeight: 1.7, marginBottom: 28 }}>
-            {isRu ? "Click Express Inc — растущая транспортная компания с рейтингом 4.9★. Мы нанимаем диспетчеров, водителей и операторов по всей США." : "Click Express Inc is a growing freight company with 4.9★ rating. We're hiring dispatchers, drivers, and operators across the US."}
-          </p>
-          <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-            <a href="#jobs" style={{ background: "#CC0000", color: "#fff", border: "none", borderRadius: 4, padding: "13px 28px", fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 14, letterSpacing: 2, textTransform: "uppercase", cursor: "pointer", textDecoration: "none", boxShadow: "0 6px 24px rgba(204,0,0,0.5)" }}>
-              {isRu ? "Открытые вакансии" : "View Open Positions"}
-            </a>
-            <a href="https://www.carriersource.io/carriers/click-express-inc" target="_blank" rel="noreferrer"
-              style={{ background: "transparent", color: "#fff", border: "1px solid rgba(255,255,255,0.3)", borderRadius: 4, padding: "13px 28px", fontFamily: "'Oswald',sans-serif", fontWeight: 600, fontSize: 14, letterSpacing: 2, textTransform: "uppercase", cursor: "pointer", textDecoration: "none" }}>
-              ★ 4.9 on CarrierSource
-            </a>
+        {/* Text on the left */}
+        <div style={{ position: "relative", width: "100%", display: "flex", justifyContent: "flex-start" }}>
+          <div style={{ maxWidth: 520, padding: "0 clamp(20px,5vw,64px)", animation: "careersIn 0.6s ease" }}>
+            <div style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 10, color: "#CC0000", letterSpacing: 4, textTransform: "uppercase", marginBottom: 14 }}>— {isRu ? "Присоединяйтесь к нам" : "Join Our Team"}</div>
+            <h1 style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: "clamp(36px,5vw,66px)", color: isDark ? "#fff" : "#0d0d0d", textTransform: "uppercase", lineHeight: 1, marginBottom: 16 }}>
+              {isRu ? <>ПОСТРОЙТЕ СВОЮ<br /><span style={{ color: "#CC0000" }}>КАРЬЕРУ</span> С НАМИ</> : <>BUILD YOUR<br /><span style={{ color: "#CC0000" }}>CAREER</span> WITH US</>}
+            </h1>
+            <p style={{ fontFamily: "'Barlow',sans-serif", fontSize: 15, color: isDark ? "rgba(255,255,255,0.65)" : "rgba(0,0,0,0.65)", maxWidth: 460, lineHeight: 1.7, marginBottom: 28 }}>
+              {isRu ? "Click Express Inc — растущая транспортная компания с рейтингом 4.9★. Мы нанимаем диспетчеров, водителей и операторов по всей США." : "Click Express Inc is a growing freight company with 4.9★ rating. We're hiring dispatchers, drivers, and operators across the US."}
+            </p>
+            <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+              <a href="#jobs" style={{ background: "#CC0000", color: "#fff", border: "none", borderRadius: 4, padding: "13px 28px", fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 14, letterSpacing: 2, textTransform: "uppercase", cursor: "pointer", textDecoration: "none", boxShadow: "0 6px 24px rgba(204,0,0,0.5)" }}>
+                {isRu ? "Открытые вакансии" : "View Open Positions"}
+              </a>
+              <a href="https://www.carriersource.io/carriers/click-express-inc" target="_blank" rel="noreferrer"
+                style={{ background: "transparent", color: isDark ? "#fff" : "#0d0d0d", border: `1px solid ${isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.3)"}`, borderRadius: 4, padding: "13px 28px", fontFamily: "'Oswald',sans-serif", fontWeight: 600, fontSize: 14, letterSpacing: 2, textTransform: "uppercase", cursor: "pointer", textDecoration: "none" }}>
+                ★ 4.9 on CarrierSource
+              </a>
+            </div>
           </div>
         </div>
       </div>

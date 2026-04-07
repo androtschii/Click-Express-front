@@ -27,15 +27,15 @@ interface HeaderProps {
   onOrdersClick?: () => void;
 }
 
-const NavLink: React.FC<{ children: React.ReactNode; onClick?: () => void; isLight?: boolean }> = ({ children, onClick, isLight }) => {
+const NavLink: React.FC<{ children: React.ReactNode; onClick?: () => void; isLight?: boolean; compact?: boolean }> = ({ children, onClick, isLight, compact }) => {
   const [hov, setHov] = useState(false);
   return (
     <span onClick={onClick} onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
       style={{
         color: hov ? "#fff" : (isLight ? "rgba(20,20,20,0.7)" : "rgba(255,255,255,0.65)"),
         background: hov ? "#CC0000" : "transparent",
-        fontSize: 11, fontFamily: "'Barlow', sans-serif", fontWeight: 700, letterSpacing: 0.8,
-        textTransform: "uppercase", padding: "6px 8px", borderRadius: 4,
+        fontSize: 11, fontFamily: "'Barlow', sans-serif", fontWeight: 700, letterSpacing: compact ? 0 : 0.8,
+        textTransform: "uppercase", padding: compact ? "6px 5px" : "6px 8px", borderRadius: 4,
         transition: "all 0.15s", cursor: "pointer", whiteSpace: "nowrap", display: "inline-block"
       }}
     >{children}</span>
@@ -131,15 +131,15 @@ export const Header: React.FC<HeaderProps> = ({
 
       <div style={{ width: 1, height: 30, background: isLight ? "rgba(0,0,0,0.1)" : "rgba(255,255,255,0.1)", flexShrink: 0 }} />
 
-      <nav style={{ display: "flex", gap: 2, flex: 1 }}>
-        <NavLink onClick={onCatalogClick} isLight={isLight}>{t.nav.catalog}</NavLink>
-        <NavLink onClick={onQuoteClick} isLight={isLight}>{t.nav.getQuote}</NavLink>
-        <NavLink onClick={onAboutClick} isLight={isLight}>{t.nav.aboutUs}</NavLink>
-        <NavLink onClick={onContactClick} isLight={isLight}>{t.nav.contact}</NavLink>
-        <NavLink onClick={onCareersClick} isLight={isLight}>{t.nav.careers}</NavLink>
-        <NavLink onClick={onNewsClick} isLight={isLight}>{t.nav.news}</NavLink>
-        <NavLink onClick={onReviewsClick} isLight={isLight}>{t.nav.reviews}</NavLink>
-        <NavLink onClick={onFleetClick} isLight={isLight}>{t.nav.fleet}</NavLink>
+      <nav style={{ display: "flex", gap: lang === 'ru' ? 0 : 2, flex: 1 }}>
+        <NavLink onClick={onCatalogClick} isLight={isLight} compact={lang === 'ru'}>{t.nav.catalog}</NavLink>
+        <NavLink onClick={onQuoteClick} isLight={isLight} compact={lang === 'ru'}>{t.nav.getQuote}</NavLink>
+        <NavLink onClick={onAboutClick} isLight={isLight} compact={lang === 'ru'}>{t.nav.aboutUs}</NavLink>
+        <NavLink onClick={onContactClick} isLight={isLight} compact={lang === 'ru'}>{t.nav.contact}</NavLink>
+        <NavLink onClick={onCareersClick} isLight={isLight} compact={lang === 'ru'}>{t.nav.careers}</NavLink>
+        <NavLink onClick={onNewsClick} isLight={isLight} compact={lang === 'ru'}>{t.nav.news}</NavLink>
+        <NavLink onClick={onReviewsClick} isLight={isLight} compact={lang === 'ru'}>{t.nav.reviews}</NavLink>
+        <NavLink onClick={onFleetClick} isLight={isLight} compact={lang === 'ru'}>{t.nav.fleet}</NavLink>
       </nav>
 
       <PhoneLink isLight={isLight} />

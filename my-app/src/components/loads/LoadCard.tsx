@@ -182,7 +182,7 @@ export const LoadCard: React.FC<LoadCardProps> = ({ load, onBook, onCancelBook, 
         {/* Диспетчер + кнопка */}
         <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:10 }}>
           <div>
-            <div style={{ fontSize:8, color:textMuted, fontFamily:"'Anton',sans-serif", letterSpacing:2, textTransform:"uppercase" }}>{t.dispatch}</div>
+            <div style={{ fontSize:8, color:textMuted, fontFamily:"'Barlow',sans-serif", fontWeight:700, letterSpacing:1.5, textTransform:"uppercase" }}>{t.dispatch}</div>
             <div style={{ fontSize:13, color:textPhone, fontFamily:"'DM Sans',sans-serif", fontWeight:700, marginTop:1 }}>+1 786-202-6599</div>
           </div>
           <button
@@ -194,8 +194,8 @@ export const LoadCard: React.FC<LoadCardProps> = ({ load, onBook, onCancelBook, 
               color: booked ? (bookHov ? "#CC0000" : "#00b450") : "#fff",
               border: booked ? `1px solid ${bookHov ? "rgba(204,0,0,0.4)" : "rgba(0,180,80,0.3)"}` : "none",
               borderRadius:2, padding:"10px 22px",
-              fontFamily:"'Anton',sans-serif", fontSize:12,
-              letterSpacing:2, textTransform:"uppercase", cursor:"pointer",
+              fontFamily:"'Barlow',sans-serif", fontSize:12,
+              fontWeight: 800, letterSpacing:1.5, textTransform:"uppercase", cursor:"pointer",
               transform: bookHov ? "translateY(-1px)" : "none",
               boxShadow: !booked ? "0 4px 18px rgba(204,0,0,0.38)" : "none",
               transition:"all 0.15s",

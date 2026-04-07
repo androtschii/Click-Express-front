@@ -21,8 +21,8 @@ export const HeroBtn: React.FC<HeroBtnProps> = ({ children, primary, onClick }) 
       onMouseLeave={() => setHov(false)}
       style={{
         background: primary ? (hov ? "#aa0000" : "#CC0000") : "transparent",
-        color: primary ? "#fff" : hov ? "#CC0000" : isLight ? "#1a1a1a" : "#fff",
-        border: primary ? "none" : `1px solid ${hov ? "#CC0000" : isLight ? "rgba(0,0,0,0.35)" : "rgba(255,255,255,0.22)"}`,
+        color: primary ? "#fff" : hov ? "#CC0000" : "#fff",
+        border: primary ? "none" : `1px solid ${hov ? "#CC0000" : isLight ? "rgba(255,255,255,0.55)" : "rgba(255,255,255,0.22)"}`,
         borderRadius: 4,
         padding: "16px 36px",
         fontFamily: "'Oswald',sans-serif",
@@ -89,10 +89,10 @@ export const Hero: React.FC<HeroProps> = ({ onViewLoads, onQuoteClick }) => {
       `}</style>
 
       {/* BG image with parallax */}
-      <div style={{ position: "absolute", inset: 0, backgroundImage: isDark ? "url(/images/red%20freightliner%20cascadia%202026.png)" : "url(/images/red%20freightliner%20cascadia.png)", backgroundSize: "cover", backgroundPosition: `center calc(50% + ${parallaxShift}px)`, transition: "background-position 0.05s linear" }} />
+      <div style={{ position: "absolute", inset: 0, backgroundImage: isDark ? "url('/images/red freightliner cascadia night.PNG')" : "url('/images/red freightliner cascadia light.png')", backgroundSize: "cover", backgroundPosition: `center calc(50% + ${parallaxShift}px)`, transition: "background-position 0.05s linear" }} />
 
-      {/* Left gradient for text readability — dark only */}
-      {isDark && <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.35) 55%, transparent 100%)", pointerEvents: "none" }} />}
+      {/* Gradient overlay for text readability */}
+      <div style={{ position: "absolute", inset: 0, background: isDark ? "linear-gradient(to right, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.35) 55%, transparent 100%)" : "linear-gradient(to right, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.15) 50%, transparent 100%)", pointerEvents: "none" }} />
 
       {/* Left red bar */}
       <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 5, background: "linear-gradient(to bottom, #CC0000, #880000)" }} />
@@ -112,11 +112,11 @@ export const Hero: React.FC<HeroProps> = ({ onViewLoads, onQuoteClick }) => {
         </div>
 
         {/* Headline */}
-        <h1 style={{ fontFamily: "'Anton', sans-serif", fontSize: "clamp(48px,7.5vw,96px)", color: isDark ? "#fff" : "#0d0d0d", lineHeight: 1.05, margin: "0 0 4px", textTransform: "uppercase", animation: "heroFadeUp 0.6s ease 0.2s both", letterSpacing: -1, whiteSpace: "nowrap" }}>{t.line1}</h1>
-        <h1 style={{ fontFamily: "'Anton', sans-serif", fontSize: "clamp(48px,7.5vw,96px)", color: isDark ? "#fff" : "#0d0d0d", lineHeight: 1.05, margin: "0 0 4px", textTransform: "uppercase", animation: "heroFadeUp 0.6s ease 0.32s both", letterSpacing: -1, whiteSpace: "nowrap" }}>{t.line2}</h1>
-        <h1 style={{ fontFamily: "'Anton', sans-serif", fontSize: "clamp(48px,7.5vw,96px)", color: "#CC0000", lineHeight: 1.05, margin: "0 0 36px", textTransform: "uppercase", animation: "heroFadeUp 0.6s ease 0.44s both", letterSpacing: -1, whiteSpace: "nowrap" }}>{t.line3}</h1>
+        <h1 style={{ fontFamily: lang === 'ru' ? "'Russo One', sans-serif" : "'Anton', sans-serif", fontSize: "clamp(48px,7.5vw,96px)", color: isDark ? "#fff" : "#0d0d0d", lineHeight: 1.05, margin: "0 0 4px", textTransform: "uppercase", animation: "heroFadeUp 0.6s ease 0.2s both", letterSpacing: lang === 'ru' ? 0 : -1, whiteSpace: "nowrap" }}>{t.line1}</h1>
+        <h1 style={{ fontFamily: lang === 'ru' ? "'Russo One', sans-serif" : "'Anton', sans-serif", fontSize: "clamp(48px,7.5vw,96px)", color: isDark ? "#fff" : "#0d0d0d", lineHeight: 1.05, margin: "0 0 4px", textTransform: "uppercase", animation: "heroFadeUp 0.6s ease 0.32s both", letterSpacing: lang === 'ru' ? 0 : -1, whiteSpace: "nowrap" }}>{t.line2}</h1>
+        <h1 style={{ fontFamily: lang === 'ru' ? "'Russo One', sans-serif" : "'Anton', sans-serif", fontSize: "clamp(48px,7.5vw,96px)", color: "#CC0000", lineHeight: 1.05, margin: "0 0 36px", textTransform: "uppercase", animation: "heroFadeUp 0.6s ease 0.44s both", letterSpacing: lang === 'ru' ? 0 : -1, whiteSpace: "nowrap" }}>{t.line3}</h1>
 
-        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: isDark ? "rgba(255,255,255,0.9)" : "#0d0d0d", lineHeight: 1.85, maxWidth: 480, marginBottom: 44, animation: "heroFadeUp 0.6s ease 0.58s both" }}>{t.desc}</p>
+        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: isDark ? "rgba(255,255,255,0.9)" : "rgba(0,0,0,0.75)", lineHeight: 1.85, maxWidth: 480, marginBottom: 44, animation: "heroFadeUp 0.6s ease 0.58s both" }}>{t.desc}</p>
 
         <div style={{ display: "flex", gap: 14, flexWrap: "wrap", animation: "heroFadeUp 0.6s ease 0.72s both" }}>
           <HeroBtn primary onClick={onViewLoads}>{t.viewLoads}</HeroBtn>

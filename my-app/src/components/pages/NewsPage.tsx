@@ -431,9 +431,9 @@ export const NewsPage: React.FC<NewsPageProps> = ({ theme = "dark", onBack, onVi
         <div style={{ position: "relative", overflow: "hidden", minHeight: "72vh", display: "flex", flexDirection: "column" }}>
           {/* Фото главной фуры */}
           <img
-            src={isDark ? "/images/red%20freightliner%20cascadia%202026%20night.png" : "/images/red%20freightliner%20cascadia%202026.PNG"}
+            src={isDark ? "/images/red freightliner cascadia night.PNG" : "/images/red freightliner cascadia light.png"}
             alt=""
-            style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 50%", filter: isDark ? "brightness(0.6) saturate(0.85)" : "brightness(0.9) saturate(0.9)", pointerEvents: "none" }}
+            style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "right center", filter: isDark ? "brightness(0.6) saturate(0.85)" : "none", pointerEvents: "none" }}
           />
           {/* Градиент — тёмный слева, прозрачный справа */}
           <div style={{ position: "absolute", inset: 0, background: isDark ? "linear-gradient(100deg,rgba(10,10,10,0.97) 0%,rgba(10,10,10,0.88) 45%,rgba(10,10,10,0.45) 70%,rgba(10,10,10,0.1) 100%)" : "linear-gradient(100deg,rgba(244,240,232,0.97) 0%,rgba(244,240,232,0.88) 45%,rgba(244,240,232,0.4) 70%,rgba(244,240,232,0.05) 100%)", pointerEvents: "none" }} />

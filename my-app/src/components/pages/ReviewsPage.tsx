@@ -304,18 +304,26 @@ export const ReviewsPage: React.FC<ReviewsPageProps> = ({ theme = "dark", onBack
       {/* ── HERO ── */}
       <div style={{
         position: "relative",
-        background: isDark ? "#060400" : "#f5f0e8",
-        padding: "90px clamp(20px,5vw,64px) 56px",
+        minHeight: 420,
+        display: "flex",
+        alignItems: "center",
         overflow: "hidden",
       }}>
-        {/* Background photo */}
-        <img src="/images/real1.jpg" alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 55%", filter: isDark ? "brightness(0.15) saturate(0.5) sepia(0.4)" : "brightness(0.5) saturate(0.4) sepia(0.3)", pointerEvents: "none" }} />
-        {/* Dark gradient overlay */}
-        <div style={{ position: "absolute", inset: 0, background: isDark ? "linear-gradient(110deg,rgba(6,4,0,0.94) 0%,rgba(20,14,0,0.78) 50%,rgba(6,4,0,0.9) 100%)" : "linear-gradient(110deg,rgba(255,252,230,0.9) 0%,rgba(245,240,200,0.75) 100%)", pointerEvents: "none" }} />
-        {/* BG grid lines */}
-        <div style={{ position: "absolute", inset: 0, backgroundImage: `repeating-linear-gradient(0deg,${isDark?"rgba(255,220,0,0.025)":"rgba(0,0,0,0.025)"} 0px,transparent 1px,transparent 60px),repeating-linear-gradient(90deg,${isDark?"rgba(255,220,0,0.025)":"rgba(0,0,0,0.025)"} 0px,transparent 1px,transparent 60px)`, pointerEvents: "none" }} />
+        {/* Background truck photo */}
+        <img
+          src={isDark ? "/images/red freightliner cascadia night.PNG" : "/images/red freightliner cascadia light.png"}
+          alt=""
+          style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "right center", filter: isDark ? "brightness(0.45)" : "none", pointerEvents: "none" }}
+        />
+        {/* Gradient: dark on left for text, transparent on right for truck */}
+        <div style={{ position: "absolute", inset: 0, background: isDark
+          ? "linear-gradient(to right, rgba(6,4,0,0.97) 0%, rgba(6,4,0,0.82) 42%, rgba(6,4,0,0.2) 68%, transparent 100%)"
+          : "linear-gradient(to right, rgba(255,255,255,0.97) 0%, rgba(255,255,255,0.82) 42%, rgba(255,255,255,0.1) 68%, transparent 100%)",
+          pointerEvents: "none" }} />
         <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 4, background: "#eab308" }} />
         <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: "linear-gradient(90deg,transparent,#eab308 30%,#fde047 60%,#eab308 80%,transparent)" }} />
+
+        <div style={{ position: "relative", width: "100%", padding: "90px clamp(20px,5vw,64px) 56px" }}>
 
         <div style={{ maxWidth: 900, animation: "revSlideUp 0.6s ease both" }}>
           <button onClick={onBack} style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "transparent", border: "none", color: isDark ? "rgba(255,255,255,0.45)" : "rgba(0,0,0,0.45)", fontFamily: "'Barlow',sans-serif", fontWeight: 600, fontSize: 13, letterSpacing: 1, cursor: "pointer", padding: "0 0 20px", transition: "color 0.15s" }}
@@ -368,7 +376,8 @@ export const ReviewsPage: React.FC<ReviewsPageProps> = ({ theme = "dark", onBack
           )}
         </div>
 
-        <div style={{ position: "absolute", right: "5%", top: "50%", transform: "translateY(-50%)", fontSize: 160, opacity: isDark ? 0.04 : 0.05, userSelect: "none", pointerEvents: "none" }}>★</div>
+          <div style={{ position: "absolute", right: "5%", top: "50%", transform: "translateY(-50%)", fontSize: 160, opacity: isDark ? 0.04 : 0.05, userSelect: "none", pointerEvents: "none" }}>★</div>
+        </div>
       </div>
 
       {/* ── WRITE REVIEW FORM ── */}

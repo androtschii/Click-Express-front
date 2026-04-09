@@ -555,13 +555,14 @@ const FormContent: React.FC<FormContentProps> = ({
       <button
         onClick={onSubmit}
         disabled={loading}
+        className={loading ? "" : "btn-split-primary"}
         style={{
           width: "100%",
           marginTop: 16,
           padding: "12px",
           background: loading
             ? "rgba(204,0,0,0.5)"
-            : "linear-gradient(135deg, #CC0000, #ff4d4d)",
+            : "#CC0000",
           border: "none",
           borderRadius: 25,
           color: "#fff",

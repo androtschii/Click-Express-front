@@ -175,7 +175,7 @@ export const QuoteModal: React.FC<QuoteModalProps> = ({ onClose, theme: themePro
 
             {error && <div style={{ color: "#CC0000", fontFamily: "'Barlow',sans-serif", fontSize: 13, marginBottom: 12 }}>⚠️ {error}</div>}
 
-            <button onClick={handleSubmit} style={{ width: "100%", background: "#CC0000", color: "#fff", border: "none", borderRadius: 6, padding: "15px", fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 15, letterSpacing: 2, textTransform: "uppercase", cursor: "pointer", boxShadow: "0 6px 24px rgba(204,0,0,0.5)" }}>
+            <button onClick={handleSubmit} className="btn-split-primary" style={{ width: "100%", background: "#CC0000", color: "#fff", border: "none", borderRadius: 6, padding: "15px", fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 15, letterSpacing: 2, textTransform: "uppercase", cursor: "pointer", boxShadow: "0 6px 24px rgba(204,0,0,0.5)" }}>
               {isRu ? "ОТПРАВИТЬ ЗАЯВКУ →" : "SEND REQUEST →"}
             </button>
           </div>

@@ -10,30 +10,23 @@ interface HeroBtnProps {
 }
 
 export const HeroBtn: React.FC<HeroBtnProps> = ({ children, primary, onClick }) => {
-  const [hov, setHov] = useState(false);
-  const ctx = useContext(ThemeContext) as { theme?: 'dark' | 'light' };
-  const btnTheme = ctx.theme || 'dark';
-  const isLight = btnTheme === 'light';
   return (
     <button
       onClick={onClick}
-      onMouseEnter={() => setHov(true)}
-      onMouseLeave={() => setHov(false)}
+      className={primary ? "btn-split-primary" : "btn-split"}
       style={{
-        background: primary ? (hov ? "#aa0000" : "#CC0000") : "transparent",
-        color: primary ? "#fff" : hov ? "#CC0000" : "#fff",
-        border: primary ? "none" : `1px solid ${hov ? "#CC0000" : isLight ? "rgba(255,255,255,0.55)" : "rgba(255,255,255,0.22)"}`,
+        background: primary ? "#CC0000" : "transparent",
+        color: "#fff",
+        border: primary ? "none" : "1px solid #CC0000",
         borderRadius: 4,
         padding: "16px 36px",
         fontFamily: "'Oswald',sans-serif",
         fontWeight: 600,
         fontSize: 15,
         letterSpacing: 2,
-        textTransform: "uppercase",
+        textTransform: "uppercase" as const,
         cursor: "pointer",
         boxShadow: primary ? "0 6px 28px rgba(204,0,0,0.45)" : "none",
-        transform: hov ? "translateY(-2px)" : "none",
-        transition: "all 0.18s",
       }}
     >
       {children}

@@ -63,6 +63,109 @@ button {
   outline: none;
 }
 
+/* ── SPLIT ANIMATION BUTTON ─────────────────────────────────────────────── */
+
+/* Outline кнопка — заливается красным с двух сторон */
+.btn-split {
+  position: relative;
+  overflow: hidden;
+  background: transparent !important;
+  border: 1px solid #CC0000 !important;
+  /* начальный цвет текста задаётся через inline style в компоненте */
+  transition: color 0.3s ease !important;
+  z-index: 0;
+}
+
+.btn-split::before,
+.btn-split::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 51%;
+  background: linear-gradient(135deg, #CC0000 0%, #ff2222 100%);
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+  z-index: -1;
+}
+
+.btn-split::before { left: 0; transform-origin: left; }
+.btn-split::after  { right: 0; transform-origin: right; }
+
+.btn-split:hover::before,
+.btn-split:hover::after { transform: scaleX(1); }
+
+.btn-split:hover {
+  color: #fff !important;
+  box-shadow: 0 0 24px rgba(204,0,0,0.45) !important;
+}
+
+/* Залитая кнопка — split с тёмно-красным */
+.btn-split-primary {
+  position: relative;
+  overflow: hidden;
+  transition: color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease !important;
+  z-index: 0;
+}
+
+.btn-split-primary::before,
+.btn-split-primary::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 51%;
+  background: linear-gradient(135deg, #990000 0%, #bb0000 100%);
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+  z-index: -1;
+}
+
+.btn-split-primary::before { left: 0; transform-origin: left; }
+.btn-split-primary::after  { right: 0; transform-origin: right; }
+
+.btn-split-primary:hover::before,
+.btn-split-primary:hover::after { transform: scaleX(1); }
+
+.btn-split-primary:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 32px rgba(204,0,0,0.6) !important;
+}
+
+/* Nav ссылки — split заливка */
+.nav-split {
+  position: relative;
+  overflow: hidden;
+  display: inline-block;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: color 0.25s ease;
+  z-index: 0;
+}
+
+.nav-split::before,
+.nav-split::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 51%;
+  background: #CC0000;
+  transform: scaleX(0);
+  transition: transform 0.25s ease;
+  z-index: -1;
+}
+
+.nav-split::before { left: 0; transform-origin: left; }
+.nav-split::after  { right: 0; transform-origin: right; }
+
+.nav-split:hover::before,
+.nav-split:hover::after { transform: scaleX(1); }
+
+.nav-split:hover { color: #fff !important; }
+
+/* ──────────────────────────────────────────────────────────────────────── */
+
 /* Input placeholder */
 input::placeholder {
   color: rgba(255, 255, 255, 0.25);

@@ -70,7 +70,6 @@ export const Header: React.FC<HeaderProps> = ({
   session, onLogout, onLogoClick, onProfileClick, onOrdersClick,
 }) => {
   const [scrolled, setScrolled] = useState(false);
-  const [reqHov, setReqHov] = useState(false);
   const [heartBurst, setHeartBurst] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const { lang, toggleLang } = useLanguage();
@@ -261,28 +260,23 @@ export const Header: React.FC<HeaderProps> = ({
           )}
         </div>
       ) : (
-        <button onClick={onLoginClick} style={{ background: "transparent", border: `1px solid ${isLight ? "rgba(0,0,0,0.2)" : "rgba(255,255,255,0.2)"}`, borderRadius: 20, padding: "7px 18px", color: isLight ? "rgba(0,0,0,0.65)" : "rgba(255,255,255,0.7)", fontFamily: "'Barlow',sans-serif", fontWeight: 600, fontSize: 12, letterSpacing: 1.5, textTransform: "uppercase", cursor: "pointer", flexShrink: 0, transition: "all 0.15s" }}
-          onMouseEnter={e => { e.currentTarget.style.borderColor = "#CC0000"; e.currentTarget.style.color = "#CC0000"; }}
-          onMouseLeave={e => { e.currentTarget.style.borderColor = isLight ? "rgba(0,0,0,0.2)" : "rgba(255,255,255,0.2)"; e.currentTarget.style.color = isLight ? "rgba(0,0,0,0.65)" : "rgba(255,255,255,0.7)"; }}>
+        <button onClick={onLoginClick} className="btn-split" style={{ borderRadius: 20, padding: "7px 18px", fontFamily: "'Barlow',sans-serif", fontWeight: 600, fontSize: 12, letterSpacing: 1.5, textTransform: "uppercase", cursor: "pointer", flexShrink: 0 }}>
           {t.header.login}
         </button>
       )}
 
       <button
-        onMouseEnter={() => setReqHov(true)}
-        onMouseLeave={() => setReqHov(false)}
         onClick={onRequestsClick || onCatalogClick}
+        className="btn-split-primary"
         style={{
           display: "flex", alignItems: "center", gap: 8,
-          background: reqHov ? "#aa0000" : "#CC0000",
+          background: "#CC0000",
           color: "#fff", border: "none", borderRadius: 5,
           padding: "10px 20px", fontFamily: "'Barlow',sans-serif",
           fontWeight: 800, fontSize: 12, letterSpacing: 1.5,
           textTransform: "uppercase", cursor: "pointer",
           flexShrink: 0, whiteSpace: "nowrap",
           boxShadow: "0 4px 20px rgba(204,0,0,0.4)",
-          transform: reqHov ? "translateY(-1px)" : "none",
-          transition: "all 0.15s",
         }}
       >
         <svg width="14" height="14" viewBox="0 0 256 256" fill="#fff" style={{ flexShrink: 0 }}>

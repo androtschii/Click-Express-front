@@ -1,0 +1,9 @@
+Hello
+
+On Mac I recommend the use of OTF format, on Windows TTF format.
+This is an early version of this typography. This will improve over time.
+
+Thank you!
+
+Vectorica
+vectorica.com@gmail.com

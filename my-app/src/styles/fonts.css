@@ -1,0 +1,84 @@
+@font-face {
+  font-family: 'Agus Sans';
+  src: url('/fronts/Agus Sans - Free Font/AgusSans-Regular.woff2') format('woff2'),
+       url('/fronts/Agus Sans - Free Font/AgusSans-Regular.woff') format('woff'),
+       url('/fronts/Agus Sans - Free Font/AgusSans-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+html[lang="ru"],
+body[lang="ru"],
+*[lang="ru"] {
+  font-family: 'Agus Sans', sans-serif;
+}
+
+html[lang="ru"] {
+  --font-primary: 'Agus Sans', sans-serif;
+}
+
+@media (max-width: 1024px) {
+  html[lang="ru"] body,
+  body[lang="ru"] {
+    font-size: 15px;
+    line-height: 1.5;
+  }
+}
+
+@media (max-width: 768px) {
+  html[lang="ru"] body,
+  body[lang="ru"] {
+    font-size: 14px;
+    line-height: 1.5;
+    letter-spacing: 0.3px;
+  }
+
+  html[lang="ru"] h1,
+  body[lang="ru"] h1 {
+    font-size: 28px;
+  }
+
+  html[lang="ru"] h2,
+  body[lang="ru"] h2 {
+    font-size: 22px;
+  }
+
+  html[lang="ru"] h3,
+  body[lang="ru"] h3 {
+    font-size: 18px;
+  }
+
+  html[lang="ru"] .section-title,
+  body[lang="ru"] .section-title {
+    font-size: 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  html[lang="ru"] body,
+  body[lang="ru"] {
+    font-size: 13px;
+    line-height: 1.45;
+  }
+
+  html[lang="ru"] h1,
+  body[lang="ru"] h1 {
+    font-size: 22px;
+  }
+
+  html[lang="ru"] h2,
+  body[lang="ru"] h2 {
+    font-size: 18px;
+  }
+
+  html[lang="ru"] h3,
+  body[lang="ru"] h3 {
+    font-size: 16px;
+  }
+
+  html[lang="ru"] .section-title,
+  body[lang="ru"] .section-title {
+    font-size: 20px;
+  }
+}

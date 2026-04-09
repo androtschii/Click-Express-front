@@ -221,6 +221,11 @@ function AppContent() {
   const { theme, toggleTheme } = useTheme();
   const { lang } = useLanguage();
   const tn = translations[lang].notifications;
+
+  useEffect(() => {
+    document.documentElement.lang = lang;
+  }, [lang]);
+
   const [weeklyIdx, setWeeklyIdx] = useState(0);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("All Loads");

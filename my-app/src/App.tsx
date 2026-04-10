@@ -26,7 +26,8 @@ import { PhoneIcon } from "./components/ui/PhoneIcon";
 import { LOADS } from "./utils/data";
 import type { Load } from "./types/index";
 import { filterLoads, fetchLoads } from "./services/loadService.ts";
-import { fetchUsers, healthCheck, type ApiUser } from "./services/userService";
+import { healthCheck } from "./services/userService";
+import { AdminPage } from "./components/pages/AdminPage";
 
 // ── Анимированное сердечко для секции "Лучшие грузы недели" ──────────────
 function WeeklyHeartBtn({ saved, onClick }: { saved: boolean; onClick: () => void }) {
@@ -241,7 +242,7 @@ function AppContent() {
   const [session, setSession] = useState<Session | null>(() => getSession());
   const [detailLoad, setDetailLoad] = useState<Load | null>(null);
   const [showCareers, setShowCareers] = useState(false);
-  const [backendUsers, setBackendUsers] = useState<ApiUser[]>([]);
+  const [backendUsers] = useState<unknown[]>([]);
   const [apiHealthy, setApiHealthy] = useState<boolean | null>(null);
   const [apiError, setApiError] = useState<string | null>(null);
   const [showNews, setShowNews] = useState(false);
@@ -249,6 +250,7 @@ function AppContent() {
   const [showProfile, setShowProfile] = useState(false);
   const [showOrders, setShowOrders] = useState(false);
   const [showFleet, setShowFleet] = useState(false);
+  const [showAdmin, setShowAdmin] = useState(false);
   const [trackLoad, setTrackLoad] = useState<Load | null>(null);
   const [notifications, setNotifications] = useState<string[]>([]);
 
@@ -278,17 +280,16 @@ function AppContent() {
 
   useEffect(() => {
     const checkBackend = async () => {
-      try {
-        await healthCheck();
-        const users = await fetchUsers();
-        setBackendUsers(users);
-        setApiHealthy(true);
-        setApiError(null);
-      } catch (err) {
-        setApiHealthy(false);
-        setApiError((err as Error).message);
-      }
-    };
+  try {
+    await healthCheck();
+    setApiHealthy(true);
+    setApiError(null);
+  } catch (err) {
+    setApiHealthy(false);
+    setApiError((err as Error).message);
+  }
+};
+
     checkBackend();
   }, []);
 
@@ -377,8 +378,9 @@ function AppContent() {
         session={session}
         onLogout={() => { logout(); setSession(null); setShowProfile(false); setShowOrders(false); }}
         onLogoClick={() => { setDetailLoad(null); setShowCareers(false); setShowNews(false); setShowReviews(false); setShowFleet(false); setShowProfile(false); setShowOrders(false); window.scrollTo({ top: 0, behavior: "smooth" }); }}
-        onProfileClick={() => { setDetailLoad(null); setShowCareers(false); setShowNews(false); setShowReviews(false); setShowOrders(false); setShowProfile(true); window.scrollTo({ top: 0, behavior: "smooth" }); }}
-        onOrdersClick={() => { setDetailLoad(null); setShowCareers(false); setShowNews(false); setShowReviews(false); setShowProfile(false); setShowOrders(true); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+        onProfileClick={() => { setDetailLoad(null); setShowCareers(false); setShowNews(false); setShowReviews(false); setShowOrders(false); setShowAdmin(false); setShowProfile(true); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+        onOrdersClick={() => { setDetailLoad(null); setShowCareers(false); setShowNews(false); setShowReviews(false); setShowProfile(false); setShowAdmin(false); setShowOrders(true); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+        onAdminClick={() => { setDetailLoad(null); setShowCareers(false); setShowNews(false); setShowReviews(false); setShowProfile(false); setShowOrders(false); setShowAdmin(true); window.scrollTo({ top: 0, behavior: "smooth" }); }}
       />
       {apiStatusBanner}
     </>
@@ -478,6 +480,22 @@ function AppContent() {
         {showAuth && <AuthModal onClose={() => setShowAuth(false)} theme={theme} onSuccess={(s) => { setSession(s); setShowAuth(false); }} />}
         {showQuote && <QuoteModal onClose={() => setShowQuote(false)} theme={theme} />}
         {sharedPanels}
+      </div>
+    );
+  }
+
+  // ── Admin page ─────────────────────────────────────────────────────────
+  if (showAdmin && session?.role === "Admin") {
+    return (
+      <div style={{ background: bgColor, minHeight: "100vh", color: textColor }}>
+        {sharedStyle}
+        {sharedHeader}
+        <AdminPage
+          theme={theme}
+          onBack={() => { setShowAdmin(false); window.scrollTo({ top: 0 }); }}
+        />
+        {showAuth && <AuthModal onClose={() => setShowAuth(false)} theme={theme} onSuccess={(s) => { setSession(s); setShowAuth(false); }} />}
+        {showQuote && <QuoteModal onClose={() => setShowQuote(false)} theme={theme} />}
       </div>
     );
   }

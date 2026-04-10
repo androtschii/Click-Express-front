@@ -14,6 +14,7 @@ export interface Session {
   name: string;
   token: string;
   avatar?: string;
+  role?: string;
 }
 
 const USERS_KEY = "ce_users";
@@ -120,6 +121,7 @@ export async function login(
       email: data.username,
       name: data.username,
       token: data.token,
+      role: data.role,
     };
     localStorage.setItem(SESSION_KEY, JSON.stringify(session));
     setCookie(COOKIE_NAME, data.token, 1);

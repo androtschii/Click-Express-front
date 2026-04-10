@@ -25,6 +25,7 @@ interface HeaderProps {
   onLogoClick?: () => void;
   onProfileClick?: () => void;
   onOrdersClick?: () => void;
+  onAdminClick?: () => void;
 }
 
 const NavLink: React.FC<{ children: React.ReactNode; onClick?: () => void; isLight?: boolean; compact?: boolean }> = ({ children, onClick, isLight, compact }) => {
@@ -67,7 +68,7 @@ const PhoneLink: React.FC<{ isLight?: boolean }> = ({ isLight }) => {
 export const Header: React.FC<HeaderProps> = ({
   cartCount, savedCount = 0, theme = 'dark', onThemeToggle,
   onCatalogClick, onAboutClick, onContactClick, onQuoteClick, onCareersClick, onNewsClick, onReviewsClick, onFleetClick, onSavedClick, onRequestsClick, onLoginClick,
-  session, onLogout, onLogoClick, onProfileClick, onOrdersClick,
+  session, onLogout, onLogoClick, onProfileClick, onOrdersClick, onAdminClick,
 }) => {
   const [scrolled, setScrolled] = useState(false);
   const [heartBurst, setHeartBurst] = useState(false);
@@ -240,6 +241,7 @@ export const Header: React.FC<HeaderProps> = ({
               </div>
               <div style={{ padding: "6px 0" }}>
                 {[
+                  ...(session?.role === "Admin" ? [{ label: "Админ панель", icon: "⚙️", onClick: onAdminClick }] : []),
                   { label: t.header.myProfile, icon: "👤", onClick: onProfileClick },
                   { label: t.header.myOrders, icon: "📋", onClick: onOrdersClick },
                 ].map(item => (

@@ -1,7 +1,14 @@
 const API_BASE_URL = "http://localhost:5000/api";
 
 // ── Token helpers ──────────────────────────────────────────────────────────
-const getToken = () => localStorage.getItem("jwt_token");
+const getToken = () => {
+  try {
+    const session = JSON.parse(localStorage.getItem("ce_session") || "null");
+    return session?.token ?? null;
+  } catch {
+    return null;
+  }
+};
 
 const authHeaders = () => ({
   "Content-Type": "application/json",
@@ -75,6 +82,74 @@ export const deleteUser = async (id) => {
   });
   if (!response.ok) throw new Error("Ошибка удаления пользователя");
   return response.ok;
+};
+
+// ── Products ───────────────────────────────────────────────────────────────
+export const fetchProducts = async (search = "", category = "") => {
+  const params = new URLSearchParams();
+  if (search) params.append("search", search);
+  if (category) params.append("category", category);
+  const response = await fetch(`${API_BASE_URL}/product?${params}`, {
+    headers: authHeaders(),
+  });
+  if (!response.ok) throw new Error("Ошибка загрузки товаров");
+  return response.json();
+};
+
+export const updateProductPrice = async (id, price) => {
+  const response = await fetch(`${API_BASE_URL}/product/${id}/price`, {
+    method: "PATCH",
+    headers: authHeaders(),
+    body: JSON.stringify({ price }),
+  });
+  if (!response.ok) throw new Error("Ошибка обновления цены");
+  return response.json();
+};
+
+export const updateProductImage = async (id, imageUrl) => {
+  const response = await fetch(`${API_BASE_URL}/product/${id}/image`, {
+    method: "PATCH",
+    headers: authHeaders(),
+    body: JSON.stringify({ imageUrl }),
+  });
+  if (!response.ok) throw new Error("Ошибка обновления фото");
+  return response.json();
+};
+
+export const updateProductStock = async (id, quantity) => {
+  const response = await fetch(`${API_BASE_URL}/product/${id}/stock`, {
+    method: "PATCH",
+    headers: authHeaders(),
+    body: JSON.stringify({ quantity }),
+  });
+  if (!response.ok) throw new Error("Ошибка обновления остатка");
+  return response.json();
+};
+
+export const toggleProductActive = async (id) => {
+  const response = await fetch(`${API_BASE_URL}/product/${id}/toggle`, {
+    method: "PATCH",
+    headers: authHeaders(),
+  });
+  if (!response.ok) throw new Error("Ошибка изменения статуса");
+  return response.json();
+};
+
+export const deleteProduct = async (id) => {
+  const response = await fetch(`${API_BASE_URL}/product/${id}`, {
+    method: "DELETE",
+    headers: authHeaders(),
+  });
+  if (!response.ok) throw new Error("Ошибка удаления товара");
+  return response.ok;
+};
+
+export const fetchProductStats = async () => {
+  const response = await fetch(`${API_BASE_URL}/product/stats`, {
+    headers: authHeaders(),
+  });
+  if (!response.ok) throw new Error("Ошибка загрузки статистики");
+  return response.json();
 };
 
 // ── Health ─────────────────────────────────────────────────────────────────

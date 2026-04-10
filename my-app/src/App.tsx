@@ -372,14 +372,14 @@ function AppContent() {
         savedCount={savedLoads.length}
         theme={theme}
         onThemeToggle={toggleTheme}
-        onCatalogClick={() => { setDetailLoad(null); setShowCareers(false); setShowNews(false); setShowReviews(false); setTimeout(() => scrollTo(catalogRef), 50); }}
-        onAboutClick={() => { setDetailLoad(null); setShowCareers(false); setShowNews(false); setShowReviews(false); setTimeout(() => scrollTo(aboutRef), 50); }}
-        onContactClick={() => { setDetailLoad(null); setShowCareers(false); setShowNews(false); setShowReviews(false); setTimeout(() => scrollTo(contactRef), 50); }}
+        onCatalogClick={() => { setDetailLoad(null); setShowCareers(false); setShowNews(false); setShowReviews(false); setShowAdmin(false); setShowFleet(false); setShowProfile(false); setShowOrders(false); window.scrollTo({ top: 0, behavior: "smooth" }); setTimeout(() => scrollTo(catalogRef), 100); }}
+        onAboutClick={() => { setDetailLoad(null); setShowCareers(false); setShowNews(false); setShowReviews(false); setShowAdmin(false); setShowFleet(false); setShowProfile(false); setShowOrders(false); window.scrollTo({ top: 0, behavior: "smooth" }); setTimeout(() => scrollTo(aboutRef), 100); }}
+        onContactClick={() => { setDetailLoad(null); setShowCareers(false); setShowNews(false); setShowReviews(false); setShowAdmin(false); setShowFleet(false); setShowProfile(false); setShowOrders(false); window.scrollTo({ top: 0, behavior: "smooth" }); setTimeout(() => scrollTo(contactRef), 100); }}
         onQuoteClick={() => setShowQuote(true)}
-        onCareersClick={() => { setDetailLoad(null); setShowCareers(true); setShowNews(false); setShowReviews(false); setShowProfile(false); setShowOrders(false); window.scrollTo({ top: 0, behavior: "smooth" }); }}
-        onNewsClick={() => { setDetailLoad(null); setShowNews(true); setShowCareers(false); setShowReviews(false); setShowProfile(false); setShowOrders(false); window.scrollTo({ top: 0, behavior: "smooth" }); }}
-        onReviewsClick={() => { setDetailLoad(null); setShowReviews(true); setShowNews(false); setShowCareers(false); setShowFleet(false); setShowProfile(false); setShowOrders(false); window.scrollTo({ top: 0, behavior: "smooth" }); }}
-        onFleetClick={() => { setDetailLoad(null); setShowFleet(true); setShowCareers(false); setShowNews(false); setShowReviews(false); setShowProfile(false); setShowOrders(false); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+        onCareersClick={() => { setDetailLoad(null); setShowCareers(true); setShowNews(false); setShowReviews(false); setShowProfile(false); setShowOrders(false); setShowAdmin(false); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+        onNewsClick={() => { setDetailLoad(null); setShowNews(true); setShowCareers(false); setShowReviews(false); setShowProfile(false); setShowOrders(false); setShowAdmin(false); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+        onReviewsClick={() => { setDetailLoad(null); setShowReviews(true); setShowNews(false); setShowCareers(false); setShowFleet(false); setShowProfile(false); setShowOrders(false); setShowAdmin(false); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+        onFleetClick={() => { setDetailLoad(null); setShowFleet(true); setShowCareers(false); setShowNews(false); setShowReviews(false); setShowProfile(false); setShowOrders(false); setShowAdmin(false); window.scrollTo({ top: 0, behavior: "smooth" }); }}
         onSavedClick={() => setShowFavorites(true)}
         onRequestsClick={() => setShowRequests(true)}
         onLoginClick={() => setShowAuth(true)}

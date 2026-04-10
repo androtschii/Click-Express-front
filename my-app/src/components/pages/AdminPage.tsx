@@ -4,6 +4,7 @@ import {
   updateProductPrice, updateProductImage,
   updateProductStock, toggleProductActive, deleteProduct
 } from "../../api/client.js";
+import { useLanguage } from "../../context/LanguageContext";
 
 interface Product {
   id: number;
@@ -30,6 +31,9 @@ interface AdminPageProps {
 }
 
 export const AdminPage: React.FC<AdminPageProps> = ({ theme, onBack }) => {
+  const { lang } = useLanguage();
+  const ru = lang === "ru";
+
   const [products, setProducts] = useState<Product[]>([]);
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
@@ -45,8 +49,8 @@ export const AdminPage: React.FC<AdminPageProps> = ({ theme, onBack }) => {
   const sub = isDark ? "rgba(255,255,255,0.45)" : "rgba(0,0,0,0.45)";
   const border = isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.1)";
 
-  const notify = (text: string, ok = true) => {
-    setMsg({ text, ok });
+  const notify = (t: string, ok = true) => {
+    setMsg({ text: t, ok });
     setTimeout(() => setMsg(null), 3000);
   };
 
@@ -55,7 +59,7 @@ export const AdminPage: React.FC<AdminPageProps> = ({ theme, onBack }) => {
       const [p, s] = await Promise.all([fetchProducts(), fetchProductStats()]);
       setProducts(p);
       setStats(s);
-    } catch { notify("Ошибка загрузки", false); }
+    } catch { notify(ru ? "Ошибка загрузки" : "Load error", false); }
     finally { setLoading(false); }
   };
 
@@ -67,8 +71,8 @@ export const AdminPage: React.FC<AdminPageProps> = ({ theme, onBack }) => {
       await updateProductPrice(id, parseFloat(editPrice.value));
       setProducts(ps => ps.map(p => p.id === id ? { ...p, price: parseFloat(editPrice.value) } : p));
       setEditPrice(null);
-      notify("Цена обновлена ✓");
-    } catch { notify("Ошибка обновления цены", false); }
+      notify(ru ? "Цена обновлена ✓" : "Price updated ✓");
+    } catch { notify(ru ? "Ошибка обновления цены" : "Price update error", false); }
   };
 
   const handleImage = async (id: number) => {
@@ -77,8 +81,8 @@ export const AdminPage: React.FC<AdminPageProps> = ({ theme, onBack }) => {
       await updateProductImage(id, editImage.value);
       setProducts(ps => ps.map(p => p.id === id ? { ...p, imageUrl: editImage.value } : p));
       setEditImage(null);
-      notify("Фото обновлено ✓");
-    } catch { notify("Ошибка обновления фото", false); }
+      notify(ru ? "Фото обновлено ✓" : "Photo updated ✓");
+    } catch { notify(ru ? "Ошибка обновления фото" : "Photo update error", false); }
   };
 
   const handleStock = async (id: number) => {
@@ -87,25 +91,25 @@ export const AdminPage: React.FC<AdminPageProps> = ({ theme, onBack }) => {
       await updateProductStock(id, parseInt(editStock.value));
       setProducts(ps => ps.map(p => p.id === id ? { ...p, stock: parseInt(editStock.value) } : p));
       setEditStock(null);
-      notify("Остаток обновлён ✓");
-    } catch { notify("Ошибка обновления остатка", false); }
+      notify(ru ? "Остаток обновлён ✓" : "Stock updated ✓");
+    } catch { notify(ru ? "Ошибка обновления остатка" : "Stock update error", false); }
   };
 
   const handleToggle = async (id: number) => {
     try {
       const res = await toggleProductActive(id);
       setProducts(ps => ps.map(p => p.id === id ? { ...p, isActive: res.isActive } : p));
-      notify(res.message);
-    } catch { notify("Ошибка", false); }
+      notify(res.isActive ? (ru ? "Активирован" : "Activated") : (ru ? "Деактивирован" : "Deactivated"));
+    } catch { notify(ru ? "Ошибка" : "Error", false); }
   };
 
   const handleDelete = async (id: number, name: string) => {
-    if (!confirm(`Удалить "${name}"?`)) return;
+    if (!confirm(ru ? `Удалить "${name}"?` : `Delete "${name}"?`)) return;
     try {
       await deleteProduct(id);
       setProducts(ps => ps.filter(p => p.id !== id));
-      notify("Удалено ✓");
-    } catch { notify("Ошибка удаления", false); }
+      notify(ru ? "Удалено ✓" : "Deleted ✓");
+    } catch { notify(ru ? "Ошибка удаления" : "Delete error", false); }
   };
 
   const inputStyle: React.CSSProperties = {
@@ -141,21 +145,23 @@ export const AdminPage: React.FC<AdminPageProps> = ({ theme, onBack }) => {
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 32 }}>
           <div>
             <h1 style={{ fontFamily: "'Oswald',sans-serif", fontSize: 28, fontWeight: 700, margin: 0 }}>
-              <span style={{ color: "#CC0000" }}>ADMIN</span> ПАНЕЛЬ
+              <span style={{ color: "#CC0000" }}>ADMIN</span> {ru ? "ПАНЕЛЬ" : "PANEL"}
             </h1>
-            <p style={{ color: sub, fontSize: 13, margin: "4px 0 0" }}>Управление услугами ClickExpress</p>
+            <p style={{ color: sub, fontSize: 13, margin: "4px 0 0" }}>
+              {ru ? "Управление услугами ClickExpress" : "ClickExpress Load Management"}
+            </p>
           </div>
-          <button onClick={onBack} style={btn("gray")}>← Назад</button>
+          <button onClick={onBack} style={btn("gray")}>{ru ? "← Назад" : "← Back"}</button>
         </div>
 
         {stats && (
           <div style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 12, marginBottom: 32 }}>
             {[
-              { label: "Всего услуг", value: stats.totalProducts },
-              { label: "Активных", value: stats.activeProducts },
-              { label: "Нет в наличии", value: stats.outOfStock },
-              { label: "Категорий", value: stats.categories },
-              { label: "Стоимость склада", value: `${stats.totalValue.toLocaleString()} ₽` },
+              { label: ru ? "Всего услуг" : "Total Loads", value: stats.totalProducts },
+              { label: ru ? "Активных" : "Active", value: stats.activeProducts },
+              { label: ru ? "Нет в наличии" : "Out of Stock", value: stats.outOfStock },
+              { label: ru ? "Категорий" : "Categories", value: stats.categories },
+              { label: ru ? "Стоимость склада" : "Total Value", value: `$${stats.totalValue.toLocaleString()}` },
             ].map(s => (
               <div key={s.label} style={{ background: card, border: `1px solid ${border}`, borderRadius: 10, padding: "16px 20px" }}>
                 <div style={{ fontSize: 22, fontWeight: 800, fontFamily: "'Oswald',sans-serif", color: "#CC0000" }}>{s.value}</div>
@@ -166,7 +172,7 @@ export const AdminPage: React.FC<AdminPageProps> = ({ theme, onBack }) => {
         )}
 
         {loading ? (
-          <div style={{ textAlign: "center", color: sub, padding: 60 }}>Загрузка...</div>
+          <div style={{ textAlign: "center", color: sub, padding: 60 }}>{ru ? "Загрузка..." : "Loading..."}</div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             {products.map(p => (
@@ -186,16 +192,16 @@ export const AdminPage: React.FC<AdminPageProps> = ({ theme, onBack }) => {
                       <span style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 16 }}>{p.name}</span>
                       <span style={{ fontSize: 11, padding: "2px 8px", borderRadius: 20, background: isDark ? "#1a1a1a" : "#f0f0f0", color: sub }}>{p.category}</span>
                       <span style={{ fontSize: 11, padding: "2px 8px", borderRadius: 20, background: p.isActive ? "rgba(22,163,74,0.15)" : "rgba(204,0,0,0.15)", color: p.isActive ? "#16a34a" : "#CC0000" }}>
-                        {p.isActive ? "Активен" : "Неактивен"}
+                        {p.isActive ? (ru ? "Активен" : "Active") : (ru ? "Неактивен" : "Inactive")}
                       </span>
                     </div>
                     <div style={{ fontSize: 13, color: sub, marginBottom: 12 }}>{p.description}</div>
 
                     <div style={{ display: "flex", gap: 16, flexWrap: "wrap" as const }}>
 
-                      {/* Цена */}
+                      {/* Price */}
                       <div style={{ minWidth: 160 }}>
-                        <div style={{ fontSize: 11, color: sub, marginBottom: 4, textTransform: "uppercase" as const }}>Цена</div>
+                        <div style={{ fontSize: 11, color: sub, marginBottom: 4, textTransform: "uppercase" as const }}>{ru ? "Цена" : "Price"}</div>
                         {editPrice?.id === p.id ? (
                           <div style={{ display: "flex", gap: 4 }}>
                             <input style={inputStyle} type="number" value={editPrice.value}
@@ -205,15 +211,15 @@ export const AdminPage: React.FC<AdminPageProps> = ({ theme, onBack }) => {
                           </div>
                         ) : (
                           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                            <span style={{ fontWeight: 700, fontSize: 15 }}>{p.price.toLocaleString()} ₽</span>
+                            <span style={{ fontWeight: 700, fontSize: 15 }}>${p.price.toLocaleString()}</span>
                             <button style={btn("gray")} onClick={() => setEditPrice({ id: p.id, value: String(p.price) })}>✏️</button>
                           </div>
                         )}
                       </div>
 
-                      {/* Остаток */}
+                      {/* Stock */}
                       <div style={{ minWidth: 140 }}>
-                        <div style={{ fontSize: 11, color: sub, marginBottom: 4, textTransform: "uppercase" as const }}>Остаток</div>
+                        <div style={{ fontSize: 11, color: sub, marginBottom: 4, textTransform: "uppercase" as const }}>{ru ? "Остаток" : "Stock"}</div>
                         {editStock?.id === p.id ? (
                           <div style={{ display: "flex", gap: 4 }}>
                             <input style={inputStyle} type="number" value={editStock.value}
@@ -229,9 +235,11 @@ export const AdminPage: React.FC<AdminPageProps> = ({ theme, onBack }) => {
                         )}
                       </div>
 
-                      {/* Фото */}
+                      {/* Image URL */}
                       <div style={{ flex: 1, minWidth: 200 }}>
-                        <div style={{ fontSize: 11, color: sub, marginBottom: 4, textTransform: "uppercase" as const }}>URL фото</div>
+                        <div style={{ fontSize: 11, color: sub, marginBottom: 4, textTransform: "uppercase" as const }}>
+                          {ru ? "URL фото" : "Photo URL"}
+                        </div>
                         {editImage?.id === p.id ? (
                           <div style={{ display: "flex", gap: 4 }}>
                             <input style={inputStyle} type="text" value={editImage.value}
@@ -252,9 +260,11 @@ export const AdminPage: React.FC<AdminPageProps> = ({ theme, onBack }) => {
 
                   <div style={{ display: "flex", flexDirection: "column", gap: 8, flexShrink: 0 }}>
                     <button style={btn(p.isActive ? "gray" : "green")} onClick={() => handleToggle(p.id)}>
-                      {p.isActive ? "Деактивировать" : "Активировать"}
+                      {p.isActive ? (ru ? "Деактивировать" : "Deactivate") : (ru ? "Активировать" : "Activate")}
                     </button>
-                    <button style={btn("red")} onClick={() => handleDelete(p.id, p.name)}>Удалить</button>
+                    <button style={btn("red")} onClick={() => handleDelete(p.id, p.name)}>
+                      {ru ? "Удалить" : "Delete"}
+                    </button>
                   </div>
 
                 </div>

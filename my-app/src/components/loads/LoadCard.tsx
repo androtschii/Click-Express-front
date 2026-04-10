@@ -3,6 +3,7 @@ import { ThemeContext } from "../../theme";
 import type { Load } from "../../types/index";
 import { useLanguage } from "../../context/LanguageContext";
 import { translations } from "../../i18n/translations";
+import { updateProductPrice, updateProductImage } from "../../api/client.js";
 
 interface LoadCardProps {
   load: Load;
@@ -12,6 +13,7 @@ interface LoadCardProps {
   onDetails?: (load: Load) => void;
   isBooked?: boolean;
   isSaved?: boolean;
+  isAdmin?: boolean;
 }
 
 const HeartIcon = ({ saved, onClick }: { saved: boolean; onClick: () => void }) => {
@@ -42,7 +44,7 @@ const HeartIcon = ({ saved, onClick }: { saved: boolean; onClick: () => void }) 
   );
 };
 
-export const LoadCard: React.FC<LoadCardProps> = ({ load, onBook, onCancelBook, onSave, onDetails, isBooked = false, isSaved = false }) => {
+export const LoadCard: React.FC<LoadCardProps> = ({ load, onBook, onCancelBook, onSave, onDetails, isBooked = false, isSaved = false, isAdmin = false }) => {
   const context = useContext(ThemeContext) as { theme?: 'dark' | 'light' };
   const theme = context.theme || 'dark';
   const isDark = theme === 'dark';
@@ -56,6 +58,38 @@ export const LoadCard: React.FC<LoadCardProps> = ({ load, onBook, onCancelBook, 
   const [hov, setHov] = useState(false);
   const [bookHov, setBookHov] = useState(false);
   const [imgLoaded, setImgLoaded] = useState(false);
+
+  // Admin edit state
+  const [currentPrice, setCurrentPrice] = useState(load.price);
+  const [currentImage, setCurrentImage] = useState(load.image);
+  const [editingPrice, setEditingPrice] = useState(false);
+  const [editingImage, setEditingImage] = useState(false);
+  const [priceInput, setPriceInput] = useState(String(load.price));
+  const [imageInput, setImageInput] = useState(load.image);
+  const [adminMsg, setAdminMsg] = useState<string | null>(null);
+
+  const showMsg = (m: string) => { setAdminMsg(m); setTimeout(() => setAdminMsg(null), 2000); };
+
+  const savePrice = async () => {
+    const val = parseFloat(priceInput);
+    if (isNaN(val) || val <= 0) return;
+    try {
+      await updateProductPrice(load.id, val);
+      setCurrentPrice(val);
+      setEditingPrice(false);
+      showMsg(lang === 'ru' ? "Цена сохранена ✓" : "Price saved ✓");
+    } catch { showMsg(lang === 'ru' ? "Ошибка сохранения" : "Save error"); }
+  };
+
+  const saveImage = async () => {
+    if (!imageInput.trim()) return;
+    try {
+      await updateProductImage(load.id, imageInput);
+      setCurrentImage(imageInput);
+      setEditingImage(false);
+      showMsg(lang === 'ru' ? "Фото сохранено ✓" : "Photo saved ✓");
+    } catch { showMsg(lang === 'ru' ? "Ошибка сохранения" : "Save error"); }
+  };
 
   const handleBook = () => {
     if (!booked) {
@@ -92,7 +126,7 @@ export const LoadCard: React.FC<LoadCardProps> = ({ load, onBook, onCancelBook, 
       <div onClick={() => onDetails && onDetails(load)} style={{ position:"relative", height:280, overflow:"hidden", cursor: onDetails ? "pointer" : "default" }}>
         {/* Skeleton */}
         {!imgLoaded && <div style={{ position:"absolute", inset:0, background: isDark ? "#1a1a1a" : "#e8e8e8", animation:"shimmer 1.4s ease infinite" }} />}
-        <img src={load.image} alt={load.route} onLoad={() => setImgLoaded(true)} style={{
+        <img src={currentImage} alt={load.route} onLoad={() => setImgLoaded(true)} style={{
           width:"100%", height:"100%", objectFit:"cover", objectPosition:"center 72%",
           filter: isDark ? "brightness(0.52)" : "brightness(1.0) saturate(1.1) contrast(1.04)",
           transform: hov ? "scale(1.04)" : "scale(1)",
@@ -120,13 +154,62 @@ export const LoadCard: React.FC<LoadCardProps> = ({ load, onBook, onCancelBook, 
 
         <HeartIcon saved={saved} onClick={handleSaveClick} />
 
+        {/* Admin: edit image button */}
+        {isAdmin && (
+          <div style={{ position:"absolute", top:10, left:10, zIndex:5 }}>
+            {editingImage ? (
+              <div style={{ display:"flex", gap:4, background:"rgba(0,0,0,0.88)", padding:6, borderRadius:6, backdropFilter:"blur(4px)" }}>
+                <input
+                  style={{ background:"#1a1a1a", border:"1px solid #CC0000", borderRadius:4, color:"#fff", padding:"4px 8px", fontSize:11, fontFamily:"'Barlow',sans-serif", width:170, outline:"none" }}
+                  placeholder={lang === 'ru' ? "URL фото..." : "Photo URL..."}
+                  value={imageInput}
+                  onChange={e => setImageInput(e.target.value)}
+                  onKeyDown={e => e.key === "Enter" && saveImage()}
+                />
+                <button onClick={saveImage} style={{ padding:"3px 10px", borderRadius:4, border:"none", cursor:"pointer", fontSize:11, fontWeight:700, background:"#CC0000", color:"#fff", fontFamily:"'Barlow',sans-serif" }}>✓</button>
+                <button onClick={() => setEditingImage(false)} style={{ padding:"3px 10px", borderRadius:4, border:"none", cursor:"pointer", fontSize:11, fontWeight:700, background:"#555", color:"#fff", fontFamily:"'Barlow',sans-serif" }}>✕</button>
+              </div>
+            ) : (
+              <button onClick={() => { setImageInput(currentImage); setEditingImage(true); }} style={{ padding:"4px 10px", borderRadius:4, border:"1px solid rgba(255,255,255,0.25)", cursor:"pointer", fontSize:11, fontWeight:700, background:"rgba(0,0,0,0.7)", color:"#fff", fontFamily:"'Barlow',sans-serif", backdropFilter:"blur(4px)" }}>
+                {lang === 'ru' ? "📷 Фото" : "📷 Photo"}
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* Admin toast */}
+        {adminMsg && (
+          <div style={{ position:"absolute", top:"50%", left:"50%", transform:"translate(-50%,-50%)", background:"rgba(0,0,0,0.9)", color:"#fff", padding:"8px 18px", borderRadius:8, fontFamily:"'Barlow',sans-serif", fontWeight:700, fontSize:13, zIndex:20, whiteSpace:"nowrap", border:"1px solid rgba(204,0,0,0.4)" }}>
+            {adminMsg}
+          </div>
+        )}
+
         {/* Цена + тип */}
         <div style={{ position:"absolute", bottom:0, left:0, right:0, padding:"16px 16px 14px" }}>
           <div style={{ display:"flex", alignItems:"flex-end", justifyContent:"space-between", gap:8 }}>
             <div>
-              <div style={{ fontFamily:"'Anton',sans-serif", fontSize:42, color:"#fff", lineHeight:0.88, textShadow:"0 2px 16px rgba(0,0,0,0.95)", letterSpacing:-1 }}>
-                ${load.price.toLocaleString()}
-              </div>
+              {isAdmin && editingPrice ? (
+                <div style={{ display:"flex", alignItems:"center", gap:4, marginBottom:4 }}>
+                  <input
+                    type="number"
+                    style={{ background:"#1a1a1a", border:"1px solid #CC0000", borderRadius:4, color:"#fff", padding:"4px 8px", fontSize:14, fontFamily:"'Barlow',sans-serif", width:100, outline:"none" }}
+                    value={priceInput}
+                    onChange={e => setPriceInput(e.target.value)}
+                    onKeyDown={e => e.key === "Enter" && savePrice()}
+                  />
+                  <button onClick={savePrice} style={{ padding:"4px 10px", borderRadius:4, border:"none", cursor:"pointer", fontSize:12, fontWeight:700, background:"#CC0000", color:"#fff", fontFamily:"'Barlow',sans-serif" }}>✓</button>
+                  <button onClick={() => setEditingPrice(false)} style={{ padding:"4px 10px", borderRadius:4, border:"none", cursor:"pointer", fontSize:12, fontWeight:700, background:"#555", color:"#fff", fontFamily:"'Barlow',sans-serif" }}>✕</button>
+                </div>
+              ) : (
+                <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+                  <div style={{ fontFamily:"'Anton',sans-serif", fontSize:42, color:"#fff", lineHeight:0.88, textShadow:"0 2px 16px rgba(0,0,0,0.95)", letterSpacing:-1 }}>
+                    ${currentPrice.toLocaleString()}
+                  </div>
+                  {isAdmin && (
+                    <button onClick={() => { setPriceInput(String(currentPrice)); setEditingPrice(true); }} style={{ padding:"3px 8px", borderRadius:4, border:"1px solid rgba(255,255,255,0.25)", cursor:"pointer", fontSize:11, background:"rgba(0,0,0,0.6)", color:"#fff", fontFamily:"'Barlow',sans-serif", backdropFilter:"blur(4px)", alignSelf:"flex-end", marginBottom:6 }}>✏️</button>
+                  )}
+                </div>
+              )}
               <div style={{ display:"flex", alignItems:"center", gap:8, marginTop:6, flexWrap:"wrap" }}>
                 <div style={{ background:"#CC0000", color:"#fff", fontFamily:"'Anton',sans-serif", fontSize:9, letterSpacing:2.5, textTransform:"uppercase", padding:"3px 10px" }}>{load.type}</div>
                 <span style={{ fontFamily:"'DM Sans',sans-serif", fontWeight:600, fontSize:12, color:"rgba(255,255,255,0.65)" }}>{load.miles.toLocaleString()} mi</span>

@@ -27,6 +27,7 @@ import { LOADS } from "./utils/data";
 import type { Load } from "./types/index";
 import { filterLoads, fetchLoads } from "./services/loadService.ts";
 import { healthCheck } from "./services/userService";
+import { fetchProducts } from "./api/client.js";
 import { AdminPage } from "./components/pages/AdminPage";
 
 // ── Анимированное сердечко для секции "Лучшие грузы недели" ──────────────
@@ -268,7 +269,14 @@ function AppContent() {
     const run = async () => {
       try {
         const data = await fetchLoads(LOADS);
-        setLoads(data);
+        // Мержим цены из БД поверх статических данных
+        try {
+          const products = await fetchProducts();
+          const priceMap = new Map(products.map((p: { id: number; price: number }) => [p.id, p.price]));
+          setLoads(data.map(l => priceMap.has(l.id) ? { ...l, price: priceMap.get(l.id) as number } : l));
+        } catch {
+          setLoads(data); // нет токена или БД недоступна — показываем статические цены
+        }
       } catch (err) {
         setError((err as Error).message);
       } finally {
@@ -377,7 +385,7 @@ function AppContent() {
         onLoginClick={() => setShowAuth(true)}
         session={session}
         onLogout={() => { logout(); setSession(null); setShowProfile(false); setShowOrders(false); }}
-        onLogoClick={() => { setDetailLoad(null); setShowCareers(false); setShowNews(false); setShowReviews(false); setShowFleet(false); setShowProfile(false); setShowOrders(false); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+        onLogoClick={() => { setDetailLoad(null); setShowCareers(false); setShowNews(false); setShowReviews(false); setShowFleet(false); setShowProfile(false); setShowOrders(false); setShowAdmin(false); window.scrollTo({ top: 0, behavior: "smooth" }); }}
         onProfileClick={() => { setDetailLoad(null); setShowCareers(false); setShowNews(false); setShowReviews(false); setShowOrders(false); setShowAdmin(false); setShowProfile(true); window.scrollTo({ top: 0, behavior: "smooth" }); }}
         onOrdersClick={() => { setDetailLoad(null); setShowCareers(false); setShowNews(false); setShowReviews(false); setShowProfile(false); setShowAdmin(false); setShowOrders(true); window.scrollTo({ top: 0, behavior: "smooth" }); }}
         onAdminClick={() => { setDetailLoad(null); setShowCareers(false); setShowNews(false); setShowReviews(false); setShowProfile(false); setShowOrders(false); setShowAdmin(true); window.scrollTo({ top: 0, behavior: "smooth" }); }}
@@ -792,6 +800,7 @@ function AppContent() {
           onFleetClick={() => { setShowFleet(true); window.scrollTo({ top: 0, behavior: "smooth" }); }}
           bookedIds={bookedLoads.map(l => l.id)}
           savedIds={savedLoads.map(l => l.id)}
+          isAdmin={session?.role === "Admin"}
         />
       </section>
 

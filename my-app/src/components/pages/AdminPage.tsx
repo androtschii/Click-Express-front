@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import {
   fetchProducts, fetchProductStats,
   updateProductPrice, updateProductImage,
-  updateProductStock, toggleProductActive, deleteProduct
+  updateProductStock, toggleProductActive, deleteProduct, createProduct
 } from "../../api/client.js";
 import { useLanguage } from "../../context/LanguageContext";
 
@@ -41,6 +41,8 @@ export const AdminPage: React.FC<AdminPageProps> = ({ theme, onBack }) => {
   const [editImage, setEditImage] = useState<{ id: number; value: string } | null>(null);
   const [editStock, setEditStock] = useState<{ id: number; value: string } | null>(null);
   const [msg, setMsg] = useState<{ text: string; ok: boolean } | null>(null);
+  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [newCard, setNewCard] = useState({ name: "", description: "", price: "", imageUrl: "", category: "Full Load", stock: "1" });
 
   const isDark = theme === "dark";
   const bg = isDark ? "#0a0a0a" : "#f5f5f5";
@@ -103,6 +105,25 @@ export const AdminPage: React.FC<AdminPageProps> = ({ theme, onBack }) => {
     } catch { notify(ru ? "Ошибка" : "Error", false); }
   };
 
+  const handleCreate = async () => {
+    if (!newCard.name.trim() || !newCard.price) return;
+    try {
+      const created = await createProduct({
+        name: newCard.name,
+        description: newCard.description,
+        price: parseFloat(newCard.price),
+        imageUrl: newCard.imageUrl || "https://placehold.co/400x280?text=Load",
+        category: newCard.category,
+        stock: parseInt(newCard.stock) || 1,
+      });
+      setProducts(ps => [...ps, created]);
+      setNewCard({ name: "", description: "", price: "", imageUrl: "", category: "Full Load", stock: "1" });
+      setShowCreateForm(false);
+      notify(ru ? "Карточка создана ✓" : "Card created ✓");
+      load();
+    } catch { notify(ru ? "Ошибка создания" : "Create error", false); }
+  };
+
   const handleDelete = async (id: number, name: string) => {
     if (!confirm(ru ? `Удалить "${name}"?` : `Delete "${name}"?`)) return;
     try {
@@ -151,8 +172,62 @@ export const AdminPage: React.FC<AdminPageProps> = ({ theme, onBack }) => {
               {ru ? "Управление услугами ClickExpress" : "ClickExpress Load Management"}
             </p>
           </div>
-          <button onClick={onBack} style={btn("gray")}>{ru ? "← Назад" : "← Back"}</button>
+          <div style={{ display: "flex", gap: 10 }}>
+            <button onClick={() => setShowCreateForm(v => !v)} style={{ ...btn("green"), padding: "8px 18px", fontSize: 13 }}>
+              {showCreateForm ? "✕" : (ru ? "+ Новая карточка" : "+ New Card")}
+            </button>
+            <button onClick={onBack} style={btn("gray")}>{ru ? "← Назад" : "← Back"}</button>
+          </div>
         </div>
+
+        {/* Форма создания */}
+        {showCreateForm && (
+          <div style={{ background: card, border: "1px solid rgba(22,163,74,0.4)", borderRadius: 12, padding: 24, marginBottom: 24 }}>
+            <h3 style={{ fontFamily: "'Oswald',sans-serif", fontSize: 18, margin: "0 0 16px", color: "#16a34a" }}>
+              {ru ? "Новая карточка груза" : "New Load Card"}
+            </h3>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+              {[
+                { key: "name", label: ru ? "Маршрут (название)" : "Route (name)", placeholder: "Colorado Springs → Tampa" },
+                { key: "description", label: ru ? "Описание" : "Description", placeholder: "Flatbed / Steel Beams" },
+                { key: "price", label: ru ? "Цена ($)" : "Price ($)", placeholder: "4100", type: "number" },
+                { key: "imageUrl", label: ru ? "URL фото" : "Photo URL", placeholder: "/images/real1.jpg" },
+                { key: "stock", label: ru ? "Количество мест" : "Stock", placeholder: "1", type: "number" },
+              ].map(f => (
+                <div key={f.key}>
+                  <div style={{ fontSize: 11, color: sub, marginBottom: 4, textTransform: "uppercase" as const, letterSpacing: 0.5 }}>{f.label}</div>
+                  <input
+                    style={{ ...inputStyle, outline: "none" }}
+                    type={f.type || "text"}
+                    placeholder={f.placeholder}
+                    value={(newCard as Record<string, string>)[f.key]}
+                    onChange={e => setNewCard(v => ({ ...v, [f.key]: e.target.value }))}
+                  />
+                </div>
+              ))}
+              <div>
+                <div style={{ fontSize: 11, color: sub, marginBottom: 4, textTransform: "uppercase" as const, letterSpacing: 0.5 }}>{ru ? "Категория" : "Category"}</div>
+                <select
+                  style={{ ...inputStyle, outline: "none" }}
+                  value={newCard.category}
+                  onChange={e => setNewCard(v => ({ ...v, category: e.target.value }))}
+                >
+                  <option value="Full Load">Full Load</option>
+                  <option value="Partial">Partial</option>
+                  <option value="Military Load">Military Load</option>
+                </select>
+              </div>
+            </div>
+            <div style={{ marginTop: 16, display: "flex", gap: 10 }}>
+              <button style={{ ...btn("green"), padding: "8px 22px", fontSize: 13 }} onClick={handleCreate}>
+                {ru ? "Создать" : "Create"}
+              </button>
+              <button style={{ ...btn("gray"), padding: "8px 22px", fontSize: 13 }} onClick={() => setShowCreateForm(false)}>
+                {ru ? "Отмена" : "Cancel"}
+              </button>
+            </div>
+          </div>
+        )}
 
         {stats && (
           <div style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 12, marginBottom: 32 }}>

@@ -241,7 +241,7 @@ export const Header: React.FC<HeaderProps> = ({
               </div>
               <div style={{ padding: "6px 0" }}>
                 {[
-                  ...(session?.role === "Admin" ? [{ label: "Админ панель", icon: "⚙️", onClick: onAdminClick }] : []),
+                  ...(session?.role === "Admin" ? [{ label: lang === "ru" ? "Админ панель" : "Admin Panel", icon: "⚙️", onClick: onAdminClick }] : []),
                   { label: t.header.myProfile, icon: "👤", onClick: onProfileClick },
                   { label: t.header.myOrders, icon: "📋", onClick: onOrdersClick },
                 ].map(item => (
@@ -262,7 +262,7 @@ export const Header: React.FC<HeaderProps> = ({
           )}
         </div>
       ) : (
-        <button onClick={onLoginClick} className="btn-split" style={{ borderRadius: 20, padding: "7px 18px", fontFamily: "'Barlow',sans-serif", fontWeight: 600, fontSize: 12, letterSpacing: 1.5, textTransform: "uppercase", cursor: "pointer", flexShrink: 0 }}>
+        <button onClick={onLoginClick} className="btn-split" style={{ borderRadius: 20, padding: "7px 18px", fontFamily: "'Barlow',sans-serif", fontWeight: 600, fontSize: 12, letterSpacing: 1.5, textTransform: "uppercase", cursor: "pointer", flexShrink: 0, color: isLight ? "#CC0000" : "#fff" }}>
           {t.header.login}
         </button>
       )}

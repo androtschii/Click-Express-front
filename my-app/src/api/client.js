@@ -96,6 +96,16 @@ export const fetchProducts = async (search = "", category = "") => {
   return response.json();
 };
 
+export const createProduct = async (productData) => {
+  const response = await fetch(`${API_BASE_URL}/product`, {
+    method: "POST",
+    headers: authHeaders(),
+    body: JSON.stringify(productData),
+  });
+  if (!response.ok) throw new Error("Ошибка создания карточки");
+  return response.json();
+};
+
 export const updateProductPrice = async (id, price) => {
   const response = await fetch(`${API_BASE_URL}/product/${id}/price`, {
     method: "PATCH",

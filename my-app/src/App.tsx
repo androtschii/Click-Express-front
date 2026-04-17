@@ -27,6 +27,8 @@ import { LOADS } from "./utils/data";
 import type { Load } from "./types/index";
 import { filterLoads, fetchLoads } from "./services/loadService.ts";
 import { healthCheck } from "./services/userService";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 import { fetchProducts } from "./api/client.js";
 import { AdminPage } from "./components/pages/AdminPage";
 
@@ -266,19 +268,36 @@ function AppContent() {
   useEffect(() => {
     setLoading(true);
     setError(null);
+    const staticMap = new Map(LOADS.map(l => [l.id, l]));
     const run = async () => {
       try {
-        const data = await fetchLoads(LOADS);
-        // Мержим цены из БД поверх статических данных
+        const products = await fetchProducts();
+        const mapped: Load[] = products
+          .filter((p: { isActive: boolean }) => p.isActive)
+          .map((p: { id: number; name: string; description: string; price: number; imageUrl: string; category: string }) => {
+            const parts = p.name.split(" → ");
+            const staticLoad = staticMap.get(p.id);
+            return {
+              id: p.id,
+              route: parts[0]?.trim() || p.name,
+              dest: parts[1]?.trim() || "",
+              price: p.price,
+              miles: staticLoad?.miles ?? 0,
+              type: (p.category === "Partial" ? "Partial" : "Full Load") as "Full Load" | "Partial",
+              cargo: p.description,
+              image: p.imageUrl,
+              tag: staticLoad?.tag ?? (p.category === "Military Load" ? "Military Load" : null),
+            };
+          });
+        setLoads(mapped);
+      } catch {
+        // БД недоступна — показываем статические данные
         try {
-          const products = await fetchProducts();
-          const priceMap = new Map(products.map((p: { id: number; price: number }) => [p.id, p.price]));
-          setLoads(data.map(l => priceMap.has(l.id) ? { ...l, price: priceMap.get(l.id) as number } : l));
-        } catch {
-          setLoads(data); // нет токена или БД недоступна — показываем статические цены
+          const data = await fetchLoads(LOADS);
+          setLoads(data);
+        } catch (err) {
+          setError((err as Error).message);
         }
-      } catch (err) {
-        setError((err as Error).message);
       } finally {
         setLoading(false);
       }

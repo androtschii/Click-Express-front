@@ -27,6 +27,7 @@ import { LOADS } from "./utils/data";
 import type { Load } from "./types/index";
 import { filterLoads, fetchLoads } from "./services/loadService.ts";
 import { healthCheck } from "./services/userService";
+import { X, Heart, ClipboardText } from "@phosphor-icons/react";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import { fetchProducts } from "./api/client.js";
@@ -69,12 +70,12 @@ function FavoritesPanel({ loads, theme, onClose, onDetails, onRemove }: { loads:
             <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 10, color: "#CC0000", letterSpacing: 3, textTransform: "uppercase", marginBottom: 4 }}>{t.saved}</div>
             <h3 style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 24, color: isDark ? "#fff" : "#1a1a1a", textTransform: "uppercase" }}>{t.title} <span style={{ color: "#CC0000" }}>({loads.length})</span></h3>
           </div>
-          <button onClick={onClose} style={{ background: "rgba(255,255,255,0.07)", border: "none", borderRadius: "50%", width: 38, height: 38, color: isDark ? "rgba(255,255,255,0.5)" : "#666", fontSize: 18, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
+          <button onClick={onClose} style={{ background: "rgba(255,255,255,0.07)", border: "none", borderRadius: "50%", width: 38, height: 38, color: isDark ? "rgba(255,255,255,0.5)" : "#666", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><X size={18} weight="bold" /></button>
         </div>
         <div style={{ flex: 1, overflowY: "auto", overscrollBehavior: "contain", padding: "16px 20px" }}>
           {loads.length === 0 ? (
             <div style={{ textAlign: "center", padding: "80px 0" }}>
-              <div style={{ fontSize: 56, marginBottom: 14 }}>🤍</div>
+              <div style={{ marginBottom: 14 }}><Heart size={56} weight="duotone" color="#CC0000" /></div>
               <p style={{ fontFamily: "'Barlow',sans-serif", color: isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.4)", fontSize: 15 }}>{t.empty}</p>
             </div>
           ) : (
@@ -149,13 +150,13 @@ function RequestsPanel({ loads, theme, onClose, onDetails, onCancel, onBrowseLoa
             <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 10, color: "#CC0000", letterSpacing: 3, textTransform: "uppercase", marginBottom: 4 }}>{t.booked}</div>
             <h3 style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 26, color: isDark ? "#fff" : "#1a1a1a", textTransform: "uppercase" }}>{t.title} <span style={{ color: "#CC0000" }}>({loads.length})</span></h3>
           </div>
-          <button onClick={onClose} style={{ background: "rgba(204,0,0,0.1)", border: "1px solid rgba(204,0,0,0.3)", borderRadius: "50%", width: 40, height: 40, color: "#CC0000", fontSize: 18, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
+          <button onClick={onClose} style={{ background: "rgba(204,0,0,0.1)", border: "1px solid rgba(204,0,0,0.3)", borderRadius: "50%", width: 40, height: 40, color: "#CC0000", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><X size={18} weight="bold" /></button>
         </div>
 
         <div style={{ flex: 1, overflowY: "auto", overscrollBehavior: "contain", padding: "16px 20px" }}>
           {loads.length === 0 ? (
             <div style={{ textAlign: "center", padding: "80px 0" }}>
-              <div style={{ fontSize: 56, marginBottom: 14 }}>📋</div>
+              <div style={{ marginBottom: 14 }}><ClipboardText size={56} weight="duotone" color="#CC0000" /></div>
               <p style={{ fontFamily: "'Barlow',sans-serif", color: isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.4)", fontSize: 15 }}>{t.empty}</p>
               <p style={{ fontFamily: "'Barlow',sans-serif", color: isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.25)", fontSize: 12, marginTop: 6, marginBottom: 28 }}>{t.emptyHint}</p>
               <button onClick={() => { onClose(); setTimeout(() => onBrowseLoads?.(), 80); }} style={{ display:"inline-flex", alignItems:"center", gap:10, padding:"13px 28px", background:"linear-gradient(135deg,#CC0000,#ff3333)", border:"none", borderRadius:10, color:"#fff", fontFamily:"'Oswald',sans-serif", fontWeight:700, fontSize:14, letterSpacing:2, textTransform:"uppercase", cursor:"pointer", boxShadow:"0 6px 24px rgba(204,0,0,0.4)", transition:"all 0.15s" }}

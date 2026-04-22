@@ -2,6 +2,7 @@ import React, { useState, useContext } from "react";
 import { ThemeContext } from "../../theme";
 import { useLanguage } from "../../context/LanguageContext";
 import type { QuoteFormData } from "../../types/index";
+import { X } from "@phosphor-icons/react";
 
 interface QuoteModalProps {
   onClose?: () => void;
@@ -89,7 +90,7 @@ export const QuoteModal: React.FC<QuoteModalProps> = ({ onClose, theme: themePro
                 <div style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 10, color: "#CC0000", letterSpacing: 3, textTransform: "uppercase", marginBottom: 6 }}>{isRu ? "Бесплатная консультация" : "Free Consultation"}</div>
                 <h3 style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 26, color: isDark ? "#fff" : "#1a1a1a", textTransform: "uppercase" }}>{isRu ? "ЗАПРОС ЦЕНЫ" : "GET A QUOTE"}</h3>
               </div>
-              <button onClick={onClose} style={{ background: "rgba(204,0,0,0.1)", border: "1px solid rgba(204,0,0,0.3)", borderRadius: "50%", width: 36, height: 36, color: "#CC0000", fontSize: 16, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
+              <button onClick={onClose} style={{ background: "rgba(204,0,0,0.1)", border: "1px solid rgba(204,0,0,0.3)", borderRadius: "50%", width: 36, height: 36, color: "#CC0000", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><X size={16} weight="bold" /></button>
             </div>
 
             <div style={{ background: isDark ? "rgba(204,0,0,0.06)" : "rgba(204,0,0,0.04)", border: "1px solid rgba(204,0,0,0.2)", borderRadius: 8, padding: "16px", marginBottom: 20 }}>

@@ -6,6 +6,7 @@ import {
   getSession,
   type Session,
 } from "../../services/authService";
+import { X } from "@phosphor-icons/react";
 
 interface AuthModalProps {
   onClose: () => void;
@@ -376,7 +377,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             e.currentTarget.style.color = "rgba(255,255,255,0.7)";
           }}
         >
-          ✕
+          <X size={18} weight="bold" />
         </button>
       </div>
     </div>

@@ -3,6 +3,7 @@ import { CELogo } from "../ui/Logo";
 import type { Session } from "../../services/authService";
 import { useLanguage } from "../../context/LanguageContext";
 import { translations } from "../../i18n/translations";
+import { Gear, User, ListBullets, SignOut } from "@phosphor-icons/react";
 
 interface HeaderProps {
   cartCount: number;
@@ -241,21 +242,21 @@ export const Header: React.FC<HeaderProps> = ({
               </div>
               <div style={{ padding: "6px 0" }}>
                 {[
-                  ...(session?.role === "Admin" ? [{ label: lang === "ru" ? "Админ панель" : "Admin Panel", icon: "⚙️", onClick: onAdminClick }] : []),
-                  { label: t.header.myProfile, icon: "👤", onClick: onProfileClick },
-                  { label: t.header.myOrders, icon: "📋", onClick: onOrdersClick },
+                  ...(session?.role === "Admin" ? [{ label: lang === "ru" ? "Админ панель" : "Admin Panel", Icon: Gear, onClick: onAdminClick }] : []),
+                  { label: t.header.myProfile, Icon: User, onClick: onProfileClick },
+                  { label: t.header.myOrders, Icon: ListBullets, onClick: onOrdersClick },
                 ].map(item => (
                   <div key={item.label} onClick={() => { setUserMenuOpen(false); item.onClick?.(); }} style={{ padding: "9px 14px", display: "flex", alignItems: "center", gap: 10, cursor: "pointer", fontFamily: "'Barlow',sans-serif", fontSize: 13, color: isLight ? "rgba(0,0,0,0.7)" : "rgba(255,255,255,0.7)", transition: "all 0.15s" }}
                     onMouseEnter={e => { e.currentTarget.style.background = "rgba(204,0,0,0.08)"; e.currentTarget.style.color = "#CC0000"; }}
                     onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = isLight ? "rgba(0,0,0,0.7)" : "rgba(255,255,255,0.7)"; }}>
-                    <span>{item.icon}</span>{item.label}
+                    <item.Icon size={16} weight="duotone" />{item.label}
                   </div>
                 ))}
                 <div style={{ margin: "6px 0", height: 1, background: isLight ? "rgba(0,0,0,0.07)" : "rgba(255,255,255,0.07)" }} />
                 <div onClick={onLogout} style={{ padding: "9px 14px", display: "flex", alignItems: "center", gap: 10, cursor: "pointer", fontFamily: "'Barlow',sans-serif", fontSize: 13, color: "#CC0000", transition: "all 0.15s" }}
                   onMouseEnter={e => { e.currentTarget.style.background = "rgba(204,0,0,0.08)"; }}
                   onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}>
-                  <span>🚪</span> {t.header.signOut}
+                  <SignOut size={16} weight="duotone" /> {t.header.signOut}
                 </div>
               </div>
             </div>

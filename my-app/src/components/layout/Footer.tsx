@@ -3,6 +3,7 @@ import { CELogo } from "../ui/Logo";
 import { PhoneIcon } from "../ui/PhoneIcon";
 import { useLanguage } from "../../context/LanguageContext";
 import { translations } from "../../i18n/translations";
+import { Truck } from "@phosphor-icons/react";
 
 interface FooterProps {
   theme?: "dark" | "light";
@@ -81,7 +82,7 @@ export const Footer: React.FC<FooterProps> = ({
         padding: "44px clamp(20px,5vw,64px)",
         position: "relative", overflow: "hidden",
       }}>
-        <div style={{ position: "absolute", right: "3%", top: "50%", transform: "translateY(-50%)", fontSize: 130, opacity: 0.07, userSelect: "none", pointerEvents: "none", lineHeight: 1 }}>🚛</div>
+        <div style={{ position: "absolute", right: "3%", top: "50%", transform: "translateY(-50%)", opacity: 0.07, userSelect: "none", pointerEvents: "none", lineHeight: 1 }}><Truck size={130} weight="duotone" color="#CC0000" /></div>
         <div style={{ position: "absolute", inset: 0, backgroundImage: "repeating-linear-gradient(90deg,rgba(255,255,255,0.04) 0px,rgba(255,255,255,0.04) 1px,transparent 1px,transparent 80px)", pointerEvents: "none" }} />
         <div style={{ maxWidth: 1200, margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 24, position: "relative", zIndex: 1 }}>
           {stats.map((s, i) => (

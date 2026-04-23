@@ -76,6 +76,17 @@ export const Footer: React.FC<FooterProps> = ({
 
   return (
     <>
+      <style>{`
+        .footer-stats-grid { grid-template-columns: repeat(4,1fr); }
+        .footer-main-grid { grid-template-columns: 2fr 1fr 1fr 1fr; gap: 44px; }
+        @media (max-width: 900px) {
+          .footer-main-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
+        }
+        @media (max-width: 600px) {
+          .footer-stats-grid { grid-template-columns: repeat(2,1fr); row-gap: 28px; }
+          .footer-main-grid { grid-template-columns: 1fr; gap: 28px; }
+        }
+      `}</style>
       {/* Stats strip — always red, bold */}
       <div style={{
         background: "linear-gradient(135deg,#CC0000 0%,#aa0000 40%,#880000 100%)",
@@ -84,7 +95,7 @@ export const Footer: React.FC<FooterProps> = ({
       }}>
         <div style={{ position: "absolute", right: "3%", top: "50%", transform: "translateY(-50%)", opacity: 0.07, userSelect: "none", pointerEvents: "none", lineHeight: 1 }}><Truck size={130} weight="duotone" color="#CC0000" /></div>
         <div style={{ position: "absolute", inset: 0, backgroundImage: "repeating-linear-gradient(90deg,rgba(255,255,255,0.04) 0px,rgba(255,255,255,0.04) 1px,transparent 1px,transparent 80px)", pointerEvents: "none" }} />
-        <div style={{ maxWidth: 1200, margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 24, position: "relative", zIndex: 1 }}>
+        <div className="footer-stats-grid" style={{ maxWidth: 1200, margin: "0 auto", display: "grid", gap: 24, position: "relative", zIndex: 1 }}>
           {stats.map((s, i) => (
             <div key={i} style={{ textAlign: "center" }}>
               <div style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: "clamp(32px,4vw,52px)", color: "#fff", lineHeight: 1, textShadow: "0 2px 20px rgba(0,0,0,0.25)" }}>{s.value}</div>
@@ -96,7 +107,7 @@ export const Footer: React.FC<FooterProps> = ({
 
       <footer style={{ background: bg, borderTop: "3px solid #CC0000", padding: "52px clamp(20px,5vw,64px) 28px" }}>
         <div style={{ maxWidth: 1200, margin: "0 auto" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", gap: 44, marginBottom: 44 }}>
+          <div className="footer-main-grid" style={{ display: "grid", marginBottom: 44 }}>
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: 11, marginBottom: 16 }}>
                 <CELogo size={46} />

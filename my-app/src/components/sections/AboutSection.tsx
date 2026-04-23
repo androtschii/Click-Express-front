@@ -2,6 +2,7 @@ import React, { useRef } from "react";
 import { CELogo } from "../ui/Logo";
 import { useLanguage } from "../../context/LanguageContext";
 import { translations } from "../../i18n/translations";
+import { useInView } from "../../hooks/useInView";
 import companyVideo from "../../assets/Recap 2025.One of the best loads this year🤝Dear customer, contact us to get more information ab.mp4";
 
 interface AboutSectionProps {
@@ -76,8 +77,10 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onContactClick, them
     return () => observer.disconnect();
   }, []);
 
+  const { ref: inViewRef, inView } = useInView<HTMLElement>(0.1);
+
   return (
-    <section style={{ background: isDark ? "#0a0a0a" : "#ffffff", padding: "80px clamp(20px,5vw,64px)" }}>
+    <section ref={inViewRef} style={{ background: isDark ? "#0a0a0a" : "#ffffff", padding: "80px clamp(20px,5vw,64px)", opacity: inView ? 1 : 0, transform: inView ? "translateY(0)" : "translateY(30px)", transition: "opacity 0.7s ease, transform 0.7s ease" }}>
       <div style={{ maxWidth: 1300, margin: "0 auto" }}>
 
         <div style={{ marginBottom: 60, display: "flex", alignItems: "flex-end", justifyContent: "space-between", flexWrap: "wrap", gap: 20 }}>

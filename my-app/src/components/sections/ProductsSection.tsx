@@ -105,7 +105,7 @@ export const ProductsSection: React.FC<ProductsSectionProps> = ({ theme, isAdmin
   return (
     <section style={{ background: bg, padding: "60px 20px" }}>
 
-      {/* Toast */}
+ {/* Toast */}
       {msg && (
         <div style={{
           position: "fixed", top: 80, right: 24, zIndex: 9999,
@@ -118,7 +118,7 @@ export const ProductsSection: React.FC<ProductsSectionProps> = ({ theme, isAdmin
 
       <div style={{ maxWidth: 1200, margin: "0 auto" }}>
 
-        {/* Title */}
+ {/* Title */}
         <div style={{ textAlign: "center", marginBottom: 40 }}>
           <div style={{ fontSize: 11, letterSpacing: 3, textTransform: "uppercase", color: "#CC0000", fontFamily: "'Barlow',sans-serif", fontWeight: 700, marginBottom: 10 }}>
             Наши услуги
@@ -133,7 +133,7 @@ export const ProductsSection: React.FC<ProductsSectionProps> = ({ theme, isAdmin
           )}
         </div>
 
-        {/* Cards grid */}
+ {/* Cards grid */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: 24 }}>
           {products.map(p => (
             <div key={p.id} style={{
@@ -149,22 +149,22 @@ export const ProductsSection: React.FC<ProductsSectionProps> = ({ theme, isAdmin
               onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = isDark ? "0 12px 40px rgba(0,0,0,0.5)" : "0 12px 40px rgba(0,0,0,0.15)"; }}
               onMouseLeave={e => { e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = isDark ? "0 4px 24px rgba(0,0,0,0.3)" : "0 4px 24px rgba(0,0,0,0.08)"; }}
             >
-              {/* Inactive badge */}
+ {/* Inactive badge */}
               {!p.isActive && (
                 <div style={{ position: "absolute", top: 12, left: 12, background: "#CC0000", color: "#fff", fontSize: 10, fontWeight: 700, padding: "3px 8px", borderRadius: 4, fontFamily: "'Barlow',sans-serif", letterSpacing: 1, zIndex: 2 }}>
                   НЕАКТИВЕН
                 </div>
               )}
 
-              {/* Image */}
+ {/* Image */}
               <div style={{ position: "relative", height: 180, overflow: "hidden", background: isDark ? "#1a1a1a" : "#f0f0f0" }}>
                 <img
                   src={p.imageUrl}
                   alt={p.name}
                   style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                  onError={e => { (e.target as HTMLImageElement).src = "https://placehold.co/400x180?text=ClickExpress"; }}
+ onError={e => { (e.target as HTMLImageElement).src = "https://placehold.co/400x180?text=ClickExpress"; }}
                 />
-                {/* Admin: edit image button */}
+ {/* Admin: edit image button */}
                 {isAdmin && (
                   <div style={{ position: "absolute", bottom: 8, right: 8, zIndex: 3 }}>
                     {editImage?.id === p.id ? (
@@ -189,7 +189,7 @@ export const ProductsSection: React.FC<ProductsSectionProps> = ({ theme, isAdmin
                 )}
               </div>
 
-              {/* Content */}
+ {/* Content */}
               <div style={{ padding: "20px 20px 16px" }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
                   <span style={{ fontSize: 11, color: "#CC0000", fontFamily: "'Barlow',sans-serif", fontWeight: 700, textTransform: "uppercase", letterSpacing: 1 }}>{p.category}</span>
@@ -201,7 +201,7 @@ export const ProductsSection: React.FC<ProductsSectionProps> = ({ theme, isAdmin
                 <h3 style={{ fontFamily: "'Oswald',sans-serif", fontSize: 20, fontWeight: 700, color: text, margin: "0 0 8px" }}>{p.name}</h3>
                 <p style={{ fontFamily: "'Barlow',sans-serif", fontSize: 13, color: sub, margin: "0 0 16px", lineHeight: 1.5 }}>{p.description}</p>
 
-                {/* Price */}
+ {/* Price */}
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                   {isAdmin && editPrice?.id === p.id ? (
                     <div style={{ display: "flex", gap: 4, flex: 1, marginRight: 8 }}>
@@ -229,7 +229,7 @@ export const ProductsSection: React.FC<ProductsSectionProps> = ({ theme, isAdmin
                     </div>
                   )}
 
-                  {/* Admin toggle button */}
+ {/* Admin toggle button */}
                   {isAdmin ? (
                     <button
                       style={smallBtn(p.isActive ? "#555" : "#16a34a")}

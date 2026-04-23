@@ -157,27 +157,27 @@ export const CareersPage: React.FC<CareersPageProps> = ({ theme = "dark", onBack
         @keyframes mapPulse { 0%,100%{opacity:0.7} 50%{opacity:1} }
       `}</style>
 
-      {/* ── Hero ── */}
+ {/* Hero */}
       <div style={{ position: "relative", height: 520, overflow: "hidden", display: "flex", alignItems: "center" }}>
         <img
           src={isDark ? "/images/red freightliner cascadia night.PNG" : "/images/red freightliner cascadia light.png"}
           alt="careers"
           style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "20% center", filter: isDark ? "brightness(0.38)" : "none" }}
         />
-        {/* Gradient: dark on left for text, transparent on right for truck */}
+ {/* Gradient: dark on left for text, transparent on right for truck */}
         <div style={{ position: "absolute", inset: 0, background: isDark
           ? "linear-gradient(to right, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.6) 38%, rgba(0,0,0,0.1) 65%, transparent 100%)"
           : "linear-gradient(to right, rgba(255,255,255,0.88) 0%, rgba(255,255,255,0.6) 38%, rgba(255,255,255,0.05) 65%, transparent 100%)"
         }} />
 
-        {/* Back button */}
+ {/* Back button */}
         <button onClick={onBack} style={{ position: "absolute", top: 90, left: 32, display: "flex", alignItems: "center", gap: 8, background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.2)", borderRadius: 24, padding: "8px 18px", color: "#fff", fontFamily: "'Barlow',sans-serif", fontWeight: 600, fontSize: 12, letterSpacing: 1.5, textTransform: "uppercase", cursor: "pointer", backdropFilter: "blur(8px)", transition: "all 0.2s" }}
           onMouseEnter={e => { e.currentTarget.style.background = "rgba(204,0,0,0.4)"; e.currentTarget.style.borderColor = "#CC0000"; }}
           onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.1)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.2)"; }}>
           {isRu ? "← Назад" : "← Back"}
         </button>
 
-        {/* Text on the left */}
+ {/* Text on the left */}
         <div style={{ position: "relative", width: "100%", display: "flex", justifyContent: "flex-start" }}>
           <div style={{ maxWidth: 520, padding: "0 clamp(20px,5vw,64px)", animation: "careersIn 0.6s ease" }}>
             <div style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 10, color: "#CC0000", letterSpacing: 4, textTransform: "uppercase", marginBottom: 14 }}>— {isRu ? "Присоединяйтесь к нам" : "Join Our Team"}</div>
@@ -191,7 +191,7 @@ export const CareersPage: React.FC<CareersPageProps> = ({ theme = "dark", onBack
               <a href="#jobs" style={{ background: "#CC0000", color: "#fff", border: "none", borderRadius: 4, padding: "13px 28px", fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 14, letterSpacing: 2, textTransform: "uppercase", cursor: "pointer", textDecoration: "none", boxShadow: "0 6px 24px rgba(204,0,0,0.5)" }}>
                 {isRu ? "Открытые вакансии" : "View Open Positions"}
               </a>
-              <a href="https://www.carriersource.io/carriers/click-express-inc" target="_blank" rel="noreferrer"
+ <a href="https://www.carriersource.io/carriers/click-express-inc" target="_blank" rel="noreferrer"
                 style={{ background: "transparent", color: isDark ? "#fff" : "#0d0d0d", border: `1px solid ${isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.3)"}`, borderRadius: 4, padding: "13px 28px", fontFamily: "'Oswald',sans-serif", fontWeight: 600, fontSize: 14, letterSpacing: 2, textTransform: "uppercase", cursor: "pointer", textDecoration: "none" }}>
                 ★ 4.9 on CarrierSource
               </a>
@@ -200,7 +200,7 @@ export const CareersPage: React.FC<CareersPageProps> = ({ theme = "dark", onBack
         </div>
       </div>
 
-      {/* ── Stats bar ── */}
+ {/* Stats bar */}
       <div style={{ background: "#CC0000", padding: "18px clamp(20px,5vw,64px)" }}>
         <div style={{ maxWidth: 1200, margin: "0 auto", display: "flex", gap: 40, flexWrap: "wrap", justifyContent: "center" }}>
           {(isRu
@@ -215,7 +215,7 @@ export const CareersPage: React.FC<CareersPageProps> = ({ theme = "dark", onBack
         </div>
       </div>
 
-      {/* ── Operating Area Map ── */}
+ {/* Operating Area Map */}
       <section style={{ maxWidth: 1200, margin: "0 auto", padding: "64px clamp(20px,5vw,64px) 0" }}>
         <div style={{ marginBottom: 32 }}>
           <div style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 10, color: "#CC0000", letterSpacing: 4, textTransform: "uppercase", marginBottom: 8 }}>— {isRu ? "Где мы работаем" : "Where We Operate"}</div>
@@ -224,17 +224,17 @@ export const CareersPage: React.FC<CareersPageProps> = ({ theme = "dark", onBack
           </h2>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 32, alignItems: "start" }}>
-          {/* Map embed */}
+ {/* Map embed */}
           <div style={{ borderRadius: 14, overflow: "hidden", border: `1px solid ${bord}`, boxShadow: "0 20px 60px rgba(0,0,0,0.3)", background: card }}>
             <iframe
-              src="https://maps.google.com/maps?q=Florida,USA&z=4&output=embed&t=m"
+ src="https://maps.google.com/maps?q=Florida,USA&z=4&output=embed&t=m"
               width="100%"
               height="360"
               style={{ border: "none", display: "block" }}
               title="Operating Area"
             />
           </div>
-          {/* Legend */}
+ {/* Legend */}
           <div style={{ minWidth: 220, background: card, border: `1px solid ${bord}`, borderRadius: 14, padding: "24px 20px" }}>
             <div style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 15, color: text, textTransform: "uppercase", marginBottom: 16 }}>{isRu ? "Покрытие" : "Coverage"}</div>
             {(isRu
@@ -259,7 +259,7 @@ export const CareersPage: React.FC<CareersPageProps> = ({ theme = "dark", onBack
             ))}
             <div style={{ marginTop: 20, padding: "12px 14px", background: "rgba(204,0,0,0.08)", border: "1px solid rgba(204,0,0,0.25)", borderRadius: 8 }}>
               <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 11, color: sub, marginBottom: 4 }}>{isRu ? "Профиль перевозчика" : "Carrier Profile"}</div>
-              <a href="https://www.carriersource.io/carriers/click-express-inc" target="_blank" rel="noreferrer"
+ <a href="https://www.carriersource.io/carriers/click-express-inc" target="_blank" rel="noreferrer"
                 style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 12, color: "#CC0000", textDecoration: "none" }}>
                 carriersource.io →
               </a>
@@ -268,7 +268,7 @@ export const CareersPage: React.FC<CareersPageProps> = ({ theme = "dark", onBack
         </div>
       </section>
 
-      {/* ── Perks ── */}
+ {/* Perks */}
       <section style={{ maxWidth: 1200, margin: "0 auto", padding: "64px clamp(20px,5vw,64px) 0" }}>
         <div style={{ marginBottom: 32 }}>
           <div style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 10, color: "#CC0000", letterSpacing: 4, textTransform: "uppercase", marginBottom: 8 }}>— {isRu ? "Почему мы?" : "Why Join Us"}</div>
@@ -289,7 +289,7 @@ export const CareersPage: React.FC<CareersPageProps> = ({ theme = "dark", onBack
         </div>
       </section>
 
-      {/* ── Open Positions ── */}
+ {/* Open Positions */}
       <section id="jobs" style={{ maxWidth: 1200, margin: "0 auto", padding: "64px clamp(20px,5vw,64px) 0" }}>
         <div style={{ marginBottom: 32 }}>
           <div style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 10, color: "#CC0000", letterSpacing: 4, textTransform: "uppercase", marginBottom: 8 }}>— {isRu ? "Набор сотрудников" : "Now Hiring"}</div>
@@ -351,7 +351,7 @@ export const CareersPage: React.FC<CareersPageProps> = ({ theme = "dark", onBack
         </div>
       </section>
 
-      {/* ── Apply Form ── */}
+ {/* Apply Form */}
       <section style={{ maxWidth: 1200, margin: "0 auto", padding: "64px clamp(20px,5vw,64px) 80px" }}>
         <div style={{ background: card, border: `1px solid ${bord}`, borderRadius: 20, padding: "44px clamp(24px,5vw,64px)", boxShadow: "0 20px 60px rgba(0,0,0,0.2)" }}>
           {sent ? (
@@ -383,7 +383,7 @@ export const CareersPage: React.FC<CareersPageProps> = ({ theme = "dark", onBack
                       <div style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 15 }}>+1 786-202-6599</div>
                     </div>
                   </a>
-                  <a href="https://www.linkedin.com/company/clickexpressinc" target="_blank" rel="noreferrer" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
+ <a href="https://www.linkedin.com/company/clickexpressinc" target="_blank" rel="noreferrer" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
                     <div style={{ width: 38, height: 38, borderRadius: "50%", background: "rgba(10,102,194,0.12)", border: "1px solid rgba(10,102,194,0.3)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                       <svg width="18" height="18" viewBox="0 0 256 256" fill="#0A66C2"><path d="M216,24H40A16,16,0,0,0,24,40V216a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V40A16,16,0,0,0,216,24Zm0,192H40V40H216V216ZM96,112v64a8,8,0,0,1-16,0V112a8,8,0,0,1,16,0Zm88,28v36a8,8,0,0,1-16,0V140a20,20,0,0,0-40,0v36a8,8,0,0,1-16,0V112a8,8,0,0,1,15.79-1.78A36,36,0,0,1,184,140ZM100,84A12,12,0,1,1,88,72,12,12,0,0,1,100,84Z"/></svg>
                     </div>

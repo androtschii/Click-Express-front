@@ -6,10 +6,10 @@ interface TrackingPageProps {
   load: Load;
   theme?: "dark" | "light";
   onBack?: () => void;
-  bookedAt?: string; // ISO date string
+ bookedAt?: string; // ISO date string
 }
 
-// ── Status steps ──────────────────────────────────────────────────────────────
+// Status steps 
 type StepKey = "pending" | "confirmed" | "assigned" | "pickup" | "transit" | "delivered";
 
 interface Step {
@@ -32,9 +32,9 @@ const STEPS: Step[] = [
 
 // Deterministic "current step" from load ID so same load always shows same state
 function getMockStep(load: Load): number {
-  // Spread across steps 1-5 (not all delivered, not all pending)
+ // Spread across steps 1-5 (not all delivered, not all pending)
   const hash = (load.id * 31 + load.miles) % 5;
-  return hash + 1; // 1..5  (0=pending is boring, 5=in transit is most common)
+ return hash + 1; // 1..5 (0=pending is boring, 5=in transit is most common)
 }
 
 function getMockDates(load: Load, currentStep: number): string[] {
@@ -58,12 +58,12 @@ function getETA(load: Load, currentStep: number): string {
   return eta.toLocaleDateString([], { month: "long", day: "numeric", year: "numeric" });
 }
 
-// ── Mini map progress bar ─────────────────────────────────────────────────────
+// Mini map progress bar 
 function RouteProgress({ load, progress, isDark, lang }: { load: Load; progress: number; isDark: boolean; lang: string }) {
   const dotCount = 8;
   return (
     <div style={{ position: "relative", padding: "32px 0 16px" }}>
-      {/* City labels */}
+ {/* City labels */}
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 10 }}>
         <div style={{ textAlign: "left" }}>
           <div style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 11, color: "#CC0000", letterSpacing: 1.5, textTransform: "uppercase" }}>{lang === "ru" ? "ОТКУДА" : "FROM"}</div>
@@ -75,12 +75,12 @@ function RouteProgress({ load, progress, isDark, lang }: { load: Load; progress:
         </div>
       </div>
 
-      {/* Track line */}
+ {/* Track line */}
       <div style={{ position: "relative", height: 6, borderRadius: 99, background: isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)", overflow: "visible" }}>
-        {/* Filled progress */}
+ {/* Filled progress */}
         <div style={{ position: "absolute", left: 0, top: 0, height: "100%", width: `${progress}%`, background: "linear-gradient(90deg,#CC0000,#ff4444)", borderRadius: 99, transition: "width 1.2s cubic-bezier(0.4,0,0.2,1)" }} />
 
-        {/* Dots */}
+ {/* Dots */}
         {Array.from({ length: dotCount }).map((_, i) => {
           const pct = (i / (dotCount - 1)) * 100;
           const filled = pct <= progress;
@@ -89,7 +89,7 @@ function RouteProgress({ load, progress, isDark, lang }: { load: Load; progress:
           );
         })}
 
-        {/* Truck icon at current position */}
+ {/* Truck icon at current position */}
         {progress > 0 && progress < 100 && (
           <div style={{ position: "absolute", top: "50%", left: `${progress}%`, transform: "translate(-50%,-50%)", fontSize: 20, zIndex: 3, filter: "drop-shadow(0 2px 6px rgba(204,0,0,0.6))", transition: "left 1.2s cubic-bezier(0.4,0,0.2,1)" }}>
             🚛
@@ -100,7 +100,7 @@ function RouteProgress({ load, progress, isDark, lang }: { load: Load; progress:
         )}
       </div>
 
-      {/* Miles info */}
+ {/* Miles info */}
       <div style={{ display: "flex", justifyContent: "space-between", marginTop: 10 }}>
         <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 11, color: isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.4)" }}>
           {Math.round(load.miles * progress / 100).toLocaleString()} {lang === "ru" ? "миль пройдено" : "mi traveled"}
@@ -113,7 +113,7 @@ function RouteProgress({ load, progress, isDark, lang }: { load: Load; progress:
   );
 }
 
-// ── Main component ────────────────────────────────────────────────────────────
+// Main component 
 export const TrackingPage: React.FC<TrackingPageProps> = ({ load, theme = "dark", onBack }) => {
   const isDark = theme === "dark";
   const { lang } = useLanguage();
@@ -131,7 +131,7 @@ export const TrackingPage: React.FC<TrackingPageProps> = ({ load, theme = "dark"
   const currentStepData = STEPS[currentStep];
   const isDelivered = currentStep === STEPS.length - 1;
 
-  // Animate progress bar on mount
+ // Animate progress bar on mount
   const [animProgress, setAnimProgress] = useState(0);
   useEffect(() => {
     const t = setTimeout(() => setAnimProgress(progress), 200);
@@ -148,7 +148,7 @@ export const TrackingPage: React.FC<TrackingPageProps> = ({ load, theme = "dark"
 
       <div style={{ maxWidth: 780, margin: "0 auto", animation: "trackFadeUp 0.4s ease" }}>
 
-        {/* Back */}
+ {/* Back */}
         <button onClick={onBack}
           style={{ background:"transparent", border:"none", color:muted, fontFamily:"'Barlow',sans-serif", fontWeight:600, fontSize:13, letterSpacing:1, cursor:"pointer", marginBottom:32, padding:0, display:"flex", alignItems:"center", gap:6, transition:"color 0.15s" }}
           onMouseEnter={e => e.currentTarget.style.color="#CC0000"}
@@ -156,7 +156,7 @@ export const TrackingPage: React.FC<TrackingPageProps> = ({ load, theme = "dark"
           ← {lang === "ru" ? "Назад" : "Back"}
         </button>
 
-        {/* Header */}
+ {/* Header */}
         <div style={{ marginBottom: 28 }}>
           <div style={{ fontFamily:"'Barlow',sans-serif", fontWeight:700, fontSize:10, color:"#CC0000", letterSpacing:4, textTransform:"uppercase", marginBottom:6 }}>
             ● {lang === "ru" ? "ОТСЛЕЖИВАНИЕ ГРУЗА" : "LOAD TRACKING"}
@@ -166,7 +166,7 @@ export const TrackingPage: React.FC<TrackingPageProps> = ({ load, theme = "dark"
           </h1>
         </div>
 
-        {/* Current status banner */}
+ {/* Current status banner */}
         <div style={{ background: isDelivered ? "rgba(0,180,80,0.08)" : "rgba(204,0,0,0.07)", border:`1px solid ${isDelivered ? "rgba(0,180,80,0.3)" : "rgba(204,0,0,0.25)"}`, borderRadius:12, padding:"18px 22px", marginBottom:24, display:"flex", alignItems:"center", gap:16 }}>
           <div className={currentStep < STEPS.length - 1 ? "track-step-active" : ""} style={{ fontSize:36 }}>{currentStepData.icon}</div>
           <div style={{ flex:1 }}>
@@ -185,12 +185,12 @@ export const TrackingPage: React.FC<TrackingPageProps> = ({ load, theme = "dark"
           )}
         </div>
 
-        {/* Route progress map */}
+ {/* Route progress map */}
         <div style={{ background:card, border:`1px solid ${border}`, borderRadius:12, padding:"20px 24px", marginBottom:20 }}>
           <RouteProgress load={load} progress={animProgress} isDark={isDark} lang={lang} />
         </div>
 
-        {/* Load info strip */}
+ {/* Load info strip */}
         <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(140px,1fr))", gap:12, marginBottom:24 }}>
           {[
             { icon:"💰", label: lang==="ru"?"Стоимость":"Price",    val:`$${load.price.toLocaleString()}` },
@@ -206,7 +206,7 @@ export const TrackingPage: React.FC<TrackingPageProps> = ({ load, theme = "dark"
           ))}
         </div>
 
-        {/* Timeline */}
+ {/* Timeline */}
         <div style={{ background:card, border:`1px solid ${border}`, borderRadius:12, padding:"24px", marginBottom:20 }}>
           <div style={{ fontFamily:"'Barlow',sans-serif", fontWeight:700, fontSize:10, color:"#CC0000", letterSpacing:3, textTransform:"uppercase", marginBottom:20 }}>
             {lang === "ru" ? "📅 ИСТОРИЯ СТАТУСОВ" : "📅 STATUS TIMELINE"}
@@ -221,12 +221,12 @@ export const TrackingPage: React.FC<TrackingPageProps> = ({ load, theme = "dark"
 
               return (
                 <div key={step.key} style={{ display:"flex", gap:16, position:"relative" }}>
-                  {/* Line */}
+ {/* Line */}
                   {!isLast && (
                     <div style={{ position:"absolute", left:19, top:44, bottom:0, width:2, background: isDone ? "#CC0000" : (isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.08)"), zIndex:0 }} />
                   )}
 
-                  {/* Circle */}
+ {/* Circle */}
                   <div style={{ flexShrink:0, width:40, height:40, borderRadius:"50%", zIndex:1, display:"flex", alignItems:"center", justifyContent:"center", fontSize:16,
                     background: isDone ? "#CC0000" : isActive ? "rgba(204,0,0,0.12)" : (isDark?"rgba(255,255,255,0.04)":"rgba(0,0,0,0.04)"),
                     border: isDone ? "none" : isActive ? "2px solid #CC0000" : `2px solid ${border}`,
@@ -243,7 +243,7 @@ export const TrackingPage: React.FC<TrackingPageProps> = ({ load, theme = "dark"
                     )}
                   </div>
 
-                  {/* Content */}
+ {/* Content */}
                   <div style={{ flex:1, paddingBottom:28 }}>
                     <div style={{ display:"flex", alignItems:"center", gap:10, flexWrap:"wrap" }}>
                       <div style={{ fontFamily:"'Barlow',sans-serif", fontWeight:700, fontSize:14,
@@ -281,7 +281,7 @@ export const TrackingPage: React.FC<TrackingPageProps> = ({ load, theme = "dark"
           </div>
         </div>
 
-        {/* Dispatcher contact */}
+ {/* Dispatcher contact */}
         <div style={{ background: isDark?"rgba(204,0,0,0.06)":"rgba(204,0,0,0.04)", border:"1px solid rgba(204,0,0,0.2)", borderRadius:12, padding:"18px 22px", display:"flex", alignItems:"center", justifyContent:"space-between", flexWrap:"wrap", gap:14 }}>
           <div>
             <div style={{ fontFamily:"'Barlow',sans-serif", fontWeight:700, fontSize:10, color:"#CC0000", letterSpacing:2.5, textTransform:"uppercase", marginBottom:4 }}>

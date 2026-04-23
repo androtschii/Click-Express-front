@@ -33,7 +33,7 @@ import { X, Heart, ClipboardText } from "@phosphor-icons/react";
 import { fetchProducts } from "./api/client.js";
 import { AdminPage } from "./components/pages/AdminPage";
 
-// ── Анимированное сердечко для секции "Лучшие грузы недели" ──────────────
+// Анимированное сердечко для секции "Лучшие грузы недели" 
 function WeeklyHeartBtn({ saved, onClick }: { saved: boolean; onClick: () => void }) {
   const [burst, setBurst] = useState(false);
   const handleClick = (e: React.MouseEvent) => {
@@ -55,7 +55,7 @@ function WeeklyHeartBtn({ saved, onClick }: { saved: boolean; onClick: () => voi
   );
 }
 
-// ── Панель избранного ─────────────────────────────────────────────────────
+// Панель избранного 
 function FavoritesPanel({ loads, theme, onClose, onDetails, onRemove }: { loads: Load[]; theme: string; onClose: () => void; onDetails?: (l: Load) => void; onRemove?: (l: Load) => void }) {
   const isDark = theme === "dark";
   const bord = isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.08)";
@@ -135,7 +135,7 @@ function FavoritesPanel({ loads, theme, onClose, onDetails, onRemove }: { loads:
   );
 }
 
-// ── Панель заявок ─────────────────────────────────────────────────────────
+// Панель заявок 
 function RequestsPanel({ loads, theme, onClose, onDetails, onCancel, onBrowseLoads }: { loads: Load[]; theme: string; onClose: () => void; onDetails?: (l: Load) => void; onCancel?: (l: Load) => void; onBrowseLoads?: () => void }) {
   const isDark = theme === "dark";
   const bord = isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.08)";
@@ -210,7 +210,7 @@ function RequestsPanel({ loads, theme, onClose, onDetails, onCancel, onBrowseLoa
           ))}
         </div>
 
-        {/* Футер */}
+ {/* Футер */}
         <div style={{ padding: "16px 20px", borderTop: `1px solid ${isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.08)"}`, textAlign: "center" }}>
           <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 12, color: isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.4)" }}>
             {t.dispatcher}
@@ -292,7 +292,7 @@ function AppContent() {
           });
         setLoads(mapped);
       } catch {
-        // БД недоступна — показываем статические данные
+ // БД недоступна — показываем статические данные
         try {
           const data = await fetchLoads(LOADS);
           setLoads(data);
@@ -348,7 +348,7 @@ function AppContent() {
 
   const sharedStyle = (
     <style>{`
-      @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Barlow:wght@400;500;600;700;800&display=swap');
+ @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Barlow:wght@400;500;600;700;800&display=swap');
       *{box-sizing:border-box;margin:0;padding:0;}
       body{background:${bgColor};color:${textColor};transition: background 0.3s, color 0.3s;}
       ::selection{background:#CC0000;color:#fff;}
@@ -418,7 +418,7 @@ function AppContent() {
     <>
       {showFavorites && <FavoritesPanel loads={savedLoads} theme={theme} onClose={() => setShowFavorites(false)} onDetails={(l) => { setShowFavorites(false); setDetailLoad(l); window.scrollTo({ top: 0 }); }} onRemove={(l) => { handleSave(l, false); notify(tn.removedFromFavorites); }} />}
       {showRequests && <RequestsPanel loads={bookedLoads} theme={theme} onClose={() => setShowRequests(false)} onDetails={(l) => { setShowRequests(false); setDetailLoad(l); window.scrollTo({ top: 0 }); }} onCancel={(l) => handleCancelBook(l)} onBrowseLoads={() => { setShowRequests(false); setTimeout(() => scrollTo(catalogRef), 80); }} />}
-      {/* Apply Now floating button — visible on all pages */}
+ {/* Apply Now floating button — visible on all pages */}
       <div style={{ position: "fixed", bottom: 28, left: 28, zIndex: 1500 }}>
         <style>{`
           @keyframes applyPulse { 0%,100%{box-shadow:0 0 0 0 rgba(204,0,0,0.5),0 8px 28px rgba(204,0,0,0.4)} 50%{box-shadow:0 0 0 10px rgba(204,0,0,0),0 8px 28px rgba(204,0,0,0.4)} }
@@ -438,7 +438,7 @@ function AppContent() {
     </>
   );
 
-  // ── Detail page — full screen ──────────────────────────────────────────
+ // Detail page — full screen 
   if (detailLoad) {
     return (
       <div style={{ background: bgColor, minHeight: "100vh", color: textColor }}>
@@ -464,7 +464,7 @@ function AppContent() {
     );
   }
 
-  // ── Reviews page ─────────────────────────────────────────────────────
+ // Reviews page 
   if (showReviews) {
     return (
       <div style={{ background: bgColor, minHeight: "100vh", color: textColor }}>
@@ -480,7 +480,7 @@ function AppContent() {
     );
   }
 
-  // ── News page ─────────────────────────────────────────────────────────
+ // News page 
   if (showNews) {
     return (
       <div style={{ background: bgColor, minHeight: "100vh", color: textColor }}>
@@ -496,7 +496,7 @@ function AppContent() {
     );
   }
 
-  // ── Careers page ──────────────────────────────────────────────────────
+ // Careers page 
   if (showCareers) {
     return (
       <div style={{ background: bgColor, minHeight: "100vh", color: textColor }}>
@@ -512,7 +512,7 @@ function AppContent() {
     );
   }
 
-  // ── Admin page ─────────────────────────────────────────────────────────
+ // Admin page 
   if (showAdmin && session?.role === "Admin") {
     return (
       <div style={{ background: bgColor, minHeight: "100vh", color: textColor }}>
@@ -528,7 +528,7 @@ function AppContent() {
     );
   }
 
-  // ── Profile page ───────────────────────────────────────────────────────
+ // Profile page 
   if (showProfile && session) {
     return (
       <div style={{ background: bgColor, minHeight: "100vh", color: textColor }}>
@@ -557,7 +557,7 @@ function AppContent() {
     );
   }
 
-  // ── Tracking page ──────────────────────────────────────────────────────
+ // Tracking page 
   if (trackLoad) {
     return (
       <div style={{ background: bgColor, minHeight: "100vh", color: textColor }}>
@@ -577,7 +577,7 @@ function AppContent() {
     );
   }
 
-  // ── Fleet page ────────────────────────────────────────────────────────
+ // Fleet page 
   if (showFleet) {
     return (
       <div style={{ background: bgColor, minHeight: "100vh", color: textColor }}>
@@ -593,7 +593,7 @@ function AppContent() {
     );
   }
 
-  // ── Orders page ────────────────────────────────────────────────────────
+ // Orders page 
   if (showOrders) {
     return (
       <div style={{ background: bgColor, minHeight: "100vh", color: textColor }}>
@@ -620,7 +620,7 @@ function AppContent() {
     );
   }
 
-  // ── Main page ──────────────────────────────────────────────────────────
+ // Main page 
   return (
     <div style={{ background: bgColor, minHeight: "100vh", color: textColor, transition: "background 0.3s, color 0.3s" }}>
       {sharedStyle}
@@ -629,7 +629,7 @@ function AppContent() {
       <Ticker />
       <TrustStrip theme={theme} />
 
-      {/* ── WEEKLY BEST CAROUSEL ─────────────────────────────────────────── */}
+ {/* WEEKLY BEST CAROUSEL */}
       {!loading && (() => {
         const best = loads.filter(l => l.tag === "Best Load of the Week").slice(0, 6);
         if (!best.length) return null;
@@ -639,9 +639,9 @@ function AppContent() {
         const canPrev = weeklyIdx > 0;
         const canNext = weeklyIdx < maxIdx;
         const needArrows = best.length > visible;
-        // track width: e.g. 4 cards → 133.33%; each card → 25% of track = 33.33% of viewport
+ // track width: e.g. 4 cards → 133.33%; each card → 25% of track = 33.33% of viewport
         const trackW = (best.length / visible) * 100;
-        // one step = 1/best.length of track width
+ // one step = 1/best.length of track width
         const step = 100 / best.length;
 
         const arrowBase: React.CSSProperties = {
@@ -661,7 +661,7 @@ function AppContent() {
               @keyframes particle{0%{transform:translate(0,0) scale(1);opacity:1}100%{transform:translate(var(--tx),var(--ty)) scale(0);opacity:0}}
             `}</style>
 
-            {/* Заголовок */}
+ {/* Заголовок */}
             <div style={{ display:"flex", alignItems:"center", gap:16, marginBottom:28 }}>
               <div style={{ width:44, height:44, borderRadius:"50%", background:"linear-gradient(135deg,#CC0000,#ff4d4d)", display:"flex", alignItems:"center", justifyContent:"center", animation:"weeklyGlow 2s ease infinite", flexShrink:0 }}>
                 <svg width="22" height="22" viewBox="0 0 256 256" fill="#fff"><path d="M239.18,97.26A16.38,16.38,0,0,0,224.92,86l-59-4.76L143.14,26.15a16.36,16.36,0,0,0-30.27,0L90.11,81.23,31.08,86a16.46,16.46,0,0,0-9.37,28.86l45,38.83L53,211.75a16.38,16.38,0,0,0,24.5,17.82L128,198.49l50.53,31.08A16.4,16.4,0,0,0,203,211.75l-13.76-58.07,45-38.83A16.43,16.43,0,0,0,239.18,97.26Zm-15.34,5.47-48.7,42a8,8,0,0,0-2.56,7.91l14.88,62.8a.37.37,0,0,1-.17.48c-.18.14-.23.11-.38,0l-54.72-33.65a8,8,0,0,0-8.38,0L69.09,215.94c-.15.09-.19.12-.38,0a.37.37,0,0,1-.17-.48l14.88-62.8a8,8,0,0,0-2.56-7.91l-48.7-42c-.12-.1-.23-.19-.13-.5s.18-.27.33-.29l63.92-5.16A8,8,0,0,0,103,91.86l24.62-59.61c.08-.17.11-.25.35-.25s.27.08.35.25L153,91.86a8,8,0,0,0,6.75,4.92l63.92,5.16c.15,0,.24,0,.33.29S224,102.63,223.84,102.73Z"/></svg>
@@ -674,10 +674,10 @@ function AppContent() {
               </div>
             </div>
 
-            {/* Карусель + стрелки по бокам */}
+ {/* Карусель + стрелки по бокам */}
             <div style={{ position:"relative", padding: needArrows ? "0 68px" : "0" }}>
 
-              {/* Левая стрелка */}
+ {/* Левая стрелка */}
               {needArrows && (
                 <button
                   onClick={() => canPrev && setWeeklyIdx(i => i - 1)}
@@ -694,7 +694,7 @@ function AppContent() {
                 </button>
               )}
 
-              {/* Правая стрелка */}
+ {/* Правая стрелка */}
               {needArrows && (
                 <button
                   onClick={() => canNext && setWeeklyIdx(i => i + 1)}
@@ -711,9 +711,9 @@ function AppContent() {
                 </button>
               )}
 
-              {/* Viewport */}
+ {/* Viewport */}
               <div style={{ overflow:"hidden" }}>
-                {/* Track — явная ширина для точного translateX */}
+ {/* Track — явная ширина для точного translateX */}
                 <div style={{
                   display: "flex",
                   width: `${trackW}%`,
@@ -772,7 +772,7 @@ function AppContent() {
               </div>
             </div>
 
-            {/* Точки снизу */}
+ {/* Точки снизу */}
             {needArrows && (
               <div style={{ display:"flex", justifyContent:"center", gap:6, marginTop:18 }}>
                 {Array.from({ length: maxIdx + 1 }).map((_, i) => (

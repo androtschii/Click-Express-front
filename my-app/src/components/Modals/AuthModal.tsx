@@ -80,7 +80,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     }
     setDoneUser(result.user!.name);
     setDone(true);
-    // notify parent after short celebration
+ // notify parent after short celebration
     setTimeout(() => {
       const session = getSession();
       document.body.style.overflow = "";
@@ -160,7 +160,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           animation: "modalIn 0.4s cubic-bezier(0.34,1.56,0.64,1)",
         }}
       >
-        {/* ── Login form — right side ── */}
+ {/* Login form — right side */}
         <div
           style={{
             position: "absolute",
@@ -198,7 +198,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           />
         </div>
 
-        {/* ── Register form — left side ── */}
+ {/* Register form — left side */}
         <div
           style={{
             position: "absolute",
@@ -236,7 +236,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           />
         </div>
 
-        {/* ── Sliding red welcome panel ── */}
+ {/* Sliding red welcome panel */}
         <div
           style={{
             position: "absolute",
@@ -256,7 +256,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             textAlign: "center",
           }}
         >
-          {/* Logo circle */}
+ {/* Logo circle */}
           <div
             style={{
               width: 68,
@@ -347,7 +347,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           </button>
         </div>
 
-        {/* Close button */}
+ {/* Close button */}
         <button
           onClick={handleClose}
           style={{
@@ -384,7 +384,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   );
 };
 
-// ── Shared form content component ──────────────────────────────────────────
+// Shared form content component 
 interface FormContentProps {
   mode: "login" | "register";
   dark: boolean;
@@ -533,7 +533,7 @@ const FormContent: React.FC<FormContentProps> = ({
         )}
       </div>
 
-      {/* Error */}
+ {/* Error */}
       {error && (
         <div
           style={{
@@ -552,7 +552,7 @@ const FormContent: React.FC<FormContentProps> = ({
         </div>
       )}
 
-      {/* Submit button */}
+ {/* Submit button */}
       <button
         onClick={onSubmit}
         disabled={loading}
@@ -603,7 +603,7 @@ const FormContent: React.FC<FormContentProps> = ({
         {isLogin ? "Sign In" : "Create Account"}
       </button>
 
-      {/* Divider */}
+ {/* Divider */}
       <div
         style={{
           display: "flex",
@@ -637,9 +637,9 @@ const FormContent: React.FC<FormContentProps> = ({
         />
       </div>
 
-      {/* Social buttons */}
+ {/* Social buttons */}
       <div style={{ display: "flex", gap: 10 }}>
-        {/* Google */}
+ {/* Google */}
         <button
           onClick={onGoogle}
           disabled={googleLoading}
@@ -721,7 +721,7 @@ const FormContent: React.FC<FormContentProps> = ({
           </span>
         </button>
 
-        {/* Facebook */}
+ {/* Facebook */}
         <SocialBtn
           dark={dark}
           color="#1877F2"
@@ -733,7 +733,7 @@ const FormContent: React.FC<FormContentProps> = ({
           }
         />
 
-        {/* LinkedIn */}
+ {/* LinkedIn */}
         <SocialBtn
           dark={dark}
           color="#0A66C2"
@@ -749,7 +749,7 @@ const FormContent: React.FC<FormContentProps> = ({
   );
 };
 
-// ── Input field ────────────────────────────────────────────────────────────
+// Input field 
 const ICONS: Record<string, React.ReactNode> = {
   user: (
     <svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor">
@@ -805,7 +805,7 @@ const InputField: React.FC<{
   </div>
 );
 
-// ── Social button (fb, linkedin) ───────────────────────────────────────────
+// Social button (fb, linkedin) 
 const SocialBtn: React.FC<{
   dark: boolean;
   color: string;

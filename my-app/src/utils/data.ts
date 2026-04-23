@@ -1,7 +1,7 @@
 import type { Load } from "../types/index";
 
 export const LOADS: Load[] = [
-  // ── Реальные грузы Click Express Inc (Instagram) ───────────────────────
+ // Реальные грузы Click Express Inc (Instagram) 
   { id:1, route:"Colorado Springs, CO", dest:"Tampa, FL",          price:4100,  miles:1778, type:"Full Load", cargo:"Flatbed / Oversized Containers",    image:"/images/real9.jpg", tag:"Best Load of the Week" },
   { id:2, route:"Madera, CA",           dest:"Fort Collins, CO",   price:5120,  miles:1374, type:"Full Load", cargo:"Flatbed / HVAC Units",               image:"/images/real2.jpg", tag:"Best Load of the Week" },
   { id:3, route:"Deer Park, WA",        dest:"Jackson, WY",        price:2100,  miles:720,  type:"Full Load", cargo:"Flatbed / Steel Beams",              image:"/images/real3.jpg", tag:"Best Load of the Week" },

@@ -23,7 +23,7 @@ function ppm(price: number, miles: number) {
 }
 
 function mapUrl(from: string, to: string) {
-  return `https://maps.google.com/maps?saddr=${encodeURIComponent(from)}&daddr=${encodeURIComponent(to)}&output=embed&t=k`;
+ return `https://maps.google.com/maps?saddr=${encodeURIComponent(from)}&daddr=${encodeURIComponent(to)}&output=embed&t=k`;
 }
 
 function cargoDesc(cargo: string, type: string, cargoDescMap: Record<string, string>) {
@@ -63,7 +63,7 @@ export const LoadDetailPage: React.FC<LoadDetailPageProps> = ({
     return () => {};
   }, []);
 
-  // sync if parent changes
+ // sync if parent changes
   useEffect(() => { setBooked(isBooked); }, [isBooked]);
 
   const handleBook = () => {
@@ -114,7 +114,7 @@ export const LoadDetailPage: React.FC<LoadDetailPageProps> = ({
         .detail-scroll::-webkit-scrollbar-thumb { background: rgba(204,0,0,0.4); border-radius: 3px; }
       `}</style>
 
-      {/* ── Top nav bar ── */}
+ {/* Top nav bar */}
       <div style={{
         position: "sticky", top: 0, zIndex: 100,
         background: isDark ? "rgba(8,8,8,0.4)" : "rgba(244,244,244,0.55)",
@@ -165,7 +165,7 @@ export const LoadDetailPage: React.FC<LoadDetailPageProps> = ({
         )}
       </div>
 
-      {/* ── Hero banner ── */}
+ {/* Hero banner */}
       <div style={{ position: "relative", height: "clamp(380px,48vw,540px)", overflow: "hidden" }}>
         <img
           src={load.image} alt={load.route}
@@ -204,10 +204,10 @@ export const LoadDetailPage: React.FC<LoadDetailPageProps> = ({
         </div>
       </div>
 
-      {/* ── Main content ── */}
+ {/* Main content */}
       <div style={{ maxWidth:1100, margin:"0 auto", padding:"clamp(24px,4vw,56px) clamp(16px,4vw,48px) 80px" }}>
 
-        {/* Stats row */}
+ {/* Stats row */}
         <div style={{
           display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(150px,1fr))",
           gap:12, marginBottom:32,
@@ -224,17 +224,17 @@ export const LoadDetailPage: React.FC<LoadDetailPageProps> = ({
           ))}
         </div>
 
-        {/* Two-column layout below */}
+ {/* Two-column layout below */}
         <div style={{ display:"grid", gridTemplateColumns:"1fr clamp(280px,35%,400px)", gap:24, alignItems:"start" }}>
 
-          {/* Left column */}
+ {/* Left column */}
           <div style={{ display:"flex", flexDirection:"column", gap:20 }}>
 
-            {/* Route line */}
+ {/* Route line */}
             <div style={{ background:card, border:`1px solid ${bord}`, borderRadius:14, padding:"24px 28px", animation:"detailFadeUp 0.5s ease 0.2s both" }}>
               <div style={{ fontFamily:"'Barlow',sans-serif", fontSize:9, color:muted, letterSpacing:2, textTransform:"uppercase", marginBottom:18 }}>{t.route}</div>
               <div style={{ display:"flex", alignItems:"center", gap:16 }}>
-                {/* Origin */}
+ {/* Origin */}
                 <div style={{ flex:1 }}>
                   <div style={{ fontFamily:"'Barlow',sans-serif", fontSize:9, color:"#CC0000", letterSpacing:1.5, textTransform:"uppercase", marginBottom:6 }}>{t.origin}</div>
                   <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:4 }}>
@@ -243,7 +243,7 @@ export const LoadDetailPage: React.FC<LoadDetailPageProps> = ({
                   </div>
                 </div>
 
-                {/* Arrow + distance */}
+ {/* Arrow + distance */}
                 <div style={{ flex:2, textAlign:"center" }}>
                   <div style={{ fontSize:11, color:"#CC0000", fontFamily:"'Barlow',sans-serif", fontWeight:700, marginBottom:6 }}>
                     {load.miles.toLocaleString()} mi · {driveTime(load.miles)}
@@ -253,7 +253,7 @@ export const LoadDetailPage: React.FC<LoadDetailPageProps> = ({
                   </div>
                 </div>
 
-                {/* Dest */}
+ {/* Dest */}
                 <div style={{ flex:1, textAlign:"right" }}>
                   <div style={{ fontFamily:"'Barlow',sans-serif", fontSize:9, color:"#CC0000", letterSpacing:1.5, textTransform:"uppercase", marginBottom:6 }}>{t.destination}</div>
                   <div style={{ display:"flex", alignItems:"center", justifyContent:"flex-end", gap:8, marginBottom:4 }}>
@@ -264,7 +264,7 @@ export const LoadDetailPage: React.FC<LoadDetailPageProps> = ({
               </div>
             </div>
 
-            {/* Google Maps */}
+ {/* Google Maps */}
             <div style={{ background:card, border:`1px solid ${bord}`, borderRadius:14, overflow:"hidden", animation:"detailFadeUp 0.5s ease 0.25s both" }}>
               <div style={{ padding:"12px 18px", borderBottom:`1px solid ${bord}`, display:"flex", alignItems:"center", gap:8 }}>
                 <svg width="15" height="15" viewBox="0 0 256 256" fill="#CC0000">
@@ -272,7 +272,7 @@ export const LoadDetailPage: React.FC<LoadDetailPageProps> = ({
                 </svg>
                 <span style={{ fontFamily:"'Barlow',sans-serif", fontWeight:700, fontSize:12, color:text, flex:1 }}>{t.routeMap}</span>
                 <a
-                  href={`https://www.google.com/maps/dir/${encodeURIComponent(load.route)}/${encodeURIComponent(load.dest)}`}
+ href={`https://www.google.com/maps/dir/${encodeURIComponent(load.route)}/${encodeURIComponent(load.dest)}`}
                   target="_blank" rel="noopener noreferrer"
                   style={{ fontFamily:"'Barlow',sans-serif", fontSize:11, color:"#CC0000", textDecoration:"none", fontWeight:600 }}
                 >
@@ -282,12 +282,12 @@ export const LoadDetailPage: React.FC<LoadDetailPageProps> = ({
               <div style={{ position:"relative", height:340, background:isDark?"#1a1a1a":"#e8e8e8" }}>
                 {!mapLoaded && (
                   <div style={{ position:"absolute", inset:0, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:16, zIndex:1, background: isDark ? "rgba(10,10,10,0.97)" : "rgba(240,240,240,0.97)" }}>
-                    {/* Tire animation */}
+ {/* Tire animation */}
                     <div style={{ position:"relative", width:80, height:80, animation:"tirePulseGlow 2s ease infinite" }}>
                       <svg width="80" height="80" viewBox="0 0 80 80" style={{ animation:"tireSpin 1.4s linear infinite", transformOrigin:"40px 40px" }}>
-                        {/* Outer tire rubber */}
+ {/* Outer tire rubber */}
                         <circle cx="40" cy="40" r="38" fill={isDark?"#1a1a1a":"#2a2a2a"} stroke="#CC0000" strokeWidth="4"/>
-                        {/* Tire tread marks */}
+ {/* Tire tread marks */}
                         {[0,30,60,90,120,150,180,210,240,270,300,330].map((deg, i) => {
                           const rad = deg * Math.PI / 180;
                           const x1 = 40 + Math.cos(rad) * 30;
@@ -296,28 +296,28 @@ export const LoadDetailPage: React.FC<LoadDetailPageProps> = ({
                           const y2 = 40 + Math.sin(rad) * 36;
                           return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="#CC0000" strokeWidth="2.5" strokeLinecap="round" opacity="0.6"/>;
                         })}
-                        {/* Rim */}
+ {/* Rim */}
                         <circle cx="40" cy="40" r="26" fill={isDark?"#0d0d0d":"#1a1a1a"} stroke="#CC0000" strokeWidth="2.5"/>
-                        {/* Spokes — 5 */}
+ {/* Spokes — 5 */}
                         {[0,72,144,216,288].map((deg, i) => {
                           const rad = deg * Math.PI / 180;
                           return <line key={i} x1="40" y1="40" x2={40 + Math.cos(rad) * 20} y2={40 + Math.sin(rad) * 20} stroke="#CC0000" strokeWidth="3" strokeLinecap="round"/>;
                         })}
-                        {/* Hub */}
+ {/* Hub */}
                         <circle cx="40" cy="40" r="8" fill="#CC0000"/>
                         <circle cx="40" cy="40" r="4" fill={isDark?"#0d0d0d":"#1a1a1a"}/>
-                        {/* Lug nuts */}
+ {/* Lug nuts */}
                         {[0,72,144,216,288].map((deg, i) => {
                           const rad = deg * Math.PI / 180;
                           return <circle key={i} cx={40 + Math.cos(rad) * 16} cy={40 + Math.sin(rad) * 16} r="2.5" fill="#CC0000" opacity="0.9"/>;
                         })}
                       </svg>
-                      {/* Road shadow */}
+ {/* Road shadow */}
                       <div style={{ position:"absolute", bottom:-8, left:"50%", transform:"translateX(-50%)", width:50, height:6, background:"rgba(204,0,0,0.2)", borderRadius:"50%", filter:"blur(4px)" }}/>
                     </div>
                     <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:4 }}>
                       <span style={{ fontFamily:"'Oswald',sans-serif", fontWeight:700, fontSize:13, color: isDark ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.6)", letterSpacing:2, textTransform:"uppercase" }}>{t.loadingMap}</span>
-                      {/* Animated dots */}
+ {/* Animated dots */}
                       <div style={{ display:"flex", gap:5 }}>
                         {[0,1,2].map(i => (
                           <div key={i} style={{ width:5, height:5, borderRadius:"50%", background:"#CC0000", animation:`tirePulseGlow 1s ease ${i*0.22}s infinite` }}/>
@@ -337,7 +337,7 @@ export const LoadDetailPage: React.FC<LoadDetailPageProps> = ({
               </div>
             </div>
 
-            {/* Description */}
+ {/* Description */}
             <div style={{ background:card, border:`1px solid ${bord}`, borderRadius:14, padding:"24px 28px", animation:"detailFadeUp 0.5s ease 0.3s both" }}>
               <div style={{ fontFamily:"'Barlow',sans-serif", fontSize:9, color:muted, letterSpacing:2, textTransform:"uppercase", marginBottom:12 }}>{t.loadDescription}</div>
               <p style={{ fontFamily:"'Barlow',sans-serif", fontSize:14, color:isDark?"rgba(255,255,255,0.68)":"rgba(0,0,0,0.62)", lineHeight:1.8, margin:0 }}>
@@ -345,7 +345,7 @@ export const LoadDetailPage: React.FC<LoadDetailPageProps> = ({
               </p>
             </div>
 
-            {/* Requirements grid */}
+ {/* Requirements grid */}
             <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12, animation:"detailFadeUp 0.5s ease 0.35s both" }}>
               {[
                 { icon:"🪪", label:t.req.cdl, desc:t.req.cdlDesc },
@@ -363,9 +363,9 @@ export const LoadDetailPage: React.FC<LoadDetailPageProps> = ({
               ))}
             </div>
 
-            {/* Message Dispatcher */}
+ {/* Message Dispatcher */}
             <div ref={msgRef} style={{ background:card, border:`1px solid ${bord}`, borderRadius:14, overflow:"hidden", animation:"detailFadeUp 0.5s ease 0.4s both" }}>
-              {/* Header toggle */}
+ {/* Header toggle */}
               <div
                 onClick={() => { setMsgOpen(o => !o); setMsgSent(false); }}
                 style={{ padding:"18px 24px", display:"flex", alignItems:"center", justifyContent:"space-between", cursor:"pointer", background: msgOpen ? "rgba(204,0,0,0.06)" : "transparent", transition:"background 0.2s" }}
@@ -388,7 +388,7 @@ export const LoadDetailPage: React.FC<LoadDetailPageProps> = ({
                 </svg>
               </div>
 
-              {/* Form body */}
+ {/* Form body */}
               {msgOpen && (
                 <div style={{ padding:"0 24px 24px", borderTop:`1px solid ${bord}` }}>
                   {msgSent ? (
@@ -403,13 +403,13 @@ export const LoadDetailPage: React.FC<LoadDetailPageProps> = ({
                     </div>
                   ) : (
                     <div style={{ display:"flex", flexDirection:"column", gap:12, paddingTop:20 }}>
-                      {/* Route info (read-only) */}
+ {/* Route info (read-only) */}
                       <div style={{ background: isDark?"rgba(204,0,0,0.06)":"rgba(204,0,0,0.04)", border:"1px solid rgba(204,0,0,0.2)", borderRadius:8, padding:"10px 14px" }}>
                         <div style={{ fontFamily:"'Barlow',sans-serif", fontSize:9, color:"#CC0000", letterSpacing:1.5, textTransform:"uppercase", marginBottom:3 }}>{t.formRoute}</div>
                         <div style={{ fontFamily:"'Barlow',sans-serif", fontWeight:700, fontSize:13, color:text }}>{load.route} → {load.dest}</div>
                       </div>
 
-                      {/* Name + Phone row */}
+ {/* Name + Phone row */}
                       <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10 }}>
                         <div>
                           <div style={{ fontFamily:"'Barlow',sans-serif", fontSize:10, color:muted, letterSpacing:1, marginBottom:5 }}>{t.formName}</div>
@@ -433,7 +433,7 @@ export const LoadDetailPage: React.FC<LoadDetailPageProps> = ({
                         </div>
                       </div>
 
-                      {/* Pickup date */}
+ {/* Pickup date */}
                       <div>
                         <div style={{ fontFamily:"'Barlow',sans-serif", fontSize:10, color:muted, letterSpacing:1, marginBottom:5 }}>{t.formDate}</div>
                         <input
@@ -445,7 +445,7 @@ export const LoadDetailPage: React.FC<LoadDetailPageProps> = ({
                         />
                       </div>
 
-                      {/* Message textarea */}
+ {/* Message textarea */}
                       <div>
                         <div style={{ fontFamily:"'Barlow',sans-serif", fontSize:10, color:muted, letterSpacing:1, marginBottom:5 }}>{t.formMsg}</div>
                         <textarea
@@ -458,7 +458,7 @@ export const LoadDetailPage: React.FC<LoadDetailPageProps> = ({
                         />
                       </div>
 
-                      {/* Send button */}
+ {/* Send button */}
                       <button
                         onClick={() => { if (msgName || msgPhone) setMsgSent(true); }}
                         style={{ padding:"12px", background:"linear-gradient(135deg,#CC0000,#ff4d4d)", border:"none", borderRadius:8, color:"#fff", fontFamily:"'Oswald',sans-serif", fontWeight:700, fontSize:14, letterSpacing:2, textTransform:"uppercase", cursor:"pointer", boxShadow:"0 6px 20px rgba(204,0,0,0.35)", transition:"all 0.2s" }}
@@ -474,14 +474,14 @@ export const LoadDetailPage: React.FC<LoadDetailPageProps> = ({
             </div>
           </div>
 
-          {/* Right column — sticky booking card */}
+ {/* Right column — sticky booking card */}
           <div style={{ position:"sticky", top:76 }}>
             <div style={{
               background:card, border:`1px solid ${bord}`, borderRadius:16,
               overflow:"hidden", animation:"detailFadeUp 0.5s ease 0.2s both",
               boxShadow: isDark ? "0 20px 60px rgba(0,0,0,0.5)" : "0 20px 60px rgba(0,0,0,0.12)",
             }}>
-              {/* Price header */}
+ {/* Price header */}
               <div style={{ background:"linear-gradient(135deg,#CC0000,#ff4d4d)", padding:"24px 24px 20px" }}>
                 <div style={{ fontFamily:"'Barlow',sans-serif", fontSize:10, color:"rgba(255,255,255,0.6)", letterSpacing:2, textTransform:"uppercase", marginBottom:6 }}>{t.totalRate}</div>
                 <div style={{ fontFamily:"'Oswald',sans-serif", fontWeight:700, fontSize:40, color:"#fff", lineHeight:1 }}>
@@ -492,7 +492,7 @@ export const LoadDetailPage: React.FC<LoadDetailPageProps> = ({
                 </div>
               </div>
 
-              {/* Details */}
+ {/* Details */}
               <div style={{ padding:"20px 24px" }}>
                 {[
                   { l:t.route, v:`${load.route} → ${load.dest}` },
@@ -508,14 +508,14 @@ export const LoadDetailPage: React.FC<LoadDetailPageProps> = ({
 
                 <div style={{ height:1, background:bord, margin:"6px 0 18px" }} />
 
-                {/* Dispatch */}
+ {/* Dispatch */}
                 <div style={{ marginBottom:16 }}>
                   <div style={{ fontFamily:"'Barlow',sans-serif", fontSize:9, color:muted, letterSpacing:1.5, textTransform:"uppercase", marginBottom:4 }}>{t.dispatch}</div>
                   <div style={{ fontFamily:"'Oswald',sans-serif", fontWeight:700, fontSize:20, color:text }}>+1 786-202-6599</div>
                   <div style={{ fontFamily:"'Barlow',sans-serif", fontSize:11, color:muted, marginTop:2 }}>{t.dispatchHours}</div>
                 </div>
 
-                {/* Call + Message buttons row */}
+ {/* Call + Message buttons row */}
                 <div style={{ display:"flex", gap:8, marginBottom:10 }}>
                   <a
                     href="tel:+17862026599"
@@ -535,7 +535,7 @@ export const LoadDetailPage: React.FC<LoadDetailPageProps> = ({
                     {t.call}
                   </a>
 
-                  {/* Animated message button */}
+ {/* Animated message button */}
                   <button
                     onClick={() => {
                       setMsgOpen(true);
@@ -573,7 +573,7 @@ export const LoadDetailPage: React.FC<LoadDetailPageProps> = ({
                   </button>
                 </div>
 
-                {/* Book / Cancel button */}
+ {/* Book / Cancel button */}
                 <button
                   onClick={handleBook}
                   style={{

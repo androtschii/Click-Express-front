@@ -1,8 +1,8 @@
 import type { Load, LoadDisplay } from "../types/index";
 
-// ── УРОВЕНЬ БИЗНЕС-ЛОГИКИ (Business Logic Layer) ──────────────────────────
+// УРОВЕНЬ БИЗНЕС-ЛОГИКИ (Business Logic Layer) 
 
-// ── 1. ФИЛЬТРАЦИЯ МАРШРУТОВ ───────────────────────────────────────────────
+// 1. ФИЛЬТРАЦИЯ МАРШРУТОВ 
 export const filterLoads = (
   loads: Load[],
   search: string,
@@ -22,13 +22,13 @@ export const filterLoads = (
   });
 };
 
-// ── 2. РАСЧЁТ ЦЕНЫ ЗА МИЛЮ ───────────────────────────────────────────────
+// 2. РАСЧЁТ ЦЕНЫ ЗА МИЛЮ 
 export const getPricePerMile = (load: Load): string => {
   if (load.miles === 0) return "0.00";
   return (load.price / load.miles).toFixed(2);
 };
 
-// ── 3. СОРТИРОВКА ─────────────────────────────────────────────────────────
+// 3. СОРТИРОВКА 
 export const sortByPrice = (loads: Load[], asc = true): Load[] => {
   return [...loads].sort((a, b) =>
     asc ? a.price - b.price : b.price - a.price
@@ -41,13 +41,13 @@ export const sortByMiles = (loads: Load[], asc = true): Load[] => {
   );
 };
 
-// ── 4. ПОЛУЧИТЬ МАРШРУТЫ ПО ТИПУ ─────────────────────────────────────────
+// 4. ПОЛУЧИТЬ МАРШРУТЫ ПО ТИПУ 
 export const getLoadsByType = (loads: Load[], type: string): Load[] => {
   if (type === "All Loads") return loads;
   return loads.filter(l => l.type === type || l.tag === type);
 };
 
-// ── 5. СТАТИСТИКА ─────────────────────────────────────────────────────────
+// 5. СТАТИСТИКА 
 export const getStats = (loads: Load[]) => {
   if (loads.length === 0)
     return { total: 0, avgPrice: 0, avgMiles: 0, maxPrice: 0, minPrice: 0 };
@@ -62,7 +62,7 @@ export const getStats = (loads: Load[]) => {
   };
 };
 
-// ── 6. ВАЛИДАЦИЯ ФОРМЫ ЗАЯВКИ ─────────────────────────────────────────────
+// 6. ВАЛИДАЦИЯ ФОРМЫ ЗАЯВКИ 
 export const validateQuoteForm = (
   name: string, phone: string, from: string, to: string
 ): { valid: boolean; error?: string } => {
@@ -77,14 +77,14 @@ export const validateQuoteForm = (
   return { valid: true };
 };
 
-// ── 7. ФОРМАТИРОВАНИЕ ─────────────────────────────────────────────────────
+// 7. ФОРМАТИРОВАНИЕ 
 export const formatPrice = (price: number): string =>
   `$${price.toLocaleString("en-US")}`;
 
 export const formatMiles = (miles: number): string =>
   `${miles.toLocaleString("en-US")} mi`;
 
-// ── 8. ЗАГРУЗКА ДАННЫХ (Data Access Layer) ────────────────────────────────
+// 8. ЗАГРУЗКА ДАННЫХ (Data Access Layer) 
 export const fetchLoads = async (data: Load[]): Promise<Load[]> => {
   return new Promise<Load[]>((resolve, reject) => {
     setTimeout(() => {
@@ -94,7 +94,7 @@ export const fetchLoads = async (data: Load[]): Promise<Load[]> => {
   });
 };
 
-// ── 9. AUTOMAPPER — конвертация Load → LoadDisplay ────────────────────────
+// 9. AUTOMAPPER — конвертация Load → LoadDisplay 
 export const mapLoadToDisplay = (load: Load): LoadDisplay => ({
   id:             load.id,
   title:          `${load.route} → ${load.dest}`,

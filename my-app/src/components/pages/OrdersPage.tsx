@@ -41,14 +41,14 @@ export const OrdersPage: React.FC<OrdersPageProps> = ({
       `}</style>
 
       <div style={{ maxWidth: 860, margin: "0 auto", animation: "fadeIn 0.4s ease" }}>
-        {/* Back button */}
+ {/* Back button */}
         <button onClick={onBack} style={{ background: "transparent", border: "none", color: muted, fontFamily: "'Barlow',sans-serif", fontWeight: 600, fontSize: 13, letterSpacing: 1, cursor: "pointer", marginBottom: 32, padding: 0, display: "flex", alignItems: "center", gap: 6, transition: "color 0.15s" }}
           onMouseEnter={e => { e.currentTarget.style.color = "#CC0000"; }}
           onMouseLeave={e => { e.currentTarget.style.color = muted; }}>
           {t.back}
         </button>
 
-        {/* Page title */}
+ {/* Page title */}
         <div style={{ marginBottom: 32 }}>
           <div style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 10, color: "#CC0000", letterSpacing: 4, textTransform: "uppercase", marginBottom: 6 }}>● {lang === "ru" ? "ЗАКАЗЫ" : "ORDERS"}</div>
           <h1 style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: "clamp(28px,4vw,44px)", color: text, textTransform: "uppercase", lineHeight: 1 }}>
@@ -56,14 +56,14 @@ export const OrdersPage: React.FC<OrdersPageProps> = ({
           </h1>
         </div>
 
-        {/* Summary badge */}
+ {/* Summary badge */}
         {orders.length > 0 && (
           <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(204,0,0,0.08)", border: "1px solid rgba(204,0,0,0.22)", borderRadius: 6, padding: "8px 18px", fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 12, color: "#CC0000", letterSpacing: 1, marginBottom: 24, textTransform: "uppercase" }}>
             📋 {orders.length} {t.booked}
           </div>
         )}
 
-        {/* Empty state */}
+ {/* Empty state */}
         {orders.length === 0 ? (
           <div style={{ textAlign: "center", padding: "80px 20px", border: `1px dashed ${border}`, borderRadius: 12 }}>
             <div style={{ fontSize: 56, marginBottom: 16 }}>📭</div>
@@ -81,7 +81,7 @@ export const OrdersPage: React.FC<OrdersPageProps> = ({
             {orders.map((load, idx) => (
               <div key={load.id} className="order-card" style={{ background: card, border: `1px solid ${border}`, borderRadius: 12, overflow: "hidden", boxShadow: "none" }}>
                 <div style={{ display: "flex", alignItems: "stretch" }}>
-                  {/* Image column */}
+ {/* Image column */}
                   <div style={{ width: 130, flexShrink: 0, position: "relative", overflow: "hidden" }}>
                     <img src={load.image} alt={load.route} style={{ width: "100%", height: "100%", objectFit: "cover", filter: "brightness(0.6)" }} />
                     <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, transparent 60%, rgba(0,0,0,0.4))" }} />
@@ -90,7 +90,7 @@ export const OrdersPage: React.FC<OrdersPageProps> = ({
                     </div>
                   </div>
 
-                  {/* Content */}
+ {/* Content */}
                   <div style={{ flex: 1, padding: "18px 20px", display: "flex", flexDirection: "column", justifyContent: "space-between", gap: 10 }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
                       <div>
@@ -111,7 +111,7 @@ export const OrdersPage: React.FC<OrdersPageProps> = ({
                       </div>
                     </div>
 
-                    {/* Actions */}
+ {/* Actions */}
                     <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
                       <button onClick={() => onTrack?.(load)} style={{ padding: "7px 16px", background: "#CC0000", border: "none", borderRadius: 5, color: "#fff", fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 11, letterSpacing: 1, textTransform: "uppercase", cursor: "pointer", transition: "all 0.15s", display:"flex", alignItems:"center", gap:6 }}
                         onMouseEnter={e => { e.currentTarget.style.background = "#aa0000"; e.currentTarget.style.transform="translateY(-1px)"; }}

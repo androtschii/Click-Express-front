@@ -1,6 +1,6 @@
 const API_BASE_URL = "http://localhost:5000/api";
 
-// ── Token helpers ──────────────────────────────────────────────────────────
+// Token helpers 
 const getToken = () => {
   try {
     const session = JSON.parse(localStorage.getItem("ce_session") || "null");
@@ -15,7 +15,7 @@ const authHeaders = () => ({
   ...(getToken() ? { Authorization: `Bearer ${getToken()}` } : {}),
 });
 
-// ── Auth ───────────────────────────────────────────────────────────────────
+// Auth 
 export const login = async (username, password) => {
   const response = await fetch(`${API_BASE_URL}/auth/login`, {
     method: "POST",
@@ -46,7 +46,7 @@ export const getSession = () => {
   };
 };
 
-// ── Users ──────────────────────────────────────────────────────────────────
+// Users 
 export const fetchUsers = async () => {
   const response = await fetch(`${API_BASE_URL}/user`, {
     headers: authHeaders(),
@@ -84,7 +84,7 @@ export const deleteUser = async (id) => {
   return response.ok;
 };
 
-// ── Products ───────────────────────────────────────────────────────────────
+// Products 
 export const fetchProducts = async (search = "", category = "") => {
   const params = new URLSearchParams();
   if (search) params.append("search", search);
@@ -162,7 +162,7 @@ export const fetchProductStats = async () => {
   return response.json();
 };
 
-// ── Health ─────────────────────────────────────────────────────────────────
+// Health 
 export const healthCheck = async () => {
   const response = await fetch(`${API_BASE_URL}/health/ping`);
   if (!response.ok) throw new Error("API недоступен");

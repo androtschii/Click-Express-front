@@ -81,21 +81,21 @@ export const Hero: React.FC<HeroProps> = ({ onViewLoads, onQuoteClick }) => {
         @keyframes statReveal{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
       `}</style>
 
-      {/* BG image with parallax */}
+ {/* BG image with parallax */}
       <div style={{ position: "absolute", inset: 0, backgroundImage: isDark ? "url('/images/red freightliner cascadia night.PNG')" : "url('/images/red freightliner cascadia light.png')", backgroundSize: "cover", backgroundPosition: `center calc(50% + ${parallaxShift}px)`, transition: "background-position 0.05s linear" }} />
 
-      {/* Gradient overlay for text readability */}
+ {/* Gradient overlay for text readability */}
       <div style={{ position: "absolute", inset: 0, background: isDark ? "linear-gradient(to right, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.35) 55%, transparent 100%)" : "linear-gradient(to right, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.15) 50%, transparent 100%)", pointerEvents: "none" }} />
 
-      {/* Left red bar */}
+ {/* Left red bar */}
       <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 5, background: "linear-gradient(to bottom, #CC0000, #880000)" }} />
-      {/* Bottom red line */}
+ {/* Bottom red line */}
       <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: 3, background: "linear-gradient(90deg, #CC0000 0%, #ff3333 40%, #CC0000 100%)" }} />
 
-      {/* Main content */}
+ {/* Main content */}
       <div style={{ position: "relative", zIndex: 2, padding: "120px clamp(24px,5vw,64px) 160px", maxWidth: 860, width: "100%" }}>
 
-        {/* Live badge */}
+ {/* Live badge */}
         <div style={{ display: "inline-flex", alignItems: "center", gap: 10, border: "1px solid rgba(204,0,0,0.45)", padding: "6px 16px", marginBottom: 32, background: "rgba(204,0,0,0.08)", animation: "heroSlideIn 0.6s ease 0.1s both", position: "relative" }}>
           <div style={{ position: "relative", width: 8, height: 8 }}>
             <div style={{ position: "absolute", inset: 0, borderRadius: "50%", background: "#CC0000", animation: "heroPulseRing 1.4s ease-out infinite" }} />
@@ -104,7 +104,7 @@ export const Hero: React.FC<HeroProps> = ({ onViewLoads, onQuoteClick }) => {
           <span style={{ fontFamily: "'Anton', sans-serif", fontSize: 10, color: "#CC0000", letterSpacing: 3, textTransform: "uppercase" }}>{t.badge}</span>
         </div>
 
-        {/* Headline */}
+ {/* Headline */}
         <h1 style={{ fontFamily: lang === 'ru' ? "'Russo One', sans-serif" : "'Anton', sans-serif", fontSize: "clamp(48px,7.5vw,96px)", color: isDark ? "#fff" : "#0d0d0d", lineHeight: 1.05, margin: "0 0 4px", textTransform: "uppercase", animation: "heroFadeUp 0.6s ease 0.2s both", letterSpacing: lang === 'ru' ? 0 : -1, whiteSpace: "nowrap" }}>{t.line1}</h1>
         <h1 style={{ fontFamily: lang === 'ru' ? "'Russo One', sans-serif" : "'Anton', sans-serif", fontSize: "clamp(48px,7.5vw,96px)", color: isDark ? "#fff" : "#0d0d0d", lineHeight: 1.05, margin: "0 0 4px", textTransform: "uppercase", animation: "heroFadeUp 0.6s ease 0.32s both", letterSpacing: lang === 'ru' ? 0 : -1, whiteSpace: "nowrap" }}>{t.line2}</h1>
         <h1 style={{ fontFamily: lang === 'ru' ? "'Russo One', sans-serif" : "'Anton', sans-serif", fontSize: "clamp(48px,7.5vw,96px)", color: "#CC0000", lineHeight: 1.05, margin: "0 0 36px", textTransform: "uppercase", animation: "heroFadeUp 0.6s ease 0.44s both", letterSpacing: lang === 'ru' ? 0 : -1, whiteSpace: "nowrap" }}>{t.line3}</h1>
@@ -116,7 +116,7 @@ export const Hero: React.FC<HeroProps> = ({ onViewLoads, onQuoteClick }) => {
           <HeroBtn onClick={onQuoteClick}>{t.getQuote}</HeroBtn>
         </div>
 
-        {/* Animated stats row */}
+ {/* Animated stats row */}
         <div style={{ display: "flex", gap: 40, marginTop: 56, flexWrap: "wrap", animation: "statReveal 0.7s ease 1.1s both" }}>
           {[
             { val: `${counts.loads}+`, label: lang === 'ru' ? 'Грузов доставлено' : 'Loads Delivered' },
@@ -133,7 +133,7 @@ export const Hero: React.FC<HeroProps> = ({ onViewLoads, onQuoteClick }) => {
         </div>
       </div>
 
-      {/* Scroll indicator */}
+ {/* Scroll indicator */}
       <div style={{ position: "absolute", bottom: 28, left: "50%", transform: "translateX(-50%)", display: "flex", flexDirection: "column", alignItems: "center", gap: 6, animation: "heroFadeUp 0.6s ease 1.4s both", opacity: scrollY > 60 ? 0 : 1, transition: "opacity 0.3s", pointerEvents: "none" }}>
         <span style={{ fontFamily: "'Anton', sans-serif", fontSize: 8, letterSpacing: 4, color: isDark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.35)", textTransform: "uppercase" }}>{lang === 'ru' ? 'СКРОЛЛ' : 'SCROLL'}</span>
         <div style={{ width: 22, height: 36, border: `2px solid ${isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.2)"}`, borderRadius: 11, display: "flex", justifyContent: "center", paddingTop: 6 }}>

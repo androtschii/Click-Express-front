@@ -40,7 +40,7 @@ const CAT_COLOR: Record<Exclude<Category, "all">, string> = {
 };
 
 const ARTICLES: Article[] = [
-  /* ─── BEST LOADS ─── */
+ /* BEST LOADS */
   {
     id: 1, category: "loads", featured: true,
     accentColor: "#CC0000",
@@ -105,7 +105,7 @@ const ARTICLES: Article[] = [
     load: { id: 105, route: "Las Vegas, NV", dest: "Carnesville, GA", price: 6350, miles: 2047, type: "Partial", cargo: "Flatbed / Construction Equipment", image: "/images/real8.jpg", tag: "Best Load of the Week" },
   },
 
-  /* ─── COMPANY NEWS ─── */
+ /* COMPANY NEWS */
   {
     id: 8, category: "company",
     accentColor: "#3b82f6", icon: "🏆",
@@ -143,7 +143,7 @@ const ARTICLES: Article[] = [
     date: "Feb 15, 2025", readTime: "2 min",
   },
 
-  /* ─── FREIGHT INDUSTRY ─── */
+ /* FREIGHT INDUSTRY */
   {
     id: 12, category: "freight",
     accentColor: "#f97316", icon: "📦",
@@ -172,7 +172,7 @@ const ARTICLES: Article[] = [
     date: "Mar 8, 2025", readTime: "5 min",
   },
 
-  /* ─── ROAD SAFETY ─── */
+ /* ROAD SAFETY */
   {
     id: 15, category: "safety",
     accentColor: "#eab308", icon: "⚠️",
@@ -201,7 +201,7 @@ const ARTICLES: Article[] = [
     date: "Mar 5, 2025", readTime: "4 min",
   },
 
-  /* ─── DRIVER STOPS ─── */
+ /* DRIVER STOPS */
   {
     id: 18, category: "drivers",
     accentColor: "#a855f7", icon: "🛣️",
@@ -306,7 +306,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({ theme = "dark", onBack, onVi
   return (
     <div style={{ background: bg, minHeight: "100vh", color: textPrimary, fontFamily: "'DM Sans', sans-serif" }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Anton&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,400&display=swap');
+ @import url('https://fonts.googleapis.com/css2?family=Anton&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,400&display=swap');
         @keyframes slideUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
         @keyframes fadeIn  { from{opacity:0} to{opacity:1} }
         @keyframes ticker  { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
@@ -326,7 +326,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({ theme = "dark", onBack, onVi
         ::-webkit-scrollbar-thumb { background:#CC0000; border-radius:2px; }
       `}</style>
 
-      {/* ── DETAIL VIEW ── */}
+ {/* DETAIL VIEW */}
       {selectedId !== null && (() => {
         const article = ARTICLES.find(a => a.id === selectedId);
         if (!article) return null;
@@ -416,7 +416,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({ theme = "dark", onBack, onVi
       })()}
 
       {selectedId === null && <>
-        {/* ── TICKER ── */}
+ {/* TICKER */}
         <div style={{ background: "#CC0000", padding: "7px 0", overflow: "hidden", position: "relative" }}>
           <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 60, background: "linear-gradient(90deg,#CC0000,transparent)", zIndex: 2, pointerEvents: "none" }} />
           <div style={{ position: "absolute", right: 0, top: 0, bottom: 0, width: 60, background: "linear-gradient(270deg,#CC0000,transparent)", zIndex: 2, pointerEvents: "none" }} />
@@ -427,25 +427,25 @@ export const NewsPage: React.FC<NewsPageProps> = ({ theme = "dark", onBack, onVi
           </div>
         </div>
 
-        {/* ── HERO ── */}
+ {/* HERO */}
         <div style={{ position: "relative", overflow: "hidden", minHeight: "72vh", display: "flex", flexDirection: "column" }}>
-          {/* Фото главной фуры */}
+ {/* Фото главной фуры */}
           <img
             src={isDark ? "/images/red freightliner cascadia night.PNG" : "/images/red freightliner cascadia light.png"}
             alt=""
             style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "right center", filter: isDark ? "brightness(0.6) saturate(0.85)" : "none", pointerEvents: "none" }}
           />
-          {/* Градиент — тёмный слева, прозрачный справа */}
+ {/* Градиент — тёмный слева, прозрачный справа */}
           <div style={{ position: "absolute", inset: 0, background: isDark ? "linear-gradient(100deg,rgba(10,10,10,0.97) 0%,rgba(10,10,10,0.88) 45%,rgba(10,10,10,0.45) 70%,rgba(10,10,10,0.1) 100%)" : "linear-gradient(100deg,rgba(244,240,232,0.97) 0%,rgba(244,240,232,0.88) 45%,rgba(244,240,232,0.4) 70%,rgba(244,240,232,0.05) 100%)", pointerEvents: "none" }} />
-          {/* Снизу затемнение */}
+ {/* Снизу затемнение */}
           <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: 120, background: isDark ? "linear-gradient(to top,rgba(10,10,10,1),transparent)" : "linear-gradient(to top,rgba(244,240,232,1),transparent)", pointerEvents: "none" }} />
-          {/* Точечная сетка */}
+ {/* Точечная сетка */}
           <div style={{ position: "absolute", inset: 0, backgroundImage: isDark ? "radial-gradient(circle,rgba(255,255,255,0.035) 1px,transparent 1px)" : "radial-gradient(circle,rgba(0,0,0,0.05) 1px,transparent 1px)", backgroundSize: "28px 28px", pointerEvents: "none" }} />
-          {/* Красная линия слева */}
+ {/* Красная линия слева */}
           <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 4, background: "linear-gradient(to bottom,#CC0000,#880000)" }} />
 
           <div style={{ position: "relative", flex: 1, display: "flex", flexDirection: "column", padding: "0 clamp(24px,5vw,72px)" }}>
-            {/* Top bar */}
+ {/* Top bar */}
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: 20, paddingBottom: 20, borderBottom: `1px solid ${borderStrong}`, marginBottom: 52 }}>
               <button className="backbtn" onClick={onBack} style={{ background: "transparent", border: "none", color: textMuted, fontFamily: "'Anton', sans-serif", fontSize: 11, letterSpacing: 3, cursor: "pointer", textTransform: "uppercase", display: "flex", alignItems: "center", gap: 8 }}>
                 ← {lang === "ru" ? "НАЗАД" : "BACK"}
@@ -457,9 +457,9 @@ export const NewsPage: React.FC<NewsPageProps> = ({ theme = "dark", onBack, onVi
               </div>
             </div>
 
-            {/* Основной контент — две колонки */}
+ {/* Основной контент — две колонки */}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 60, alignItems: "center", paddingBottom: 72, animation: "slideUp 0.6s ease both" }}>
-              {/* Левая: текст */}
+ {/* Левая: текст */}
               <div>
                 <div style={{ fontFamily: "'Anton', sans-serif", fontSize: 9, letterSpacing: 6, color: "#CC0000", textTransform: "uppercase", marginBottom: 18 }}>
                   {lang === "ru" ? "ОФИЦИАЛЬНЫЕ НОВОСТИ КОМПАНИИ" : "OFFICIAL COMPANY DISPATCH"}
@@ -471,7 +471,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({ theme = "dark", onBack, onVi
                 <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 15, color: textMuted, lineHeight: 1.8, maxWidth: 420, margin: "0 0 36px" }}>
                   {lang === "ru" ? "Лучшие лоты, маршруты, новости компании, безопасность дорог и гид по стоянкам." : "Best loads of the week, routes, company news, road safety & the trucker's guide to stops."}
                 </p>
-                {/* Статы */}
+ {/* Статы */}
                 <div style={{ display: "flex", gap: 36 }}>
                   {[
                     { v: "500+", l: lang === "ru" ? "Грузов" : "Loads" },
@@ -488,13 +488,13 @@ export const NewsPage: React.FC<NewsPageProps> = ({ theme = "dark", onBack, onVi
                 </div>
               </div>
 
-              {/* Правая: пусто — фура видна сквозь градиент */}
+ {/* Правая: пусто — фура видна сквозь градиент */}
               <div />
             </div>
           </div>
         </div>
 
-        {/* ── CATEGORY NAV ── */}
+ {/* CATEGORY NAV */}
         <div style={{ position: "sticky", top: 0, zIndex: 100, background: isDark ? "rgba(10,10,10,0.97)" : "rgba(244,240,232,0.97)", backdropFilter: "blur(20px)", borderBottom: `2px solid ${border}` }}>
           <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 clamp(20px,4vw,56px)", display: "flex", gap: 0, overflowX: "auto", scrollbarWidth: "none" }}>
             {CATS.map(c => {
@@ -511,10 +511,10 @@ export const NewsPage: React.FC<NewsPageProps> = ({ theme = "dark", onBack, onVi
           </div>
         </div>
 
-        {/* ── CONTENT ── */}
+ {/* CONTENT */}
         <div style={{ maxWidth: 1280, margin: "0 auto", padding: "44px clamp(20px,4vw,56px) 100px" }}>
 
-          {/* FEATURED */}
+ {/* FEATURED */}
           {featured && (
             <div className="ncard" onClick={() => { if (featured.load && onLoadDetail) onLoadDetail(featured.load); else { setSelectedId(featured.id); window.scrollTo({ top: 0, behavior: "smooth" }); } }}
               style={{ display: "grid", gridTemplateColumns: featured.load ? "1fr 1fr" : "1fr", marginBottom: 44, border: `1px solid ${border}`, background: surface, overflow: "hidden", position: "relative", animation: "slideUp 0.5s ease both" }}>
@@ -561,7 +561,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({ theme = "dark", onBack, onVi
             </div>
           )}
 
-          {/* GRID */}
+ {/* GRID */}
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(310px,1fr))", gap: 20 }}>
             {rest.map((article, idx) => {
               const isLoad = article.category === "loads";
@@ -628,7 +628,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({ theme = "dark", onBack, onVi
             })}
           </div>
 
-          {/* CTA */}
+ {/* CTA */}
           <div style={{ marginTop: 64, background: "#CC0000", padding: "48px clamp(24px,5vw,64px)", position: "relative", overflow: "hidden", display: "grid", gridTemplateColumns: "1fr auto", gap: 40, alignItems: "center" }}>
             <div style={{ position: "absolute", inset: 0, backgroundImage: "repeating-linear-gradient(45deg,rgba(0,0,0,0.05) 0px,rgba(0,0,0,0.05) 1px,transparent 1px,transparent 20px)", pointerEvents: "none" }} />
             <div style={{ position: "relative", zIndex: 1 }}>

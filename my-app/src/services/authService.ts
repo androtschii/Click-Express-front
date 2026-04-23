@@ -21,7 +21,7 @@ const USERS_KEY = "ce_users";
 const SESSION_KEY = "ce_session";
 const COOKIE_NAME = "ce_token";
 
-// ── Cookies ────────────────────────────────────────────────────────────────
+// Cookies 
 function setCookie(name: string, value: string, days: number) {
   const expires = new Date(Date.now() + days * 864e5).toUTCString();
   document.cookie = `${name}=${value}; expires=${expires}; path=/; SameSite=Lax`;
@@ -40,7 +40,7 @@ function deleteCookie(name: string) {
   document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`;
 }
 
-// ── Storage ────────────────────────────────────────────────────────────────
+// Storage 
 function getUsers(): User[] {
   try {
     return JSON.parse(localStorage.getItem(USERS_KEY) || "[]");
@@ -66,7 +66,7 @@ function createSession(user: User) {
   setCookie(COOKIE_NAME, token, 30);
 }
 
-// ── Public API ─────────────────────────────────────────────────────────────
+// Public API 
 export function register(
   name: string,
   email: string,
@@ -103,7 +103,7 @@ export async function login(
   if (!password) return { ok: false, error: "Password is required" };
 
   try {
-    const response = await fetch("http://localhost:5000/api/auth/login", {
+ const response = await fetch("http://localhost:5000/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, password }),
@@ -115,7 +115,7 @@ export async function login(
 
     const data = await response.json();
 
-    // Сохраняем сессию с JWT токеном от бэкенда
+ // Сохраняем сессию с JWT токеном от бэкенда
     const session: Session = {
       userId: data.username,
       email: data.username,
@@ -145,7 +145,7 @@ export function loginWithGoogle(): Promise<{
   user?: User;
   error?: string;
 }> {
-  // Mock Google OAuth — replace with real Google Identity Services in production
+ // Mock Google OAuth — replace with real Google Identity Services in production
   return new Promise((resolve) => {
     setTimeout(() => {
       const mockEmail = `demo.google@gmail.com`;
@@ -160,7 +160,7 @@ export function loginWithGoogle(): Promise<{
           password: "",
           createdAt: new Date().toISOString(),
           provider: "google",
-          avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(mockName)}&background=EA4335&color=fff&size=64`,
+ avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(mockName)}&background=EA4335&color=fff&size=64`,
         };
         saveUsers([...users, user]);
       }
@@ -217,7 +217,7 @@ export function updateUser(
   users[idx] = user;
   saveUsers(users);
 
-  // Update session name if changed
+ // Update session name if changed
   if (updates.name !== undefined) {
     const session = JSON.parse(localStorage.getItem(SESSION_KEY) || "null") as Session | null;
     if (session && session.userId === userId) {

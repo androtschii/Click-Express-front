@@ -58,8 +58,9 @@ export const LoadCard: React.FC<LoadCardProps> = ({ load, onBook, onCancelBook, 
   const [hov, setHov] = useState(false);
   const [bookHov, setBookHov] = useState(false);
   const [imgLoaded, setImgLoaded] = useState(false);
+  const [spot, setSpot] = useState({ x: -200, y: -200 });
 
-  // Admin edit state
+ // Admin edit state
   const [currentPrice, setCurrentPrice] = useState(load.price);
   const [currentImage, setCurrentImage] = useState(load.image);
   const [editingPrice, setEditingPrice] = useState(false);
@@ -119,12 +120,17 @@ export const LoadCard: React.FC<LoadCardProps> = ({ load, onBook, onCancelBook, 
   const driveM = Math.round(((load.miles / 55) - driveH) * 60);
 
   return (
-    <div onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
-      style={{ background:cardBg, border:`1px solid ${hov?"#CC0000":cardBorder}`, borderRadius:6, overflow:"hidden", transform:hov?"translateY(-6px)":"none", boxShadow:hov?"0 28px 56px rgba(0,0,0,0.65), 0 0 0 1px rgba(204,0,0,0.25)":"0 2px 14px rgba(0,0,0,0.22)", transition:"all 0.22s cubic-bezier(0.22,1,0.36,1)" }}>
+    <div onMouseEnter={() => setHov(true)} onMouseLeave={() => { setHov(false); setSpot({ x: -200, y: -200 }); }}
+      onMouseMove={e => {
+        const r = e.currentTarget.getBoundingClientRect();
+        setSpot({ x: e.clientX - r.left, y: e.clientY - r.top });
+      }}
+      style={{ position: "relative", background:cardBg, border:`1px solid ${hov?"#CC0000":cardBorder}`, borderRadius:6, overflow:"hidden", transform:hov?"translateY(-6px)":"none", boxShadow:hov?"0 28px 56px rgba(0,0,0,0.65), 0 0 0 1px rgba(204,0,0,0.25)":"0 2px 14px rgba(0,0,0,0.22)", transition:"all 0.22s cubic-bezier(0.22,1,0.36,1)" }}>
+      <div style={{ position: "absolute", inset: 0, pointerEvents: "none", zIndex: 2, opacity: hov ? 1 : 0, transition: "opacity 0.2s", background: `radial-gradient(360px circle at ${spot.x}px ${spot.y}px, rgba(204,0,0,0.12), transparent 50%)` }} />
 
-      {/* ── Фото ── */}
+ {/* Фото */}
       <div onClick={() => onDetails && onDetails(load)} style={{ position:"relative", height:280, overflow:"hidden", cursor: onDetails ? "pointer" : "default" }}>
-        {/* Skeleton */}
+ {/* Skeleton */}
         {!imgLoaded && <div style={{ position:"absolute", inset:0, background: isDark ? "#1a1a1a" : "#e8e8e8", animation:"shimmer 1.4s ease infinite" }} />}
         <img src={currentImage} alt={load.route} onLoad={() => setImgLoaded(true)} style={{
           width:"100%", height:"100%", objectFit:"cover", objectPosition:"center 72%",
@@ -138,14 +144,14 @@ export const LoadCard: React.FC<LoadCardProps> = ({ load, onBook, onCancelBook, 
           : "linear-gradient(170deg,rgba(0,0,0,0.0) 0%,rgba(0,0,0,0.18) 50%,rgba(0,0,0,0.72) 100%)"
         }} />
 
-        {/* Тег */}
+ {/* Тег */}
         {load.tag && (
           <div style={{ position:"absolute", top:0, left:0, background: load.tag==="Military Load" ? "linear-gradient(135deg,#1a3a6b,#0f2347)" : "linear-gradient(135deg,#CC0000,#990000)", color:"#fff", padding:"5px 14px", fontFamily:"'Anton',sans-serif", fontSize:9, letterSpacing:2.5, textTransform:"uppercase" }}>
             {load.tag==="Best Load of the Week" ? "★ " : "✈ "}{load.tag}
           </div>
         )}
 
-        {/* View details pill */}
+ {/* View details pill */}
         {onDetails && (
           <div style={{ position:"absolute", top:10, right:54, background:"rgba(0,0,0,0.6)", border:"1px solid rgba(255,255,255,0.18)", borderRadius:20, padding:"4px 12px", fontFamily:"'Anton',sans-serif", fontSize:9, color:"rgba(255,255,255,0.85)", letterSpacing:2, backdropFilter:"blur(6px)", textTransform:"uppercase", opacity: hov ? 1 : 0, transform: hov ? "translateY(0)" : "translateY(-4px)", transition:"all 0.2s ease" }}>
             {t.viewDetails}
@@ -154,7 +160,7 @@ export const LoadCard: React.FC<LoadCardProps> = ({ load, onBook, onCancelBook, 
 
         <HeartIcon saved={saved} onClick={handleSaveClick} />
 
-        {/* Admin: edit image button */}
+ {/* Admin: edit image button */}
         {isAdmin && (
           <div style={{ position:"absolute", top:10, left:10, zIndex:5 }}>
             {editingImage ? (
@@ -177,14 +183,14 @@ export const LoadCard: React.FC<LoadCardProps> = ({ load, onBook, onCancelBook, 
           </div>
         )}
 
-        {/* Admin toast */}
+ {/* Admin toast */}
         {adminMsg && (
           <div style={{ position:"absolute", top:"50%", left:"50%", transform:"translate(-50%,-50%)", background:"rgba(0,0,0,0.9)", color:"#fff", padding:"8px 18px", borderRadius:8, fontFamily:"'Barlow',sans-serif", fontWeight:700, fontSize:13, zIndex:20, whiteSpace:"nowrap", border:"1px solid rgba(204,0,0,0.4)" }}>
             {adminMsg}
           </div>
         )}
 
-        {/* Цена + тип */}
+ {/* Цена + тип */}
         <div style={{ position:"absolute", bottom:0, left:0, right:0, padding:"16px 16px 14px" }}>
           <div style={{ display:"flex", alignItems:"flex-end", justifyContent:"space-between", gap:8 }}>
             <div>
@@ -224,10 +230,10 @@ export const LoadCard: React.FC<LoadCardProps> = ({ load, onBook, onCancelBook, 
         </div>
       </div>
 
-      {/* ── Тело карточки ── */}
+ {/* Тело карточки */}
       <div style={{ padding:"14px 16px 16px" }}>
 
-        {/* Роут визуальный */}
+ {/* Роут визуальный */}
         <div style={{ marginBottom:10, padding:"10px 12px", background: isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.03)", border:`1px solid ${dividerColor}`, borderRadius:4 }}>
           <div style={{ display:"flex", alignItems:"center", gap:0 }}>
             <div style={{ flexShrink:0 }}>
@@ -248,7 +254,7 @@ export const LoadCard: React.FC<LoadCardProps> = ({ load, onBook, onCancelBook, 
 
         <div style={{ fontFamily:"'Anton',sans-serif", fontSize:9, color:textSecondary, letterSpacing:2, textTransform:"uppercase", marginBottom:12 }}>{load.cargo}</div>
 
-        {/* Мини-статы */}
+ {/* Мини-статы */}
         <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:1, marginBottom:14, background:dividerColor, borderRadius:4, overflow:"hidden" }}>
           {[
             { label:"RATE/MI", value:`$${ratePerMile}`, color:"#00b450" },
@@ -262,7 +268,7 @@ export const LoadCard: React.FC<LoadCardProps> = ({ load, onBook, onCancelBook, 
           ))}
         </div>
 
-        {/* Диспетчер + кнопка */}
+ {/* Диспетчер + кнопка */}
         <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:10 }}>
           <div>
             <div style={{ fontSize:8, color:textMuted, fontFamily:"'Barlow',sans-serif", fontWeight:700, letterSpacing:1.5, textTransform:"uppercase" }}>{t.dispatch}</div>

@@ -6,7 +6,7 @@ interface FleetPageProps {
   onBack?: () => void;
 }
 
-// ── Truck Photo ─────────────────────────────────────────────────────────────
+// Truck Photo 
 
 function TruckImage({ id, isDark, animKey }: { id: string; isDark: boolean; animKey: number }) {
   const [loaded, setLoaded] = useState(false);
@@ -17,7 +17,7 @@ function TruckImage({ id, isDark, animKey }: { id: string; isDark: boolean; anim
   const src = imageMap[id] || "";
   useEffect(() => { setLoaded(false); }, [animKey]);
 
-  // Visible contrast backgrounds for both themes
+ // Visible contrast backgrounds for both themes
   const darkBg  = "linear-gradient(160deg,#1c0a0a 0%,#140606 40%,#0e0404 100%)";
   const lightBg = "linear-gradient(160deg,#f5ecec 0%,#ede0e0 50%,#e8d8d8 100%)";
 
@@ -27,13 +27,13 @@ function TruckImage({ id, isDark, animKey }: { id: string; isDark: boolean; anim
       background: isDark ? darkBg : lightBg,
       minHeight: 240,
     }}>
-      {/* Diagonal stripe texture */}
+ {/* Diagonal stripe texture */}
       <div style={{ position: "absolute", inset: 0, backgroundImage: `repeating-linear-gradient(135deg,rgba(204,0,0,${isDark?"0.04":"0.05"}) 0,rgba(204,0,0,${isDark?"0.04":"0.05"}) 1px,transparent 1px,transparent 22px)`, pointerEvents: "none" }} />
-      {/* Radial glow from truck center */}
+ {/* Radial glow from truck center */}
       <div style={{ position: "absolute", inset: 0, background: `radial-gradient(ellipse at 55% 55%,${isDark?"rgba(80,10,10,0.7)":"rgba(204,100,100,0.12)"} 0%,transparent 65%)`, pointerEvents: "none" }} />
-      {/* Ground shadow */}
+ {/* Ground shadow */}
       <div style={{ position: "absolute", bottom: 6, left: "8%", right: "8%", height: 24, background: `radial-gradient(ellipse,${isDark?"rgba(0,0,0,0.8)":"rgba(0,0,0,0.22)"} 0%,transparent 70%)`, pointerEvents: "none" }} />
-      {/* Road stripe */}
+ {/* Road stripe */}
       <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: 3, background: "linear-gradient(90deg,transparent,#CC0000 25%,#CC0000 75%,transparent)" }} />
 
       {!loaded && (
@@ -64,7 +64,7 @@ function TruckImage({ id, isDark, animKey }: { id: string; isDark: boolean; anim
   );
 }
 
-// ── Trailer Image ───────────────────────────────────────────────────────────
+// Trailer Image 
 
 function TrailerImage({ id, isDark }: { id: string; isDark: boolean }) {
   const [failed, setFailed] = useState(false);
@@ -86,7 +86,7 @@ function TrailerImage({ id, isDark }: { id: string; isDark: boolean }) {
   const darkBg  = "radial-gradient(ellipse at 55% 60%, #3d0000 0%, #220000 35%, #110000 65%, #080000 100%)";
   const lightBg = "linear-gradient(160deg,#f8f3f3 0%,#f0e8e8 50%,#ece2e2 100%)";
 
-  // Dark: always glowing, even brighter on hover
+ // Dark: always glowing, even brighter on hover
   const darkFilter = hovered
     ? "brightness(2.6) contrast(1.2) drop-shadow(0 0 36px rgba(255,60,60,0.9)) drop-shadow(0 0 16px rgba(255,120,120,0.6)) saturate(1.4)"
     : "brightness(1.85) contrast(1.12) drop-shadow(0 0 24px rgba(204,0,0,0.6)) drop-shadow(0 0 10px rgba(180,40,40,0.4)) saturate(1.15)";
@@ -112,16 +112,16 @@ function TrailerImage({ id, isDark }: { id: string; isDark: boolean }) {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      {/* Texture stripes */}
+ {/* Texture stripes */}
       <div style={{ position: "absolute", inset: 0, backgroundImage: `repeating-linear-gradient(135deg,rgba(204,0,0,${isDark?"0.06":"0.04"}) 0,rgba(204,0,0,${isDark?"0.06":"0.04"}) 1px,transparent 1px,transparent 22px)`, pointerEvents: "none" }} />
-      {/* Red center glow — always visible in dark, brighter on hover */}
+ {/* Red center glow — always visible in dark, brighter on hover */}
       <div style={{ position: "absolute", inset: 0, background: isDark
         ? `radial-gradient(ellipse at 52% 58%, rgba(220,0,0,${hovered?"0.65":"0.42"}) 0%, rgba(150,0,0,${hovered?"0.35":"0.22"}) 35%, rgba(80,0,0,${hovered?"0.18":"0.1"}) 60%, transparent 80%)`
         : `radial-gradient(ellipse at 50% 55%,rgba(204,0,0,${hovered?"0.1":"0.05"}) 0%,transparent 60%)`,
         transition: "background 0.35s ease", pointerEvents: "none" }} />
-      {/* Extra outer red ring */}
+ {/* Extra outer red ring */}
       {isDark && <div style={{ position: "absolute", inset: 0, background: `radial-gradient(ellipse at 50% 50%, transparent 40%, rgba(180,0,0,${hovered?"0.18":"0.1"}) 70%, transparent 90%)`, pointerEvents: "none", transition: "background 0.35s ease" }} />}
-      {/* Hover scan-line sweep */}
+ {/* Hover scan-line sweep */}
       {isDark && hovered && (
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg,rgba(204,0,0,0.06) 0%,transparent 40%,rgba(204,0,0,0.04) 100%)", pointerEvents: "none", animation: "heroGlow 1.2s ease-in-out infinite" }} />
       )}
@@ -139,9 +139,9 @@ function TrailerImage({ id, isDark }: { id: string; isDark: boolean }) {
           transform: hovered ? "scale(1.04)" : "scale(1)",
         }}
       />
-      {/* Bottom accent line — glows on hover */}
+ {/* Bottom accent line — glows on hover */}
       <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: 3, background: "linear-gradient(90deg,transparent,#CC0000 25%,#CC0000 75%,transparent)", boxShadow: hovered ? "0 0 18px 4px rgba(204,0,0,0.7)" : "none", transition: "box-shadow 0.35s ease" }} />
-      {/* Hover label */}
+ {/* Hover label */}
       {hovered && (
         <div style={{ position: "absolute", bottom: 10, left: "50%", transform: "translateX(-50%)", fontFamily: "'Barlow',sans-serif", fontSize: 9, fontWeight: 800, letterSpacing: 3, color: "#CC0000", textTransform: "uppercase", opacity: 0.85, whiteSpace: "nowrap", animation: "specIn 0.2s ease both" }}>
           {labelMap[id] || id}
@@ -151,7 +151,7 @@ function TrailerImage({ id, isDark }: { id: string; isDark: boolean }) {
   );
 }
 
-// ── Animated Counter ────────────────────────────────────────────────────────
+// Animated Counter 
 
 function Counter({ to, suffix = "" }: { to: number; suffix?: string }) {
   const [val, setVal] = useState(0);
@@ -169,7 +169,7 @@ function Counter({ to, suffix = "" }: { to: number; suffix?: string }) {
   return <span ref={ref}>{val.toLocaleString()}{suffix}</span>;
 }
 
-// ── Data ────────────────────────────────────────────────────────────────────
+// Data 
 
 const TRUCKS = [
   {
@@ -259,7 +259,7 @@ const TRAILERS = [
   },
 ];
 
-// ── Main Component ──────────────────────────────────────────────────────────
+// Main Component 
 
 export const FleetPage: React.FC<FleetPageProps> = ({ theme = "dark", onBack }) => {
   const { lang } = useLanguage();
@@ -310,33 +310,33 @@ export const FleetPage: React.FC<FleetPageProps> = ({ theme = "dark", onBack }) 
 
       <div style={{ animation: "fadeUp 0.45s ease both" }}>
 
-        {/* ══ HERO ══════════════════════════════════════════════════════════ */}
+ {/* HERO */}
         <div style={{ position: "relative", overflow: "hidden", minHeight: 440,
           background: isDark
             ? "linear-gradient(110deg,#0d0000 0%,#150000 35%,#0a0000 65%,#060606 100%)"
             : "linear-gradient(110deg,#ffffff 0%,#fdf4f4 40%,#f8ecec 70%,#f4e8e8 100%)",
         }}>
-          {/* Dark theme: dimmed photo background */}
+ {/* Dark theme: dimmed photo background */}
           {isDark && (
             <div style={{ position: "absolute", inset: 0, backgroundImage: "url('/images/real1.jpg')", backgroundSize: "cover", backgroundPosition: "center 40%", filter: "brightness(0.18) saturate(0.5)", mixBlendMode: "luminosity" }} />
           )}
-          {/* Overlay gradient */}
+ {/* Overlay gradient */}
           <div style={{ position: "absolute", inset: 0, background: isDark
             ? "linear-gradient(100deg,rgba(8,0,0,0.95) 0%,rgba(12,0,0,0.8) 45%,rgba(0,0,0,0.2) 100%)"
             : "linear-gradient(100deg,rgba(255,255,255,0.98) 0%,rgba(250,240,240,0.92) 45%,rgba(240,220,220,0.4) 100%)"
           }} />
-          {/* Dot grid */}
+ {/* Dot grid */}
           <div style={{ position: "absolute", inset: 0, backgroundImage: `radial-gradient(circle,${isDark?"rgba(255,255,255,0.022)":"rgba(180,0,0,0.06)"} 1px,transparent 1px)`, backgroundSize: "26px 26px", pointerEvents: "none" }} />
-          {/* Diagonal stripes */}
+ {/* Diagonal stripes */}
           <div style={{ position: "absolute", inset: 0, backgroundImage: `repeating-linear-gradient(135deg,${isDark?"rgba(204,0,0,0.03)":"rgba(204,0,0,0.04)"} 0,${isDark?"rgba(204,0,0,0.03)":"rgba(204,0,0,0.04)"} 1px,transparent 1px,transparent 28px)`, pointerEvents: "none" }} />
-          {/* Road dashes bottom */}
+ {/* Road dashes bottom */}
           <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: 4, backgroundImage: "repeating-linear-gradient(90deg,#CC0000 0,#CC0000 36px,transparent 36px,transparent 72px)", animation: "roadAnim 1.1s linear infinite", opacity: isDark ? 0.9 : 0.7 }} />
-          {/* Red corner */}
+ {/* Red corner */}
           <div style={{ position: "absolute", top: 0, left: 0, width: 0, height: 0, borderStyle: "solid", borderWidth: "90px 90px 0 0", borderColor: "#CC0000 transparent transparent transparent", opacity: isDark ? 0.5 : 0.7 }} />
-          {/* Top red line */}
+ {/* Top red line */}
           <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: "linear-gradient(90deg,#CC0000 0%,#880000 50%,transparent 100%)" }} />
 
-          {/* Truck image — right side, fully visible */}
+ {/* Truck image — right side, fully visible */}
           <div style={{ position: "absolute", right: "0%", bottom: 0, width: "clamp(300px,50%,700px)", zIndex: 1, pointerEvents: "none" }}>
             <img src="/images/Cascadia.png" alt="truck" style={{
               width: "100%", height: "100%", display: "block",
@@ -349,14 +349,14 @@ export const FleetPage: React.FC<FleetPageProps> = ({ theme = "dark", onBack }) 
             }} />
           </div>
 
-          {/* Back button */}
+ {/* Back button */}
           <button onClick={onBack} style={{ position: "absolute", top: 24, left: "clamp(20px,5vw,80px)", background: isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.06)", border: `1px solid ${isDark?"rgba(255,255,255,0.2)":"rgba(0,0,0,0.15)"}`, backdropFilter: "blur(8px)", borderRadius: 20, padding: "7px 18px", color: isDark ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.55)", fontFamily: "'Barlow',sans-serif", fontWeight: 600, fontSize: 11, letterSpacing: 1.5, textTransform: "uppercase", cursor: "pointer", transition: "all 0.15s", zIndex: 3 }}
             onMouseEnter={e => { e.currentTarget.style.borderColor="#CC0000"; e.currentTarget.style.color="#CC0000"; }}
             onMouseLeave={e => { e.currentTarget.style.borderColor=isDark?"rgba(255,255,255,0.2)":"rgba(0,0,0,0.15)"; e.currentTarget.style.color=isDark?"rgba(255,255,255,0.7)":"rgba(0,0,0,0.55)"; }}>
             ← {lang === "ru" ? "НАЗАД" : "BACK"}
           </button>
 
-          {/* Content */}
+ {/* Content */}
           <div style={{ position: "relative", zIndex: 2, padding: "80px clamp(20px,5vw,80px) 52px", minHeight: 440, display: "flex", flexDirection: "column", justifyContent: "flex-end", maxWidth: "55%" }}>
             <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 10, color: "#CC0000", letterSpacing: 5, textTransform: "uppercase", marginBottom: 14 }}>
               {lang === "ru" ? "ОФИЦИАЛЬНЫЙ АВТОПАРК" : "OFFICIAL COMPANY FLEET"}
@@ -370,7 +370,7 @@ export const FleetPage: React.FC<FleetPageProps> = ({ theme = "dark", onBack }) 
                 ? "Современные грузовики и специализированное оборудование по всей Северной Америке."
                 : "Modern trucks and specialized equipment for any freight across North America."}
             </p>
-            {/* Stats row */}
+ {/* Stats row */}
             <div style={{ display: "flex", gap: 0, border: `1px solid ${isDark?"rgba(204,0,0,0.28)":"rgba(204,0,0,0.2)"}`, background: isDark ? "rgba(0,0,0,0.45)" : "rgba(255,255,255,0.7)", backdropFilter: "blur(12px)", width: "fit-content" }}>
               {[
                 { num: 2,  suffix: "+", en: "TRUCKS",        ru: "ГРУЗОВИКИ" },
@@ -391,7 +391,7 @@ export const FleetPage: React.FC<FleetPageProps> = ({ theme = "dark", onBack }) 
           </div>
         </div>
 
-        {/* ══ TRUCKS ════════════════════════════════════════════════════════ */}
+ {/* TRUCKS */}
         <section style={{ padding: "64px clamp(20px,5vw,80px) 80px", background: bg }}>
           <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 36 }}>
             <div style={{ width: 4, height: 52, background: "linear-gradient(180deg,#CC0000,#880000)", flexShrink: 0 }} />
@@ -405,7 +405,7 @@ export const FleetPage: React.FC<FleetPageProps> = ({ theme = "dark", onBack }) 
             </div>
           </div>
 
-          {/* Thumb switcher */}
+ {/* Thumb switcher */}
           <div style={{ display: "flex", gap: 10, marginBottom: 40, flexWrap: "wrap" }}>
             {TRUCKS.map(tr => {
               const isA = activeTruck === tr.id;
@@ -435,7 +435,7 @@ export const FleetPage: React.FC<FleetPageProps> = ({ theme = "dark", onBack }) 
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: "minmax(260px,44%) 1fr", gap: "clamp(28px,5vw,72px)", alignItems: "start" }}>
-            {/* LEFT: accordion */}
+ {/* LEFT: accordion */}
             <div>
               {TRUCKS.map(tr => {
                 const isA = activeTruck === tr.id;
@@ -485,7 +485,7 @@ export const FleetPage: React.FC<FleetPageProps> = ({ theme = "dark", onBack }) 
               <div style={{ borderTop: `1px solid ${divider}` }} />
             </div>
 
-            {/* RIGHT: photo */}
+ {/* RIGHT: photo */}
             <div style={{ position: "sticky", top: 84 }}>
               <div key={truckKey}>
                 <div style={{ marginBottom: 14, display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
@@ -521,7 +521,7 @@ export const FleetPage: React.FC<FleetPageProps> = ({ theme = "dark", onBack }) 
           </div>
         </section>
 
-        {/* ══ RED STRIP ════════════════════════════════════════════════════ */}
+ {/* RED STRIP */}
         <div style={{ background: "linear-gradient(135deg,#AA0000 0%,#CC0000 40%,#990000 100%)", padding: "24px clamp(20px,5vw,80px)", display: "flex", alignItems: "center", overflow: "hidden", position: "relative" }}>
           <div style={{ position: "absolute", inset: 0, backgroundImage: "repeating-linear-gradient(45deg,rgba(0,0,0,0.07) 0,rgba(0,0,0,0.07) 1px,transparent 1px,transparent 16px)", pointerEvents: "none" }} />
           {[
@@ -539,7 +539,7 @@ export const FleetPage: React.FC<FleetPageProps> = ({ theme = "dark", onBack }) 
           ))}
         </div>
 
-        {/* ══ TRAILERS ═════════════════════════════════════════════════════ */}
+ {/* TRAILERS */}
         <section style={{ padding: "64px clamp(20px,5vw,80px) 90px", background: isDark ? "#060202" : "#fdf6f6" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 44 }}>
             <div style={{ width: 4, height: 52, background: "linear-gradient(180deg,#CC0000,#880000)", flexShrink: 0 }} />
@@ -554,7 +554,7 @@ export const FleetPage: React.FC<FleetPageProps> = ({ theme = "dark", onBack }) 
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: "minmax(260px,44%) 1fr", gap: "clamp(28px,5vw,72px)", alignItems: "start" }}>
-            {/* LEFT: accordion */}
+ {/* LEFT: accordion */}
             <div>
               {TRAILERS.map(tr => {
                 const isA = activeTrailer === tr.id;
@@ -596,7 +596,7 @@ export const FleetPage: React.FC<FleetPageProps> = ({ theme = "dark", onBack }) 
               <div style={{ borderTop: `1px solid ${divider}` }} />
             </div>
 
-            {/* RIGHT: trailer photo */}
+ {/* RIGHT: trailer photo */}
             <div style={{ position: "sticky", top: 84 }}>
               <div key={`t-${trailerKey}`} style={{ animation: "truckRollIn 0.6s cubic-bezier(0.22,1,0.36,1) both" }}>
                 <div style={{ marginBottom: 14, display: "flex", alignItems: "baseline", gap: 14 }}>
@@ -607,7 +607,7 @@ export const FleetPage: React.FC<FleetPageProps> = ({ theme = "dark", onBack }) 
                 <div style={{ border: `1px solid ${cardBorder}`, overflow: "hidden", boxShadow: cardShadow }}>
                   <div style={{ height: 3, background: "linear-gradient(90deg,#CC0000 0%,#880000 60%,transparent 100%)" }} />
                   <TrailerImage id={activeTrailer} isDark={isDark} />
-                  {/* 3 quick specs row */}
+ {/* 3 quick specs row */}
                   <div style={{ display: "flex", background: isDark ? "#0c0101" : "#fff", borderTop: `1px solid ${divider}` }}>
                     {trailer.specs.slice(0, 3).map((s, i) => (
                       <div key={i} style={{ flex: 1, padding: "10px 14px", borderRight: i < 2 ? `1px solid ${divider}` : "none" }}>
@@ -626,7 +626,7 @@ export const FleetPage: React.FC<FleetPageProps> = ({ theme = "dark", onBack }) 
           </div>
         </section>
 
-        {/* ══ CTA ══════════════════════════════════════════════════════════ */}
+ {/* CTA */}
         <div style={{ background: "linear-gradient(135deg,#AA0000 0%,#CC0000 50%,#880000 100%)", padding: "52px clamp(20px,5vw,80px)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 28, flexWrap: "wrap", position: "relative", overflow: "hidden" }}>
           <div style={{ position: "absolute", inset: 0, backgroundImage: "repeating-linear-gradient(45deg,rgba(0,0,0,0.06) 0,rgba(0,0,0,0.06) 1px,transparent 1px,transparent 20px)", pointerEvents: "none" }} />
           <div style={{ position: "absolute", right: -60, top: -60, width: 320, height: 320, borderRadius: "50%", border: "70px solid rgba(255,255,255,0.05)", pointerEvents: "none" }} />

@@ -188,7 +188,7 @@ export const ReviewsPage: React.FC<ReviewsPageProps> = ({ theme = "dark", onBack
   const [commentInputs, setCommentInputs] = useState<Record<number, string>>({});
   const [commentAuthorInputs, setCommentAuthorInputs] = useState<Record<number, string>>({});
 
-  // New review form
+ // New review form
   const [showForm, setShowForm] = useState(false);
   const [formName, setFormName] = useState("");
   const [formRole, setFormRole] = useState("");
@@ -301,7 +301,7 @@ export const ReviewsPage: React.FC<ReviewsPageProps> = ({ theme = "dark", onBack
         .form-submit:hover { background: #ca9f00 !important; transform: translateY(-1px) !important; }
       `}</style>
 
-      {/* ── HERO ── */}
+ {/* HERO */}
       <div style={{
         position: "relative",
         minHeight: 420,
@@ -309,13 +309,13 @@ export const ReviewsPage: React.FC<ReviewsPageProps> = ({ theme = "dark", onBack
         alignItems: "center",
         overflow: "hidden",
       }}>
-        {/* Background truck photo */}
+ {/* Background truck photo */}
         <img
           src={isDark ? "/images/red freightliner cascadia night.PNG" : "/images/red freightliner cascadia light.png"}
           alt=""
           style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "right center", filter: isDark ? "brightness(0.45)" : "none", pointerEvents: "none" }}
         />
-        {/* Gradient: dark on left for text, transparent on right for truck */}
+ {/* Gradient: dark on left for text, transparent on right for truck */}
         <div style={{ position: "absolute", inset: 0, background: isDark
           ? "linear-gradient(to right, rgba(6,4,0,0.97) 0%, rgba(6,4,0,0.82) 42%, rgba(6,4,0,0.2) 68%, transparent 100%)"
           : "linear-gradient(to right, rgba(255,255,255,0.97) 0%, rgba(255,255,255,0.82) 42%, rgba(255,255,255,0.1) 68%, transparent 100%)",
@@ -365,7 +365,7 @@ export const ReviewsPage: React.FC<ReviewsPageProps> = ({ theme = "dark", onBack
             </button>
           </div>
 
-          {/* Success toast */}
+ {/* Success toast */}
           {formSubmitted && (
             <div style={{ marginTop: 16, display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(34,197,94,0.15)", border: "1px solid rgba(34,197,94,0.4)", borderRadius: 8, padding: "10px 18px", animation: "revFadeIn 0.3s ease both" }}>
               <span style={{ color: "#22c55e", fontSize: 16 }}>✓</span>
@@ -380,7 +380,7 @@ export const ReviewsPage: React.FC<ReviewsPageProps> = ({ theme = "dark", onBack
         </div>
       </div>
 
-      {/* ── WRITE REVIEW FORM ── */}
+ {/* WRITE REVIEW FORM */}
       {showForm && (
         <div style={{ maxWidth: 1240, margin: "0 auto", padding: "32px clamp(20px,4vw,56px) 0", animation: "revFadeIn 0.3s ease both" }}>
           <div style={{ background: cardBg, border: `1px solid ${isDark ? "rgba(234,179,8,0.25)" : "rgba(234,179,8,0.35)"}`, borderRadius: 14, padding: "32px 36px", position: "relative", overflow: "hidden" }}>
@@ -464,7 +464,7 @@ export const ReviewsPage: React.FC<ReviewsPageProps> = ({ theme = "dark", onBack
         </div>
       )}
 
-      {/* ── REVIEWS GRID ── */}
+ {/* REVIEWS GRID */}
       <div style={{ maxWidth: 1240, margin: "0 auto", padding: "40px clamp(20px,4vw,56px) 80px" }}>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(360px,1fr))", gap: 24 }}>
           {reviews.map((review, idx) => {
@@ -481,31 +481,31 @@ export const ReviewsPage: React.FC<ReviewsPageProps> = ({ theme = "dark", onBack
                 animation: `revSlideUp 0.4s ease ${Math.min(idx, 6) * 0.05}s both`,
                 position: "relative",
               }}>
-                {/* Top accent */}
+ {/* Top accent */}
                 <div style={{ height: 3, background: review.isUser ? "linear-gradient(90deg,#eab308,#fde047,transparent)" : `linear-gradient(90deg,#eab308,rgba(234,179,8,0.3),transparent)` }} />
 
                 <div style={{ padding: "22px 24px 0" }}>
-                  {/* User badge */}
+ {/* User badge */}
                   {review.isUser && (
                     <div style={{ display: "inline-flex", alignItems: "center", gap: 5, background: "rgba(234,179,8,0.12)", border: "1px solid rgba(234,179,8,0.3)", borderRadius: 10, padding: "2px 10px", marginBottom: 10, fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 9, color: "#eab308", letterSpacing: 2, textTransform: "uppercase" }}>
                       ✓ {lang === "ru" ? "Новый отзыв" : "New review"}
                     </div>
                   )}
 
-                  {/* Stars */}
+ {/* Stars */}
                   <div style={{ marginBottom: 12 }}>
                     <StarDisplay n={review.stars} />
                   </div>
 
-                  {/* Quote decoration */}
+ {/* Quote decoration */}
                   <div style={{ position: "absolute", right: 20, top: 18, fontSize: 70, color: isDark ? "rgba(234,179,8,0.05)" : "rgba(234,179,8,0.08)", fontFamily: "Georgia,serif", lineHeight: 1, userSelect: "none", pointerEvents: "none" }}>"</div>
 
-                  {/* Comment */}
+ {/* Comment */}
                   <p style={{ fontFamily: "'Barlow',sans-serif", fontSize: 13.5, color: textMuted, lineHeight: 1.75, marginBottom: 20, fontStyle: "italic" }}>
                     "{lang === "ru" ? review.commentRu : review.commentEn}"
                   </p>
 
-                  {/* Author */}
+ {/* Author */}
                   <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
                     <div style={{ width: 42, height: 42, borderRadius: "50%", background: review.avatarColor, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 16, color: "#fff", flexShrink: 0, boxShadow: "0 3px 12px rgba(0,0,0,0.25)" }}>
                       {review.initial}
@@ -526,9 +526,9 @@ export const ReviewsPage: React.FC<ReviewsPageProps> = ({ theme = "dark", onBack
                   </div>
                 </div>
 
-                {/* ── ACTIONS ROW ── */}
+ {/* ACTIONS ROW */}
                 <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "12px 24px", borderTop: `1px solid ${isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)"}` }}>
-                  {/* Like */}
+ {/* Like */}
                   <button
                     className="vote-btn"
                     onClick={() => handleVote(review.id, "like")}
@@ -537,7 +537,7 @@ export const ReviewsPage: React.FC<ReviewsPageProps> = ({ theme = "dark", onBack
                     <span style={{ fontSize: 14 }}>👍</span> {review.likes}
                   </button>
 
-                  {/* Dislike */}
+ {/* Dislike */}
                   <button
                     className="vote-btn"
                     onClick={() => handleVote(review.id, "dislike")}
@@ -546,7 +546,7 @@ export const ReviewsPage: React.FC<ReviewsPageProps> = ({ theme = "dark", onBack
                     <span style={{ fontSize: 14 }}>👎</span> {review.dislikes}
                   </button>
 
-                  {/* Comments toggle */}
+ {/* Comments toggle */}
                   <button
                     onClick={() => toggleComments(review.id)}
                     style={{ display: "inline-flex", alignItems: "center", gap: 5, background: commentsOpen ? "rgba(59,130,246,0.12)" : "transparent", border: `1px solid ${commentsOpen ? "rgba(59,130,246,0.4)" : inputBorder}`, borderRadius: 6, padding: "5px 10px", cursor: "pointer", fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 12, color: commentsOpen ? "#3b82f6" : textSubtle, transition: "all 0.15s", marginLeft: "auto" }}
@@ -556,10 +556,10 @@ export const ReviewsPage: React.FC<ReviewsPageProps> = ({ theme = "dark", onBack
                   </button>
                 </div>
 
-                {/* ── COMMENTS SECTION ── */}
+ {/* COMMENTS SECTION */}
                 {commentsOpen && (
                   <div style={{ padding: "0 24px 20px", animation: "revFadeIn 0.25s ease both" }}>
-                    {/* Existing comments */}
+ {/* Existing comments */}
                     {review.comments.length > 0 && (
                       <div style={{ marginBottom: 16 }}>
                         {review.comments.map(c => (
@@ -574,7 +574,7 @@ export const ReviewsPage: React.FC<ReviewsPageProps> = ({ theme = "dark", onBack
                       </div>
                     )}
 
-                    {/* New comment form */}
+ {/* New comment form */}
                     <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                       <input
                         className="rev-input"
@@ -608,7 +608,7 @@ export const ReviewsPage: React.FC<ReviewsPageProps> = ({ theme = "dark", onBack
           })}
         </div>
 
-        {/* CTA */}
+ {/* CTA */}
         <div style={{ marginTop: 60, background: "linear-gradient(135deg,#eab308,#a16207)", borderRadius: 14, padding: "44px 48px", position: "relative", overflow: "hidden", textAlign: "center" }}>
           <div style={{ position: "absolute", inset: 0, backgroundImage: "repeating-linear-gradient(90deg,rgba(255,255,255,0.05) 0px,rgba(255,255,255,0.05) 1px,transparent 1px,transparent 80px)", pointerEvents: "none" }} />
           <div style={{ position: "absolute", right: "3%", top: "50%", transform: "translateY(-50%)", fontSize: 100, opacity: 0.08, pointerEvents: "none" }}>★</div>

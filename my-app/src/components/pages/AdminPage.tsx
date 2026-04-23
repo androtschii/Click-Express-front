@@ -112,7 +112,7 @@ export const AdminPage: React.FC<AdminPageProps> = ({ theme, onBack }) => {
         name: newCard.name,
         description: newCard.description,
         price: parseFloat(newCard.price),
-        imageUrl: newCard.imageUrl || "https://placehold.co/400x280?text=Load",
+ imageUrl: newCard.imageUrl || "https://placehold.co/400x280?text=Load",
         category: newCard.category,
         stock: parseInt(newCard.stock) || 1,
       });
@@ -180,7 +180,7 @@ export const AdminPage: React.FC<AdminPageProps> = ({ theme, onBack }) => {
           </div>
         </div>
 
-        {/* Форма создания */}
+ {/* Форма создания */}
         {showCreateForm && (
           <div style={{ background: card, border: "1px solid rgba(22,163,74,0.4)", borderRadius: 12, padding: 24, marginBottom: 24 }}>
             <h3 style={{ fontFamily: "'Oswald',sans-serif", fontSize: 18, margin: "0 0 16px", color: "#16a34a" }}>
@@ -259,7 +259,7 @@ export const AdminPage: React.FC<AdminPageProps> = ({ theme, onBack }) => {
 
                   <img src={p.imageUrl} alt={p.name}
                     style={{ width: 80, height: 80, objectFit: "cover", borderRadius: 8, border: `1px solid ${border}`, flexShrink: 0 }}
-                    onError={e => { (e.target as HTMLImageElement).src = "https://placehold.co/80x80?text=?"; }}
+ onError={e => { (e.target as HTMLImageElement).src = "https://placehold.co/80x80?text=?"; }}
                   />
 
                   <div style={{ flex: 1 }}>
@@ -274,7 +274,7 @@ export const AdminPage: React.FC<AdminPageProps> = ({ theme, onBack }) => {
 
                     <div style={{ display: "flex", gap: 16, flexWrap: "wrap" as const }}>
 
-                      {/* Price */}
+ {/* Price */}
                       <div style={{ minWidth: 160 }}>
                         <div style={{ fontSize: 11, color: sub, marginBottom: 4, textTransform: "uppercase" as const }}>{ru ? "Цена" : "Price"}</div>
                         {editPrice?.id === p.id ? (
@@ -292,7 +292,7 @@ export const AdminPage: React.FC<AdminPageProps> = ({ theme, onBack }) => {
                         )}
                       </div>
 
-                      {/* Stock */}
+ {/* Stock */}
                       <div style={{ minWidth: 140 }}>
                         <div style={{ fontSize: 11, color: sub, marginBottom: 4, textTransform: "uppercase" as const }}>{ru ? "Остаток" : "Stock"}</div>
                         {editStock?.id === p.id ? (
@@ -310,7 +310,7 @@ export const AdminPage: React.FC<AdminPageProps> = ({ theme, onBack }) => {
                         )}
                       </div>
 
-                      {/* Image URL */}
+ {/* Image URL */}
                       <div style={{ flex: 1, minWidth: 200 }}>
                         <div style={{ fontSize: 11, color: sub, marginBottom: 4, textTransform: "uppercase" as const }}>
                           {ru ? "URL фото" : "Photo URL"}

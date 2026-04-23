@@ -108,9 +108,9 @@ export const Header: React.FC<HeaderProps> = ({
       transition: "background 0.3s, border 0.3s, box-shadow 0.3s",
       display: "flex", alignItems: "center", padding: "0 16px", gap: 8,
     }}>
-      {/* Red glow line at top */}
+ {/* Red glow line at top */}
       <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: "linear-gradient(90deg,transparent 0%,#CC0000 30%,#ff3333 60%,#CC0000 80%,transparent 100%)", opacity: isLight ? 1 : (scrolled ? 1 : 0.6), transition: "opacity 0.3s" }} />
-      {/* Subtle red glow under top line */}
+ {/* Subtle red glow under top line */}
       <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 16, background: "linear-gradient(180deg,rgba(204,0,0,0.18) 0%,transparent 100%)", pointerEvents: "none" }} />
 
       <style>{`

@@ -87,7 +87,7 @@ export const Footer: React.FC<FooterProps> = ({
           .footer-main-grid { grid-template-columns: 1fr; gap: 28px; }
         }
       `}</style>
-      {/* Stats strip — always red, bold */}
+ {/* Stats strip — always red, bold */}
       <div style={{
         background: "linear-gradient(135deg,#CC0000 0%,#aa0000 40%,#880000 100%)",
         padding: "44px clamp(20px,5vw,64px)",
@@ -165,7 +165,7 @@ export const Footer: React.FC<FooterProps> = ({
               ].map((item, i) => (
                 <FooterLink key={i} onClick={item.onClick} isLight={isLight}>{item.label}</FooterLink>
               ))}
-              <FooterLink href="https://www.instagram.com/clickexpress.official" target="_blank" isLight={isLight}>
+ <FooterLink href="https://www.instagram.com/clickexpress.official" target="_blank" isLight={isLight}>
                 {t.companyItems[5]}
               </FooterLink>
             </div>
@@ -176,7 +176,7 @@ export const Footer: React.FC<FooterProps> = ({
               </div>
               <FooterLink onClick={onCatalogClick} isLight={isLight}>{t.quickItems[0]}</FooterLink>
               <FooterLink onClick={onQuoteClick} isLight={isLight}>{t.quickItems[1]}</FooterLink>
-              <FooterLink href="https://www.instagram.com/clickexpress.official" target="_blank" isLight={isLight}>
+ <FooterLink href="https://www.instagram.com/clickexpress.official" target="_blank" isLight={isLight}>
                 {t.quickItems[2]}
               </FooterLink>
               <FooterLink onClick={onContactClick} isLight={isLight}>{t.quickItems[3]}</FooterLink>

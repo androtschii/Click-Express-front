@@ -18,7 +18,7 @@ export interface QuoteFormData {
   cargo: string;
 }
 
-// ── AutoMapper аналог — отображаемая модель ───────────────────────────────
+// AutoMapper аналог — отображаемая модель 
 export interface LoadDisplay {
   id: number;
   title: string;

@@ -122,26 +122,26 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
         .prof-card-hover:hover { border-color:#CC0000 !important; transform:translateY(-2px); }
       `}</style>
 
-      {/* ── Hero banner ── */}
+ {/* Hero banner */}
       <div style={{ background: isDark ? "linear-gradient(135deg,#0a0000 0%,#1a0000 40%,#0d0d0d 100%)" : "linear-gradient(135deg,#fff 0%,#fff5f5 60%,#ffe8e8 100%)", borderBottom: "1px solid rgba(204,0,0,0.2)", padding: "48px clamp(20px,5vw,64px) 0", position:"relative", overflow:"hidden" }}>
-        {/* Truck silhouette background */}
+ {/* Truck silhouette background */}
         <div style={{ position:"absolute", right:0, bottom:0, top:0, width:"55%", pointerEvents:"none", zIndex:0 }}>
           <img src="/images/real2.jpg" alt="" style={{ width:"100%", height:"100%", objectFit:"cover", objectPosition:"center 60%", filter: isDark ? "brightness(0.12) saturate(0.4)" : "brightness(0.08) saturate(0)", opacity: isDark ? 1 : 0.35 }} />
           <div style={{ position:"absolute", inset:0, background: isDark ? "linear-gradient(to right,#0a0000 0%,transparent 55%)" : "linear-gradient(to right,#fff 0%,transparent 55%)" }} />
         </div>
         <div style={{ maxWidth: 1100, margin: "0 auto", position:"relative", zIndex:1 }}>
 
-          {/* Back */}
+ {/* Back */}
           <button onClick={onBack} style={{ background:"transparent", border:"none", color: muted, fontFamily:"'Barlow',sans-serif", fontWeight:600, fontSize:12, letterSpacing:1, cursor:"pointer", marginBottom:28, padding:0, display:"flex", alignItems:"center", gap:6, transition:"color 0.15s" }}
             onMouseEnter={e => { e.currentTarget.style.color = "#CC0000"; }}
             onMouseLeave={e => { e.currentTarget.style.color = muted; }}>
             {t.back}
           </button>
 
-          {/* Avatar + info row */}
+ {/* Avatar + info row */}
           <div style={{ display:"flex", alignItems:"flex-end", gap:28, flexWrap:"wrap", paddingBottom:32 }}>
 
-            {/* Avatar */}
+ {/* Avatar */}
             <div style={{ position:"relative", flexShrink:0 }}>
               <div style={{ width:96, height:96, borderRadius:"50%", border:"3px solid #CC0000", overflow:"hidden", boxShadow:"0 0 32px rgba(204,0,0,0.35)", cursor:"pointer", position:"relative" }} onClick={() => fileRef.current?.click()}>
                 {avatar ? (
@@ -158,10 +158,10 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
               <div style={{ position:"absolute", bottom:2, right:2, width:24, height:24, borderRadius:"50%", background:"#CC0000", border:"2px solid "+bg, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", fontSize:11 }} onClick={() => fileRef.current?.click()}>
                 ✏️
               </div>
-              <input ref={fileRef} type="file" accept="image/*" style={{ display:"none" }} onChange={handleAvatarChange} />
+ <input ref={fileRef} type="file" accept="image/*" style={{ display:"none" }} onChange={handleAvatarChange} />
             </div>
 
-            {/* Name / email */}
+ {/* Name / email */}
             <div style={{ flex:1, minWidth:200, paddingBottom:4 }}>
               <div style={{ display:"flex", alignItems:"center", gap:10, flexWrap:"wrap" }}>
                 <h1 style={{ fontFamily:"'Oswald',sans-serif", fontWeight:700, fontSize:"clamp(22px,3vw,34px)", color:text, margin:0, lineHeight:1 }}>{displayName}</h1>
@@ -176,7 +176,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
               </div>
             </div>
 
-            {/* Balance card */}
+ {/* Balance card */}
             <div style={{ background: isDark?"rgba(204,0,0,0.08)":"rgba(204,0,0,0.06)", border:"1px solid rgba(204,0,0,0.25)", borderRadius:12, padding:"16px 24px", textAlign:"center", minWidth:140, marginBottom:4 }}>
               <div style={{ fontFamily:"'Barlow',sans-serif", fontSize:9, color:"#CC0000", letterSpacing:2.5, textTransform:"uppercase", marginBottom:4 }}>💳 {lang==="ru"?"Баланс":"Balance"}</div>
               <div style={{ fontFamily:"'Oswald',sans-serif", fontWeight:700, fontSize:28, color:text, lineHeight:1 }}>${balance.toFixed(2)}</div>
@@ -186,7 +186,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
             </div>
           </div>
 
-          {/* Stats strip */}
+ {/* Stats strip */}
           <div style={{ display:"flex", gap:0, borderTop:`1px solid ${border}`, marginBottom: -1 }}>
             {[
               { n: savedLoads.length, label: lang==="ru"?"Сохранено":"Saved Loads", icon:"❤️" },
@@ -201,7 +201,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
             ))}
           </div>
 
-          {/* Tab nav */}
+ {/* Tab nav */}
           <div style={{ display:"flex", gap:0, marginTop:16 }}>
             {TABS.map(tb => (
               <button key={tb.id} className="prof-tab" onClick={() => setTab(tb.id)}
@@ -216,13 +216,13 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
         </div>
       </div>
 
-      {/* ── Tab content ── */}
+ {/* Tab content */}
       <div style={{ maxWidth:1100, margin:"0 auto", padding:"32px clamp(20px,5vw,64px)", animation:"fadeUp 0.35s ease" }}>
 
-        {/* OVERVIEW */}
+ {/* OVERVIEW */}
         {tab === "overview" && (
           <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))", gap:16 }}>
-            {/* Recent order */}
+ {/* Recent order */}
             <div style={{ background:card, border:`1px solid ${border}`, borderRadius:12, padding:22, gridColumn:"span 2" }}>
               <div style={{ fontFamily:"'Barlow',sans-serif", fontWeight:700, fontSize:10, color:"#CC0000", letterSpacing:3, textTransform:"uppercase", marginBottom:14 }}>📦 {lang==="ru"?"Последние заказы":"Recent Orders"}</div>
               {bookedLoads.length === 0 ? (
@@ -246,7 +246,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
               )}
             </div>
 
-            {/* Saved preview */}
+ {/* Saved preview */}
             <div style={{ background:card, border:`1px solid ${border}`, borderRadius:12, padding:22 }}>
               <div style={{ fontFamily:"'Barlow',sans-serif", fontWeight:700, fontSize:10, color:"#CC0000", letterSpacing:3, textTransform:"uppercase", marginBottom:14 }}>❤️ {lang==="ru"?"Избранное":"Saved"}</div>
               {savedLoads.length === 0 ? (
@@ -267,7 +267,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
               )}
             </div>
 
-            {/* Balance / quick pay */}
+ {/* Balance / quick pay */}
             <div style={{ background:card, border:`1px solid ${border}`, borderRadius:12, padding:22 }}>
               <div style={{ fontFamily:"'Barlow',sans-serif", fontWeight:700, fontSize:10, color:"#CC0000", letterSpacing:3, textTransform:"uppercase", marginBottom:14 }}>💳 {lang==="ru"?"Баланс":"Balance"}</div>
               <div style={{ fontFamily:"'Oswald',sans-serif", fontWeight:700, fontSize:36, color:text, marginBottom:6 }}>${balance.toFixed(2)}</div>
@@ -279,7 +279,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
           </div>
         )}
 
-        {/* MY ORDERS */}
+ {/* MY ORDERS */}
         {tab === "orders" && (
           <div>
             <div style={{ fontFamily:"'Oswald',sans-serif", fontWeight:700, fontSize:22, color:text, textTransform:"uppercase", marginBottom:20 }}>
@@ -348,7 +348,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
           </div>
         )}
 
-        {/* SAVED */}
+ {/* SAVED */}
         {tab === "saved" && (
           <div>
             <div style={{ fontFamily:"'Oswald',sans-serif", fontWeight:700, fontSize:22, color:text, textTransform:"uppercase", marginBottom:20 }}>
@@ -405,7 +405,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
           </div>
         )}
 
-        {/* PAYMENT */}
+ {/* PAYMENT */}
         {tab === "payment" && (
           <div style={{ maxWidth:560 }}>
             <div style={{ fontFamily:"'Oswald',sans-serif", fontWeight:700, fontSize:22, color:text, textTransform:"uppercase", marginBottom:6 }}>
@@ -415,7 +415,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
               {lang==="ru"?"Внесите предоплату для бронирования груза. Средства будут зачислены на ваш баланс.":"Submit a prepayment to book a load. Funds are added to your account balance."}
             </div>
 
-            {/* Current balance */}
+ {/* Current balance */}
             <div style={{ background:isDark?"rgba(204,0,0,0.08)":"rgba(204,0,0,0.05)", border:"1px solid rgba(204,0,0,0.2)", borderRadius:10, padding:"16px 20px", marginBottom:24, display:"flex", justifyContent:"space-between", alignItems:"center" }}>
               <div>
                 <div style={{ fontFamily:"'Barlow',sans-serif", fontSize:9, color:"#CC0000", letterSpacing:2.5, textTransform:"uppercase", marginBottom:4 }}>{lang==="ru"?"Текущий баланс":"Current Balance"}</div>
@@ -429,7 +429,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
               )}
             </div>
 
-            {/* Select load for prepay */}
+ {/* Select load for prepay */}
             <div style={{ background:card, border:`1px solid ${border}`, borderRadius:12, padding:24, marginBottom:16 }}>
               <div style={{ fontFamily:"'Barlow',sans-serif", fontWeight:700, fontSize:10, color:"#CC0000", letterSpacing:3, textTransform:"uppercase", marginBottom:14 }}>
                 📦 {lang==="ru"?"Выбрать груз (необязательно)":"Select Load (optional)"}
@@ -443,7 +443,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
               </select>
             </div>
 
-            {/* Payment form */}
+ {/* Payment form */}
             <div style={{ background:card, border:`1px solid ${border}`, borderRadius:12, padding:24 }}>
               <div style={{ fontFamily:"'Barlow',sans-serif", fontWeight:700, fontSize:10, color:"#CC0000", letterSpacing:3, textTransform:"uppercase", marginBottom:18 }}>
                 💳 {lang==="ru"?"Данные карты":"Card Details"}
@@ -456,27 +456,27 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                 </div>
               ) : (
                 <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
-                  {/* Amount */}
+ {/* Amount */}
                   <div>
                     <div style={{ fontFamily:"'Barlow',sans-serif", fontSize:11, color:muted, marginBottom:6, letterSpacing:0.5 }}>{lang==="ru"?"Сумма ($)":"Amount ($)"}</div>
                     <input className="prof-input" type="number" min="1" placeholder={payLoad ? `${(payLoad.price * 0.1).toFixed(0)}` : "500"} value={payAmount} onChange={e => setPayAmount(e.target.value)}
                       style={{ width:"100%", padding:"11px 14px", background:inputBg, border:`1px solid ${inputBd}`, borderRadius:8, color:text, fontSize:14, fontFamily:"'Barlow',sans-serif", transition:"all 0.2s" }} />
                     {payLoad && <div style={{ fontFamily:"'Barlow',sans-serif", fontSize:10, color:"#CC0000", marginTop:4 }}>10% = ${(payLoad.price * 0.1).toFixed(0)} · 25% = ${(payLoad.price * 0.25).toFixed(0)}</div>}
                   </div>
-                  {/* Card number */}
+ {/* Card number */}
                   <div>
                     <div style={{ fontFamily:"'Barlow',sans-serif", fontSize:11, color:muted, marginBottom:6, letterSpacing:0.5 }}>{lang==="ru"?"Номер карты":"Card Number"}</div>
                     <input className="prof-input" placeholder="1234 5678 9012 3456" value={payCard} maxLength={19}
                       onChange={e => setPayCard(e.target.value.replace(/\D/g,"").replace(/(.{4})/g,"$1 ").trim())}
                       style={{ width:"100%", padding:"11px 14px", background:inputBg, border:`1px solid ${inputBd}`, borderRadius:8, color:text, fontSize:14, fontFamily:"'Barlow',sans-serif", transition:"all 0.2s", letterSpacing:2 }} />
                   </div>
-                  {/* Name */}
+ {/* Name */}
                   <div>
                     <div style={{ fontFamily:"'Barlow',sans-serif", fontSize:11, color:muted, marginBottom:6, letterSpacing:0.5 }}>{lang==="ru"?"Имя на карте":"Cardholder Name"}</div>
                     <input className="prof-input" placeholder="JOHN SMITH" value={payName} onChange={e => setPayName(e.target.value.toUpperCase())}
                       style={{ width:"100%", padding:"11px 14px", background:inputBg, border:`1px solid ${inputBd}`, borderRadius:8, color:text, fontSize:14, fontFamily:"'Barlow',sans-serif", transition:"all 0.2s", letterSpacing:1 }} />
                   </div>
-                  {/* Expiry + CVV */}
+ {/* Expiry + CVV */}
                   <div style={{ display:"flex", gap:12 }}>
                     <div style={{ flex:1 }}>
                       <div style={{ fontFamily:"'Barlow',sans-serif", fontSize:11, color:muted, marginBottom:6 }}>{lang==="ru"?"Срок действия":"Expiry"}</div>
@@ -504,10 +504,10 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
           </div>
         )}
 
-        {/* SETTINGS */}
+ {/* SETTINGS */}
         {tab === "settings" && (
           <div style={{ maxWidth:520, display:"flex", flexDirection:"column", gap:16 }}>
-            {/* Edit name */}
+ {/* Edit name */}
             <div style={{ background:card, border:`1px solid ${border}`, borderRadius:12, padding:24 }}>
               <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom: editName?16:0 }}>
                 <div>
@@ -534,7 +534,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
               )}
             </div>
 
-            {/* Change password */}
+ {/* Change password */}
             {!isGoogle && (
               <div style={{ background:card, border:`1px solid ${border}`, borderRadius:12, padding:24 }}>
                 <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom: editPass?16:0 }}>
@@ -565,7 +565,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
               </div>
             )}
 
-            {/* Account info */}
+ {/* Account info */}
             <div style={{ background:isDark?"rgba(204,0,0,0.06)":"rgba(204,0,0,0.04)", border:"1px solid rgba(204,0,0,0.2)", borderRadius:12, padding:20 }}>
               <div style={{ fontFamily:"'Barlow',sans-serif", fontWeight:700, fontSize:10, color:"#CC0000", letterSpacing:3, textTransform:"uppercase", marginBottom:12 }}>ℹ️ {lang==="ru"?"ИНФОРМАЦИЯ":"ACCOUNT INFO"}</div>
               {[
@@ -580,7 +580,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
               ))}
             </div>
 
-            {/* Sign out */}
+ {/* Sign out */}
             <button onClick={onLogout} style={{ padding:"12px 0", background:"transparent", border:"1px solid rgba(204,0,0,0.3)", borderRadius:8, color:"#ff6b6b", fontFamily:"'Barlow',sans-serif", fontWeight:700, fontSize:12, letterSpacing:1.5, textTransform:"uppercase", cursor:"pointer", transition:"all 0.15s" }}
               onMouseEnter={e => { e.currentTarget.style.background="rgba(204,0,0,0.1)"; e.currentTarget.style.borderColor="#CC0000"; }}
               onMouseLeave={e => { e.currentTarget.style.background="transparent"; e.currentTarget.style.borderColor="rgba(204,0,0,0.3)"; }}>
@@ -590,7 +590,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
         )}
       </div>
 
-      {/* Toast */}
+ {/* Toast */}
       {toast && (
         <div style={{ position:"fixed", bottom:24, right:24, zIndex:9999, background: toast.ok ? (isDark?"#111":"#fff") : "#1a0000", border:`1px solid ${toast.ok?"#CC0000":"#ff4444"}`, borderRadius:10, padding:"13px 22px", fontFamily:"'Barlow',sans-serif", fontWeight:600, fontSize:13, color: toast.ok ? (isDark?"#fff":"#1a1a1a") : "#ff6b6b", boxShadow:"0 8px 32px rgba(0,0,0,0.5)", animation:"slideDown 0.3s ease" }}>
           {toast.ok ? "✓ " : "⚠ "}{toast.msg}

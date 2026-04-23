@@ -47,12 +47,12 @@ const MailIcon = () => (
 );
 
 const contactsBase = [
-  { icon: <MapIcon />, iconBg: "linear-gradient(135deg,#CC0000,#ff3333)", key: "Address" as const, value: "Hallandale Beach, FL, United States, 33009", href: "https://maps.google.com/?q=Hallandale+Beach+FL+33009", highlight: false },
+ { icon: <MapIcon />, iconBg: "linear-gradient(135deg,#CC0000,#ff3333)", key: "Address" as const, value: "Hallandale Beach, FL, United States, 33009", href: "https://maps.google.com/?q=Hallandale+Beach+FL+33009", highlight: false },
   { icon: <PhoneIcon />, iconBg: "linear-gradient(135deg,#16a34a,#22c55e)", key: "Phone" as const, value: "+1 786-202-6599", href: "tel:+17862026599", highlight: true },
   { icon: <MailIcon />, iconBg: "linear-gradient(135deg,#2563eb,#60a5fa)", key: "Email" as const, value: "clickexpress.inc@gmail.com", href: "mailto:clickexpress.inc@gmail.com", highlight: false },
-  { icon: <LinkedInIcon />, iconBg: "linear-gradient(135deg,#0a66c2,#2490d8)", key: "LinkedIn" as const, value: "Click Express Inc", href: "https://www.linkedin.com/company/clickexpressinc", highlight: false },
-  { icon: <FacebookIcon />, iconBg: "linear-gradient(135deg,#1877f2,#42a5f5)", key: "Facebook" as const, value: "Click Express Inc", href: "https://www.facebook.com/share/1FP9dJ2L4i/", highlight: false },
-  { icon: <InstagramIcon />, iconBg: "linear-gradient(135deg,#833ab4,#E1306C,#F77737)", key: "Instagram" as const, value: "@clickexpress.official", href: "https://www.instagram.com/clickexpress.official", highlight: false },
+ { icon: <LinkedInIcon />, iconBg: "linear-gradient(135deg,#0a66c2,#2490d8)", key: "LinkedIn" as const, value: "Click Express Inc", href: "https://www.linkedin.com/company/clickexpressinc", highlight: false },
+ { icon: <FacebookIcon />, iconBg: "linear-gradient(135deg,#1877f2,#42a5f5)", key: "Facebook" as const, value: "Click Express Inc", href: "https://www.facebook.com/share/1FP9dJ2L4i/", highlight: false },
+ { icon: <InstagramIcon />, iconBg: "linear-gradient(135deg,#833ab4,#E1306C,#F77737)", key: "Instagram" as const, value: "@clickexpress.official", href: "https://www.instagram.com/clickexpress.official", highlight: false },
 ];
 
 export const AboutSection: React.FC<AboutSectionProps> = ({ onContactClick, theme = 'dark' }) => {
@@ -62,7 +62,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onContactClick, them
   const videoRef = useRef<HTMLVideoElement>(null);
   const videoWrapRef = useRef<HTMLDivElement>(null);
 
-  // Auto-play when visible, pause when out of view
+ // Auto-play when visible, pause when out of view
   React.useEffect(() => {
     const el = videoRef.current;
     if (!el) return;
@@ -97,10 +97,10 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onContactClick, them
           </button>
         </div>
 
-        {/* 3-column: company info | vertical video | contacts */}
+ {/* 3-column: company info | vertical video | contacts */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 260px 1fr", gap: 40, alignItems: "start" }}>
 
-          {/* LEFT — company info */}
+ {/* LEFT — company info */}
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: 20, marginBottom: 32 }}>
               <div style={{ width: 110, height: 110, borderRadius: "50%", border: "3px solid #CC0000", padding: 6, background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 0 40px rgba(204,0,0,0.3)", flexShrink: 0 }}>
@@ -141,12 +141,12 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onContactClick, them
             </div>
           </div>
 
-          {/* CENTER — vertical video */}
+ {/* CENTER — vertical video */}
           <div ref={videoWrapRef} style={{ position: "sticky", top: 90 }}>
             <div style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 9, color: "#CC0000", letterSpacing: 3, textTransform: "uppercase", textAlign: "center", marginBottom: 10 }}>
               ● {lang === "ru" ? "РЕКАП 2025" : "RECAP 2025"}
             </div>
-            {/* Phone frame */}
+ {/* Phone frame */}
             <div style={{ position: "relative", borderRadius: 24, overflow: "hidden", border: "3px solid rgba(204,0,0,0.4)", boxShadow: "0 0 0 6px rgba(204,0,0,0.08), 0 24px 60px rgba(0,0,0,0.6)", aspectRatio: "9/16", width: "100%" }}>
               <video
                 ref={videoRef}
@@ -157,12 +157,12 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onContactClick, them
                 preload="metadata"
                 style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
               />
-              {/* Subtle red glow top */}
+ {/* Subtle red glow top */}
               <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 40, background: "linear-gradient(to bottom, rgba(204,0,0,0.15), transparent)", pointerEvents: "none" }} />
             </div>
           </div>
 
-          {/* RIGHT — contacts */}
+ {/* RIGHT — contacts */}
           <div>
             <div style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 600, fontSize: 13, color: "#CC0000", letterSpacing: 2.5, textTransform: "uppercase", marginBottom: 24 }}>
               {t.contactInfo}

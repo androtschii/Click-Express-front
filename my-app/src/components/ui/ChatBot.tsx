@@ -14,29 +14,29 @@ interface ChatBotProps {
 
 type Lang = "en" | "ru";
 
-// ── Safe math calculator ──────────────────────────────────────────────────────
+// Safe math calculator 
 // Only allows numbers, operators, parens, spaces — no code injection possible
 function safeCalc(expr: string): string | null {
-  // Extract math expression from natural language
+ // Extract math expression from natural language
   const cleaned = expr
-    .replace(/[xх×]/gi, "*")           // replace × x with *
-    .replace(/[÷:]/g, "/")             // replace ÷ with /
-    .replace(/(\d)\s*\^\s*(\d)/g, "($1**$2)") // power
+ .replace(/[xх×]/gi, "*") // replace × x with *
+ .replace(/[÷:]/g, "/") // replace ÷ with /
+ .replace(/(\d)\s*\^\s*(\d)/g, "($1**$2)") // power
     .replace(/squared/gi, "**2")
     .replace(/cubed/gi, "**3")
-    .replace(/[^0-9+\-*/().%\s**]/g, " ") // strip non-math chars
+ .replace(/[^0-9+\-*/().%\s**]/g, " ") // strip non-math chars
     .trim();
 
-  // Must contain at least a number and an operator
+ // Must contain at least a number and an operator
   if (!/\d/.test(cleaned) || !/[+\-*/]/.test(cleaned)) return null;
-  // Must not be empty after cleaning
+ // Must not be empty after cleaning
   if (!cleaned.trim()) return null;
 
   try {
-    // eslint-disable-next-line no-new-func
+ // eslint-disable-next-line no-new-func
     const result = new Function(`"use strict"; return (${cleaned})`)() as number;
     if (!isFinite(result)) return "Ошибка: деление на ноль / Division by zero ⚠️";
-    // Format result: remove trailing .000...
+ // Format result: remove trailing .000...
     const formatted = parseFloat(result.toPrecision(12)).toString();
     return formatted;
   } catch {
@@ -46,7 +46,7 @@ function safeCalc(expr: string): string | null {
 
 function detectMath(input: string): string | null {
   const lower = input.toLowerCase();
-  // Trigger words for math
+ // Trigger words for math
   const mathTriggers = [
     "calculate", "compute", "calc", "math", "=", "how much is", "what is", "сколько будет",
     "посчитай", "вычисли", "рассчитай", "считай", "+", "-", "*", "/", "×", "÷", "плюс", "минус",
@@ -59,7 +59,7 @@ function detectMath(input: string): string | null {
   if (!hasNumbers) return null;
   if (!hasTrigger && !hasOperator) return null;
 
-  // Extract expression: replace word operators
+ // Extract expression: replace word operators
   let expr = input
     .replace(/плюс|plus/gi, "+")
     .replace(/минус|minus/gi, "-")
@@ -72,7 +72,7 @@ function detectMath(input: string): string | null {
   return safeCalc(expr);
 }
 
-// ── Knowledge base with weighted keywords ────────────────────────────────────
+// Knowledge base with weighted keywords 
 interface KBEntry {
   keywords: Array<{ word: string; weight: number }>;
   answer: Record<Lang, string>;
@@ -372,11 +372,11 @@ const KB: Record<string, KBEntry> = {
   },
 };
 
-// ── Score-based matching ──────────────────────────────────────────────────────
+// Score-based matching 
 function getBotAnswer(input: string, lang: Lang): string {
   const lower = input.toLowerCase();
 
-  // 1. Check for math first
+ // 1. Check for math first
   const mathResult = detectMath(input);
   if (mathResult !== null) {
     const expr = input.replace(/посчитай|вычисли|рассчитай|сколько будет|calculate|compute|what is|how much is/gi, "").trim();
@@ -385,7 +385,7 @@ function getBotAnswer(input: string, lang: Lang): string {
       : `🧮 **Result:** ${expr.trim() ? `\`${expr.trim()}\` = ` : ""}**${mathResult}**`;
   }
 
-  // 2. Score each KB topic
+ // 2. Score each KB topic
   let bestKey = "";
   let bestScore = 0;
 
@@ -402,12 +402,12 @@ function getBotAnswer(input: string, lang: Lang): string {
     }
   }
 
-  // 3. Minimum score threshold (avoid garbage matches)
+ // 3. Minimum score threshold (avoid garbage matches)
   if (bestScore >= 5 && bestKey) {
     return KB[bestKey].answer[lang];
   }
 
-  // 4. Fallback
+ // 4. Fallback
   return lang === "ru"
     ? "Не совсем понял 🤔 Попробуй переформулировать.\n\nЯ умею отвечать на вопросы о:\n• Грузах и бронировании\n• Ценах и маршрутах\n• Вакансиях и контактах\n• **Математических расчётах** (например: `2500 * 3.73`)\n\nИли звони: **+1 786-202-6599**"
     : "Not sure I understood 🤔 Try rephrasing.\n\nI can answer about:\n• Loads & booking\n• Pricing & routes\n• Careers & contacts\n• **Math calculations** (e.g. `2500 * 3.73`)\n\nOr call: **+1 786-202-6599**";
@@ -433,7 +433,7 @@ function MsgText({ text, isDark }: { text: string; isDark: boolean }) {
   return (
     <span>
       {lines.map((line, i) => {
-        // Handle bold (**text**) and inline code (`text`)
+ // Handle bold (**text**) and inline code (`text`)
         const parts = line.split(/(`[^`]+`|\*\*[^*]+\*\*)/g);
         return (
           <span key={i}>
@@ -454,7 +454,7 @@ function MsgText({ text, isDark }: { text: string; isDark: boolean }) {
   );
 }
 
-// ── Component ─────────────────────────────────────────────────────────────────
+// Component 
 export const ChatBot: React.FC<ChatBotProps> = ({ theme = "dark" }) => {
   const isDark = theme === "dark";
   const { lang } = useLanguage();
@@ -523,7 +523,7 @@ export const ChatBot: React.FC<ChatBotProps> = ({ theme = "dark" }) => {
         .chat-send-btn:hover:not(:disabled){background:#aa0000!important;transform:scale(1.05)}
       `}</style>
 
-      {/* Floating button */}
+ {/* Floating button */}
       <div style={{ position:"fixed", bottom:28, right:28, zIndex:3000 }}>
         <button onClick={() => setOpen(o => !o)}
           style={{ width:58, height:58, borderRadius:"50%", background:"linear-gradient(135deg,#CC0000,#ff3333)", border:"none", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", boxShadow:"0 8px 32px rgba(204,0,0,0.5)", animation: pulse && !open ? "chatPulse 2s infinite" : "none", transition:"transform 0.2s", position:"relative" }}
@@ -541,11 +541,11 @@ export const ChatBot: React.FC<ChatBotProps> = ({ theme = "dark" }) => {
         </button>
       </div>
 
-      {/* Chat window */}
+ {/* Chat window */}
       {open && (
         <div style={{ position:"fixed", bottom:100, right:28, zIndex:2999, width:"clamp(300px,90vw,390px)", borderRadius:18, overflow:"hidden", boxShadow:"0 24px 80px rgba(0,0,0,0.6),0 0 0 1px rgba(204,0,0,0.2)", animation:"chatUp 0.3s ease", display:"flex", flexDirection:"column", maxHeight:"72vh" }}>
 
-          {/* Header */}
+ {/* Header */}
           <div style={{ background: isDark ? "#1a0000" : "#CC0000", padding:"14px 18px", display:"flex", alignItems:"center", gap:12 }}>
             <div style={{ width:40, height:40, borderRadius:"50%", background:"rgba(255,255,255,0.15)", border:"2px solid rgba(255,255,255,0.3)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, fontSize:18 }}>🚛</div>
             <div style={{ flex:1 }}>
@@ -562,7 +562,7 @@ export const ChatBot: React.FC<ChatBotProps> = ({ theme = "dark" }) => {
             </button>
           </div>
 
-          {/* Messages */}
+ {/* Messages */}
           <div style={{ flex:1, overflowY:"auto", background:bg, padding:"16px 14px", display:"flex", flexDirection:"column", gap:10, overscrollBehavior:"contain" }}>
             {messages.map(msg => (
               <div key={msg.id} style={{ display:"flex", flexDirection:"column", alignItems: msg.from === "user" ? "flex-end" : "flex-start", animation:"chatUp 0.2s ease" }}>
@@ -584,7 +584,7 @@ export const ChatBot: React.FC<ChatBotProps> = ({ theme = "dark" }) => {
             <div ref={endRef} />
           </div>
 
-          {/* Quick replies panel */}
+ {/* Quick replies panel */}
           {showQuick && (
             <div style={{ background:bg, borderTop:`1px solid ${border}`, padding:"10px 14px 8px", display:"flex", gap:6, flexWrap:"wrap" }}>
               <div style={{ width:"100%", fontFamily:"'Barlow',sans-serif", fontSize:10, color:mutedColor, letterSpacing:1, textTransform:"uppercase", marginBottom:4 }}>
@@ -599,7 +599,7 @@ export const ChatBot: React.FC<ChatBotProps> = ({ theme = "dark" }) => {
             </div>
           )}
 
-          {/* Input row */}
+ {/* Input row */}
           <div style={{ background:bg, borderTop: showQuick ? "none" : `1px solid ${border}`, padding:"10px 14px", display:"flex", gap:8, alignItems:"center" }}>
             {messages.length > 1 && (
               <button

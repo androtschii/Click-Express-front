@@ -64,7 +64,7 @@ button {
   outline: none;
 }
 
-/* ── SPLIT ANIMATION BUTTON ─────────────────────────────────────────────── */
+/* SPLIT ANIMATION BUTTON */
 
 /* Outline кнопка — заливается красным с двух сторон */
 .btn-split {
@@ -72,7 +72,7 @@ button {
   overflow: hidden;
   background: transparent !important;
   border: 1px solid #CC0000 !important;
-  /* начальный цвет текста задаётся через inline style в компоненте */
+ /* начальный цвет текста задаётся через inline style в компоненте */
   transition: color 0.3s ease !important;
   z-index: 0;
 }
@@ -165,7 +165,7 @@ button {
 
 .nav-split:hover { color: #fff !important; }
 
-/* ──────────────────────────────────────────────────────────────────────── */
+/* */
 
 /* Input placeholder */
 input::placeholder {

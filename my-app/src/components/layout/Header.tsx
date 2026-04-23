@@ -3,7 +3,7 @@ import { CELogo } from "../ui/Logo";
 import type { Session } from "../../services/authService";
 import { useLanguage } from "../../context/LanguageContext";
 import { translations } from "../../i18n/translations";
-import { Gear, User, ListBullets, SignOut } from "@phosphor-icons/react";
+import { Gear, User, ListBullets, SignOut, List, X } from "@phosphor-icons/react";
 
 interface HeaderProps {
   cartCount: number;
@@ -74,6 +74,8 @@ export const Header: React.FC<HeaderProps> = ({
   const [scrolled, setScrolled] = useState(false);
   const [heartBurst, setHeartBurst] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(typeof window !== "undefined" ? window.innerWidth < 1024 : false);
   const { lang, toggleLang } = useLanguage();
   const t = translations[lang];
 
@@ -81,6 +83,12 @@ export const Header: React.FC<HeaderProps> = ({
     const fn = () => setScrolled(window.scrollY > 60);
     window.addEventListener("scroll", fn);
     return () => window.removeEventListener("scroll", fn);
+  }, []);
+
+  useEffect(() => {
+    const fn = () => setIsMobile(window.innerWidth < 1024);
+    window.addEventListener("resize", fn);
+    return () => window.removeEventListener("resize", fn);
   }, []);
 
   const handleSavedClick = () => {
@@ -132,16 +140,43 @@ export const Header: React.FC<HeaderProps> = ({
 
       <div style={{ width: 1, height: 30, background: isLight ? "rgba(0,0,0,0.1)" : "rgba(255,255,255,0.1)", flexShrink: 0 }} />
 
-      <nav style={{ display: "flex", gap: lang === 'ru' ? 0 : 2, flex: 1 }}>
-        <NavLink onClick={onCatalogClick} isLight={isLight} compact={lang === 'ru'}>{t.nav.catalog}</NavLink>
-        <NavLink onClick={onQuoteClick} isLight={isLight} compact={lang === 'ru'}>{t.nav.getQuote}</NavLink>
-        <NavLink onClick={onAboutClick} isLight={isLight} compact={lang === 'ru'}>{t.nav.aboutUs}</NavLink>
-        <NavLink onClick={onContactClick} isLight={isLight} compact={lang === 'ru'}>{t.nav.contact}</NavLink>
-        <NavLink onClick={onCareersClick} isLight={isLight} compact={lang === 'ru'}>{t.nav.careers}</NavLink>
-        <NavLink onClick={onNewsClick} isLight={isLight} compact={lang === 'ru'}>{t.nav.news}</NavLink>
-        <NavLink onClick={onReviewsClick} isLight={isLight} compact={lang === 'ru'}>{t.nav.reviews}</NavLink>
-        <NavLink onClick={onFleetClick} isLight={isLight} compact={lang === 'ru'}>{t.nav.fleet}</NavLink>
-      </nav>
+      {!isMobile && (
+        <nav style={{ display: "flex", gap: lang === 'ru' ? 0 : 2, flex: 1 }}>
+          <NavLink onClick={onCatalogClick} isLight={isLight} compact={lang === 'ru'}>{t.nav.catalog}</NavLink>
+          <NavLink onClick={onQuoteClick} isLight={isLight} compact={lang === 'ru'}>{t.nav.getQuote}</NavLink>
+          <NavLink onClick={onAboutClick} isLight={isLight} compact={lang === 'ru'}>{t.nav.aboutUs}</NavLink>
+          <NavLink onClick={onContactClick} isLight={isLight} compact={lang === 'ru'}>{t.nav.contact}</NavLink>
+          <NavLink onClick={onCareersClick} isLight={isLight} compact={lang === 'ru'}>{t.nav.careers}</NavLink>
+          <NavLink onClick={onNewsClick} isLight={isLight} compact={lang === 'ru'}>{t.nav.news}</NavLink>
+          <NavLink onClick={onReviewsClick} isLight={isLight} compact={lang === 'ru'}>{t.nav.reviews}</NavLink>
+          <NavLink onClick={onFleetClick} isLight={isLight} compact={lang === 'ru'}>{t.nav.fleet}</NavLink>
+        </nav>
+      )}
+      {isMobile && <div style={{ flex: 1 }} />}
+      {isMobile && (
+        <button onClick={() => setMobileOpen(o => !o)} aria-label="menu" style={{ background: "transparent", border: `1px solid ${isLight ? "rgba(0,0,0,0.15)" : "rgba(255,255,255,0.2)"}`, borderRadius: 6, width: 38, height: 38, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: isLight ? "#1a1a1a" : "#fff", flexShrink: 0 }}>
+          {mobileOpen ? <X size={20} weight="bold" /> : <List size={20} weight="bold" />}
+        </button>
+      )}
+      {isMobile && mobileOpen && (
+        <div style={{ position: "absolute", top: 70, left: 0, right: 0, background: isLight ? "rgba(255,255,255,0.98)" : "rgba(10,10,10,0.97)", backdropFilter: "blur(20px)", borderBottom: "1px solid rgba(204,0,0,0.3)", padding: "8px 0", boxShadow: "0 12px 30px rgba(0,0,0,0.4)" }}>
+          {[
+            { label: t.nav.catalog, fn: onCatalogClick },
+            { label: t.nav.getQuote, fn: onQuoteClick },
+            { label: t.nav.aboutUs, fn: onAboutClick },
+            { label: t.nav.contact, fn: onContactClick },
+            { label: t.nav.careers, fn: onCareersClick },
+            { label: t.nav.news, fn: onNewsClick },
+            { label: t.nav.reviews, fn: onReviewsClick },
+            { label: t.nav.fleet, fn: onFleetClick },
+          ].map(item => (
+            <div key={item.label} onClick={() => { setMobileOpen(false); item.fn?.(); }}
+              style={{ padding: "14px 24px", fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 13, letterSpacing: 1.2, textTransform: "uppercase", color: isLight ? "rgba(0,0,0,0.75)" : "rgba(255,255,255,0.8)", cursor: "pointer", borderBottom: `1px solid ${isLight ? "rgba(0,0,0,0.05)" : "rgba(255,255,255,0.05)"}` }}>
+              {item.label}
+            </div>
+          ))}
+        </div>
+      )}
 
       <PhoneLink isLight={isLight} />
 

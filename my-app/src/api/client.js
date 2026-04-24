@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://localhost:5000/api";
+const API_BASE_URL = "http://localhost:5114/api";
 
 // Token helpers 
 const getToken = () => {
@@ -89,11 +89,12 @@ export const fetchProducts = async (search = "", category = "") => {
   const params = new URLSearchParams();
   if (search) params.append("search", search);
   if (category) params.append("category", category);
-  const response = await fetch(`${API_BASE_URL}/product?${params}`, {
+  const response = await fetch(`${API_BASE_URL}/product?${params}&pageSize=100`, {
     headers: authHeaders(),
   });
   if (!response.ok) throw new Error("Ошибка загрузки товаров");
-  return response.json();
+  const data = await response.json();
+  return Array.isArray(data) ? data : (data.items ?? []);
 };
 
 export const createProduct = async (productData) => {

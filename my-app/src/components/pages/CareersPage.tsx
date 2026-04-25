@@ -1,11 +1,24 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { PhoneIcon } from "../ui/PhoneIcon";
 import { useLanguage } from "../../context/LanguageContext";
-import { submitJobApplication } from "../../api/client.js";
+import { submitJobApplication, fetchJobApplications, updateJobApplicationStatus, deleteJobApplication } from "../../api/client.js";
+import type { Session } from "../../services/authService";
+
+interface JobApp {
+  id: number;
+  fullName: string;
+  email: string;
+  phone: string;
+  position: string;
+  message: string;
+  status: string;
+  createdAt: string;
+}
 
 interface CareersPageProps {
   theme?: "dark" | "light";
   onBack?: () => void;
+  session?: Session | null;
 }
 
 const JOBS_EN = [
@@ -120,7 +133,7 @@ const PERKS_RU = [
   { icon: "⭐", title: "Рейтинг 4.9", desc: "Лучший перевозчик на CarrierSource" },
 ];
 
-export const CareersPage: React.FC<CareersPageProps> = ({ theme = "dark", onBack }) => {
+export const CareersPage: React.FC<CareersPageProps> = ({ theme = "dark", onBack, session }) => {
   const isDark = theme === "dark";
   const bg = isDark ? "#080808" : "#f5f5f5";
   const card = isDark ? "#0f0f0f" : "#fff";
@@ -140,6 +153,47 @@ export const CareersPage: React.FC<CareersPageProps> = ({ theme = "dark", onBack
   const [sent, setSent] = useState(false);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState("");
+
+  const isAdmin = session?.role === "Admin";
+  const [apps, setApps] = useState<JobApp[]>([]);
+  const [appsLoading, setAppsLoading] = useState(false);
+  const [appsError, setAppsError] = useState("");
+
+  const loadApps = async () => {
+    setAppsLoading(true);
+    setAppsError("");
+    try {
+      const data = await fetchJobApplications();
+      setApps(data);
+    } catch (e) {
+      setAppsError(e instanceof Error ? e.message : "Failed to load");
+    } finally {
+      setAppsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isAdmin) loadApps();
+  }, [isAdmin, sent]);
+
+  const handleStatusChange = async (id: number, status: string) => {
+    try {
+      await updateJobApplicationStatus(id, status);
+      setApps(prev => prev.map(a => a.id === id ? { ...a, status } : a));
+    } catch (e) {
+      setAppsError(e instanceof Error ? e.message : "Failed to update");
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    if (!confirm(isRu ? "Удалить заявку?" : "Delete application?")) return;
+    try {
+      await deleteJobApplication(id);
+      setApps(prev => prev.filter(a => a.id !== id));
+    } catch (e) {
+      setAppsError(e instanceof Error ? e.message : "Failed to delete");
+    }
+  };
 
   const handleApply = (jobId: number) => {
     if (applied === jobId) {
@@ -473,6 +527,81 @@ export const CareersPage: React.FC<CareersPageProps> = ({ theme = "dark", onBack
           )}
         </div>
       </section>
+
+      {isAdmin && (
+        <section style={{ padding: "60px 20px", borderTop: `1px solid ${bord}`, background: isDark ? "#0a0a0a" : "#fafafa" }}>
+          <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24, flexWrap: "wrap", gap: 12 }}>
+              <h2 style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: "clamp(24px,3vw,32px)", color: text, textTransform: "uppercase", margin: 0 }}>
+                <span style={{ color: "#CC0000" }}>{isRu ? "АДМИН:" : "ADMIN:"}</span> {isRu ? "Заявки" : "Applications"}
+              </h2>
+              <button onClick={loadApps} disabled={appsLoading} style={{ padding: "8px 16px", background: "transparent", border: `1px solid ${bord}`, borderRadius: 6, color: text, fontFamily: "'Barlow',sans-serif", fontSize: 12, fontWeight: 600, letterSpacing: 1, textTransform: "uppercase", cursor: appsLoading ? "default" : "pointer", opacity: appsLoading ? 0.6 : 1 }}>
+                {appsLoading ? (isRu ? "Загрузка..." : "Loading...") : (isRu ? "↻ Обновить" : "↻ Refresh")}
+              </button>
+            </div>
+
+            {appsError && (
+              <div style={{ padding: "12px 16px", marginBottom: 16, background: "rgba(204,0,0,0.1)", border: "1px solid rgba(204,0,0,0.3)", borderRadius: 8, color: "#CC0000", fontFamily: "'Barlow',sans-serif", fontSize: 13 }}>
+                {appsError}
+              </div>
+            )}
+
+            {!appsLoading && apps.length === 0 && !appsError && (
+              <div style={{ padding: 40, textAlign: "center", color: sub, fontFamily: "'Barlow',sans-serif", fontSize: 14, border: `1px dashed ${bord}`, borderRadius: 8 }}>
+                {isRu ? "Заявок пока нет" : "No applications yet"}
+              </div>
+            )}
+
+            {apps.length > 0 && (
+              <div style={{ overflowX: "auto" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse", fontFamily: "'Barlow',sans-serif", fontSize: 13, color: text }}>
+                  <thead>
+                    <tr style={{ borderBottom: `2px solid ${bord}` }}>
+                      <th style={{ padding: "12px 10px", textAlign: "left", fontWeight: 700, color: sub, textTransform: "uppercase", fontSize: 11, letterSpacing: 1 }}>#</th>
+                      <th style={{ padding: "12px 10px", textAlign: "left", fontWeight: 700, color: sub, textTransform: "uppercase", fontSize: 11, letterSpacing: 1 }}>{isRu ? "Имя" : "Name"}</th>
+                      <th style={{ padding: "12px 10px", textAlign: "left", fontWeight: 700, color: sub, textTransform: "uppercase", fontSize: 11, letterSpacing: 1 }}>Email</th>
+                      <th style={{ padding: "12px 10px", textAlign: "left", fontWeight: 700, color: sub, textTransform: "uppercase", fontSize: 11, letterSpacing: 1 }}>{isRu ? "Телефон" : "Phone"}</th>
+                      <th style={{ padding: "12px 10px", textAlign: "left", fontWeight: 700, color: sub, textTransform: "uppercase", fontSize: 11, letterSpacing: 1 }}>{isRu ? "Вакансия" : "Position"}</th>
+                      <th style={{ padding: "12px 10px", textAlign: "left", fontWeight: 700, color: sub, textTransform: "uppercase", fontSize: 11, letterSpacing: 1 }}>{isRu ? "Дата" : "Date"}</th>
+                      <th style={{ padding: "12px 10px", textAlign: "left", fontWeight: 700, color: sub, textTransform: "uppercase", fontSize: 11, letterSpacing: 1 }}>{isRu ? "Статус" : "Status"}</th>
+                      <th style={{ padding: "12px 10px", textAlign: "right", fontWeight: 700, color: sub, textTransform: "uppercase", fontSize: 11, letterSpacing: 1 }}></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {apps.map(a => (
+                      <tr key={a.id} style={{ borderBottom: `1px solid ${bord}` }}>
+                        <td style={{ padding: "12px 10px", color: sub }}>{a.id}</td>
+                        <td style={{ padding: "12px 10px", fontWeight: 600 }}>{a.fullName}</td>
+                        <td style={{ padding: "12px 10px" }}>
+                          <a href={`mailto:${a.email}`} style={{ color: "#CC0000", textDecoration: "none" }}>{a.email}</a>
+                        </td>
+                        <td style={{ padding: "12px 10px" }}>{a.phone || "—"}</td>
+                        <td style={{ padding: "12px 10px" }}>{a.position}</td>
+                        <td style={{ padding: "12px 10px", color: sub, fontSize: 12 }}>{new Date(a.createdAt).toLocaleDateString()}</td>
+                        <td style={{ padding: "12px 10px" }}>
+                          <select value={a.status} onChange={e => handleStatusChange(a.id, e.target.value)}
+                            style={{ padding: "6px 10px", background: isDark ? "#1a1a1a" : "#fff", border: `1px solid ${bord}`, borderRadius: 6, color: text, fontFamily: "'Barlow',sans-serif", fontSize: 12, cursor: "pointer", outline: "none" }}>
+                            <option value="New">{isRu ? "Новая" : "New"}</option>
+                            <option value="Reviewed">{isRu ? "Просмотрена" : "Reviewed"}</option>
+                            <option value="Approved">{isRu ? "Одобрена" : "Approved"}</option>
+                            <option value="Rejected">{isRu ? "Отклонена" : "Rejected"}</option>
+                          </select>
+                        </td>
+                        <td style={{ padding: "12px 10px", textAlign: "right" }}>
+                          <button onClick={() => handleDelete(a.id)}
+                            style={{ padding: "6px 12px", background: "transparent", border: "1px solid rgba(204,0,0,0.3)", borderRadius: 6, color: "#CC0000", fontFamily: "'Barlow',sans-serif", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
+                            {isRu ? "Удалить" : "Delete"}
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        </section>
+      )}
     </div>
   );
 };

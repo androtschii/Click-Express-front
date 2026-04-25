@@ -503,7 +503,7 @@ function AppContent() {
         {sharedStyle}
         {sharedHeader}
         <div style={{ paddingTop: 70 }}>
-          <CareersPage theme={theme} onBack={() => { setShowCareers(false); window.scrollTo({ top: 0 }); }} />
+          <CareersPage theme={theme} session={session} onBack={() => { setShowCareers(false); window.scrollTo({ top: 0 }); }} />
         </div>
         {showAuth && <AuthModal onClose={() => setShowAuth(false)} theme={theme} onSuccess={(s) => { setSession(s); setShowAuth(false); }} />}
         {showQuote && <QuoteModal onClose={() => setShowQuote(false)} theme={theme} />}

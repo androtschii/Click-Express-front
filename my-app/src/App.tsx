@@ -471,7 +471,7 @@ function AppContent() {
         {sharedStyle}
         {sharedHeader}
         <div style={{ paddingTop: 70 }}>
-          <ReviewsPage theme={theme} onBack={() => { setShowReviews(false); window.scrollTo({ top: 0 }); }} />
+          <ReviewsPage theme={theme} session={session} onBack={() => { setShowReviews(false); window.scrollTo({ top: 0 }); }} />
         </div>
         {showAuth && <AuthModal onClose={() => setShowAuth(false)} theme={theme} onSuccess={(s) => { setSession(s); setShowAuth(false); }} />}
         {showQuote && <QuoteModal onClose={() => setShowQuote(false)} theme={theme} />}

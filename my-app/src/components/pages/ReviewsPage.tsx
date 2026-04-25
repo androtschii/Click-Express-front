@@ -1,9 +1,22 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useLanguage } from "../../context/LanguageContext";
+import { fetchReviews, createReview, approveReview, deleteReview } from "../../api/client.js";
+import type { Session } from "../../services/authService";
 
 interface ReviewsPageProps {
   theme?: "dark" | "light";
   onBack?: () => void;
+  session?: Session | null;
+}
+
+interface ApiReview {
+  id: number;
+  rating: number;
+  text: string;
+  createdAt: string;
+  isApproved: boolean;
+  productId: number | null;
+  username: string;
 }
 
 interface Comment {
@@ -31,6 +44,8 @@ interface ReviewItem {
   likes: number;
   dislikes: number;
   comments: Comment[];
+  isFromApi?: boolean;
+  isApproved?: boolean;
 }
 
 const AVATAR_COLORS = [
@@ -169,7 +184,29 @@ const STAR_LABELS: Record<number, { en: string; ru: string }> = {
   5: { en: "Excellent", ru: "Отлично" },
 };
 
-export const ReviewsPage: React.FC<ReviewsPageProps> = ({ theme = "dark", onBack }) => {
+export const ReviewsPage: React.FC<ReviewsPageProps> = ({ theme = "dark", onBack, session }) => {
+  const isAuthed = !!session;
+  const isAdmin = session?.role === "Admin";
+
+  const apiToReviewItem = (r: ApiReview, idx: number): ReviewItem => {
+    const initials = (r.username || "?").split(/[\s.@_]/).filter(Boolean).map(w => w[0]).join("").toUpperCase().slice(0, 2);
+    const date = new Date(r.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+    return {
+      id: r.id,
+      nameEn: r.username, nameRu: r.username,
+      roleEn: "Customer", roleRu: "Клиент",
+      commentEn: r.text, commentRu: r.text,
+      initial: initials || "?",
+      avatarColor: AVATAR_COLORS[idx % AVATAR_COLORS.length],
+      date, stateEn: "", stateRu: "",
+      stars: r.rating,
+      isUser: true,
+      likes: 0, dislikes: 0, comments: [],
+      isFromApi: true,
+      isApproved: r.isApproved,
+    };
+  };
+
   const { lang } = useLanguage();
   const isDark = theme === "dark";
 
@@ -183,6 +220,26 @@ export const ReviewsPage: React.FC<ReviewsPageProps> = ({ theme = "dark", onBack
   const inputBorder = isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.12)";
 
   const [reviews, setReviews] = useState<ReviewItem[]>(INITIAL_REVIEWS);
+  const [apiLoading, setApiLoading] = useState(false);
+
+  const loadApiReviews = async () => {
+    setApiLoading(true);
+    try {
+      const data: ApiReview[] = await fetchReviews(!isAdmin);
+      const apiItems = data.map((r, i) => apiToReviewItem(r, i));
+      setReviews([...apiItems, ...INITIAL_REVIEWS]);
+    } catch {
+      // если API недоступен — оставляем INITIAL_REVIEWS
+    } finally {
+      setApiLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadApiReviews();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAdmin]);
+
   const [votes, setVotes] = useState<Record<number, "like" | "dislike" | null>>({});
   const [openComments, setOpenComments] = useState<Set<number>>(new Set());
   const [commentInputs, setCommentInputs] = useState<Record<number, string>>({});
@@ -243,33 +300,40 @@ export const ReviewsPage: React.FC<ReviewsPageProps> = ({ theme = "dark", onBack
     setCommentAuthorInputs(c => ({ ...c, [reviewId]: "" }));
   };
 
-  const submitReview = () => {
-    if (!formName.trim()) { setFormError(lang === "ru" ? "Введите имя" : "Enter your name"); return; }
+  const submitReview = async () => {
+    if (!isAuthed) { setFormError(lang === "ru" ? "Войдите, чтобы оставить отзыв" : "Login to post a review"); return; }
     if (!formComment.trim()) { setFormError(lang === "ru" ? "Напишите отзыв" : "Write a review"); return; }
     if (formComment.trim().length < 20) { setFormError(lang === "ru" ? "Отзыв слишком короткий (мин. 20 символов)" : "Review too short (min 20 chars)"); return; }
     setFormError("");
-    const initials = formName.trim().split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
-    const color = AVATAR_COLORS[reviews.length % AVATAR_COLORS.length];
-    const now = new Date();
-    const date = now.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
-    const newReview: ReviewItem = {
-      id: Date.now(),
-      nameEn: formName.trim(), nameRu: formName.trim(),
-      roleEn: formRole.trim() || (lang === "ru" ? "Пользователь" : "User"),
-      roleRu: formRole.trim() || "Пользователь",
-      commentEn: formComment.trim(), commentRu: formComment.trim(),
-      initial: initials || "?",
-      avatarColor: color,
-      date, stateEn: "", stateRu: "",
-      stars: formStars,
-      isUser: true,
-      likes: 0, dislikes: 0, comments: [],
-    };
-    setReviews(rs => [newReview, ...rs]);
-    setFormName(""); setFormRole(""); setFormStars(5); setFormComment("");
-    setFormSubmitted(true);
-    setShowForm(false);
-    setTimeout(() => setFormSubmitted(false), 4000);
+    try {
+      await createReview({ rating: formStars, text: formComment.trim() });
+      setFormName(""); setFormRole(""); setFormStars(5); setFormComment("");
+      setFormSubmitted(true);
+      setShowForm(false);
+      setTimeout(() => setFormSubmitted(false), 5000);
+      await loadApiReviews();
+    } catch (e) {
+      setFormError(e instanceof Error ? e.message : "Error");
+    }
+  };
+
+  const handleApprove = async (id: number) => {
+    try {
+      await approveReview(id);
+      setReviews(rs => rs.map(r => r.id === id && r.isFromApi ? { ...r, isApproved: true } : r));
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "Error");
+    }
+  };
+
+  const handleDeleteReview = async (id: number) => {
+    if (!confirm(lang === "ru" ? "Удалить отзыв?" : "Delete review?")) return;
+    try {
+      await deleteReview(id);
+      setReviews(rs => rs.filter(r => !(r.id === id && r.isFromApi)));
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "Error");
+    }
   };
 
   const inputStyle = {
@@ -489,6 +553,27 @@ export const ReviewsPage: React.FC<ReviewsPageProps> = ({ theme = "dark", onBack
                   {review.isUser && (
                     <div style={{ display: "inline-flex", alignItems: "center", gap: 5, background: "rgba(234,179,8,0.12)", border: "1px solid rgba(234,179,8,0.3)", borderRadius: 10, padding: "2px 10px", marginBottom: 10, fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 9, color: "#eab308", letterSpacing: 2, textTransform: "uppercase" }}>
                       ✓ {lang === "ru" ? "Новый отзыв" : "New review"}
+                    </div>
+                  )}
+
+                  {review.isFromApi && review.isApproved === false && (
+                    <div style={{ display: "inline-flex", alignItems: "center", gap: 5, marginLeft: review.isUser ? 8 : 0, background: "rgba(234,88,12,0.12)", border: "1px solid rgba(234,88,12,0.3)", borderRadius: 10, padding: "2px 10px", marginBottom: 10, fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 9, color: "#ea580c", letterSpacing: 2, textTransform: "uppercase" }}>
+                      {lang === "ru" ? "На модерации" : "Pending"}
+                    </div>
+                  )}
+
+                  {isAdmin && review.isFromApi && (
+                    <div style={{ position: "absolute", top: 16, right: 16, display: "flex", gap: 6, zIndex: 2 }}>
+                      {!review.isApproved && (
+                        <button onClick={() => handleApprove(review.id)} title={lang === "ru" ? "Одобрить" : "Approve"}
+                          style={{ padding: "4px 10px", background: "rgba(0,180,80,0.12)", border: "1px solid rgba(0,180,80,0.4)", borderRadius: 6, color: "#00b450", fontFamily: "'Barlow',sans-serif", fontSize: 11, fontWeight: 700, cursor: "pointer", letterSpacing: 1, textTransform: "uppercase" }}>
+                          ✓ {lang === "ru" ? "Одобрить" : "Approve"}
+                        </button>
+                      )}
+                      <button onClick={() => handleDeleteReview(review.id)} title={lang === "ru" ? "Удалить" : "Delete"}
+                        style={{ padding: "4px 10px", background: "rgba(204,0,0,0.12)", border: "1px solid rgba(204,0,0,0.4)", borderRadius: 6, color: "#CC0000", fontFamily: "'Barlow',sans-serif", fontSize: 11, fontWeight: 700, cursor: "pointer", letterSpacing: 1, textTransform: "uppercase" }}>
+                        ✕
+                      </button>
                     </div>
                   )}
 

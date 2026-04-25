@@ -163,6 +163,44 @@ export const fetchProductStats = async () => {
   return response.json();
 };
 
+// Reviews
+export const fetchReviews = async (onlyApproved = true) => {
+  const response = await fetch(`${API_BASE_URL}/review?onlyApproved=${onlyApproved}`);
+  if (!response.ok) throw new Error("Ошибка загрузки отзывов");
+  return response.json();
+};
+
+export const createReview = async (data) => {
+  const response = await fetch(`${API_BASE_URL}/review`, {
+    method: "POST",
+    headers: authHeaders(),
+    body: JSON.stringify(data),
+  });
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err.message || "Ошибка отправки отзыва");
+  }
+  return response.json();
+};
+
+export const approveReview = async (id) => {
+  const response = await fetch(`${API_BASE_URL}/review/${id}/approve`, {
+    method: "PATCH",
+    headers: authHeaders(),
+  });
+  if (!response.ok) throw new Error("Ошибка одобрения");
+  return response.json();
+};
+
+export const deleteReview = async (id) => {
+  const response = await fetch(`${API_BASE_URL}/review/${id}`, {
+    method: "DELETE",
+    headers: authHeaders(),
+  });
+  if (!response.ok) throw new Error("Ошибка удаления");
+  return true;
+};
+
 // Job Applications
 export const submitJobApplication = async (data) => {
   const response = await fetch(`${API_BASE_URL}/jobapplication`, {

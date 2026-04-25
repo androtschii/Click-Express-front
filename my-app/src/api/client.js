@@ -163,7 +163,49 @@ export const fetchProductStats = async () => {
   return response.json();
 };
 
-// Health 
+// Job Applications
+export const submitJobApplication = async (data) => {
+  const response = await fetch(`${API_BASE_URL}/jobapplication`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err.message || "Ошибка отправки заявки");
+  }
+  return response.json();
+};
+
+export const fetchJobApplications = async (status = "") => {
+  const params = status ? `?status=${encodeURIComponent(status)}` : "";
+  const response = await fetch(`${API_BASE_URL}/jobapplication${params}`, {
+    headers: authHeaders(),
+  });
+  if (!response.ok) throw new Error("Ошибка загрузки заявок");
+  return response.json();
+};
+
+export const updateJobApplicationStatus = async (id, status) => {
+  const response = await fetch(`${API_BASE_URL}/jobapplication/${id}/status`, {
+    method: "PATCH",
+    headers: authHeaders(),
+    body: JSON.stringify({ status }),
+  });
+  if (!response.ok) throw new Error("Ошибка обновления статуса");
+  return response.json();
+};
+
+export const deleteJobApplication = async (id) => {
+  const response = await fetch(`${API_BASE_URL}/jobapplication/${id}`, {
+    method: "DELETE",
+    headers: authHeaders(),
+  });
+  if (!response.ok) throw new Error("Ошибка удаления заявки");
+  return true;
+};
+
+// Health
 export const healthCheck = async () => {
   const response = await fetch(`${API_BASE_URL}/health/ping`);
   if (!response.ok) throw new Error("API недоступен");

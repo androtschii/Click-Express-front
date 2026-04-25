@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { PhoneIcon } from "../ui/PhoneIcon";
 import { useLanguage } from "../../context/LanguageContext";
+import { submitJobApplication } from "../../api/client.js";
 
 interface CareersPageProps {
   theme?: "dark" | "light";
@@ -134,8 +135,11 @@ export const CareersPage: React.FC<CareersPageProps> = ({ theme = "dark", onBack
   const [applied, setApplied] = useState<number | null>(null);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [msg, setMsg] = useState("");
   const [sent, setSent] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState("");
 
   const handleApply = (jobId: number) => {
     if (applied === jobId) {
@@ -146,8 +150,32 @@ export const CareersPage: React.FC<CareersPageProps> = ({ theme = "dark", onBack
     }
   };
 
-  const handleSend = () => {
-    if (name && email) { setSent(true); }
+  const handleSend = async () => {
+    setError("");
+    if (!name.trim() || !email.trim()) {
+      setError(isRu ? "Заполните имя и email" : "Name and email are required");
+      return;
+    }
+    if (!applied) {
+      setError(isRu ? "Выберите вакансию" : "Select a position");
+      return;
+    }
+    const job = JOBS.find(j => j.id === applied);
+    setSending(true);
+    try {
+      await submitJobApplication({
+        fullName: name.trim(),
+        email: email.trim(),
+        phone: phone.trim(),
+        position: job?.title ?? "",
+        message: msg.trim(),
+      });
+      setSent(true);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : (isRu ? "Не удалось отправить" : "Failed to send"));
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
@@ -400,10 +428,21 @@ export const CareersPage: React.FC<CareersPageProps> = ({ theme = "dark", onBack
                     {isRu ? "Отклик на:" : "Applying for:"} <strong>{JOBS.find(j => j.id === applied)?.title}</strong>
                   </div>
                 )}
+                {sent && (
+                  <div style={{ marginBottom: 14, padding: "12px 16px", background: "rgba(0,180,80,0.1)", border: "1px solid rgba(0,180,80,0.3)", borderRadius: 8, fontFamily: "'Barlow',sans-serif", fontSize: 13, color: "#00b450" }}>
+                    {isRu ? "Заявка успешно отправлена! Мы свяжемся с вами в течение 24 часов." : "Application sent! We'll get back to you within 24 hours."}
+                  </div>
+                )}
+                {error && (
+                  <div style={{ marginBottom: 14, padding: "12px 16px", background: "rgba(204,0,0,0.1)", border: "1px solid rgba(204,0,0,0.3)", borderRadius: 8, fontFamily: "'Barlow',sans-serif", fontSize: 13, color: "#CC0000" }}>
+                    {error}
+                  </div>
+                )}
                 <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                   {[
                     { val: name, set: setName, ph: isRu ? "Полное имя" : "Full Name", type: "text" },
                     { val: email, set: setEmail, ph: isRu ? "Адрес эл. почты" : "Email Address", type: "email" },
+                    { val: phone, set: setPhone, ph: isRu ? "Телефон" : "Phone", type: "tel" },
                   ].map(f => (
                     <input key={f.ph} value={f.val} onChange={e => f.set(e.target.value)} placeholder={f.ph} type={f.type}
                       style={{ padding: "12px 16px", background: isDark ? "rgba(255,255,255,0.05)" : "#f8f8f8", border: `1px solid ${bord}`, borderRadius: 8, color: text, fontSize: 14, fontFamily: "'Barlow',sans-serif", outline: "none" }}
@@ -423,10 +462,10 @@ export const CareersPage: React.FC<CareersPageProps> = ({ theme = "dark", onBack
                     onFocus={e => e.target.style.borderColor = "#CC0000"}
                     onBlur={e => e.target.style.borderColor = bord}
                   />
-                  <button onClick={handleSend} style={{ padding: "13px", background: "linear-gradient(135deg,#CC0000,#ff4d4d)", border: "none", borderRadius: 8, color: "#fff", fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 15, letterSpacing: 2, textTransform: "uppercase", cursor: "pointer", boxShadow: "0 6px 20px rgba(204,0,0,0.4)", transition: "all 0.2s" }}
-                    onMouseEnter={e => e.currentTarget.style.transform = "translateY(-2px)"}
+                  <button onClick={handleSend} disabled={sending || sent} style={{ padding: "13px", background: sent ? "linear-gradient(135deg,#00b450,#22c55e)" : "linear-gradient(135deg,#CC0000,#ff4d4d)", border: "none", borderRadius: 8, color: "#fff", fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 15, letterSpacing: 2, textTransform: "uppercase", cursor: sending || sent ? "default" : "pointer", boxShadow: "0 6px 20px rgba(204,0,0,0.4)", transition: "all 0.2s", opacity: sending ? 0.7 : 1 }}
+                    onMouseEnter={e => { if (!sending && !sent) e.currentTarget.style.transform = "translateY(-2px)"; }}
                     onMouseLeave={e => e.currentTarget.style.transform = "none"}>
-                    {isRu ? "Отправить заявку" : "Send Application"}
+                    {sent ? (isRu ? "✓ Отправлено" : "✓ Sent") : sending ? (isRu ? "Отправка..." : "Sending...") : (isRu ? "Отправить заявку" : "Send Application")}
                   </button>
                 </div>
               </div>

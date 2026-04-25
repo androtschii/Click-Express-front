@@ -163,6 +163,96 @@ export const fetchProductStats = async () => {
   return response.json();
 };
 
+// News
+export const fetchNews = async (onlyPublished = true) => {
+  const response = await fetch(`${API_BASE_URL}/news?onlyPublished=${onlyPublished}`);
+  if (!response.ok) throw new Error("Ошибка загрузки новостей");
+  return response.json();
+};
+
+export const createNews = async (data) => {
+  const response = await fetch(`${API_BASE_URL}/news`, {
+    method: "POST",
+    headers: authHeaders(),
+    body: JSON.stringify(data),
+  });
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err.message || "Ошибка создания новости");
+  }
+  return response.json();
+};
+
+export const updateNews = async (id, data) => {
+  const response = await fetch(`${API_BASE_URL}/news/${id}`, {
+    method: "PUT",
+    headers: authHeaders(),
+    body: JSON.stringify(data),
+  });
+  if (!response.ok) throw new Error("Ошибка обновления новости");
+  return response.json();
+};
+
+export const deleteNews = async (id) => {
+  const response = await fetch(`${API_BASE_URL}/news/${id}`, {
+    method: "DELETE",
+    headers: authHeaders(),
+  });
+  if (!response.ok) throw new Error("Ошибка удаления новости");
+  return true;
+};
+
+// Vehicles
+export const fetchVehicles = async (type = "", available = null) => {
+  const params = new URLSearchParams();
+  if (type) params.append("type", type);
+  if (available !== null) params.append("available", String(available));
+  const response = await fetch(`${API_BASE_URL}/vehicle?${params}`);
+  if (!response.ok) throw new Error("Ошибка загрузки автопарка");
+  return response.json();
+};
+
+export const createVehicle = async (data) => {
+  const response = await fetch(`${API_BASE_URL}/vehicle`, {
+    method: "POST",
+    headers: authHeaders(),
+    body: JSON.stringify(data),
+  });
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err.message || "Ошибка создания транспорта");
+  }
+  return response.json();
+};
+
+export const updateVehicle = async (id, data) => {
+  const response = await fetch(`${API_BASE_URL}/vehicle/${id}`, {
+    method: "PUT",
+    headers: authHeaders(),
+    body: JSON.stringify(data),
+  });
+  if (!response.ok) throw new Error("Ошибка обновления транспорта");
+  return response.json();
+};
+
+export const toggleVehicleAvailability = async (id) => {
+  const response = await fetch(`${API_BASE_URL}/vehicle/${id}/availability`, {
+    method: "PATCH",
+    headers: authHeaders(),
+  });
+  if (!response.ok) throw new Error("Ошибка изменения доступности");
+  return response.json();
+};
+
+export const deleteVehicle = async (id) => {
+  const response = await fetch(`${API_BASE_URL}/vehicle/${id}`, {
+    method: "DELETE",
+    headers: authHeaders(),
+  });
+  if (!response.ok) throw new Error("Ошибка удаления транспорта");
+  return true;
+};
+
 // Reviews
 export const fetchReviews = async (onlyApproved = true) => {
   const response = await fetch(`${API_BASE_URL}/review?onlyApproved=${onlyApproved}`);

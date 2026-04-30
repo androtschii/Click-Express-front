@@ -1,12 +1,25 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useLanguage } from "../../context/LanguageContext";
 import type { Load } from "../../types/index";
+import { fetchNews, createNews, deleteNews } from "../../api/client.js";
+import type { Session } from "../../services/authService";
 
 interface NewsPageProps {
   theme?: "dark" | "light";
   onBack?: () => void;
   onViewLoads?: () => void;
   onLoadDetail?: (load: Load) => void;
+  session?: Session | null;
+}
+
+interface ApiNews {
+  id: number;
+  title: string;
+  content: string;
+  imageUrl: string | null;
+  publishedAt: string;
+  isPublished: boolean;
+  authorName: string;
 }
 
 type Category = "all" | "loads" | "company" | "freight" | "safety" | "drivers";
@@ -281,7 +294,7 @@ function StarRating({ n }: { n: number }) {
   );
 }
 
-export const NewsPage: React.FC<NewsPageProps> = ({ theme = "dark", onBack, onViewLoads, onLoadDetail }) => {
+export const NewsPage: React.FC<NewsPageProps> = ({ theme = "dark", onBack, onViewLoads, onLoadDetail, session }) => {
   const { lang } = useLanguage();
   const [activecat, setActivecat] = useState<Category>("all");
   const [selectedId, setSelectedId] = useState<number | null>(null);
@@ -295,9 +308,85 @@ export const NewsPage: React.FC<NewsPageProps> = ({ theme = "dark", onBack, onVi
   const border       = isDark ? "rgba(240,237,232,0.08)" : "rgba(13,13,13,0.1)";
   const borderStrong = isDark ? "rgba(240,237,232,0.18)" : "rgba(13,13,13,0.2)";
 
-  const filtered = activecat === "all" ? ARTICLES : ARTICLES.filter(a => a.category === activecat);
+  const isAdmin = session?.role === "Admin";
+
+  const apiToArticle = (n: ApiNews): Article => ({
+    id: 100000 + n.id,
+    category: "company",
+    titleEn: n.title, titleRu: n.title,
+    excerptEn: n.content, excerptRu: n.content,
+    date: new Date(n.publishedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
+    readTime: `${Math.max(1, Math.ceil(n.content.split(" ").length / 200))} min`,
+    icon: "📰",
+    accentColor: "#3b82f6",
+    author: n.authorName,
+  });
+
+  const [apiArticles, setApiArticles] = useState<Article[]>([]);
+  const [apiIdMap, setApiIdMap] = useState<Map<number, number>>(new Map());
+
+  const loadApiNews = async () => {
+    try {
+      const data: ApiNews[] = await fetchNews(!isAdmin);
+      setApiArticles(data.map(apiToArticle));
+      setApiIdMap(new Map(data.map(n => [100000 + n.id, n.id])));
+    } catch {
+      setApiArticles([]);
+    }
+  };
+
+  useEffect(() => {
+    loadApiNews();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAdmin]);
+
+  const allArticles = [...apiArticles, ...ARTICLES];
+  const filtered = activecat === "all" ? allArticles : allArticles.filter(a => a.category === activecat);
   const featured = filtered.find(a => a.featured) || filtered[0];
   const rest     = filtered.filter(a => a.id !== featured?.id);
+
+  const [showCreate, setShowCreate] = useState(false);
+  const [newTitle, setNewTitle] = useState("");
+  const [newContent, setNewContent] = useState("");
+  const [newImage, setNewImage] = useState("");
+  const [creating, setCreating] = useState(false);
+  const [createError, setCreateError] = useState("");
+
+  const handleCreate = async () => {
+    setCreateError("");
+    if (!newTitle.trim() || !newContent.trim()) {
+      setCreateError(lang === "ru" ? "Заполните заголовок и текст" : "Title and content required");
+      return;
+    }
+    setCreating(true);
+    try {
+      await createNews({
+        title: newTitle.trim(),
+        content: newContent.trim(),
+        imageUrl: newImage.trim() || null,
+        isPublished: true,
+      });
+      setNewTitle(""); setNewContent(""); setNewImage("");
+      setShowCreate(false);
+      await loadApiNews();
+    } catch (e) {
+      setCreateError(e instanceof Error ? e.message : "Error");
+    } finally {
+      setCreating(false);
+    }
+  };
+
+  const handleDeleteApi = async (articleId: number) => {
+    const realId = apiIdMap.get(articleId);
+    if (!realId) return;
+    if (!confirm(lang === "ru" ? "Удалить новость?" : "Delete news?")) return;
+    try {
+      await deleteNews(realId);
+      await loadApiNews();
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "Error");
+    }
+  };
 
   const tickerItems = ARTICLES
     .filter(a => a.category === "loads" && a.highlightEn && a.load)
@@ -561,15 +650,57 @@ export const NewsPage: React.FC<NewsPageProps> = ({ theme = "dark", onBack, onVi
             </div>
           )}
 
+ {/* ADMIN PANEL */}
+          {isAdmin && (
+            <div style={{ marginBottom: 24, padding: 24, background: surface, border: `1px solid ${border}`, borderTop: `3px solid #CC0000` }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: showCreate ? 16 : 0 }}>
+                <div style={{ fontFamily: "'Anton', sans-serif", fontSize: 18, color: textPrimary, letterSpacing: 1, textTransform: "uppercase" }}>
+                  <span style={{ color: "#CC0000" }}>{lang === "ru" ? "Админ:" : "Admin:"}</span> {lang === "ru" ? "Управление новостями" : "Manage News"}
+                </div>
+                <button onClick={() => { setShowCreate(!showCreate); setCreateError(""); }}
+                  style={{ padding: "8px 16px", background: showCreate ? "transparent" : "#CC0000", border: showCreate ? `1px solid ${border}` : "none", color: showCreate ? textPrimary : "#fff", fontFamily: "'DM Sans', sans-serif", fontSize: 12, fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", cursor: "pointer" }}>
+                  {showCreate ? (lang === "ru" ? "Отмена" : "Cancel") : (lang === "ru" ? "+ Создать" : "+ Create")}
+                </button>
+              </div>
+              {showCreate && (
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  <input value={newTitle} onChange={e => setNewTitle(e.target.value)} placeholder={lang === "ru" ? "Заголовок" : "Title"}
+                    style={{ padding: "10px 14px", background: isDark ? "#0a0a0a" : "#f8f8f8", border: `1px solid ${border}`, color: textPrimary, fontFamily: "'DM Sans', sans-serif", fontSize: 13, outline: "none" }} />
+                  <input value={newImage} onChange={e => setNewImage(e.target.value)} placeholder={lang === "ru" ? "URL картинки (необязательно)" : "Image URL (optional)"}
+                    style={{ padding: "10px 14px", background: isDark ? "#0a0a0a" : "#f8f8f8", border: `1px solid ${border}`, color: textPrimary, fontFamily: "'DM Sans', sans-serif", fontSize: 13, outline: "none" }} />
+                  <textarea value={newContent} onChange={e => setNewContent(e.target.value)} placeholder={lang === "ru" ? "Текст новости" : "Content"} rows={4}
+                    style={{ padding: "10px 14px", background: isDark ? "#0a0a0a" : "#f8f8f8", border: `1px solid ${border}`, color: textPrimary, fontFamily: "'DM Sans', sans-serif", fontSize: 13, outline: "none", resize: "vertical" }} />
+                  {createError && (
+                    <div style={{ padding: "8px 12px", background: "rgba(204,0,0,0.1)", border: "1px solid rgba(204,0,0,0.3)", color: "#CC0000", fontFamily: "'DM Sans', sans-serif", fontSize: 12 }}>
+                      {createError}
+                    </div>
+                  )}
+                  <button onClick={handleCreate} disabled={creating}
+                    style={{ padding: "12px", background: "#CC0000", border: "none", color: "#fff", fontFamily: "'Anton', sans-serif", fontSize: 14, letterSpacing: 2, textTransform: "uppercase", cursor: creating ? "default" : "pointer", opacity: creating ? 0.6 : 1 }}>
+                    {creating ? (lang === "ru" ? "Создание..." : "Creating...") : (lang === "ru" ? "Опубликовать" : "Publish")}
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
  {/* GRID */}
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(310px,1fr))", gap: 20 }}>
             {rest.map((article, idx) => {
               const isLoad = article.category === "loads";
               const ratePerMile = article.load ? (article.load.price / article.load.miles).toFixed(2) : null;
+              const isApiArticle = apiIdMap.has(article.id);
               return (
                 <div key={article.id} className="ncard"
                   onClick={() => { if (article.load && onLoadDetail) onLoadDetail(article.load); else { setSelectedId(article.id); window.scrollTo({ top: 0, behavior: "smooth" }); } }}
                   style={{ background: isLoad ? (isDark ? "#0e0000" : "#fff8f8") : surface, border: `1px solid ${border}`, borderTop: `3px solid ${article.accentColor}`, overflow: "hidden", position: "relative", animation: `slideUp 0.4s ease ${idx * 0.04}s both` }}>
+                  {isAdmin && isApiArticle && (
+                    <button onClick={e => { e.stopPropagation(); handleDeleteApi(article.id); }}
+                      title={lang === "ru" ? "Удалить" : "Delete"}
+                      style={{ position: "absolute", top: 10, right: 10, zIndex: 3, width: 28, height: 28, background: "rgba(204,0,0,0.85)", border: "none", borderRadius: 4, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      ✕
+                    </button>
+                  )}
                   <div style={{ padding: "28px 28px 24px" }}>
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
                       <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: `${article.accentColor}14`, border: `1px solid ${article.accentColor}30`, padding: "4px 12px" }}>

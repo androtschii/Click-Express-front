@@ -150,6 +150,18 @@ export const translations = {
       titleHighlight: "LOADS",
       titleEnd: "OF THE WEEK",
     },
+    howItWorks: {
+      badge: "HOW IT WORKS",
+      title: "FROM CLICK TO",
+      titleHighlight: "DELIVERY",
+      subtitle: "Four straightforward steps. No hidden fees, no surprises — just freight that moves on time.",
+      steps: [
+        { title: "Request a Quote",   desc: "Send your origin, destination and equipment. We respond within 30 minutes." },
+        { title: "Dispatcher Confirms", desc: "A real dispatcher matches your load with a vetted truck and signs the rate confirmation." },
+        { title: "Pickup On Schedule", desc: "Driver checks in at origin, loads under DOT-compliant conditions and rolls out." },
+        { title: "Tracked Delivery",   desc: "Live updates from pickup to drop. POD delivered to your inbox the same day." },
+      ],
+    },
     ticker: [
       "LOADS DON'T MOVE THEMSELVES",
       "ALWAYS MOVING",
@@ -351,6 +363,18 @@ export const translations = {
       titleMain: "ЛУЧШИЕ",
       titleHighlight: "ГРУЗЫ",
       titleEnd: "НЕДЕЛИ",
+    },
+    howItWorks: {
+      badge: "КАК ЭТО РАБОТАЕТ",
+      title: "ОТ КЛИКА ДО",
+      titleHighlight: "ДОСТАВКИ",
+      subtitle: "Четыре простых шага. Без скрытых комиссий и сюрпризов — груз доходит вовремя.",
+      steps: [
+        { title: "Запрос ставки",        desc: "Отправьте отправку, назначение и тип прицепа. Ответ — в течение 30 минут." },
+        { title: "Подтверждение диспетчера", desc: "Живой диспетчер подбирает проверенный грузовик и подписывает rate confirmation." },
+        { title: "Погрузка по расписанию",  desc: "Водитель прибывает к отгрузке, грузится по нормам DOT и отправляется в путь." },
+        { title: "Доставка с трекингом",    desc: "Обновления в реальном времени от погрузки до выгрузки. POD приходит на email в тот же день." },
+      ],
     },
     ticker: [
       "ГРУЗЫ НЕ ДВИГАЮТСЯ САМИ",

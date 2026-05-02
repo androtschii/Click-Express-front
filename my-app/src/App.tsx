@@ -7,6 +7,7 @@ import { Hero } from "./components/sections/Hero";
 import { Ticker } from "./components/layout/Ticker";
 import { TrustStrip } from "./components/sections/TrustStrip";
 import { ComplianceBar } from "./components/sections/ComplianceBar";
+import { HowItWorks } from "./components/sections/HowItWorks";
 import { AboutSection } from "./components/sections/AboutSection";
 import { Footer } from "./components/layout/Footer";
 import { QuoteModal } from "./components/Modals/QuoteModal";
@@ -630,6 +631,7 @@ function AppContent() {
       <Ticker />
       <TrustStrip theme={theme} />
       <ComplianceBar theme={theme} />
+      <HowItWorks theme={theme} onQuoteClick={() => setShowQuote(true)} />
 
  {/* WEEKLY BEST CAROUSEL */}
       {!loading && (() => {

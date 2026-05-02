@@ -516,6 +516,9 @@ const FormContent: React.FC<FormContentProps> = ({
           icon="lock"
           onKeyDown={(e) => e.key === "Enter" && onSubmit()}
         />
+        {!isLogin && password.length > 0 && (
+          <PasswordStrength password={password} dark={dark} />
+        )}
         {isLogin && (
           <div style={{ textAlign: "right", marginTop: -4 }}>
             <span
@@ -805,7 +808,61 @@ const InputField: React.FC<{
   </div>
 );
 
-// Social button (fb, linkedin) 
+const PasswordStrength: React.FC<{
+  password: string;
+  dark: boolean;
+}> = ({ password, dark }) => {
+  const score = (() => {
+    let s = 0;
+    if (password.length >= 8) s++;
+    if (password.length >= 12) s++;
+    if (/[A-Z]/.test(password) && /[a-z]/.test(password)) s++;
+    if (/\d/.test(password)) s++;
+    if (/[^A-Za-z0-9]/.test(password)) s++;
+    return Math.min(s, 4);
+  })();
+
+  const labels = ["Too weak", "Weak", "Fair", "Good", "Strong"];
+  const colors = ["#CC0000", "#e07a3a", "#d9b441", "#7ac74f", "#3aa55a"];
+  const label = labels[score];
+  const color = colors[score];
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 6, marginTop: -4 }}>
+      <div style={{ display: "flex", gap: 4 }}>
+        {[0, 1, 2, 3].map((i) => (
+          <div
+            key={i}
+            style={{
+              flex: 1,
+              height: 4,
+              borderRadius: 2,
+              background:
+                i < score
+                  ? color
+                  : dark
+                  ? "rgba(255,255,255,0.1)"
+                  : "rgba(0,0,0,0.08)",
+              transition: "background 0.2s",
+            }}
+          />
+        ))}
+      </div>
+      <span
+        style={{
+          fontFamily: "'Barlow',sans-serif",
+          fontSize: 11,
+          color,
+          opacity: 0.9,
+        }}
+      >
+        {label}
+      </span>
+    </div>
+  );
+};
+
+// Social button (fb, linkedin)
 const SocialBtn: React.FC<{
   dark: boolean;
   color: string;

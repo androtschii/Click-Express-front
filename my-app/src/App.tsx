@@ -627,7 +627,7 @@ function AppContent() {
     <div style={{ background: bgColor, minHeight: "100vh", color: textColor, transition: "background 0.3s, color 0.3s" }}>
       {sharedStyle}
       {sharedHeader}
-      <Hero onViewLoads={() => scrollTo(catalogRef)} onQuoteClick={() => setShowQuote(true)} />
+      <Hero onViewLoads={() => scrollTo(catalogRef)} onQuoteClick={() => setShowQuote(true)} onCareersClick={() => { setShowCareers(true); window.scrollTo({ top: 0, behavior: "smooth" }); }} />
       <Ticker />
       <TrustStrip theme={theme} />
       <ComplianceBar theme={theme} />

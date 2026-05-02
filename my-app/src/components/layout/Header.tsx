@@ -34,10 +34,10 @@ const NavLink: React.FC<{ children: React.ReactNode; onClick?: () => void; isLig
   return (
     <span onClick={onClick} onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
       style={{
-        color: hov ? "#fff" : (isLight ? "rgba(20,20,20,0.7)" : "rgba(255,255,255,0.65)"),
+        color: hov ? "#fff" : (isLight ? "rgba(20,20,20,0.78)" : "rgba(255,255,255,0.78)"),
         background: hov ? "#CC0000" : "transparent",
-        fontSize: 11, fontFamily: "'Barlow', sans-serif", fontWeight: 700, letterSpacing: compact ? 0 : 0.8,
-        textTransform: "uppercase", padding: compact ? "6px 5px" : "6px 8px", borderRadius: 4,
+        fontSize: 13, fontFamily: "'Barlow', sans-serif", fontWeight: 700, letterSpacing: compact ? 0.4 : 1.1,
+        textTransform: "uppercase", padding: compact ? "8px 8px" : "8px 11px", borderRadius: 4,
         transition: "all 0.15s", cursor: "pointer", whiteSpace: "nowrap", display: "inline-block"
       }}
     >{children}</span>
@@ -124,15 +124,16 @@ export const Header: React.FC<HeaderProps> = ({
       <style>{`
         @keyframes heartPulse { 0%{transform:scale(1)} 25%{transform:scale(1.4)} 50%{transform:scale(1.1)} 75%{transform:scale(1.25)} 100%{transform:scale(1)} }
         @keyframes ringOut { 0%{transform:translate(-50%,-50%) scale(0.3);opacity:1} 100%{transform:translate(-50%,-50%) scale(2.5);opacity:0} }
+        @keyframes applyPulse { 0%,100%{opacity:1} 50%{opacity:0.35} }
       `}</style>
 
       <div onClick={onLogoClick || (() => window.scrollTo({ top: 0, behavior: "smooth" }))} style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", flexShrink: 0 }}>
         <CELogo size={42} theme={theme} />
         <div style={{ lineHeight: 1 }}>
-          <div style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 19, color: isLight ? "#1a1a1a" : "#fff", letterSpacing: 1, textTransform: "uppercase" }}>
+          <div style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 21, color: isLight ? "#1a1a1a" : "#fff", letterSpacing: 1, textTransform: "uppercase" }}>
             <span style={{ color: "#CC0000" }}>CLICK</span> EXPRESS
           </div>
-          <div style={{ fontSize: 7.5, color: isLight ? "rgba(0,0,0,0.35)" : "rgba(255,255,255,0.3)", fontFamily: "'Barlow',sans-serif", letterSpacing: 2, textTransform: "uppercase", marginTop: 1 }}>
+          <div style={{ fontSize: 9, color: isLight ? "rgba(0,0,0,0.42)" : "rgba(255,255,255,0.4)", fontFamily: "'Barlow',sans-serif", letterSpacing: 2.2, textTransform: "uppercase", marginTop: 2 }}>
             Inc · Heavy Freight
           </div>
         </div>
@@ -158,6 +159,43 @@ export const Header: React.FC<HeaderProps> = ({
           {mobileOpen ? <X size={20} weight="bold" /> : <List size={20} weight="bold" />}
         </button>
       )}
+      {!isMobile && onCareersClick && (
+        <button
+          onClick={onCareersClick}
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 6,
+            background: "transparent",
+            color: "#CC0000",
+            border: "1.5px solid #CC0000",
+            borderRadius: 999,
+            padding: "7px 16px",
+            fontFamily: "'Barlow',sans-serif",
+            fontWeight: 800,
+            fontSize: 12,
+            letterSpacing: 1.2,
+            textTransform: "uppercase",
+            cursor: "pointer",
+            flexShrink: 0,
+            whiteSpace: "nowrap",
+            transition: "all 0.15s",
+          }}
+          onMouseEnter={e => {
+            e.currentTarget.style.background = "#CC0000";
+            e.currentTarget.style.color = "#fff";
+            e.currentTarget.style.boxShadow = "0 4px 16px rgba(204,0,0,0.4)";
+          }}
+          onMouseLeave={e => {
+            e.currentTarget.style.background = "transparent";
+            e.currentTarget.style.color = "#CC0000";
+            e.currentTarget.style.boxShadow = "none";
+          }}
+        >
+          <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#CC0000", display: "inline-block", animation: "applyPulse 1.6s ease-in-out infinite" }} />
+          {t.header.applyNow}
+        </button>
+      )}
       {isMobile && mobileOpen && (
         <div style={{ position: "absolute", top: 70, left: 0, right: 0, background: isLight ? "rgba(255,255,255,0.98)" : "rgba(10,10,10,0.97)", backdropFilter: "blur(20px)", borderBottom: "1px solid rgba(204,0,0,0.3)", padding: "8px 0", boxShadow: "0 12px 30px rgba(0,0,0,0.4)" }}>
           {[
@@ -171,10 +209,16 @@ export const Header: React.FC<HeaderProps> = ({
             { label: t.nav.fleet, fn: onFleetClick },
           ].map(item => (
             <div key={item.label} onClick={() => { setMobileOpen(false); item.fn?.(); }}
-              style={{ padding: "14px 24px", fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 13, letterSpacing: 1.2, textTransform: "uppercase", color: isLight ? "rgba(0,0,0,0.75)" : "rgba(255,255,255,0.8)", cursor: "pointer", borderBottom: `1px solid ${isLight ? "rgba(0,0,0,0.05)" : "rgba(255,255,255,0.05)"}` }}>
+              style={{ padding: "14px 24px", fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 14, letterSpacing: 1.4, textTransform: "uppercase", color: isLight ? "rgba(0,0,0,0.78)" : "rgba(255,255,255,0.82)", cursor: "pointer", borderBottom: `1px solid ${isLight ? "rgba(0,0,0,0.05)" : "rgba(255,255,255,0.05)"}` }}>
               {item.label}
             </div>
           ))}
+          {onCareersClick && (
+            <div onClick={() => { setMobileOpen(false); onCareersClick(); }}
+              style={{ padding: "16px 24px", fontFamily: "'Barlow',sans-serif", fontWeight: 800, fontSize: 14, letterSpacing: 1.4, textTransform: "uppercase", color: "#CC0000", cursor: "pointer" }}>
+              ● {t.header.applyNow} →
+            </div>
+          )}
         </div>
       )}
 

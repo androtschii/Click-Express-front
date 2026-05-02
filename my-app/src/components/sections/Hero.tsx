@@ -37,9 +37,10 @@ export const HeroBtn: React.FC<HeroBtnProps> = ({ children, primary, onClick }) 
 interface HeroProps {
   onViewLoads?: () => void;
   onQuoteClick?: () => void;
+  onCareersClick?: () => void;
 }
 
-export const Hero: React.FC<HeroProps> = ({ onViewLoads, onQuoteClick }) => {
+export const Hero: React.FC<HeroProps> = ({ onViewLoads, onQuoteClick, onCareersClick }) => {
   const context = useContext(ThemeContext) as { theme?: 'dark' | 'light'; toggleTheme?: () => void };
   const theme = context.theme || 'dark';
   const { lang } = useLanguage();
@@ -115,6 +116,36 @@ export const Hero: React.FC<HeroProps> = ({ onViewLoads, onQuoteClick }) => {
           <HeroBtn primary onClick={onViewLoads}>{t.viewLoads}</HeroBtn>
           <HeroBtn onClick={onQuoteClick}>{t.getQuote}</HeroBtn>
         </div>
+
+        {onCareersClick && (
+          <button
+            onClick={onCareersClick}
+            style={{
+              marginTop: 20,
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 10,
+              background: "transparent",
+              border: "none",
+              padding: 0,
+              cursor: "pointer",
+              fontFamily: "'Barlow',sans-serif",
+              fontWeight: 700,
+              fontSize: 13,
+              letterSpacing: 2,
+              textTransform: "uppercase",
+              color: isDark ? "rgba(255,255,255,0.85)" : "rgba(0,0,0,0.78)",
+              animation: "heroFadeUp 0.6s ease 0.85s both",
+              transition: "color 0.15s",
+            }}
+            onMouseEnter={e => { e.currentTarget.style.color = "#CC0000"; }}
+            onMouseLeave={e => { e.currentTarget.style.color = isDark ? "rgba(255,255,255,0.85)" : "rgba(0,0,0,0.78)"; }}
+          >
+            <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#CC0000", boxShadow: "0 0 10px rgba(204,0,0,0.7)", animation: "pulse 1.4s ease-in-out infinite" }} />
+            {t.driverCta}
+            <span style={{ fontSize: 16, lineHeight: 1 }}>→</span>
+          </button>
+        )}
 
  {/* Animated stats row */}
         <div style={{ display: "flex", gap: 40, marginTop: 56, flexWrap: "wrap", animation: "statReveal 0.7s ease 1.1s both" }}>

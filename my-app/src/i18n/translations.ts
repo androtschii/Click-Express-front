@@ -17,6 +17,7 @@ export const translations = {
       myProfile: "My Profile",
       myOrders: "My Orders",
       signOut: "Sign Out",
+      applyNow: "Apply Now",
     },
     favorites: {
       saved: "Saved",
@@ -80,6 +81,7 @@ export const translations = {
       desc: "We keep American commerce moving — delivering stability, reliability, and efficiency on every mile.",
       viewLoads: "VIEW AVAILABLE LOADS",
       getQuote: "GET A FREE QUOTE",
+      driverCta: "Drivers — Apply Now",
     },
     about: {
       who: "— Who We Are",
@@ -231,6 +233,7 @@ export const translations = {
       myProfile: "Мой профиль",
       myOrders: "Мои заказы",
       signOut: "Выйти",
+      applyNow: "Стать водителем",
     },
     favorites: {
       saved: "Сохранено",
@@ -294,6 +297,7 @@ export const translations = {
       desc: "Мы держим американскую логистику в движении — стабильность, надёжность и эффективность на каждой миле.",
       viewLoads: "СМОТРЕТЬ ГРУЗЫ",
       getQuote: "ПОЛУЧИТЬ БЕСПЛАТНЫЙ РАСЧЁТ",
+      driverCta: "Водителям — откликнуться",
     },
     about: {
       who: "— Кто мы",

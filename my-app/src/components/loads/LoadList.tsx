@@ -25,11 +25,13 @@ interface LoadListProps {
   savedIds?: number[];
   onFleetClick?: () => void;
   isAdmin?: boolean;
+  compareIds?: number[];
+  onCompare?: (load: Load) => void;
 }
 
 export const LoadListView: React.FC<LoadListProps> = ({
   loads, loading, error, search, filter,
-theme = 'dark', onSearchChange, onFilterChange, onBook, onCancelBook, onSave, onDetails, bookedIds = [], savedIds = [], onFleetClick, isAdmin = false,
+theme = 'dark', onSearchChange, onFilterChange, onBook, onCancelBook, onSave, onDetails, bookedIds = [], savedIds = [], onFleetClick, isAdmin = false, compareIds = [], onCompare,
 }) => {
   const isDark = theme === 'dark';
   const { lang } = useLanguage();
@@ -105,7 +107,7 @@ theme = 'dark', onSearchChange, onFilterChange, onBook, onCancelBook, onSave, on
       ) : (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(310px,1fr))", gap: 20 }}>
           {loads.map(l => (
-            <LoadCard key={l.id} load={l} onBook={onBook} onCancelBook={onCancelBook} onSave={onSave} onDetails={onDetails} isBooked={bookedIds.includes(l.id)} isSaved={savedIds.includes(l.id)} isAdmin={isAdmin} />
+            <LoadCard key={l.id} load={l} onBook={onBook} onCancelBook={onCancelBook} onSave={onSave} onDetails={onDetails} onCompare={onCompare} isBooked={bookedIds.includes(l.id)} isSaved={savedIds.includes(l.id)} isAdmin={isAdmin} isCompared={compareIds.includes(l.id)} compareDisabled={compareIds.length >= 3} />
           ))}
         </div>
       )}

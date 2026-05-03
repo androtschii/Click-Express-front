@@ -11,9 +11,12 @@ interface LoadCardProps {
   onCancelBook?: (load?: Load) => void;
   onSave?: (saved: boolean, load?: Load) => void;
   onDetails?: (load: Load) => void;
+  onCompare?: (load: Load) => void;
   isBooked?: boolean;
   isSaved?: boolean;
   isAdmin?: boolean;
+  isCompared?: boolean;
+  compareDisabled?: boolean;
 }
 
 const HeartIcon = ({ saved, onClick }: { saved: boolean; onClick: () => void }) => {
@@ -44,7 +47,7 @@ const HeartIcon = ({ saved, onClick }: { saved: boolean; onClick: () => void }) 
   );
 };
 
-export const LoadCard: React.FC<LoadCardProps> = ({ load, onBook, onCancelBook, onSave, onDetails, isBooked = false, isSaved = false, isAdmin = false }) => {
+export const LoadCard: React.FC<LoadCardProps> = ({ load, onBook, onCancelBook, onSave, onDetails, onCompare, isBooked = false, isSaved = false, isAdmin = false, isCompared = false, compareDisabled = false }) => {
   const context = useContext(ThemeContext) as { theme?: 'dark' | 'light' };
   const theme = context.theme || 'dark';
   const isDark = theme === 'dark';
@@ -293,6 +296,32 @@ export const LoadCard: React.FC<LoadCardProps> = ({ load, onBook, onCancelBook, 
             {booked ? (bookHov ? t.cancel : t.requested) : t.bookLoad}
           </button>
         </div>
+      </div>
+        {onCompare && (
+          <button
+            onClick={e => { e.stopPropagation(); onCompare(load); }}
+            disabled={compareDisabled && !isCompared}
+            style={{
+              marginTop: 10, width: "100%", padding: "7px",
+              background: isCompared ? (isDark ? "rgba(204,0,0,0.12)" : "rgba(204,0,0,0.08)") : "transparent",
+              border: `1px solid ${isCompared ? "#CC0000" : dividerColor}`,
+              color: isCompared ? "#CC0000" : textSecondary,
+              fontFamily: "'Anton', sans-serif", fontSize: 9, letterSpacing: 2.5,
+              textTransform: "uppercase", cursor: compareDisabled && !isCompared ? "not-allowed" : "pointer",
+              transition: "all 0.15s", opacity: compareDisabled && !isCompared ? 0.4 : 1,
+              display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+            }}
+            onMouseEnter={e => { if (!compareDisabled || isCompared) { (e.currentTarget as HTMLButtonElement).style.borderColor = "#CC0000"; (e.currentTarget as HTMLButtonElement).style.color = "#CC0000"; } }}
+            onMouseLeave={e => { if (!isCompared) { (e.currentTarget as HTMLButtonElement).style.borderColor = dividerColor; (e.currentTarget as HTMLButtonElement).style.color = textSecondary; } }}
+          >
+            {isCompared ? "✓ " : "⊕ "}
+            {isCompared
+              ? (lang === "ru" ? "В СРАВНЕНИИ" : "IN COMPARE")
+              : compareDisabled
+                ? (lang === "ru" ? "МАХ 3 ГРУЗА" : "MAX 3 LOADS")
+                : (lang === "ru" ? "СРАВНИТЬ" : "COMPARE")}
+          </button>
+        )}
       </div>
       <style>{`@keyframes shimmer{0%,100%{opacity:0.5}50%{opacity:1}}`}</style>
     </div>

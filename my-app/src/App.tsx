@@ -12,6 +12,7 @@ import { AboutSection } from "./components/sections/AboutSection";
 import { Footer } from "./components/layout/Footer";
 import { QuoteModal } from "./components/Modals/QuoteModal";
 import { AuthModal } from "./components/Modals/AuthModal";
+import { CompareModal } from "./components/Modals/CompareModal";
 import { getSession, logout, type Session } from "./services/authService";
 import { LoadListView } from "./components/loads/LoadList";
 import { LoadDetailPage } from "./components/loads/LoadDetailPage";
@@ -245,6 +246,16 @@ function AppContent() {
   const [showFavorites, setShowFavorites] = useState(false);
   const [showRequests, setShowRequests] = useState(false);
   const [showAuth, setShowAuth] = useState(false);
+  const [compareIds, setCompareIds] = useState<number[]>([]);
+  const [showCompare, setShowCompare] = useState(false);
+
+  const handleCompare = (load: Load) => {
+    setCompareIds(prev => {
+      if (prev.includes(load.id)) return prev.filter(id => id !== load.id);
+      if (prev.length >= 3) return prev;
+      return [...prev, load.id];
+    });
+  };
   const [session, setSession] = useState<Session | null>(() => getSession());
   const [detailLoad, setDetailLoad] = useState<Load | null>(null);
   const [showCareers, setShowCareers] = useState(false);
@@ -825,6 +836,8 @@ function AppContent() {
           bookedIds={bookedLoads.map(l => l.id)}
           savedIds={savedLoads.map(l => l.id)}
           isAdmin={session?.role === "Admin"}
+          compareIds={compareIds}
+          onCompare={handleCompare}
         />
       </section>
 
@@ -840,6 +853,52 @@ function AppContent() {
       {showQuote && <QuoteModal onClose={() => setShowQuote(false)} theme={theme} />}
       {showFavorites && <FavoritesPanel loads={savedLoads} theme={theme} onClose={() => setShowFavorites(false)} onDetails={(l) => { setShowFavorites(false); setDetailLoad(l); window.scrollTo({ top: 0 }); }} onRemove={(l) => { handleSave(l, false); notify(tn.removedFromFavorites); }} />}
       {showRequests && <RequestsPanel loads={bookedLoads} theme={theme} onClose={() => setShowRequests(false)} onDetails={(l) => { setShowRequests(false); setDetailLoad(l); window.scrollTo({ top: 0 }); }} onCancel={(l) => handleCancelBook(l)} onBrowseLoads={() => { setShowRequests(false); setTimeout(() => scrollTo(catalogRef), 80); }} />}
+
+      {/* Floating compare bar */}
+      {compareIds.length > 0 && (
+        <div style={{ position: "fixed", bottom: 24, left: "50%", transform: "translateX(-50%)", zIndex: 1800, display: "flex", alignItems: "center", gap: 12, background: theme === "dark" ? "#111" : "#fff", border: "1px solid rgba(204,0,0,0.45)", borderTop: "3px solid #CC0000", padding: "12px 20px", boxShadow: "0 8px 40px rgba(0,0,0,0.6)", animation: "compareBarIn 0.25s cubic-bezier(0.22,1,0.36,1) both" }}>
+          <style>{`@keyframes compareBarIn{from{opacity:0;transform:translateX(-50%) translateY(16px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}`}</style>
+          <div style={{ fontFamily: "'Anton', sans-serif", fontSize: 10, letterSpacing: 2, color: "#CC0000", textTransform: "uppercase", whiteSpace: "nowrap" }}>
+            ⊞ {compareIds.length}/3 {lang === "ru" ? "ВЫБРАНО" : "SELECTED"}
+          </div>
+          <div style={{ width: 1, height: 20, background: "rgba(204,0,0,0.25)" }} />
+          {loads.filter(l => compareIds.includes(l.id)).map(l => (
+            <div key={l.id} style={{ display: "flex", alignItems: "center", gap: 6, background: "rgba(204,0,0,0.08)", border: "1px solid rgba(204,0,0,0.2)", padding: "4px 10px" }}>
+              <span style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 700, fontSize: 11, color: theme === "dark" ? "#f0ede8" : "#111", whiteSpace: "nowrap" }}>{l.route.split(",")[0]}</span>
+              <button onClick={() => setCompareIds(p => p.filter(id => id !== l.id))} style={{ background: "none", border: "none", color: "rgba(204,0,0,0.7)", cursor: "pointer", padding: 0, fontSize: 12, lineHeight: 1, display: "flex", alignItems: "center" }}>✕</button>
+            </div>
+          ))}
+          <button
+            onClick={() => setShowCompare(true)}
+            disabled={compareIds.length < 2}
+            style={{ padding: "8px 18px", background: compareIds.length >= 2 ? "#CC0000" : "rgba(204,0,0,0.2)", border: "none", color: "#fff", fontFamily: "'Anton', sans-serif", fontSize: 11, letterSpacing: 2, textTransform: "uppercase", cursor: compareIds.length >= 2 ? "pointer" : "not-allowed", whiteSpace: "nowrap", transition: "background 0.15s" }}
+          >
+            {lang === "ru" ? "СРАВНИТЬ →" : "COMPARE →"}
+          </button>
+          <button onClick={() => setCompareIds([])} style={{ padding: "8px 12px", background: "transparent", border: "1px solid rgba(204,0,0,0.25)", color: theme === "dark" ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.4)", fontFamily: "'Anton', sans-serif", fontSize: 10, letterSpacing: 1, textTransform: "uppercase", cursor: "pointer", whiteSpace: "nowrap" }}>
+            {lang === "ru" ? "ОЧИСТИТЬ" : "CLEAR"}
+          </button>
+        </div>
+      )}
+
+      {/* Compare modal */}
+      {showCompare && compareIds.length >= 2 && (
+        <CompareModal
+          loads={loads.filter(l => compareIds.includes(l.id))}
+          theme={theme}
+          onClose={() => setShowCompare(false)}
+          onBook={(l) => { handleBook(l); }}
+          onDetails={(l) => { setShowCompare(false); setDetailLoad(l); window.scrollTo({ top: 0 }); }}
+          onRemove={(id) => {
+            setCompareIds(p => {
+              const next = p.filter(i => i !== id);
+              if (next.length < 2) setShowCompare(false);
+              return next;
+            });
+          }}
+          bookedIds={bookedLoads.map(l => l.id)}
+        />
+      )}
       {notifications.map((msg, idx) => (
         <Notification key={idx} text={msg} onClose={() => setNotifications(n => n.filter((_, i) => i !== idx))} />
       ))}

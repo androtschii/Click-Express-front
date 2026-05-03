@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import type { Load } from "../../types/index";
 import { LoadCard } from "./LoadCard";
 import { SearchBar } from "./SearchBar";
 import { FilterButtons } from "./FilterButtons";
+import { LoadMapView } from "./LoadMapView";
 import { useLanguage } from "../../context/LanguageContext";
 import { translations } from "../../i18n/translations";
 
@@ -33,6 +34,7 @@ theme = 'dark', onSearchChange, onFilterChange, onBook, onCancelBook, onSave, on
   const isDark = theme === 'dark';
   const { lang } = useLanguage();
   const t = translations[lang];
+  const [viewMode, setViewMode] = useState<"grid" | "map">("grid");
   const searchBg    = isDark ? "#0d0d0d"                : "#ffffff";
   const searchBorder= isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.14)";
   const searchShadow= isDark ? "none"                   : "0 2px 16px rgba(0,0,0,0.07)";
@@ -61,7 +63,7 @@ theme = 'dark', onSearchChange, onFilterChange, onBook, onCancelBook, onSave, on
         <FilterButtons active={filter} onChange={onFilterChange} theme={theme} />
       </div>
 
-      <div style={{ display: "flex", gap: 12, marginBottom: 26, flexWrap: "wrap" }}>
+      <div style={{ display: "flex", gap: 12, marginBottom: 26, flexWrap: "wrap", alignItems: "center" }}>
         <div style={{ background: "rgba(204,0,0,0.08)", border: "1px solid rgba(204,0,0,0.22)", borderRadius: 4, padding: "7px 16px", fontFamily: "'Barlow',sans-serif", fontWeight: 600, fontSize: 12, color: "#CC0000", letterSpacing: 1 }}>
           📋 {loads.length} {loads.length !== 1 ? t.loadList.loads : t.loadList.load} — {t.loadList.available}
         </div>
@@ -72,9 +74,30 @@ theme = 'dark', onSearchChange, onFilterChange, onBook, onCancelBook, onSave, on
             🚛 {lang === "ru" ? "НАШ ФЛОТ →" : "OUR FLEET →"}
           </div>
         )}
+        {/* View toggle */}
+        <div style={{ marginLeft: "auto", display: "flex", gap: 0, border: `1px solid ${isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.14)"}`, borderRadius: 4, overflow: "hidden" }}>
+          {(["grid", "map"] as const).map(mode => {
+            const active = viewMode === mode;
+            return (
+              <button key={mode} onClick={() => setViewMode(mode)} style={{
+                padding: "6px 14px",
+                border: "none",
+                background: active ? "#CC0000" : "transparent",
+                color: active ? "#fff" : isDark ? "rgba(255,255,255,0.45)" : "rgba(0,0,0,0.5)",
+                fontFamily: "'Barlow',sans-serif", fontWeight: 600, fontSize: 12, letterSpacing: 1,
+                cursor: "pointer", transition: "all 0.15s",
+                display: "flex", alignItems: "center", gap: 5,
+              }}>
+                {mode === "grid" ? "⊞" : "📍"} {mode === "grid" ? (lang === "ru" ? "Карточки" : "Grid") : (lang === "ru" ? "Карта" : "Map")}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
-      {loads.length === 0 ? (
+      {viewMode === "map" ? (
+        <LoadMapView loads={loads} theme={theme} onDetails={onDetails} />
+      ) : loads.length === 0 ? (
         <div style={{ textAlign: "center", padding: "80px 20px", border: `1px dashed ${emptyBorder}`, borderRadius: 6 }}>
           <div style={{ fontSize: 48, marginBottom: 14 }}>🚛</div>
           <p style={{ color: emptyText, fontFamily: "'Barlow',sans-serif", fontSize: 16 }}>{t.loadList.noMatch}</p>

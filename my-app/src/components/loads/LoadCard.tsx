@@ -322,7 +322,6 @@ export const LoadCard: React.FC<LoadCardProps> = ({ load, onBook, onCancelBook, 
                 : (lang === "ru" ? "СРАВНИТЬ" : "COMPARE")}
           </button>
         )}
-      </div>
       <style>{`@keyframes shimmer{0%,100%{opacity:0.5}50%{opacity:1}}`}</style>
     </div>
   );

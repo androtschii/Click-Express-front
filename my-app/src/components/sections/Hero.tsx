@@ -2,6 +2,7 @@ import React, { useState, useContext, useEffect } from "react";
 import { ThemeContext } from "../../theme";
 import { useLanguage } from "../../context/LanguageContext";
 import { translations } from "../../i18n/translations";
+import { useInView } from "../../hooks/useInView";
 
 interface HeroBtnProps {
   children: React.ReactNode;
@@ -49,8 +50,10 @@ export const Hero: React.FC<HeroProps> = ({ onViewLoads, onQuoteClick, onCareers
 
   const [counts, setCounts] = useState({ loads: 0, states: 0, miles: 0 });
   const [scrollY, setScrollY] = useState(0);
+  const { ref: statsRef, inView: statsInView } = useInView<HTMLDivElement>(0.4);
 
   useEffect(() => {
+    if (!statsInView) return;
     const targets = { loads: 500, states: 48, miles: 2 };
     const steps = 55;
     let step = 0;
@@ -61,7 +64,7 @@ export const Hero: React.FC<HeroProps> = ({ onViewLoads, onQuoteClick, onCareers
       if (step >= steps) clearInterval(timer);
     }, 28);
     return () => clearInterval(timer);
-  }, []);
+  }, [statsInView]);
 
   useEffect(() => {
     const onScroll = () => setScrollY(window.scrollY);
@@ -148,7 +151,7 @@ export const Hero: React.FC<HeroProps> = ({ onViewLoads, onQuoteClick, onCareers
         )}
 
  {/* Animated stats row */}
-        <div style={{ display: "flex", gap: 40, marginTop: 56, flexWrap: "wrap", animation: "statReveal 0.7s ease 1.1s both" }}>
+        <div ref={statsRef} style={{ display: "flex", gap: 40, marginTop: 56, flexWrap: "wrap", animation: statsInView ? "statReveal 0.7s ease 0.1s both" : "none", opacity: statsInView ? undefined : 0 }}>
           {[
             { val: `${counts.loads}+`, label: lang === 'ru' ? 'Грузов доставлено' : 'Loads Delivered' },
             { val: counts.states, label: lang === 'ru' ? 'Штатов покрыто' : 'States Covered' },

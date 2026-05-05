@@ -8,6 +8,7 @@ import { Ticker } from "./components/layout/Ticker";
 import { TrustStrip } from "./components/sections/TrustStrip";
 import { ComplianceBar } from "./components/sections/ComplianceBar";
 import { HowItWorks } from "./components/sections/HowItWorks";
+import { HaulTypes } from "./components/sections/HaulTypes";
 import { AboutSection } from "./components/sections/AboutSection";
 import { Footer } from "./components/layout/Footer";
 import { QuoteModal } from "./components/Modals/QuoteModal";
@@ -840,6 +841,8 @@ function AppContent() {
           onCompare={handleCompare}
         />
       </section>
+
+      <HaulTypes theme={theme} onQuoteClick={() => setShowQuote(true)} />
 
       <div ref={aboutRef}>
         <AboutSection onContactClick={() => scrollTo(contactRef)} theme={theme} />

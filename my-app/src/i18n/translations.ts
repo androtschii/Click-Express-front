@@ -164,6 +164,39 @@ export const translations = {
         { title: "Tracked Delivery",   desc: "Live updates from pickup to drop. POD delivered to your inbox the same day." },
       ],
     },
+    haulTypes: {
+      badge: "WHAT WE HAUL",
+      title: "BUILT FOR",
+      titleHighlight: "ANY FREIGHT",
+      subtitle: "Four equipment classes covering full truckload, heavy haul, and oversized — under one carrier authority.",
+      types: [
+        {
+          tag: "01 / FLATBED",
+          name: "53' Flatbed",
+          spec: "48,000 lbs · Aluminum · Tarps & chains on request",
+          desc: "Standard open-deck for steel, lumber, building materials, machinery and containers. Tarp protection and DOT-grade strapping included.",
+        },
+        {
+          tag: "02 / STEP DECK",
+          name: "48' Step Deck",
+          spec: "46,000 lbs · 11'6\" deck height · 2 + tag axles",
+          desc: "Two-level trailer for cargo taller than standard flatbed allowance. Construction equipment, prefab panels, tall machinery.",
+        },
+        {
+          tag: "03 / RGN / LOWBOY",
+          name: "Removable Gooseneck",
+          spec: "Up to 80,000 lbs · 18\"–24\" deck · 3–5 axles",
+          desc: "Detachable gooseneck for the heaviest loads. Direct drive-on for tracked vehicles, cranes, and mining equipment.",
+        },
+        {
+          tag: "04 / OVERSIZED",
+          name: "Oversize / Superload",
+          spec: "Permits, escorts, route surveys included",
+          desc: "Anything beyond legal width, height, or weight. We handle the permits, escort coordination, and pilot car logistics end-to-end.",
+        },
+      ],
+      cta: "Quote My Load",
+    },
     ticker: [
       "LOADS DON'T MOVE THEMSELVES",
       "ALWAYS MOVING",
@@ -379,6 +412,39 @@ export const translations = {
         { title: "Погрузка по расписанию",  desc: "Водитель прибывает к отгрузке, грузится по нормам DOT и отправляется в путь." },
         { title: "Доставка с трекингом",    desc: "Обновления в реальном времени от погрузки до выгрузки. POD приходит на email в тот же день." },
       ],
+    },
+    haulTypes: {
+      badge: "ЧТО МЫ ВОЗИМ",
+      title: "ОБОРУДОВАНИЕ ПОД",
+      titleHighlight: "ЛЮБОЙ ГРУЗ",
+      subtitle: "Четыре класса техники — полная загрузка, тяжёлый haul и негабарит — под одной перевозчиской лицензией.",
+      types: [
+        {
+          tag: "01 / FLATBED",
+          name: "Платформа 53'",
+          spec: "48 000 lbs · Алюминий · Тент и цепи по запросу",
+          desc: "Стандартная открытая платформа для стали, пиломатериалов, стройматериалов, техники и контейнеров. Тент и DOT-крепления включены.",
+        },
+        {
+          tag: "02 / STEP DECK",
+          name: "Степ-дек 48'",
+          spec: "46 000 lbs · Высота деки 11'6\" · 2 + теги",
+          desc: "Двухуровневый прицеп для грузов выше стандартного флэтбеда. Стройтехника, сборные панели, высокая техника.",
+        },
+        {
+          tag: "03 / RGN / LOWBOY",
+          name: "Съёмная шея (RGN)",
+          spec: "До 80 000 lbs · Дека 18\"–24\" · 3–5 осей",
+          desc: "Съёмная шея для самых тяжёлых грузов. Прямая загрузка наездом для гусеничной техники, кранов и горной техники.",
+        },
+        {
+          tag: "04 / OVERSIZED",
+          name: "Негабарит / Superload",
+          spec: "Permits, escort, маршрутизация — под ключ",
+          desc: "Всё, что выходит за нормы по ширине, высоте или весу. Берём на себя разрешения, эскорт и pilot car от точки до точки.",
+        },
+      ],
+      cta: "Получить ставку",
     },
     ticker: [
       "ГРУЗЫ НЕ ДВИГАЮТСЯ САМИ",

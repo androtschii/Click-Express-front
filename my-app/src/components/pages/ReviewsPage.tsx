@@ -390,7 +390,7 @@ export const ReviewsPage: React.FC<ReviewsPageProps> = ({ theme = "dark", onBack
         <div style={{ position: "relative", width: "100%", padding: "90px clamp(20px,5vw,64px) 56px" }}>
 
         <div style={{ maxWidth: 900, animation: "revSlideUp 0.6s ease both" }}>
-          <button onClick={onBack} style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "transparent", border: "none", color: isDark ? "rgba(255,255,255,0.45)" : "rgba(0,0,0,0.45)", fontFamily: "'Barlow',sans-serif", fontWeight: 600, fontSize: 13, letterSpacing: 1, cursor: "pointer", padding: "0 0 20px", transition: "color 0.15s" }}
+          <button onClick={onBack} style={{ display: "flex", alignItems: "center", gap: 6, background: "transparent", border: "none", color: isDark ? "rgba(255,255,255,0.45)" : "rgba(0,0,0,0.45)", fontFamily: "'Barlow',sans-serif", fontWeight: 600, fontSize: 13, letterSpacing: 1, cursor: "pointer", padding: 0, marginBottom: 28, transition: "color 0.15s" }}
             onMouseEnter={e => { e.currentTarget.style.color = "#eab308"; }}
             onMouseLeave={e => { e.currentTarget.style.color = isDark ? "rgba(255,255,255,0.45)" : "rgba(0,0,0,0.45)"; }}>
             ← {lang === "ru" ? "Назад" : "Back"}

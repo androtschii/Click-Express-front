@@ -36,8 +36,8 @@ const NavLink: React.FC<{ children: React.ReactNode; onClick?: () => void; isLig
       style={{
         color: hov ? "#fff" : (isLight ? "rgba(20,20,20,0.78)" : "rgba(255,255,255,0.78)"),
         background: hov ? "#CC0000" : "transparent",
-        fontSize: 13, fontFamily: "'Barlow', sans-serif", fontWeight: 700, letterSpacing: compact ? 0.4 : 1.1,
-        textTransform: "uppercase", padding: compact ? "8px 8px" : "8px 11px", borderRadius: 4,
+        fontSize: compact ? 11 : 13, fontFamily: "'Barlow', sans-serif", fontWeight: 700, letterSpacing: compact ? 0.4 : 1,
+        textTransform: "uppercase", padding: compact ? "7px 7px" : "8px 10px", borderRadius: 4,
         transition: "all 0.15s", cursor: "pointer", whiteSpace: "nowrap", display: "inline-block"
       }}
     >{children}</span>
@@ -114,7 +114,7 @@ export const Header: React.FC<HeaderProps> = ({
         ? (scrolled ? "0 4px 24px rgba(0,0,0,0.1)" : "0 2px 12px rgba(0,0,0,0.06)")
         : "none",
       transition: "background 0.3s, border 0.3s, box-shadow 0.3s",
-      display: "flex", alignItems: "center", padding: "0 16px", gap: 8,
+      display: "flex", alignItems: "center", padding: "0 12px", gap: 6,
     }}>
  {/* Red glow line at top */}
       <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: "linear-gradient(90deg,transparent 0%,#CC0000 30%,#ff3333 60%,#CC0000 80%,transparent 100%)", opacity: isLight ? 1 : (scrolled ? 1 : 0.6), transition: "opacity 0.3s" }} />
@@ -170,11 +170,11 @@ export const Header: React.FC<HeaderProps> = ({
             color: "#CC0000",
             border: "1.5px solid #CC0000",
             borderRadius: 999,
-            padding: "7px 16px",
+            padding: lang === 'ru' ? "6px 12px" : "7px 16px",
             fontFamily: "'Barlow',sans-serif",
             fontWeight: 800,
-            fontSize: 12,
-            letterSpacing: 1.2,
+            fontSize: lang === 'ru' ? 10 : 12,
+            letterSpacing: lang === 'ru' ? 0.6 : 1.2,
             textTransform: "uppercase",
             cursor: "pointer",
             flexShrink: 0,
@@ -342,7 +342,7 @@ export const Header: React.FC<HeaderProps> = ({
           )}
         </div>
       ) : (
-        <button onClick={onLoginClick} className="btn-split" style={{ borderRadius: 20, padding: "7px 18px", fontFamily: "'Barlow',sans-serif", fontWeight: 600, fontSize: 12, letterSpacing: 1.5, textTransform: "uppercase", cursor: "pointer", flexShrink: 0, color: isLight ? "#CC0000" : "#fff" }}>
+        <button onClick={onLoginClick} className="btn-split" style={{ borderRadius: 20, padding: "6px 15px", fontFamily: "'Barlow',sans-serif", fontWeight: 600, fontSize: 11, letterSpacing: 1.3, textTransform: "uppercase", cursor: "pointer", flexShrink: 0, color: isLight ? "#CC0000" : "#fff" }}>
           {t.header.login}
         </button>
       )}
@@ -351,17 +351,17 @@ export const Header: React.FC<HeaderProps> = ({
         onClick={onRequestsClick || onCatalogClick}
         className="btn-split-primary"
         style={{
-          display: "flex", alignItems: "center", gap: 8,
+          display: "flex", alignItems: "center", gap: 7,
           background: "#CC0000",
           color: "#fff", border: "none", borderRadius: 5,
-          padding: "10px 20px", fontFamily: "'Barlow',sans-serif",
-          fontWeight: 800, fontSize: 12, letterSpacing: 1.5,
+          padding: "8px 16px", fontFamily: "'Barlow',sans-serif",
+          fontWeight: 800, fontSize: 11, letterSpacing: 1.3,
           textTransform: "uppercase", cursor: "pointer",
           flexShrink: 0, whiteSpace: "nowrap",
           boxShadow: "0 4px 20px rgba(204,0,0,0.4)",
         }}
       >
-        <svg width="14" height="14" viewBox="0 0 256 256" fill="#fff" style={{ flexShrink: 0 }}>
+        <svg width="13" height="13" viewBox="0 0 256 256" fill="#fff" style={{ flexShrink: 0 }}>
           <path d="M173.66,98.34a8,8,0,0,1,0,11.32l-56,56a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L112,148.69l50.34-50.35A8,8,0,0,1,173.66,98.34ZM224,48V208a16,16,0,0,1-16,16H48a16,16,0,0,1-16-16V48A16,16,0,0,1,48,32H208A16,16,0,0,1,224,48ZM208,208V48H48V208H208Z"/>
         </svg>
         {t.header.requests}

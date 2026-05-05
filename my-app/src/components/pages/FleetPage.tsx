@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useLanguage } from "../../context/LanguageContext";
+import { TiltedCard } from "../ui/TiltedCard";
 
 interface FleetPageProps {
   theme?: "dark" | "light";
@@ -497,7 +498,7 @@ export const FleetPage: React.FC<FleetPageProps> = ({ theme = "dark", onBack }) 
                   </span>
                 </div>
 
-                <div style={{ border: `1px solid ${cardBorder}`, overflow: "hidden", boxShadow: cardShadow, position: "relative" }}>
+                <TiltedCard maxTilt={6} scale={1.015} glareOpacity={0.22} style={{ border: `1px solid ${cardBorder}`, boxShadow: cardShadow, overflow: "hidden" }}>
                   <div style={{ height: 3, background: "linear-gradient(90deg,#CC0000 0%,#880000 60%,transparent 100%)" }} />
                   <div style={{ position: "absolute", top: 14, right: 14, zIndex: 2, background: "#CC0000", color: "#fff", fontFamily: "'Barlow',sans-serif", fontWeight: 800, fontSize: 9, letterSpacing: 2.5, textTransform: "uppercase", padding: "4px 12px" }}>
                     {truck.badge}
@@ -514,7 +515,7 @@ export const FleetPage: React.FC<FleetPageProps> = ({ theme = "dark", onBack }) 
                       </span>
                     </div>
                   </div>
-                </div>
+                </TiltedCard>
                 <div style={{ height: 3, background: `repeating-linear-gradient(90deg,${isDark?"rgba(204,0,0,0.14)":"rgba(204,0,0,0.12)"} 0,${isDark?"rgba(204,0,0,0.14)":"rgba(204,0,0,0.12)"} 3px,transparent 3px,transparent 9px)` }} />
               </div>
             </div>
@@ -596,7 +597,7 @@ export const FleetPage: React.FC<FleetPageProps> = ({ theme = "dark", onBack }) 
               <div style={{ borderTop: `1px solid ${divider}` }} />
             </div>
 
- {/* RIGHT: trailer photo */}
+ {/* RIGHT: trailer photo with 3D tilt */}
             <div style={{ position: "sticky", top: 84 }}>
               <div key={`t-${trailerKey}`} style={{ animation: "truckRollIn 0.6s cubic-bezier(0.22,1,0.36,1) both" }}>
                 <div style={{ marginBottom: 14, display: "flex", alignItems: "baseline", gap: 14 }}>
@@ -604,7 +605,7 @@ export const FleetPage: React.FC<FleetPageProps> = ({ theme = "dark", onBack }) 
                     {lang === "ru" ? trailer.nameRu : trailer.nameEn}
                   </span>
                 </div>
-                <div style={{ border: `1px solid ${cardBorder}`, overflow: "hidden", boxShadow: cardShadow }}>
+                <TiltedCard maxTilt={6} scale={1.015} glareOpacity={0.22} style={{ border: `1px solid ${cardBorder}`, boxShadow: cardShadow, overflow: "hidden" }}>
                   <div style={{ height: 3, background: "linear-gradient(90deg,#CC0000 0%,#880000 60%,transparent 100%)" }} />
                   <TrailerImage id={activeTrailer} isDark={isDark} />
  {/* 3 quick specs row */}
@@ -620,7 +621,7 @@ export const FleetPage: React.FC<FleetPageProps> = ({ theme = "dark", onBack }) 
                       </div>
                     ))}
                   </div>
-                </div>
+                </TiltedCard>
               </div>
             </div>
           </div>

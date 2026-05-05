@@ -3,6 +3,7 @@ import { ThemeContext } from "../../theme";
 import { useLanguage } from "../../context/LanguageContext";
 import { translations } from "../../i18n/translations";
 import { useInView } from "../../hooks/useInView";
+import { TextType } from "../ui/TextType";
 
 interface HeroBtnProps {
   children: React.ReactNode;
@@ -108,10 +109,57 @@ export const Hero: React.FC<HeroProps> = ({ onViewLoads, onQuoteClick, onCareers
           <span style={{ fontFamily: "'Anton', sans-serif", fontSize: 10, color: "#CC0000", letterSpacing: 3, textTransform: "uppercase" }}>{t.badge}</span>
         </div>
 
- {/* Headline */}
-        <h1 style={{ fontFamily: lang === 'ru' ? "'Russo One', sans-serif" : "'Anton', sans-serif", fontSize: "clamp(48px,7.5vw,96px)", color: isDark ? "#fff" : "#0d0d0d", lineHeight: 1.05, margin: "0 0 4px", textTransform: "uppercase", animation: "heroFadeUp 0.6s ease 0.2s both", letterSpacing: lang === 'ru' ? 0 : -1, whiteSpace: "nowrap" }}>{t.line1}</h1>
-        <h1 style={{ fontFamily: lang === 'ru' ? "'Russo One', sans-serif" : "'Anton', sans-serif", fontSize: "clamp(48px,7.5vw,96px)", color: isDark ? "#fff" : "#0d0d0d", lineHeight: 1.05, margin: "0 0 4px", textTransform: "uppercase", animation: "heroFadeUp 0.6s ease 0.32s both", letterSpacing: lang === 'ru' ? 0 : -1, whiteSpace: "nowrap" }}>{t.line2}</h1>
-        <h1 style={{ fontFamily: lang === 'ru' ? "'Russo One', sans-serif" : "'Anton', sans-serif", fontSize: "clamp(48px,7.5vw,96px)", color: "#CC0000", lineHeight: 1.05, margin: "0 0 36px", textTransform: "uppercase", animation: "heroFadeUp 0.6s ease 0.44s both", letterSpacing: lang === 'ru' ? 0 : -1, whiteSpace: "nowrap" }}>{t.line3}</h1>
+ {/* Headline — typed in cascade, preserves original scale and red on line 3 */}
+        {(() => {
+          const headlineFamily = lang === 'ru' ? "'Russo One', sans-serif" : "'Anton', sans-serif";
+          const baseStyle = { fontFamily: headlineFamily, fontSize: "clamp(48px,7.5vw,96px)", lineHeight: 1.05, textTransform: "uppercase" as const, letterSpacing: lang === 'ru' ? 0 : -1, whiteSpace: "nowrap" as const };
+          const speed = 55;
+          const len1 = t.line1.length;
+          const len2 = t.line2.length;
+          return (
+            <>
+              <TextType
+                as="h1"
+                key={`l1-${lang}`}
+                text={t.line1}
+                typingSpeed={speed}
+                initialDelay={150}
+                loop={false}
+                showCursor
+                hideCursorWhileTyping={false}
+                cursorCharacter="▍"
+                cursorClassName="hero-headline-cursor"
+                style={{ ...baseStyle, color: isDark ? "#fff" : "#0d0d0d", margin: "0 0 4px" }}
+              />
+              <TextType
+                as="h1"
+                key={`l2-${lang}`}
+                text={t.line2}
+                typingSpeed={speed}
+                initialDelay={150 + len1 * speed + 120}
+                loop={false}
+                showCursor
+                hideCursorWhileTyping={false}
+                cursorCharacter="▍"
+                cursorClassName="hero-headline-cursor"
+                style={{ ...baseStyle, color: isDark ? "#fff" : "#0d0d0d", margin: "0 0 4px" }}
+              />
+              <TextType
+                as="h1"
+                key={`l3-${lang}`}
+                text={t.line3}
+                typingSpeed={speed}
+                initialDelay={150 + (len1 + len2) * speed + 240}
+                loop={false}
+                showCursor
+                hideCursorWhileTyping={false}
+                cursorCharacter="▍"
+                cursorClassName="hero-headline-cursor hero-headline-cursor--accent"
+                style={{ ...baseStyle, color: "#CC0000", margin: "0 0 36px" }}
+              />
+            </>
+          );
+        })()}
 
         <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: isDark ? "rgba(255,255,255,0.9)" : "rgba(0,0,0,0.75)", lineHeight: 1.85, maxWidth: 480, marginBottom: 44, animation: "heroFadeUp 0.6s ease 0.58s both" }}>{t.desc}</p>
 

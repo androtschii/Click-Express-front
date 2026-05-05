@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useLanguage } from "../../context/LanguageContext";
 import { fetchReviews, createReview, approveReview, deleteReview } from "../../api/client.js";
 import type { Session } from "../../services/authService";
+import { Threads } from "../ui/Threads";
 
 interface ReviewsPageProps {
   theme?: "dark" | "light";
@@ -387,7 +388,9 @@ export const ReviewsPage: React.FC<ReviewsPageProps> = ({ theme = "dark", onBack
         <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 4, background: "#eab308" }} />
         <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: "linear-gradient(90deg,transparent,#eab308 30%,#fde047 60%,#eab308 80%,transparent)" }} />
 
-        <div style={{ position: "relative", width: "100%", padding: "90px clamp(20px,5vw,64px) 56px" }}>
+        <Threads color="#eab308" count={16} opacity={isDark ? 0.32 : 0.18} speed={0.85} thickness={1} />
+
+        <div style={{ position: "relative", width: "100%", padding: "90px clamp(20px,5vw,64px) 56px", zIndex: 1 }}>
 
         <div style={{ maxWidth: 900, animation: "revSlideUp 0.6s ease both" }}>
           <button onClick={onBack} style={{ display: "flex", alignItems: "center", gap: 6, background: "transparent", border: "none", color: isDark ? "rgba(255,255,255,0.45)" : "rgba(0,0,0,0.45)", fontFamily: "'Barlow',sans-serif", fontWeight: 600, fontSize: 13, letterSpacing: 1, cursor: "pointer", padding: 0, marginBottom: 28, transition: "color 0.15s" }}

@@ -3,6 +3,7 @@ import { useLanguage } from "../../context/LanguageContext";
 import { translations } from "../../i18n/translations";
 import { useInView } from "../../hooks/useInView";
 import { ChatTeardropDots, Headset, Truck, MapPinLine } from "@phosphor-icons/react";
+import { LightRays } from "../ui/LightRays";
 
 interface HowItWorksProps {
   theme?: "dark" | "light";
@@ -33,6 +34,8 @@ export const HowItWorks: React.FC<HowItWorksProps> = ({ theme = "dark", onQuoteC
         overflow: "hidden",
       }}
     >
+      <LightRays color="#CC0000" intensity={isDark ? 0.5 : 0.25} speed={0.9} origin="center-top" blur={70} />
+
       <div
         style={{
           position: "absolute",
@@ -42,7 +45,7 @@ export const HowItWorks: React.FC<HowItWorksProps> = ({ theme = "dark", onQuoteC
         }}
       />
 
-      <div style={{ maxWidth: 1280, margin: "0 auto", position: "relative" }}>
+      <div style={{ maxWidth: 1280, margin: "0 auto", position: "relative", zIndex: 1 }}>
         <div
           style={{
             textAlign: "center",

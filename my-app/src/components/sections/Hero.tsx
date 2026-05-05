@@ -4,6 +4,7 @@ import { useLanguage } from "../../context/LanguageContext";
 import { translations } from "../../i18n/translations";
 import { useInView } from "../../hooks/useInView";
 import { TextType } from "../ui/TextType";
+import { ElectricBorder } from "../ui/ElectricBorder";
 
 interface HeroBtnProps {
   children: React.ReactNode;
@@ -165,7 +166,9 @@ export const Hero: React.FC<HeroProps> = ({ onViewLoads, onQuoteClick, onCareers
 
         <div style={{ display: "flex", gap: 14, flexWrap: "wrap", animation: "heroFadeUp 0.6s ease 0.72s both" }}>
           <HeroBtn primary onClick={onViewLoads}>{t.viewLoads}</HeroBtn>
-          <HeroBtn onClick={onQuoteClick}>{t.getQuote}</HeroBtn>
+          <ElectricBorder color="#CC0000" speed={1.2} thickness={2} radius={4}>
+            <HeroBtn onClick={onQuoteClick}>{t.getQuote}</HeroBtn>
+          </ElectricBorder>
         </div>
 
         {onCareersClick && (

@@ -14,6 +14,7 @@ import { Footer } from "./components/layout/Footer";
 import { QuoteModal } from "./components/Modals/QuoteModal";
 import { AuthModal } from "./components/Modals/AuthModal";
 import { CompareModal } from "./components/Modals/CompareModal";
+import { CartPanel, type CartItemDto } from "./components/Modals/CartPanel";
 import { getSession, logout, type Session } from "./services/authService";
 import { LoadListView } from "./components/loads/LoadList";
 import { LoadDetailPage } from "./components/loads/LoadDetailPage";
@@ -226,6 +227,8 @@ function RequestsPanel({ loads, theme, onClose, onDetails, onCancel, onBrowseLoa
   );
 }
 
+const API_BASE = "http://localhost:5114/api";
+
 function AppContent() {
   const { theme, toggleTheme } = useTheme();
   const { lang } = useLanguage();
@@ -243,6 +246,9 @@ function AppContent() {
   const [error, setError] = useState<string | null>(null);
   const [bookedLoads, setBookedLoads] = useState<Load[]>([]);
   const [savedLoads, setSavedLoads] = useState<Load[]>([]);
+  const [orderIdMap, setOrderIdMap] = useState<Map<number, number>>(new Map());
+  const [cartItems, setCartItems] = useState<CartItemDto[]>([]);
+  const [showCart, setShowCart] = useState(false);
   const [showQuote, setShowQuote] = useState(false);
   const [showFavorites, setShowFavorites] = useState(false);
   const [showRequests, setShowRequests] = useState(false);
@@ -335,25 +341,154 @@ function AppContent() {
     checkBackend();
   }, []);
 
+  useEffect(() => {
+    if (session) fetchCart();
+    else setCartItems([]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session]);
+
+  useEffect(() => {
+    if (!session || loading || loads.length === 0) return;
+    const token = session.token;
+
+    fetch(`${API_BASE}/user/favorites`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then(r => (r.ok ? r.json() : Promise.reject()) as Promise<Array<{ productId: number }>>)
+      .then(data => {
+        const ids = new Set(data.map(d => d.productId));
+        setSavedLoads(loads.filter(l => ids.has(l.id)));
+      })
+      .catch(() => {});
+
+    fetch(`${API_BASE}/order/my`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then(r => (r.ok ? r.json() : Promise.reject()) as Promise<Array<{ id: number; productId: number; status: string }>>)
+      .then(orders => {
+        const active = orders.filter(o => o.status !== "Cancelled");
+        const newMap = new Map<number, number>();
+        const booked = active
+          .map(o => {
+            const load = loads.find(l => l.id === o.productId);
+            if (load) newMap.set(load.id, o.id);
+            return load ?? null;
+          })
+          .filter((l): l is Load => l !== null);
+        setBookedLoads(booked);
+        setOrderIdMap(newMap);
+      })
+      .catch(() => {});
+  }, [session, loading, loads]);
+
   const filtered = filterLoads(loads, search, filter);
 
   const handleSave = (load: Load, saved: boolean) => {
     setSavedLoads(prev => saved ? [...prev, load] : prev.filter(l => l.id !== load.id));
     notify(saved ? tn.savedToFavorites : tn.removedFromFavorites);
+    if (session) {
+      const token = session.token;
+      if (saved) {
+        fetch(`${API_BASE}/user/favorites`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ productId: load.id }),
+        }).catch(() => {});
+      } else {
+        fetch(`${API_BASE}/user/favorites/${load.id}`, {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${token}` },
+        }).catch(() => {});
+      }
+    }
   };
 
   const handleCancelBook = (load?: Load) => {
-    if (load) setBookedLoads(prev => prev.filter(l => l.id !== load.id));
+    if (load && session) {
+      const cartItem = cartItems.find(i => i.productId === load.id);
+      if (cartItem) {
+        handleRemoveFromCart(cartItem.id);
+      } else {
+        // Cancel existing order if not in cart
+        const orderId = orderIdMap.get(load.id);
+        if (orderId) {
+          setBookedLoads(prev => prev.filter(l => l.id !== load.id));
+          fetch(`${API_BASE}/order/${orderId}/cancel`, {
+            method: "PATCH",
+            headers: { Authorization: `Bearer ${session.token}` },
+          }).catch(() => {});
+          setOrderIdMap(prev => { const m = new Map(prev); m.delete(load.id); return m; });
+        }
+      }
+    }
     notify(tn.requestCancelled);
   };
 
   const handleBook = (load?: Load) => {
-    if (load) setBookedLoads(prev => [...prev, load]);
-    notify(tn.loadAdded);
+    if (!load) return;
+    if (!session) { setShowAuth(true); return; }
+    fetch(`${API_BASE}/cart/items`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.token}` },
+      body: JSON.stringify({ productId: load.id, quantity: 1 }),
+    })
+      .then(r => (r.ok ? r.json() : Promise.reject()))
+      .then(() => fetchCart())
+      .catch(() => {});
+    notify(lang === "ru" ? "Добавлено в корзину" : "Added to cart");
   };
 
   const notify = (text: string) => {
     setNotifications(n => [...n, text]);
+  };
+
+  const fetchCart = () => {
+    if (!session) { setCartItems([]); return; }
+    fetch(`${API_BASE}/cart/my`, { headers: { Authorization: `Bearer ${session.token}` } })
+      .then(r => (r.ok ? r.json() : Promise.reject()) as Promise<{ items: CartItemDto[] }>)
+      .then(data => setCartItems(data.items || []))
+      .catch(() => {});
+  };
+
+  const handleRemoveFromCart = (itemId: number) => {
+    if (!session) return;
+    setCartItems(prev => prev.filter(i => i.id !== itemId));
+    fetch(`${API_BASE}/cart/items/${itemId}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${session.token}` },
+    }).then(() => fetchCart()).catch(() => {});
+  };
+
+  const handleCheckoutSuccess = () => {
+    setCartItems([]);
+    // Refresh orders after checkout
+    if (session) {
+      fetch(`${API_BASE}/order/my`, { headers: { Authorization: `Bearer ${session.token}` } })
+        .then(r => (r.ok ? r.json() : Promise.reject()) as Promise<Array<{ id: number; productId: number; status: string }>>)
+        .then(orders => {
+          const active = orders.filter(o => o.status !== "Cancelled");
+          const newMap = new Map<number, number>();
+          const booked = active
+            .map(o => { const load = loads.find(l => l.id === o.productId); if (load) newMap.set(load.id, o.id); return load ?? null; })
+            .filter((l): l is Load => l !== null);
+          setBookedLoads(booked);
+          setOrderIdMap(newMap);
+        }).catch(() => {});
+    }
+    notify(lang === "ru" ? "Заказ оформлен!" : "Order placed!");
+    setShowOrders(true);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleLogout = () => {
+    logout();
+    setSession(null);
+    setSavedLoads([]);
+    setBookedLoads([]);
+    setOrderIdMap(new Map());
+    setCartItems([]);
+    setShowProfile(false);
+    setShowOrders(false);
   };
 
   const bgColor = theme === "dark" ? "#080808" : "#f5f5f5";
@@ -402,7 +537,7 @@ function AppContent() {
   const sharedHeader = (
     <>
       <Header
-        cartCount={bookedLoads.length}
+        cartCount={cartItems.length}
         savedCount={savedLoads.length}
         theme={theme}
         onThemeToggle={toggleTheme}
@@ -415,10 +550,10 @@ function AppContent() {
         onReviewsClick={() => { setDetailLoad(null); setShowReviews(true); setShowNews(false); setShowCareers(false); setShowFleet(false); setShowProfile(false); setShowOrders(false); setShowAdmin(false); window.scrollTo({ top: 0, behavior: "smooth" }); }}
         onFleetClick={() => { setDetailLoad(null); setShowFleet(true); setShowCareers(false); setShowNews(false); setShowReviews(false); setShowProfile(false); setShowOrders(false); setShowAdmin(false); window.scrollTo({ top: 0, behavior: "smooth" }); }}
         onSavedClick={() => setShowFavorites(true)}
-        onRequestsClick={() => setShowRequests(true)}
+        onRequestsClick={() => setShowCart(true)}
         onLoginClick={() => setShowAuth(true)}
         session={session}
-        onLogout={() => { logout(); setSession(null); setShowProfile(false); setShowOrders(false); }}
+        onLogout={handleLogout}
         onLogoClick={() => { setDetailLoad(null); setShowCareers(false); setShowNews(false); setShowReviews(false); setShowFleet(false); setShowProfile(false); setShowOrders(false); setShowAdmin(false); window.scrollTo({ top: 0, behavior: "smooth" }); }}
         onProfileClick={() => { setDetailLoad(null); setShowCareers(false); setShowNews(false); setShowReviews(false); setShowOrders(false); setShowAdmin(false); setShowProfile(true); window.scrollTo({ top: 0, behavior: "smooth" }); }}
         onOrdersClick={() => { setDetailLoad(null); setShowCareers(false); setShowNews(false); setShowReviews(false); setShowProfile(false); setShowAdmin(false); setShowOrders(true); window.scrollTo({ top: 0, behavior: "smooth" }); }}
@@ -432,6 +567,7 @@ function AppContent() {
     <>
       {showFavorites && <FavoritesPanel loads={savedLoads} theme={theme} onClose={() => setShowFavorites(false)} onDetails={(l) => { setShowFavorites(false); setDetailLoad(l); window.scrollTo({ top: 0 }); }} onRemove={(l) => { handleSave(l, false); notify(tn.removedFromFavorites); }} />}
       {showRequests && <RequestsPanel loads={bookedLoads} theme={theme} onClose={() => setShowRequests(false)} onDetails={(l) => { setShowRequests(false); setDetailLoad(l); window.scrollTo({ top: 0 }); }} onCancel={(l) => handleCancelBook(l)} onBrowseLoads={() => { setShowRequests(false); setTimeout(() => scrollTo(catalogRef), 80); }} />}
+      {showCart && session && <CartPanel session={session} theme={theme} loads={loads} cartItems={cartItems} apiBase={API_BASE} onClose={() => setShowCart(false)} onRemoveItem={handleRemoveFromCart} onCheckoutSuccess={handleCheckoutSuccess} />}
  {/* Apply Now floating button — visible on all pages */}
       <div style={{ position: "fixed", bottom: 28, left: 28, zIndex: 1500 }}>
         <style>{`
@@ -462,7 +598,7 @@ function AppContent() {
           <LoadDetailPage
             load={detailLoad}
             theme={theme}
-            isBooked={bookedLoads.some(l => l.id === detailLoad.id)}
+            isBooked={cartItems.some(i => i.productId === detailLoad.id)}
             onClose={() => { setDetailLoad(null); setTimeout(() => scrollTo(catalogRef), 80); }}
             onBook={(load) => handleBook(load)}
             onCancelBook={(load) => handleCancelBook(load)}
@@ -556,7 +692,7 @@ function AppContent() {
             bookedLoads={bookedLoads}
             onBack={() => { setShowProfile(false); window.scrollTo({ top: 0 }); }}
             onBrowseLoads={() => { setShowProfile(false); setTimeout(() => scrollTo(catalogRef), 80); }}
-            onLogout={() => { logout(); setSession(null); setShowProfile(false); }}
+            onLogout={handleLogout}
             onSessionUpdate={(name) => setSession(s => s ? { ...s, name } : s)}
             onDetails={(l) => { setShowProfile(false); setDetailLoad(l); window.scrollTo({ top: 0 }); }}
             onSaveRemove={(l) => handleSave(l, false)}
@@ -738,7 +874,7 @@ function AppContent() {
                 }}>
                   {best.map((l, i) => {
                     const isSaved = savedLoads.some(s => s.id === l.id);
-                    const isBooked = bookedLoads.some(b => b.id === l.id);
+                    const isBooked = cartItems.some(i => i.productId === l.id);
                     return (
                       <div key={l.id} style={{ width:`${100 / best.length}%`, padding:"0 8px", boxSizing:"border-box" }}>
                         <div onClick={() => { setDetailLoad(l); window.scrollTo({ top:0, behavior:"smooth" }); }}
@@ -834,7 +970,7 @@ function AppContent() {
           onSave={(saved: boolean, load?: Load) => { if (load) handleSave(load, saved); }}
           onDetails={(load: Load) => { setDetailLoad(load); window.scrollTo({ top: 0, behavior: "smooth" }); }}
           onFleetClick={() => { setShowFleet(true); window.scrollTo({ top: 0, behavior: "smooth" }); }}
-          bookedIds={bookedLoads.map(l => l.id)}
+          bookedIds={cartItems.map(i => i.productId)}
           savedIds={savedLoads.map(l => l.id)}
           isAdmin={session?.role === "Admin"}
           compareIds={compareIds}
@@ -899,7 +1035,7 @@ function AppContent() {
               return next;
             });
           }}
-          bookedIds={bookedLoads.map(l => l.id)}
+          bookedIds={cartItems.map(i => i.productId)}
         />
       )}
       {notifications.map((msg, idx) => (

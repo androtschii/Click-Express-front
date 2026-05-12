@@ -5,6 +5,7 @@ import {
   updateProductStock, toggleProductActive, deleteProduct, createProduct,
   fetchVehicles, createVehicle, updateVehicle,
   toggleVehicleAvailability, deleteVehicle,
+  fetchAdminStats,
 } from "../../api/client.js";
 import { useLanguage } from "../../context/LanguageContext";
 
@@ -36,7 +37,22 @@ interface Vehicle {
   available: boolean;
 }
 
-type Tab = "loads" | "fleet";
+type Tab = "loads" | "fleet" | "stats";
+
+interface AdminStats {
+  totalOrders: number;
+  orders30d: number;
+  activeOrders: number;
+  totalRevenue: number;
+  revenue30d: number;
+  totalUsers: number;
+  newUsers30d: number;
+  totalLeads: number;
+  conversionRate: number;
+  statusBreakdown: Array<{ status: string; count: number }>;
+  topRoutes: Array<{ route: string; count: number }>;
+  leadBreakdown: Array<{ status: string; count: number }>;
+}
 
 interface AdminPageProps {
   theme: "dark" | "light";
@@ -64,6 +80,8 @@ export const AdminPage: React.FC<AdminPageProps> = ({ theme, onBack }) => {
   const [showVehicleForm, setShowVehicleForm] = useState(false);
   const [newVehicle, setNewVehicle] = useState({ model: "", type: "Truck", year: String(new Date().getFullYear()), plate: "" });
   const [editVehicle, setEditVehicle] = useState<{ id: number; model: string; type: string; year: string; plate: string } | null>(null);
+  const [adminStats, setAdminStats] = useState<AdminStats | null>(null);
+  const [statsLoading, setStatsLoading] = useState(false);
 
   const isDark = theme === "dark";
   const bg = isDark ? "#0a0a0a" : "#f5f5f5";
@@ -165,7 +183,17 @@ export const AdminPage: React.FC<AdminPageProps> = ({ theme, onBack }) => {
 
   useEffect(() => {
     if (tab === "fleet" && vehicles.length === 0 && !vehiclesLoading) loadVehicles();
+    if (tab === "stats" && !adminStats && !statsLoading) loadStats();
   }, [tab]);
+
+  const loadStats = async () => {
+    setStatsLoading(true);
+    try {
+      const data = await fetchAdminStats() as AdminStats;
+      setAdminStats(data);
+    } catch { notify(ru ? "Ошибка загрузки аналитики" : "Stats load error", false); }
+    finally { setStatsLoading(false); }
+  };
 
   const handleCreateVehicle = async () => {
     if (!newVehicle.model.trim()) return;
@@ -264,6 +292,11 @@ export const AdminPage: React.FC<AdminPageProps> = ({ theme, onBack }) => {
                 {showVehicleForm ? "✕" : (ru ? "+ Транспорт" : "+ Vehicle")}
               </button>
             )}
+            {tab === "stats" && (
+              <button onClick={() => { setAdminStats(null); loadStats(); }} style={{ ...btn("gray"), padding: "8px 18px", fontSize: 13 }}>
+                ↻ {ru ? "Обновить" : "Refresh"}
+              </button>
+            )}
             <button onClick={onBack} style={btn("gray")}>{ru ? "← Назад" : "← Back"}</button>
           </div>
         </div>
@@ -273,6 +306,7 @@ export const AdminPage: React.FC<AdminPageProps> = ({ theme, onBack }) => {
           {([
             { key: "loads",  label: ru ? "Грузы" : "Loads" },
             { key: "fleet",  label: ru ? "Автопарк" : "Fleet" },
+            { key: "stats",  label: ru ? "Аналитика" : "Analytics" },
           ] as { key: Tab; label: string }[]).map(t => (
             <button
               key={t.key}
@@ -465,7 +499,149 @@ export const AdminPage: React.FC<AdminPageProps> = ({ theme, onBack }) => {
           </div>
         ))}
 
- {/* Fleet section */}
+        {/* Stats / Analytics tab */}
+        {tab === "stats" && (
+          <>
+            {statsLoading ? (
+              <div style={{ textAlign: "center", color: sub, padding: 80 }}>
+                <div style={{ display: "inline-block", width: 36, height: 36, border: "3px solid rgba(204,0,0,0.2)", borderTopColor: "#CC0000", borderRadius: "50%", animation: "spin 0.8s linear infinite", marginBottom: 16 }} />
+                <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
+                <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 14 }}>{ru ? "Загрузка аналитики..." : "Loading analytics..."}</div>
+              </div>
+            ) : !adminStats ? (
+              <div style={{ textAlign: "center", color: sub, padding: 80, border: `1px dashed ${border}`, borderRadius: 12 }}>
+                {ru ? "Нет данных" : "No data"}
+              </div>
+            ) : (() => {
+              const s = adminStats;
+              const statusColor = (st: string) => {
+                const m: Record<string, string> = { "Pending": "#f59e0b", "Approved": "#3b82f6", "Confirmed": "#3b82f6", "Assigned": "#8b5cf6", "In Transit": "#7c3aed", "Delivered": "#16a34a", "Cancelled": "#CC0000" };
+                return m[st] ?? "#888";
+              };
+              const maxOrders = Math.max(...s.statusBreakdown.map(x => x.count), 1);
+              const maxRoute  = Math.max(...s.topRoutes.map(x => x.count), 1);
+
+              return (
+                <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
+
+                  {/* KPI row 1 — Revenue & Orders */}
+                  <div>
+                    <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 10, color: "#CC0000", letterSpacing: 3, textTransform: "uppercase", marginBottom: 12 }}>
+                      💰 {ru ? "ВЫРУЧКА И ЗАКАЗЫ" : "REVENUE & ORDERS"}
+                    </div>
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(160px,1fr))", gap: 12 }}>
+                      {[
+                        { label: ru ? "Общая выручка" : "Total Revenue",  value: `$${s.totalRevenue.toLocaleString()}`, accent: true },
+                        { label: ru ? "Выручка 30д" : "Revenue 30d",      value: `$${s.revenue30d.toLocaleString()}` },
+                        { label: ru ? "Всего заказов" : "Total Orders",    value: s.totalOrders },
+                        { label: ru ? "Заказы 30д" : "Orders 30d",        value: s.orders30d },
+                        { label: ru ? "Активных" : "Active Orders",        value: s.activeOrders },
+                      ].map(k => (
+                        <div key={k.label} style={{ background: card, border: `1px solid ${k.accent ? "rgba(204,0,0,0.3)" : border}`, borderRadius: 10, padding: "18px 20px" }}>
+                          <div style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 800, fontSize: 26, color: k.accent ? "#CC0000" : text, lineHeight: 1 }}>{k.value}</div>
+                          <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 11, color: sub, marginTop: 6, textTransform: "uppercase", letterSpacing: 0.6 }}>{k.label}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* KPI row 2 — Users & Leads */}
+                  <div>
+                    <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 10, color: "#CC0000", letterSpacing: 3, textTransform: "uppercase", marginBottom: 12 }}>
+                      👥 {ru ? "ПОЛЬЗОВАТЕЛИ И ЛИДЫ" : "USERS & LEADS"}
+                    </div>
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(160px,1fr))", gap: 12 }}>
+                      {[
+                        { label: ru ? "Всего пользователей" : "Total Users", value: s.totalUsers },
+                        { label: ru ? "Новых 30д" : "New Users 30d",         value: s.newUsers30d },
+                        { label: ru ? "Всего лидов" : "Total Leads",         value: s.totalLeads },
+                        { label: ru ? "Конверсия" : "Conversion",            value: `${s.conversionRate}%`, accent: s.conversionRate > 0 },
+                      ].map(k => (
+                        <div key={k.label} style={{ background: card, border: `1px solid ${border}`, borderRadius: 10, padding: "18px 20px" }}>
+                          <div style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 800, fontSize: 26, color: k.accent ? "#16a34a" : text, lineHeight: 1 }}>{k.value}</div>
+                          <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 11, color: sub, marginTop: 6, textTransform: "uppercase", letterSpacing: 0.6 }}>{k.label}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Bottom row: status breakdown + top routes */}
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
+
+                    {/* Order Status Breakdown */}
+                    <div style={{ background: card, border: `1px solid ${border}`, borderRadius: 12, padding: 24 }}>
+                      <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 10, color: "#CC0000", letterSpacing: 3, textTransform: "uppercase", marginBottom: 20 }}>
+                        📊 {ru ? "ЗАКАЗЫ ПО СТАТУСАМ" : "ORDERS BY STATUS"}
+                      </div>
+                      {s.statusBreakdown.length === 0 ? (
+                        <div style={{ color: sub, fontSize: 13 }}>{ru ? "Нет данных" : "No data"}</div>
+                      ) : s.statusBreakdown.map(item => {
+                        const pct = Math.round(item.count / maxOrders * 100);
+                        const color = statusColor(item.status);
+                        return (
+                          <div key={item.status} style={{ marginBottom: 14 }}>
+                            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}>
+                              <span style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 12, color: text }}>{item.status}</span>
+                              <span style={{ fontFamily: "'Barlow',sans-serif", fontSize: 12, color: sub }}>{item.count} ({Math.round(item.count / s.totalOrders * 100)}%)</span>
+                            </div>
+                            <div style={{ height: 7, background: isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.07)", borderRadius: 99, overflow: "hidden" }}>
+                              <div style={{ height: "100%", width: `${pct}%`, background: color, borderRadius: 99, transition: "width 0.8s cubic-bezier(0.4,0,0.2,1)" }} />
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* Top Routes */}
+                    <div style={{ background: card, border: `1px solid ${border}`, borderRadius: 12, padding: 24 }}>
+                      <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 10, color: "#CC0000", letterSpacing: 3, textTransform: "uppercase", marginBottom: 20 }}>
+                        🏆 {ru ? "ТОП-5 МАРШРУТОВ" : "TOP 5 ROUTES"}
+                      </div>
+                      {s.topRoutes.length === 0 ? (
+                        <div style={{ color: sub, fontSize: 13 }}>{ru ? "Нет данных" : "No data"}</div>
+                      ) : s.topRoutes.map((item, i) => {
+                        const pct = Math.round(item.count / maxRoute * 100);
+                        return (
+                          <div key={item.route} style={{ marginBottom: 14 }}>
+                            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}>
+                              <span style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 12, color: text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 220 }}>
+                                <span style={{ color: "#CC0000", marginRight: 6 }}>#{i + 1}</span>{item.route}
+                              </span>
+                              <span style={{ fontFamily: "'Barlow',sans-serif", fontSize: 12, color: sub, flexShrink: 0, marginLeft: 8 }}>{item.count}</span>
+                            </div>
+                            <div style={{ height: 7, background: isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.07)", borderRadius: 99, overflow: "hidden" }}>
+                              <div style={{ height: "100%", width: `${pct}%`, background: `linear-gradient(90deg,#CC0000,#ff4444)`, borderRadius: 99, transition: "width 0.8s cubic-bezier(0.4,0,0.2,1)" }} />
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Lead breakdown */}
+                  {s.leadBreakdown.length > 0 && (
+                    <div style={{ background: card, border: `1px solid ${border}`, borderRadius: 12, padding: 24 }}>
+                      <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 10, color: "#CC0000", letterSpacing: 3, textTransform: "uppercase", marginBottom: 16 }}>
+                        📋 {ru ? "ЛИДЫ ПО СТАТУСАМ" : "LEADS BY STATUS"}
+                      </div>
+                      <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+                        {s.leadBreakdown.map(item => (
+                          <div key={item.status} style={{ background: isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.04)", border: `1px solid ${border}`, borderRadius: 8, padding: "12px 20px", minWidth: 120, textAlign: "center" }}>
+                            <div style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 800, fontSize: 22, color: item.status === "Converted" ? "#16a34a" : item.status === "New" ? "#f59e0b" : text }}>{item.count}</div>
+                            <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 11, color: sub, marginTop: 4, textTransform: "uppercase", letterSpacing: 0.6 }}>{item.status}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                </div>
+              );
+            })()}
+          </>
+        )}
+
+        {/* Fleet section */}
         {tab === "fleet" && (
           <>
             {showVehicleForm && (

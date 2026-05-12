@@ -333,6 +333,15 @@ export const deleteJobApplication = async (id) => {
   return true;
 };
 
+// Admin
+export const fetchAdminStats = async () => {
+  const response = await fetch(`${API_BASE_URL}/admin/stats`, {
+    headers: authHeaders(),
+  });
+  if (!response.ok) throw new Error("Ошибка загрузки аналитики");
+  return response.json();
+};
+
 // Health
 export const healthCheck = async () => {
   const response = await fetch(`${API_BASE_URL}/health/ping`);

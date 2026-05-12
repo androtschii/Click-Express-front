@@ -717,6 +717,9 @@ function AppContent() {
           <TrackingPage
             load={trackLoad}
             theme={theme}
+            orderId={orderIdMap.get(trackLoad.id)}
+            session={session}
+            apiBase={API_BASE}
             onBack={() => setTrackLoad(null)}
           />
         </div>

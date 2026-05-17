@@ -150,11 +150,14 @@ export const AdminPage: React.FC<AdminPageProps> = ({ theme, onBack }) => {
 
   const load = async () => {
     try {
-      const [p, s] = await Promise.all([fetchProducts(), fetchProductStats()]);
-      setProducts(p);
-      setStats(s);
-    } catch { notify(ru ? "Ошибка загрузки" : "Load error", false); }
+      const p = await fetchProducts();
+      setProducts(Array.isArray(p) ? p : []);
+    } catch { notify(ru ? "Ошибка загрузки товаров" : "Products load error", false); }
     finally { setLoading(false); }
+    try {
+      const s = await fetchProductStats();
+      setStats(s);
+    } catch { /* stats are optional */ }
   };
 
   useEffect(() => { load(); }, []);

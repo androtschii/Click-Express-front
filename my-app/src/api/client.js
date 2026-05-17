@@ -333,6 +333,87 @@ export const deleteJobApplication = async (id) => {
   return true;
 };
 
+// Drivers
+export const fetchDrivers = async (status = "") => {
+  const params = status ? `?status=${encodeURIComponent(status)}` : "";
+  const response = await fetch(`${API_BASE_URL}/driver${params}`, {
+    headers: authHeaders(),
+  });
+  if (!response.ok) throw new Error("Failed to load drivers");
+  return response.json();
+};
+
+export const createDriver = async (data) => {
+  const response = await fetch(`${API_BASE_URL}/driver`, {
+    method: "POST",
+    headers: authHeaders(),
+    body: JSON.stringify(data),
+  });
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err.message || "Failed to create driver");
+  }
+  return response.json();
+};
+
+export const updateDriver = async (id, data) => {
+  const response = await fetch(`${API_BASE_URL}/driver/${id}`, {
+    method: "PUT",
+    headers: authHeaders(),
+    body: JSON.stringify(data),
+  });
+  if (!response.ok) throw new Error("Failed to update driver");
+  return response.json();
+};
+
+export const patchDriverStatus = async (id, status) => {
+  const response = await fetch(`${API_BASE_URL}/driver/${id}/status`, {
+    method: "PATCH",
+    headers: authHeaders(),
+    body: JSON.stringify({ status }),
+  });
+  if (!response.ok) throw new Error("Failed to update driver status");
+  return response.json();
+};
+
+export const deleteDriver = async (id) => {
+  const response = await fetch(`${API_BASE_URL}/driver/${id}`, {
+    method: "DELETE",
+    headers: authHeaders(),
+  });
+  if (!response.ok) throw new Error("Failed to delete driver");
+  return true;
+};
+
+// Leads
+export const fetchLeads = async (status = "") => {
+  const params = status ? `?status=${encodeURIComponent(status)}` : "";
+  const response = await fetch(`${API_BASE_URL}/lead${params}`, {
+    headers: authHeaders(),
+  });
+  if (!response.ok) throw new Error("Failed to load leads");
+  return response.json();
+};
+
+export const updateLeadStatus = async (id, status) => {
+  const response = await fetch(`${API_BASE_URL}/lead/${id}/status`, {
+    method: "PATCH",
+    headers: authHeaders(),
+    body: JSON.stringify({ status }),
+  });
+  if (!response.ok) throw new Error("Failed to update lead status");
+  return response.json();
+};
+
+export const deleteLead = async (id) => {
+  const response = await fetch(`${API_BASE_URL}/lead/${id}`, {
+    method: "DELETE",
+    headers: authHeaders(),
+  });
+  if (!response.ok) throw new Error("Failed to delete lead");
+  return true;
+};
+
 // Admin
 export const fetchAdminStats = async () => {
   const response = await fetch(`${API_BASE_URL}/admin/stats`, {

@@ -37,6 +37,7 @@ import { X, Heart, ClipboardText } from "@phosphor-icons/react";
 // @ts-ignore
 import { fetchProducts } from "./api/client.js";
 import { AdminPage } from "./components/pages/AdminPage";
+import { NotFoundPage } from "./components/pages/NotFoundPage";
 
 // Анимированное сердечко для секции "Лучшие грузы недели" 
 function WeeklyHeartBtn({ saved, onClick }: { saved: boolean; onClick: () => void }) {
@@ -275,6 +276,7 @@ function AppContent() {
   const [showOrders, setShowOrders] = useState(false);
   const [showFleet, setShowFleet] = useState(false);
   const [showAdmin, setShowAdmin] = useState(false);
+  const [show404, setShow404] = useState(false);
   const [trackLoad, setTrackLoad] = useState<Load | null>(null);
   const [notifications, setNotifications] = useState<string[]>([]);
 
@@ -730,7 +732,23 @@ function AppContent() {
     );
   }
 
- // Fleet page 
+ // 404 page
+  if (show404) {
+    return (
+      <div style={{ background: theme === "dark" ? "#080808" : "#f5f5f5", minHeight: "100vh" }}>
+        {sharedStyle}
+        {sharedHeader}
+        <div style={{ paddingTop: 70 }}>
+          <NotFoundPage theme={theme} onBack={() => { setShow404(false); window.scrollTo({ top: 0 }); }} />
+        </div>
+        {showAuth && <AuthModal onClose={() => setShowAuth(false)} theme={theme} onSuccess={(s) => { setSession(s); setShowAuth(false); }} />}
+        {showQuote && <QuoteModal onClose={() => setShowQuote(false)} theme={theme} />}
+        {sharedPanels}
+      </div>
+    );
+  }
+
+ // Fleet page
   if (showFleet) {
     return (
       <div style={{ background: bgColor, minHeight: "100vh", color: textColor }}>

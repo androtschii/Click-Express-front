@@ -228,7 +228,7 @@ function RequestsPanel({ loads, theme, onClose, onDetails, onCancel, onBrowseLoa
   );
 }
 
-const API_BASE = "http://localhost:5114/api";
+const API_BASE = "https://localhost:7262/api";
 
 function AppContent() {
   const { theme, toggleTheme } = useTheme();

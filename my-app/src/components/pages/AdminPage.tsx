@@ -5,6 +5,7 @@ import {
   updateProductStock, toggleProductActive, deleteProduct, createProduct,
   fetchVehicles, createVehicle, updateVehicle,
   toggleVehicleAvailability, deleteVehicle,
+  fetchDrivers, createDriver, updateDriver, patchDriverStatus, deleteDriver,
   fetchAdminStats,
 } from "../../api/client.js";
 import { useLanguage } from "../../context/LanguageContext";
@@ -37,7 +38,18 @@ interface Vehicle {
   available: boolean;
 }
 
-type Tab = "loads" | "fleet" | "stats";
+interface Driver {
+  id: number;
+  fullName: string;
+  phone: string;
+  cdlNumber: string;
+  status: string;
+  vehicleId?: number | null;
+  vehicleModel?: string | null;
+  createdAt: string;
+}
+
+type Tab = "loads" | "fleet" | "drivers" | "stats";
 
 interface AdminStats {
   totalOrders: number;
@@ -80,6 +92,12 @@ export const AdminPage: React.FC<AdminPageProps> = ({ theme, onBack }) => {
   const [showVehicleForm, setShowVehicleForm] = useState(false);
   const [newVehicle, setNewVehicle] = useState({ model: "", type: "Truck", year: String(new Date().getFullYear()), plate: "" });
   const [editVehicle, setEditVehicle] = useState<{ id: number; model: string; type: string; year: string; plate: string } | null>(null);
+  const [drivers, setDrivers] = useState<Driver[]>([]);
+  const [driversLoading, setDriversLoading] = useState(false);
+  const [showDriverForm, setShowDriverForm] = useState(false);
+  const [newDriver, setNewDriver] = useState({ fullName: "", phone: "", cdlNumber: "", status: "Active" });
+  const [editDriver, setEditDriver] = useState<{ id: number; fullName: string; phone: string; cdlNumber: string; status: string } | null>(null);
+
   const [adminStats, setAdminStats] = useState<AdminStats | null>(null);
   const [statsLoading, setStatsLoading] = useState(false);
 
@@ -181,8 +199,66 @@ export const AdminPage: React.FC<AdminPageProps> = ({ theme, onBack }) => {
     finally { setVehiclesLoading(false); }
   };
 
+  const loadDrivers = async () => {
+    setDriversLoading(true);
+    try {
+      const data = await fetchDrivers();
+      setDrivers(Array.isArray(data) ? data : []);
+    } catch { notify(ru ? "Ошибка загрузки водителей" : "Drivers load error", false); }
+    finally { setDriversLoading(false); }
+  };
+
+  const handleCreateDriver = async () => {
+    if (!newDriver.fullName.trim() || !newDriver.cdlNumber.trim()) return;
+    try {
+      const created = await createDriver({
+        fullName: newDriver.fullName.trim(),
+        phone: newDriver.phone.trim(),
+        cdlNumber: newDriver.cdlNumber.trim(),
+        status: newDriver.status,
+      });
+      setDrivers(ds => [...ds, created]);
+      setNewDriver({ fullName: "", phone: "", cdlNumber: "", status: "Active" });
+      setShowDriverForm(false);
+      notify(ru ? "Водитель добавлен ✓" : "Driver added ✓");
+    } catch { notify(ru ? "Ошибка создания" : "Create error", false); }
+  };
+
+  const handleUpdateDriver = async () => {
+    if (!editDriver) return;
+    try {
+      const updated = await updateDriver(editDriver.id, {
+        fullName: editDriver.fullName.trim(),
+        phone: editDriver.phone.trim(),
+        cdlNumber: editDriver.cdlNumber.trim(),
+        status: editDriver.status,
+      });
+      setDrivers(ds => ds.map(d => d.id === editDriver.id ? { ...d, ...updated } : d));
+      setEditDriver(null);
+      notify(ru ? "Обновлено ✓" : "Updated ✓");
+    } catch { notify(ru ? "Ошибка обновления" : "Update error", false); }
+  };
+
+  const handlePatchDriverStatus = async (id: number, status: string) => {
+    try {
+      await patchDriverStatus(id, status);
+      setDrivers(ds => ds.map(d => d.id === id ? { ...d, status } : d));
+      notify(ru ? "Статус обновлён ✓" : "Status updated ✓");
+    } catch { notify(ru ? "Ошибка" : "Error", false); }
+  };
+
+  const handleDeleteDriver = async (id: number, name: string) => {
+    if (!confirm(ru ? `Удалить "${name}"?` : `Delete "${name}"?`)) return;
+    try {
+      await deleteDriver(id);
+      setDrivers(ds => ds.filter(d => d.id !== id));
+      notify(ru ? "Удалено ✓" : "Deleted ✓");
+    } catch { notify(ru ? "Ошибка удаления" : "Delete error", false); }
+  };
+
   useEffect(() => {
     if (tab === "fleet" && vehicles.length === 0 && !vehiclesLoading) loadVehicles();
+    if (tab === "drivers" && drivers.length === 0 && !driversLoading) loadDrivers();
     if (tab === "stats" && !adminStats && !statsLoading) loadStats();
   }, [tab]);
 
@@ -292,6 +368,11 @@ export const AdminPage: React.FC<AdminPageProps> = ({ theme, onBack }) => {
                 {showVehicleForm ? "✕" : (ru ? "+ Транспорт" : "+ Vehicle")}
               </button>
             )}
+            {tab === "drivers" && (
+              <button onClick={() => setShowDriverForm(v => !v)} style={{ ...btn("green"), padding: "8px 18px", fontSize: 13 }}>
+                {showDriverForm ? "✕" : (ru ? "+ Водитель" : "+ Driver")}
+              </button>
+            )}
             {tab === "stats" && (
               <button onClick={() => { setAdminStats(null); loadStats(); }} style={{ ...btn("gray"), padding: "8px 18px", fontSize: 13 }}>
                 ↻ {ru ? "Обновить" : "Refresh"}
@@ -304,9 +385,10 @@ export const AdminPage: React.FC<AdminPageProps> = ({ theme, onBack }) => {
  {/* Tabs */}
         <div style={{ display: "flex", gap: 4, marginBottom: 28, borderBottom: `1px solid ${border}` }}>
           {([
-            { key: "loads",  label: ru ? "Грузы" : "Loads" },
-            { key: "fleet",  label: ru ? "Автопарк" : "Fleet" },
-            { key: "stats",  label: ru ? "Аналитика" : "Analytics" },
+            { key: "loads",   label: ru ? "Грузы" : "Loads" },
+            { key: "fleet",   label: ru ? "Автопарк" : "Fleet" },
+            { key: "drivers", label: ru ? "Водители" : "Drivers" },
+            { key: "stats",   label: ru ? "Аналитика" : "Analytics" },
           ] as { key: Tab; label: string }[]).map(t => (
             <button
               key={t.key}
@@ -638,6 +720,156 @@ export const AdminPage: React.FC<AdminPageProps> = ({ theme, onBack }) => {
                 </div>
               );
             })()}
+          </>
+        )}
+
+        {/* Drivers section */}
+        {tab === "drivers" && (
+          <>
+            {showDriverForm && (
+              <div style={{ background: card, border: "1px solid rgba(22,163,74,0.4)", borderRadius: 12, padding: 24, marginBottom: 24 }}>
+                <h3 style={{ fontFamily: "'Oswald',sans-serif", fontSize: 18, margin: "0 0 16px", color: "#16a34a" }}>
+                  {ru ? "Новый водитель" : "New Driver"}
+                </h3>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                  {[
+                    { key: "fullName",  label: ru ? "Имя" : "Full Name",   placeholder: "John Smith" },
+                    { key: "phone",     label: ru ? "Телефон" : "Phone",   placeholder: "+1 555 000 1234" },
+                    { key: "cdlNumber", label: "CDL Number",               placeholder: "CDL-123456" },
+                  ].map(f => (
+                    <div key={f.key}>
+                      <div style={{ fontSize: 11, color: sub, marginBottom: 4, textTransform: "uppercase" as const, letterSpacing: 0.5 }}>{f.label}</div>
+                      <input
+                        style={{ ...inputStyle, outline: "none" }}
+                        placeholder={f.placeholder}
+                        value={(newDriver as Record<string, string>)[f.key]}
+                        onChange={e => setNewDriver(v => ({ ...v, [f.key]: e.target.value }))}
+                      />
+                    </div>
+                  ))}
+                  <div>
+                    <div style={{ fontSize: 11, color: sub, marginBottom: 4, textTransform: "uppercase" as const, letterSpacing: 0.5 }}>{ru ? "Статус" : "Status"}</div>
+                    <select style={{ ...inputStyle, outline: "none" }} value={newDriver.status}
+                      onChange={e => setNewDriver(v => ({ ...v, status: e.target.value }))}>
+                      <option value="Active">Active</option>
+                      <option value="Off-duty">Off-duty</option>
+                      <option value="On-leave">On-leave</option>
+                    </select>
+                  </div>
+                </div>
+                <div style={{ marginTop: 16, display: "flex", gap: 10 }}>
+                  <button style={{ ...btn("green"), padding: "8px 22px", fontSize: 13 }} onClick={handleCreateDriver}>
+                    {ru ? "Создать" : "Create"}
+                  </button>
+                  <button style={{ ...btn("gray"), padding: "8px 22px", fontSize: 13 }} onClick={() => setShowDriverForm(false)}>
+                    {ru ? "Отмена" : "Cancel"}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {driversLoading ? (
+              <div style={{ textAlign: "center", color: sub, padding: 60 }}>{ru ? "Загрузка..." : "Loading..."}</div>
+            ) : drivers.length === 0 ? (
+              <div style={{ textAlign: "center", color: sub, padding: 60, border: `1px dashed ${border}`, borderRadius: 12 }}>
+                {ru ? "Водители не добавлены" : "No drivers yet"}
+              </div>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                {drivers.map(d => {
+                  const isEditing = editDriver?.id === d.id;
+                  const statusColor = d.status === "Active" ? "#16a34a" : d.status === "On-leave" ? "#f59e0b" : "#888";
+                  return (
+                    <div key={d.id} style={{ background: card, border: `1px solid ${border}`, borderRadius: 12, padding: 20 }}>
+                      <div style={{ display: "flex", gap: 20, alignItems: "flex-start" }}>
+
+                        <div style={{ width: 44, height: 44, borderRadius: "50%", background: isDark ? "#1a1a1a" : "#e5e5e5", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>
+                          🧑‍✈️
+                        </div>
+
+                        <div style={{ flex: 1 }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
+                            {isEditing ? (
+                              <input style={{ ...inputStyle, maxWidth: 220 }} value={editDriver.fullName}
+                                onChange={e => setEditDriver({ ...editDriver, fullName: e.target.value })} />
+                            ) : (
+                              <span style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 16 }}>{d.fullName}</span>
+                            )}
+                            <span style={{ fontSize: 11, padding: "2px 8px", borderRadius: 20, background: `${statusColor}22`, color: statusColor, fontWeight: 700 }}>
+                              {d.status}
+                            </span>
+                            {d.vehicleModel && (
+                              <span style={{ fontSize: 11, padding: "2px 8px", borderRadius: 20, background: isDark ? "#1a1a1a" : "#f0f0f0", color: sub }}>
+                                🚛 {d.vehicleModel}
+                              </span>
+                            )}
+                          </div>
+
+                          <div style={{ display: "flex", gap: 16, flexWrap: "wrap" as const }}>
+                            <div style={{ minWidth: 160 }}>
+                              <div style={{ fontSize: 11, color: sub, marginBottom: 4, textTransform: "uppercase" as const }}>{ru ? "Телефон" : "Phone"}</div>
+                              {isEditing ? (
+                                <input style={inputStyle} value={editDriver.phone}
+                                  onChange={e => setEditDriver({ ...editDriver, phone: e.target.value })} />
+                              ) : (
+                                <span style={{ fontSize: 13 }}>{d.phone || "—"}</span>
+                              )}
+                            </div>
+                            <div style={{ minWidth: 160 }}>
+                              <div style={{ fontSize: 11, color: sub, marginBottom: 4, textTransform: "uppercase" as const }}>CDL</div>
+                              {isEditing ? (
+                                <input style={inputStyle} value={editDriver.cdlNumber}
+                                  onChange={e => setEditDriver({ ...editDriver, cdlNumber: e.target.value })} />
+                              ) : (
+                                <span style={{ fontSize: 13, fontFamily: "'Barlow Condensed',sans-serif", letterSpacing: 1 }}>{d.cdlNumber}</span>
+                              )}
+                            </div>
+                            {isEditing && (
+                              <div style={{ minWidth: 140 }}>
+                                <div style={{ fontSize: 11, color: sub, marginBottom: 4, textTransform: "uppercase" as const }}>{ru ? "Статус" : "Status"}</div>
+                                <select style={inputStyle} value={editDriver.status}
+                                  onChange={e => setEditDriver({ ...editDriver, status: e.target.value })}>
+                                  <option value="Active">Active</option>
+                                  <option value="Off-duty">Off-duty</option>
+                                  <option value="On-leave">On-leave</option>
+                                </select>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        <div style={{ display: "flex", flexDirection: "column", gap: 8, flexShrink: 0 }}>
+                          {isEditing ? (
+                            <>
+                              <button style={btn("green")} onClick={handleUpdateDriver}>{ru ? "Сохранить" : "Save"}</button>
+                              <button style={btn("gray")} onClick={() => setEditDriver(null)}>{ru ? "Отмена" : "Cancel"}</button>
+                            </>
+                          ) : (
+                            <>
+                              <button style={btn("gray")} onClick={() => setEditDriver({ id: d.id, fullName: d.fullName, phone: d.phone, cdlNumber: d.cdlNumber, status: d.status })}>
+                                {ru ? "Изменить" : "Edit"}
+                              </button>
+                              <select
+                                style={{ ...btn("gray"), cursor: "pointer", appearance: "none" as const, textAlign: "center" as const }}
+                                value={d.status}
+                                onChange={e => handlePatchDriverStatus(d.id, e.target.value)}
+                              >
+                                <option value="Active">Active</option>
+                                <option value="Off-duty">Off-duty</option>
+                                <option value="On-leave">On-leave</option>
+                              </select>
+                              <button style={btn("red")} onClick={() => handleDeleteDriver(d.id, d.fullName)}>
+                                {ru ? "Удалить" : "Delete"}
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </>
         )}
 

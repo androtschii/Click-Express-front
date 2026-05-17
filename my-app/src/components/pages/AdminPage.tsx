@@ -587,6 +587,14 @@ export const AdminPage: React.FC<AdminPageProps> = ({ theme, onBack }) => {
 
         {tab === "loads" && (loading ? (
           <div style={{ textAlign: "center", color: sub, padding: 60 }}>{ru ? "Загрузка..." : "Loading..."}</div>
+        ) : products.length === 0 ? (
+          <div style={{ textAlign: "center", color: sub, padding: 80, border: `1px dashed ${border}`, borderRadius: 12 }}>
+            <div style={{ fontSize: 40, marginBottom: 12 }}>📦</div>
+            <div style={{ fontFamily: "'Oswald',sans-serif", fontSize: 18, marginBottom: 8, color: text }}>
+              {ru ? "Товаров нет" : "No loads yet"}
+            </div>
+            <div style={{ fontSize: 13 }}>{ru ? "Нажми «+ Новая карточка» чтобы добавить первый груз" : "Click «+ New Card» to add the first load"}</div>
+          </div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             {products.map(p => (

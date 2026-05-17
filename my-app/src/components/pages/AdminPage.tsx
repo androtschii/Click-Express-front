@@ -6,6 +6,8 @@ import {
   fetchVehicles, createVehicle, updateVehicle,
   toggleVehicleAvailability, deleteVehicle,
   fetchDrivers, createDriver, updateDriver, patchDriverStatus, deleteDriver,
+  fetchLeads, updateLeadStatus, deleteLead,
+  fetchJobApplications, updateJobApplicationStatus, deleteJobApplication,
   fetchAdminStats,
 } from "../../api/client.js";
 import { useLanguage } from "../../context/LanguageContext";
@@ -49,7 +51,34 @@ interface Driver {
   createdAt: string;
 }
 
-type Tab = "loads" | "fleet" | "drivers" | "stats";
+interface Lead {
+  id: number;
+  fullName: string;
+  email: string;
+  phone: string;
+  company?: string;
+  origin: string;
+  destination: string;
+  equipment: string;
+  weight?: number;
+  pickupDate?: string;
+  message: string;
+  status: string;
+  createdAt: string;
+}
+
+interface JobApplication {
+  id: number;
+  fullName: string;
+  email: string;
+  phone: string;
+  position: string;
+  message: string;
+  status: string;
+  createdAt: string;
+}
+
+type Tab = "loads" | "fleet" | "drivers" | "leads" | "stats";
 
 interface AdminStats {
   totalOrders: number;
@@ -97,6 +126,12 @@ export const AdminPage: React.FC<AdminPageProps> = ({ theme, onBack }) => {
   const [showDriverForm, setShowDriverForm] = useState(false);
   const [newDriver, setNewDriver] = useState({ fullName: "", phone: "", cdlNumber: "", status: "Active" });
   const [editDriver, setEditDriver] = useState<{ id: number; fullName: string; phone: string; cdlNumber: string; status: string } | null>(null);
+
+  const [leads, setLeads] = useState<Lead[]>([]);
+  const [leadsLoading, setLeadsLoading] = useState(false);
+  const [jobApps, setJobApps] = useState<JobApplication[]>([]);
+  const [jobAppsLoading, setJobAppsLoading] = useState(false);
+  const [leadsSubTab, setLeadsSubTab] = useState<"quotes" | "jobs">("quotes");
 
   const [adminStats, setAdminStats] = useState<AdminStats | null>(null);
   const [statsLoading, setStatsLoading] = useState(false);
@@ -256,11 +291,67 @@ export const AdminPage: React.FC<AdminPageProps> = ({ theme, onBack }) => {
     } catch { notify(ru ? "Ошибка удаления" : "Delete error", false); }
   };
 
+  const loadLeads = async () => {
+    setLeadsLoading(true);
+    try {
+      const data = await fetchLeads();
+      setLeads(Array.isArray(data) ? data : []);
+    } catch { notify(ru ? "Ошибка загрузки лидов" : "Leads load error", false); }
+    finally { setLeadsLoading(false); }
+  };
+
+  const loadJobApps = async () => {
+    setJobAppsLoading(true);
+    try {
+      const data = await fetchJobApplications();
+      setJobApps(Array.isArray(data) ? data : []);
+    } catch { notify(ru ? "Ошибка загрузки заявок" : "Applications load error", false); }
+    finally { setJobAppsLoading(false); }
+  };
+
+  const handleLeadStatus = async (id: number, status: string) => {
+    try {
+      await updateLeadStatus(id, status);
+      setLeads(ls => ls.map(l => l.id === id ? { ...l, status } : l));
+      notify(ru ? "Статус обновлён ✓" : "Status updated ✓");
+    } catch { notify(ru ? "Ошибка" : "Error", false); }
+  };
+
+  const handleDeleteLead = async (id: number) => {
+    if (!confirm(ru ? "Удалить лид?" : "Delete lead?")) return;
+    try {
+      await deleteLead(id);
+      setLeads(ls => ls.filter(l => l.id !== id));
+      notify(ru ? "Удалено ✓" : "Deleted ✓");
+    } catch { notify(ru ? "Ошибка удаления" : "Delete error", false); }
+  };
+
+  const handleJobAppStatus = async (id: number, status: string) => {
+    try {
+      await updateJobApplicationStatus(id, status);
+      setJobApps(js => js.map(j => j.id === id ? { ...j, status } : j));
+      notify(ru ? "Статус обновлён ✓" : "Status updated ✓");
+    } catch { notify(ru ? "Ошибка" : "Error", false); }
+  };
+
+  const handleDeleteJobApp = async (id: number) => {
+    if (!confirm(ru ? "Удалить заявку?" : "Delete application?")) return;
+    try {
+      await deleteJobApplication(id);
+      setJobApps(js => js.filter(j => j.id !== id));
+      notify(ru ? "Удалено ✓" : "Deleted ✓");
+    } catch { notify(ru ? "Ошибка удаления" : "Delete error", false); }
+  };
+
   useEffect(() => {
     if (tab === "fleet" && vehicles.length === 0 && !vehiclesLoading) loadVehicles();
     if (tab === "drivers" && drivers.length === 0 && !driversLoading) loadDrivers();
+    if (tab === "leads") {
+      if (leadsSubTab === "quotes" && leads.length === 0 && !leadsLoading) loadLeads();
+      if (leadsSubTab === "jobs" && jobApps.length === 0 && !jobAppsLoading) loadJobApps();
+    }
     if (tab === "stats" && !adminStats && !statsLoading) loadStats();
-  }, [tab]);
+  }, [tab, leadsSubTab]);
 
   const loadStats = async () => {
     setStatsLoading(true);
@@ -373,6 +464,17 @@ export const AdminPage: React.FC<AdminPageProps> = ({ theme, onBack }) => {
                 {showDriverForm ? "✕" : (ru ? "+ Водитель" : "+ Driver")}
               </button>
             )}
+            {tab === "leads" && (
+              <button
+                onClick={() => {
+                  if (leadsSubTab === "quotes") { setLeads([]); loadLeads(); }
+                  else { setJobApps([]); loadJobApps(); }
+                }}
+                style={{ ...btn("gray"), padding: "8px 18px", fontSize: 13 }}
+              >
+                ↻ {ru ? "Обновить" : "Refresh"}
+              </button>
+            )}
             {tab === "stats" && (
               <button onClick={() => { setAdminStats(null); loadStats(); }} style={{ ...btn("gray"), padding: "8px 18px", fontSize: 13 }}>
                 ↻ {ru ? "Обновить" : "Refresh"}
@@ -388,6 +490,7 @@ export const AdminPage: React.FC<AdminPageProps> = ({ theme, onBack }) => {
             { key: "loads",   label: ru ? "Грузы" : "Loads" },
             { key: "fleet",   label: ru ? "Автопарк" : "Fleet" },
             { key: "drivers", label: ru ? "Водители" : "Drivers" },
+            { key: "leads",   label: ru ? "Лиды" : "Leads" },
             { key: "stats",   label: ru ? "Аналитика" : "Analytics" },
           ] as { key: Tab; label: string }[]).map(t => (
             <button
@@ -872,6 +975,180 @@ export const AdminPage: React.FC<AdminPageProps> = ({ theme, onBack }) => {
             )}
           </>
         )}
+
+        {/* Leads section */}
+        {tab === "leads" && (() => {
+          const leadStatusColor = (s: string) => s === "New" ? "#f59e0b" : s === "Contacted" ? "#3b82f6" : s === "Converted" ? "#16a34a" : "#888";
+          const appStatusColor  = (s: string) => s === "Pending" ? "#f59e0b" : s === "Reviewed" ? "#3b82f6" : s === "Accepted" ? "#16a34a" : s === "Rejected" ? "#CC0000" : "#888";
+
+          return (
+            <>
+              {/* Sub-tabs */}
+              <div style={{ display: "flex", gap: 8, marginBottom: 24 }}>
+                {([
+                  { key: "quotes", label: ru ? "Заявки на перевозку" : "Quote Requests" },
+                  { key: "jobs",   label: ru ? "Вакансии" : "Job Applications" },
+                ] as { key: "quotes" | "jobs"; label: string }[]).map(st => (
+                  <button
+                    key={st.key}
+                    onClick={() => setLeadsSubTab(st.key)}
+                    style={{
+                      padding: "7px 18px", borderRadius: 20, border: `1px solid ${leadsSubTab === st.key ? "#CC0000" : border}`,
+                      background: leadsSubTab === st.key ? "rgba(204,0,0,0.1)" : "transparent",
+                      color: leadsSubTab === st.key ? "#CC0000" : sub,
+                      fontFamily: "'Barlow',sans-serif", fontWeight: 600, fontSize: 13, cursor: "pointer",
+                    }}
+                  >
+                    {st.label}
+                    {leadsSubTab === st.key && (
+                      <span style={{ marginLeft: 8, background: "#CC0000", color: "#fff", borderRadius: 10, padding: "1px 7px", fontSize: 11 }}>
+                        {st.key === "quotes" ? leads.length : jobApps.length}
+                      </span>
+                    )}
+                  </button>
+                ))}
+              </div>
+
+              {/* Quote Requests */}
+              {leadsSubTab === "quotes" && (
+                leadsLoading ? (
+                  <div style={{ textAlign: "center", color: sub, padding: 60 }}>{ru ? "Загрузка..." : "Loading..."}</div>
+                ) : leads.length === 0 ? (
+                  <div style={{ textAlign: "center", color: sub, padding: 60, border: `1px dashed ${border}`, borderRadius: 12 }}>
+                    {ru ? "Нет заявок" : "No quote requests"}
+                  </div>
+                ) : (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                    {leads.map(l => (
+                      <div key={l.id} style={{ background: card, border: `1px solid ${border}`, borderRadius: 12, padding: 20 }}>
+                        <div style={{ display: "flex", gap: 16, alignItems: "flex-start" }}>
+                          <div style={{ flex: 1 }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8, flexWrap: "wrap" as const }}>
+                              <span style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 15 }}>{l.fullName}</span>
+                              {l.company && <span style={{ fontSize: 11, color: sub }}>{l.company}</span>}
+                              <span style={{ fontSize: 11, padding: "2px 8px", borderRadius: 20, background: `${leadStatusColor(l.status)}22`, color: leadStatusColor(l.status), fontWeight: 700 }}>
+                                {l.status}
+                              </span>
+                              <span style={{ fontSize: 11, color: sub, marginLeft: "auto" }}>
+                                {new Date(l.createdAt).toLocaleDateString()}
+                              </span>
+                            </div>
+
+                            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 12, marginBottom: 10 }}>
+                              {[
+                                { label: "Email", value: l.email },
+                                { label: ru ? "Телефон" : "Phone", value: l.phone || "—" },
+                                { label: ru ? "Откуда" : "Origin", value: l.origin },
+                                { label: ru ? "Куда" : "Destination", value: l.destination },
+                                { label: ru ? "Груз" : "Equipment", value: l.equipment || "—" },
+                                { label: ru ? "Вес" : "Weight", value: l.weight ? `${l.weight} lb` : "—" },
+                              ].map(f => (
+                                <div key={f.label}>
+                                  <div style={{ fontSize: 10, color: sub, textTransform: "uppercase" as const, letterSpacing: 0.5, marginBottom: 2 }}>{f.label}</div>
+                                  <div style={{ fontSize: 13, fontWeight: 600 }}>{f.value}</div>
+                                </div>
+                              ))}
+                            </div>
+
+                            {l.message && (
+                              <div style={{ fontSize: 12, color: sub, background: isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.03)", borderRadius: 6, padding: "8px 12px" }}>
+                                {l.message}
+                              </div>
+                            )}
+                          </div>
+
+                          <div style={{ display: "flex", flexDirection: "column", gap: 8, flexShrink: 0 }}>
+                            <select
+                              style={{ ...btn("gray"), cursor: "pointer", appearance: "none" as const, textAlign: "center" as const, minWidth: 110 }}
+                              value={l.status}
+                              onChange={e => handleLeadStatus(l.id, e.target.value)}
+                            >
+                              <option value="New">New</option>
+                              <option value="Contacted">Contacted</option>
+                              <option value="Converted">Converted</option>
+                              <option value="Closed">Closed</option>
+                            </select>
+                            <button style={{ ...btn("red"), minWidth: 110 }} onClick={() => handleDeleteLead(l.id)}>
+                              {ru ? "Удалить" : "Delete"}
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )
+              )}
+
+              {/* Job Applications */}
+              {leadsSubTab === "jobs" && (
+                jobAppsLoading ? (
+                  <div style={{ textAlign: "center", color: sub, padding: 60 }}>{ru ? "Загрузка..." : "Loading..."}</div>
+                ) : jobApps.length === 0 ? (
+                  <div style={{ textAlign: "center", color: sub, padding: 60, border: `1px dashed ${border}`, borderRadius: 12 }}>
+                    {ru ? "Нет откликов" : "No applications"}
+                  </div>
+                ) : (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                    {jobApps.map(j => (
+                      <div key={j.id} style={{ background: card, border: `1px solid ${border}`, borderRadius: 12, padding: 20 }}>
+                        <div style={{ display: "flex", gap: 16, alignItems: "flex-start" }}>
+                          <div style={{ flex: 1 }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8, flexWrap: "wrap" as const }}>
+                              <span style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 15 }}>{j.fullName}</span>
+                              <span style={{ fontSize: 12, padding: "2px 10px", borderRadius: 20, background: isDark ? "#1a1a1a" : "#f0f0f0", color: sub, fontWeight: 600 }}>
+                                {j.position}
+                              </span>
+                              <span style={{ fontSize: 11, padding: "2px 8px", borderRadius: 20, background: `${appStatusColor(j.status)}22`, color: appStatusColor(j.status), fontWeight: 700 }}>
+                                {j.status}
+                              </span>
+                              <span style={{ fontSize: 11, color: sub, marginLeft: "auto" }}>
+                                {new Date(j.createdAt).toLocaleDateString()}
+                              </span>
+                            </div>
+
+                            <div style={{ display: "flex", gap: 24, marginBottom: 10, flexWrap: "wrap" as const }}>
+                              {[
+                                { label: "Email", value: j.email },
+                                { label: ru ? "Телефон" : "Phone", value: j.phone || "—" },
+                              ].map(f => (
+                                <div key={f.label}>
+                                  <div style={{ fontSize: 10, color: sub, textTransform: "uppercase" as const, letterSpacing: 0.5, marginBottom: 2 }}>{f.label}</div>
+                                  <div style={{ fontSize: 13, fontWeight: 600 }}>{f.value}</div>
+                                </div>
+                              ))}
+                            </div>
+
+                            {j.message && (
+                              <div style={{ fontSize: 12, color: sub, background: isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.03)", borderRadius: 6, padding: "8px 12px" }}>
+                                {j.message}
+                              </div>
+                            )}
+                          </div>
+
+                          <div style={{ display: "flex", flexDirection: "column", gap: 8, flexShrink: 0 }}>
+                            <select
+                              style={{ ...btn("gray"), cursor: "pointer", appearance: "none" as const, textAlign: "center" as const, minWidth: 110 }}
+                              value={j.status}
+                              onChange={e => handleJobAppStatus(j.id, e.target.value)}
+                            >
+                              <option value="Pending">Pending</option>
+                              <option value="Reviewed">Reviewed</option>
+                              <option value="Accepted">Accepted</option>
+                              <option value="Rejected">Rejected</option>
+                            </select>
+                            <button style={{ ...btn("red"), minWidth: 110 }} onClick={() => handleDeleteJobApp(j.id)}>
+                              {ru ? "Удалить" : "Delete"}
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )
+              )}
+            </>
+          );
+        })()}
 
         {/* Fleet section */}
         {tab === "fleet" && (

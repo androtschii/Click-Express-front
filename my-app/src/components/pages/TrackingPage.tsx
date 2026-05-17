@@ -111,7 +111,7 @@ function RouteProgress({ load, progress, isDark, lang }: { load: Load; progress:
 }
 
 export const TrackingPage: React.FC<TrackingPageProps> = ({
-  load, theme = "dark", onBack, orderId, session, apiBase = "https://localhost:7262/api",
+  load, theme = "dark", onBack, orderId, session, apiBase = "http://localhost:5114/api",
 }) => {
   const isDark = theme === "dark";
   const { lang } = useLanguage();

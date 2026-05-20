@@ -19,6 +19,8 @@ interface ReviewDTO {
   rating: number;
   text: string;
   createdAt: string;
+  role?: string;
+  location?: string;
 }
 
 const FALLBACK = [
@@ -111,7 +113,7 @@ export const ReviewsStrip: React.FC<ReviewsStripProps> = ({ theme = "dark", onAl
                 <div>
                   <div style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 13, color: textColor }}>{r.username}</div>
                   <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 11, color: subColor, textTransform: "uppercase", letterSpacing: 0.8 }}>
-                    {new Date(r.createdAt).toLocaleDateString(lang === "ru" ? "ru-RU" : "en-US", { month: "short", year: "numeric" })}
+                    {r.role && r.location ? `${r.role} · ${r.location}` : r.role || r.location || new Date(r.createdAt).toLocaleDateString(lang === "ru" ? "ru-RU" : "en-US", { month: "short", year: "numeric" })}
                   </div>
                 </div>
               </div>

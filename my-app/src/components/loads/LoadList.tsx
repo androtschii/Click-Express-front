@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import type { Load } from "../../types/index";
 import { LoadCard } from "./LoadCard";
+import { LoadSkeleton } from "./LoadSkeleton";
 import { SearchBar } from "./SearchBar";
 import { FilterButtons } from "./FilterButtons";
 import { LoadMapView } from "./LoadMapView";
@@ -45,10 +46,8 @@ theme = 'dark', onSearchChange, onFilterChange, onBook, onCancelBook, onSave, on
   const loadingText = isDark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.55)";
 
   if (loading) return (
-    <div style={{ textAlign: "center", padding: "90px 0" }}>
-      <div style={{ width: 46, height: 46, margin: "0 auto 18px", border: "3px solid rgba(204,0,0,0.15)", borderTop: "3px solid #CC0000", borderRadius: "50%", animation: "spin 0.75s linear infinite" }} />
-      <p style={{ fontFamily: "'Barlow',sans-serif", color: loadingText, fontSize: 14 }}>{t.loadList.loading}</p>
-      <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(310px,1fr))", gap: 20 }}>
+      {Array.from({ length: 6 }).map((_, i) => <LoadSkeleton key={i} theme={theme} />)}
     </div>
   );
 

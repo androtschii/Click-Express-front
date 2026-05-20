@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { AdminRowSkeleton } from "../loads/LoadSkeleton";
 import {
   fetchProducts, fetchProductStats,
   updateProductPrice, updateProductImage,
@@ -586,7 +587,9 @@ export const AdminPage: React.FC<AdminPageProps> = ({ theme, onBack }) => {
         )}
 
         {tab === "loads" && (loading ? (
-          <div style={{ textAlign: "center", color: sub, padding: 60 }}>{ru ? "Загрузка..." : "Loading..."}</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            {Array.from({ length: 5 }).map((_, i) => <AdminRowSkeleton key={i} theme={theme} avatar="square" />)}
+          </div>
         ) : products.length === 0 ? (
           <div style={{ textAlign: "center", color: sub, padding: 80, border: `1px dashed ${border}`, borderRadius: 12 }}>
             <div style={{ fontSize: 40, marginBottom: 12 }}>📦</div>
@@ -883,7 +886,9 @@ export const AdminPage: React.FC<AdminPageProps> = ({ theme, onBack }) => {
             )}
 
             {driversLoading ? (
-              <div style={{ textAlign: "center", color: sub, padding: 60 }}>{ru ? "Загрузка..." : "Loading..."}</div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                {Array.from({ length: 4 }).map((_, i) => <AdminRowSkeleton key={i} theme={theme} avatar="circle" />)}
+              </div>
             ) : drivers.length === 0 ? (
               <div style={{ textAlign: "center", color: sub, padding: 60, border: `1px dashed ${border}`, borderRadius: 12 }}>
                 {ru ? "Водители не добавлены" : "No drivers yet"}
@@ -1207,7 +1212,9 @@ export const AdminPage: React.FC<AdminPageProps> = ({ theme, onBack }) => {
             )}
 
             {vehiclesLoading ? (
-              <div style={{ textAlign: "center", color: sub, padding: 60 }}>{ru ? "Загрузка..." : "Loading..."}</div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                {Array.from({ length: 4 }).map((_, i) => <AdminRowSkeleton key={i} theme={theme} avatar="square" />)}
+              </div>
             ) : vehicles.length === 0 ? (
               <div style={{ textAlign: "center", color: sub, padding: 60, border: `1px dashed ${border}`, borderRadius: 12 }}>
                 {ru ? "Транспорт не добавлен" : "No vehicles yet"}

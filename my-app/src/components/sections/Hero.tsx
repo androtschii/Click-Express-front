@@ -74,10 +74,10 @@ export const Hero: React.FC<HeroProps> = ({ onViewLoads, onQuoteClick, onCareers
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  const parallaxShift = scrollY * 0.3;
+  const parallaxShift = Math.min(scrollY * 0.28, 130);
 
   return (
-    <section style={{ minHeight: "100vh", position: "relative", overflow: "hidden", display: "flex", alignItems: "center", background: isDark ? '#0a0a0a' : '#f4f4f4' }}>
+    <section style={{ minHeight: "100vh", position: "relative", overflow: "hidden", display: "flex", alignItems: "center", background: isDark ? '#0a0a0a' : '#f4f4f4', clipPath: "polygon(0 0, 100% 0, 100% 92%, 0 100%)" }}>
       <style>{`
         @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.35}}
         @keyframes heroFadeUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
@@ -88,15 +88,13 @@ export const Hero: React.FC<HeroProps> = ({ onViewLoads, onQuoteClick, onCareers
       `}</style>
 
  {/* BG image with parallax */}
-      <div style={{ position: "absolute", inset: 0, backgroundImage: isDark ? "url('/images/red freightliner cascadia night.PNG')" : "url('/images/red freightliner cascadia light.png')", backgroundSize: "cover", backgroundPosition: `center calc(50% + ${parallaxShift}px)`, transition: "background-position 0.05s linear" }} />
+      <div style={{ position: "absolute", top: "-15%", left: 0, right: 0, bottom: "-15%", backgroundImage: isDark ? "url('/images/red freightliner cascadia night.PNG')" : "url('/images/red freightliner cascadia light.png')", backgroundSize: "cover", backgroundPosition: "center 65%", transform: `translateY(${parallaxShift}px)`, willChange: "transform" }} />
 
  {/* Gradient overlay for text readability */}
       <div style={{ position: "absolute", inset: 0, background: isDark ? "linear-gradient(to right, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.35) 55%, transparent 100%)" : "linear-gradient(to right, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.15) 50%, transparent 100%)", pointerEvents: "none" }} />
 
  {/* Left red bar */}
       <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 5, background: "linear-gradient(to bottom, #CC0000, #880000)" }} />
- {/* Bottom red line */}
-      <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: 3, background: "linear-gradient(90deg, #CC0000 0%, #ff3333 40%, #CC0000 100%)" }} />
 
  {/* Main content */}
       <div style={{ position: "relative", zIndex: 2, padding: "120px clamp(24px,5vw,64px) 160px", maxWidth: 860, width: "100%" }}>

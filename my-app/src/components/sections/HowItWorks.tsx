@@ -32,6 +32,7 @@ export const HowItWorks: React.FC<HowItWorksProps> = ({ theme = "dark", onQuoteC
         padding: "clamp(56px,7vw,96px) clamp(16px,5vw,64px)",
         position: "relative",
         overflow: "hidden",
+        clipPath: "polygon(0 0, 100% 0, 100% 92%, 0 100%)",
       }}
     >
       <LightRays color="#CC0000" intensity={isDark ? 0.5 : 0.25} speed={0.9} origin="center-top" blur={70} />

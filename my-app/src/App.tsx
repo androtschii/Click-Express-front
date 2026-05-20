@@ -41,6 +41,7 @@ import { AdminPage } from "./components/pages/AdminPage";
 import { NotFoundPage } from "./components/pages/NotFoundPage";
 import { CookieConsent } from "./components/ui/CookieConsent";
 import { ReviewsStrip } from "./components/sections/ReviewsStrip";
+import { ContactSection } from "./components/sections/ContactSection";
 
 // Анимированное сердечко для секции "Лучшие грузы недели" 
 function WeeklyHeartBtn({ saved, onClick }: { saved: boolean; onClick: () => void }) {
@@ -1012,6 +1013,8 @@ function AppContent() {
       <div ref={aboutRef}>
         <AboutSection onContactClick={() => scrollTo(contactRef)} theme={theme} />
       </div>
+
+      <ContactSection theme={theme} />
 
       <div ref={contactRef}>
         <Footer theme={theme} onCatalogClick={() => scrollTo(catalogRef)} onAboutClick={() => scrollTo(aboutRef)} onQuoteClick={() => setShowQuote(true)} onContactClick={() => scrollTo(contactRef)} onCareersClick={() => { setShowCareers(true); window.scrollTo({ top: 0, behavior: "smooth" }); }} onFleetClick={() => { setShowFleet(true); window.scrollTo({ top: 0, behavior: "smooth" }); }} />

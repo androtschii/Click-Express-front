@@ -38,12 +38,20 @@ theme = 'dark', onSearchChange, onFilterChange, onBook, onCancelBook, onSave, on
   const { lang } = useLanguage();
   const t = translations[lang];
   const [viewMode, setViewMode] = useState<"grid" | "map">("grid");
+  const [sortBy, setSortBy] = useState<"none" | "price_asc" | "price_desc" | "miles_asc" | "miles_desc">("none");
   const searchBg    = isDark ? "#0d0d0d"                : "#ffffff";
   const searchBorder= isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.14)";
   const searchShadow= isDark ? "none"                   : "0 2px 16px rgba(0,0,0,0.07)";
   const emptyBorder = isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.12)";
   const emptyText   = isDark ? "rgba(255,255,255,0.3)"  : "rgba(0,0,0,0.6)";
-  const loadingText = isDark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.55)";
+
+  const sorted = [...loads].sort((a, b) => {
+    if (sortBy === "price_asc")  return a.price - b.price;
+    if (sortBy === "price_desc") return b.price - a.price;
+    if (sortBy === "miles_asc")  return a.miles - b.miles;
+    if (sortBy === "miles_desc") return b.miles - a.miles;
+    return 0;
+  });
 
   if (loading) return (
     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(310px,1fr))", gap: 20 }}>
@@ -75,6 +83,30 @@ theme = 'dark', onSearchChange, onFilterChange, onBook, onCancelBook, onSave, on
             🚛 {lang === "ru" ? "НАШ ФЛОТ →" : "OUR FLEET →"}
           </div>
         )}
+        {/* Sort buttons */}
+        <div style={{ display: "flex", gap: 0, border: `1px solid ${isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.14)"}`, borderRadius: 4, overflow: "hidden" }}>
+          {([
+            { key: "none",       label: lang === "ru" ? "По умолч." : "Default" },
+            { key: "price_asc",  label: lang === "ru" ? "Цена ↑" : "Price ↑" },
+            { key: "price_desc", label: lang === "ru" ? "Цена ↓" : "Price ↓" },
+            { key: "miles_asc",  label: lang === "ru" ? "Мили ↑" : "Miles ↑" },
+            { key: "miles_desc", label: lang === "ru" ? "Мили ↓" : "Miles ↓" },
+          ] as { key: typeof sortBy; label: string }[]).map(opt => {
+            const active = sortBy === opt.key;
+            return (
+              <button key={opt.key} onClick={() => setSortBy(opt.key)} style={{
+                padding: "6px 11px", border: "none",
+                background: active ? "#CC0000" : "transparent",
+                color: active ? "#fff" : isDark ? "rgba(255,255,255,0.45)" : "rgba(0,0,0,0.5)",
+                fontFamily: "'Barlow',sans-serif", fontWeight: 600, fontSize: 11, letterSpacing: 0.5,
+                cursor: "pointer", transition: "all 0.15s", whiteSpace: "nowrap",
+              }}>
+                {opt.label}
+              </button>
+            );
+          })}
+        </div>
+
         {/* View toggle */}
         <div style={{ marginLeft: "auto", display: "flex", gap: 0, border: `1px solid ${isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.14)"}`, borderRadius: 4, overflow: "hidden" }}>
           {(["grid", "map"] as const).map(mode => {
@@ -97,15 +129,15 @@ theme = 'dark', onSearchChange, onFilterChange, onBook, onCancelBook, onSave, on
       </div>
 
       {viewMode === "map" ? (
-        <LoadMapView loads={loads} theme={theme} onDetails={onDetails} />
-      ) : loads.length === 0 ? (
+        <LoadMapView loads={sorted} theme={theme} onDetails={onDetails} />
+      ) : sorted.length === 0 ? (
         <div style={{ textAlign: "center", padding: "80px 20px", border: `1px dashed ${emptyBorder}`, borderRadius: 6 }}>
           <div style={{ fontSize: 48, marginBottom: 14 }}>🚛</div>
           <p style={{ color: emptyText, fontFamily: "'Barlow',sans-serif", fontSize: 16 }}>{t.loadList.noMatch}</p>
         </div>
       ) : (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(310px,1fr))", gap: 20 }}>
-          {loads.map(l => (
+          {sorted.map(l => (
             <LoadCard key={l.id} load={l} onBook={onBook} onCancelBook={onCancelBook} onSave={onSave} onDetails={onDetails} onCompare={onCompare} isBooked={bookedIds.includes(l.id)} isSaved={savedIds.includes(l.id)} isAdmin={isAdmin} isCompared={compareIds.includes(l.id)} compareDisabled={compareIds.length >= 3} />
           ))}
         </div>

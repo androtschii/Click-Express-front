@@ -25,8 +25,8 @@ interface Product {
 }
 
 interface Stats {
-  totalProducts: number;
-  activeProducts: number;
+  total: number;
+  active: number;
   outOfStock: number;
   totalValue: number;
   categories: number;
@@ -572,11 +572,11 @@ export const AdminPage: React.FC<AdminPageProps> = ({ theme, onBack }) => {
         {tab === "loads" && stats && (
           <div style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 12, marginBottom: 32 }}>
             {[
-              { label: ru ? "Всего услуг" : "Total Loads", value: stats.totalProducts },
-              { label: ru ? "Активных" : "Active", value: stats.activeProducts },
+              { label: ru ? "Всего услуг" : "Total Loads", value: stats.total ?? 0 },
+              { label: ru ? "Активных" : "Active", value: stats.active ?? 0 },
               { label: ru ? "Нет в наличии" : "Out of Stock", value: stats.outOfStock },
               { label: ru ? "Категорий" : "Categories", value: stats.categories },
-              { label: ru ? "Стоимость склада" : "Total Value", value: `$${stats.totalValue.toLocaleString()}` },
+              { label: ru ? "Стоимость склада" : "Total Value", value: `$${(stats.totalValue ?? 0).toLocaleString()}` },
             ].map(s => (
               <div key={s.label} style={{ background: card, border: `1px solid ${border}`, borderRadius: 10, padding: "16px 20px" }}>
                 <div style={{ fontSize: 22, fontWeight: 800, fontFamily: "'Oswald',sans-serif", color: "#CC0000" }}>{s.value}</div>

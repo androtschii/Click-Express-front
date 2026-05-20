@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useLanguage } from "../../context/LanguageContext";
-
-const API_BASE = "http://localhost:5114/api";
+import { API_BASE } from "../../config";
 
 const GRADIENTS = [
   "linear-gradient(135deg,#CC0000,#ff4d4d)",

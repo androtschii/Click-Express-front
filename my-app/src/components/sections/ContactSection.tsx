@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useLanguage } from "../../context/LanguageContext";
-
-const API_BASE = "http://localhost:5114/api";
+import { API_BASE } from "../../config";
 
 interface ContactSectionProps {
   theme?: "dark" | "light";

@@ -44,6 +44,7 @@ import { ReviewsStrip } from "./components/sections/ReviewsStrip";
 import { ContactSection } from "./components/sections/ContactSection";
 import { FaqPage } from "./components/pages/FaqPage";
 import { PrivacyPage } from "./components/pages/PrivacyPage";
+import { API_BASE } from "./config";
 
 // Анимированное сердечко для секции "Лучшие грузы недели" 
 function WeeklyHeartBtn({ saved, onClick }: { saved: boolean; onClick: () => void }) {
@@ -234,7 +235,6 @@ function RequestsPanel({ loads, theme, onClose, onDetails, onCancel, onBrowseLoa
   );
 }
 
-const API_BASE = "http://localhost:5114/api";
 
 function AppContent() {
   const { theme, toggleTheme } = useTheme();

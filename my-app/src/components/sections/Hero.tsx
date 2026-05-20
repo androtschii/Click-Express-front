@@ -52,7 +52,14 @@ export const Hero: React.FC<HeroProps> = ({ onViewLoads, onQuoteClick, onCareers
 
   const [counts, setCounts] = useState({ loads: 0, states: 0, miles: 0 });
   const [scrollY, setScrollY] = useState(0);
+  const [isMobile, setIsMobile] = useState(() => typeof window !== "undefined" ? window.innerWidth < 768 : false);
   const { ref: statsRef, inView: statsInView } = useInView<HTMLDivElement>(0.4);
+
+  useEffect(() => {
+    const fn = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener("resize", fn);
+    return () => window.removeEventListener("resize", fn);
+  }, []);
 
   useEffect(() => {
     if (!statsInView) return;
@@ -111,7 +118,7 @@ export const Hero: React.FC<HeroProps> = ({ onViewLoads, onQuoteClick, onCareers
  {/* Headline — typed in cascade, preserves original scale and red on line 3 */}
         {(() => {
           const headlineFamily = lang === 'ru' ? "'Russo One', sans-serif" : "'Anton', sans-serif";
-          const baseStyle = { fontFamily: headlineFamily, fontSize: "clamp(48px,7.5vw,96px)", lineHeight: 1.05, textTransform: "uppercase" as const, letterSpacing: lang === 'ru' ? 0 : -1, whiteSpace: "nowrap" as const };
+          const baseStyle = { fontFamily: headlineFamily, fontSize: isMobile ? "clamp(28px,8.5vw,56px)" : "clamp(48px,7.5vw,96px)", lineHeight: 1.05, textTransform: "uppercase" as const, letterSpacing: lang === 'ru' ? 0 : -1, ...(isMobile ? {} : { whiteSpace: "nowrap" as const }) };
           const speed = 55;
           const len1 = t.line1.length;
           const len2 = t.line2.length;
@@ -200,7 +207,7 @@ export const Hero: React.FC<HeroProps> = ({ onViewLoads, onQuoteClick, onCareers
         )}
 
  {/* Animated stats row */}
-        <div ref={statsRef} style={{ display: "flex", gap: 40, marginTop: 56, flexWrap: "wrap", animation: statsInView ? "statReveal 0.7s ease 0.1s both" : "none", opacity: statsInView ? undefined : 0 }}>
+        <div ref={statsRef} style={{ display: "flex", gap: isMobile ? 20 : 40, marginTop: isMobile ? 32 : 56, flexWrap: "wrap", animation: statsInView ? "statReveal 0.7s ease 0.1s both" : "none", opacity: statsInView ? undefined : 0 }}>
           {[
             { val: `${counts.loads}+`, label: lang === 'ru' ? 'Грузов доставлено' : 'Loads Delivered' },
             { val: counts.states, label: lang === 'ru' ? 'Штатов покрыто' : 'States Covered' },

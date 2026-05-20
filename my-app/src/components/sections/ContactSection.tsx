@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useLanguage } from "../../context/LanguageContext";
 import { API_BASE } from "../../config";
 
@@ -17,6 +17,13 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ theme = "dark" }
   const [phone, setPhone] = useState("");
   const [message, setMessage] = useState("");
   const [status, setStatus] = useState<Status>("idle");
+  const [isMobile, setIsMobile] = useState(() => typeof window !== "undefined" ? window.innerWidth < 768 : false);
+
+  useEffect(() => {
+    const fn = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener("resize", fn);
+    return () => window.removeEventListener("resize", fn);
+  }, []);
 
   const bg = isDark ? "#080808" : "#f5f5f5";
   const cardBg = isDark ? "#0f0f0f" : "#ffffff";
@@ -70,7 +77,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ theme = "dark" }
 
   return (
     <section style={{ background: bg, padding: "72px clamp(20px,5vw,64px)" }}>
-      <div style={{ maxWidth: 1240, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 48, alignItems: "start" }}>
+      <div style={{ maxWidth: 1240, margin: "0 auto", display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? 32 : 48, alignItems: "start" }}>
 
         <div>
           <div style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 800, fontSize: 11, color: "#CC0000", letterSpacing: 4, textTransform: "uppercase", marginBottom: 10, display: "flex", alignItems: "center", gap: 8 }}>

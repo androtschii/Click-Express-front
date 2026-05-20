@@ -287,6 +287,7 @@ function AppContent() {
   const [showPrivacy, setShowPrivacy] = useState(false);
   const [trackLoad, setTrackLoad] = useState<Load | null>(null);
   const [notifications, setNotifications] = useState<Array<{ id: number; text: string }>>([]);
+  const [isMobileView, setIsMobileView] = useState(() => typeof window !== "undefined" ? window.innerWidth < 768 : false);
 
   const catalogRef = useRef<HTMLDivElement>(null);
   const aboutRef = useRef<HTMLDivElement>(null);
@@ -349,6 +350,12 @@ function AppContent() {
 };
 
     checkBackend();
+  }, []);
+
+  useEffect(() => {
+    const fn = () => setIsMobileView(window.innerWidth < 768);
+    window.addEventListener("resize", fn);
+    return () => window.removeEventListener("resize", fn);
   }, []);
 
   useEffect(() => {
@@ -572,7 +579,6 @@ function AppContent() {
         onOrdersClick={() => { setDetailLoad(null); setShowCareers(false); setShowNews(false); setShowReviews(false); setShowProfile(false); setShowAdmin(false); setShowOrders(true); window.scrollTo({ top: 0, behavior: "smooth" }); }}
         onAdminClick={() => { setDetailLoad(null); setShowCareers(false); setShowNews(false); setShowReviews(false); setShowProfile(false); setShowOrders(false); setShowAdmin(true); window.scrollTo({ top: 0, behavior: "smooth" }); }}
       />
-      {apiStatusBanner}
     </>
   );
 
@@ -850,7 +856,7 @@ function AppContent() {
         const best = loads.filter(l => l.tag === "Best Load of the Week").slice(0, 6);
         if (!best.length) return null;
         const tw = translations[lang].weeklyBest;
-        const visible = 3;
+        const visible = isMobileView ? 1 : 3;
         const maxIdx = Math.max(0, best.length - visible);
         const canPrev = weeklyIdx > 0;
         const canNext = weeklyIdx < maxIdx;
@@ -1106,8 +1112,8 @@ function AppContent() {
           bookedIds={cartItems.map(i => i.productId)}
         />
       )}
-      {notifications.map((msg, idx) => (
-        <Notification key={idx} text={msg} onClose={() => setNotifications(n => n.filter((_, i) => i !== idx))} />
+      {notifications.map((item, idx) => (
+        <Notification key={item.id} item={item} index={idx} onClose={(id) => setNotifications(n => n.filter(x => x.id !== id))} />
       ))}
       <ChatBot theme={theme} />
       <BackToTop />

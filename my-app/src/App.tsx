@@ -39,6 +39,7 @@ import { X, Heart, ClipboardText } from "@phosphor-icons/react";
 import { fetchProducts } from "./api/client.js";
 import { AdminPage } from "./components/pages/AdminPage";
 import { NotFoundPage } from "./components/pages/NotFoundPage";
+import { CookieConsent } from "./components/ui/CookieConsent";
 
 // Анимированное сердечко для секции "Лучшие грузы недели" 
 function WeeklyHeartBtn({ saved, onClick }: { saved: boolean; onClick: () => void }) {
@@ -1068,6 +1069,7 @@ function AppContent() {
       ))}
       <ChatBot theme={theme} />
       <BackToTop />
+      <CookieConsent theme={theme} />
     </div>
   );
 }

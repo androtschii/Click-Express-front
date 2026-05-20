@@ -1,48 +1,55 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useLanguage } from "../../context/LanguageContext";
+
+const API_BASE = "http://localhost:5114/api";
+
+const GRADIENTS = [
+  "linear-gradient(135deg,#CC0000,#ff4d4d)",
+  "linear-gradient(135deg,#1a1a2e,#CC0000)",
+  "linear-gradient(135deg,#0d0d0d,#CC0000)",
+];
 
 interface ReviewsStripProps {
   theme?: "dark" | "light";
   onAllReviews?: () => void;
 }
 
-const REVIEWS = [
-  {
-    name: "Marcus T.",
-    role: "Owner-Operator",
-    state: "TX",
-    avatar: "MT",
-    gradient: "linear-gradient(135deg,#CC0000,#ff4d4d)",
-    stars: 5,
-    en: "Best dispatcher I've worked with. Always smooth loads, great communication, never left me waiting. Highly recommend Click Express to any driver.",
-    ru: "Лучший диспетчер, с которым я работал. Всегда чёткие грузы, отличная связь. Рекомендую Click Express каждому водителю.",
-  },
-  {
-    name: "Roberto M.",
-    role: "Flatbed Driver",
-    state: "FL",
-    avatar: "RM",
-    gradient: "linear-gradient(135deg,#1a1a2e,#CC0000)",
-    stars: 5,
-    en: "Professional team, fast bookings and solid rates. They always find the best loads for my route. Working with Click Express is a pleasure.",
-    ru: "Профессиональная команда, быстрое бронирование и хорошие ставки. Всегда находят лучшие грузы по моему маршруту.",
-  },
-  {
-    name: "Dmitri K.",
-    role: "Independent Carrier",
-    state: "IL",
-    avatar: "DK",
-    gradient: "linear-gradient(135deg,#0d0d0d,#CC0000)",
-    stars: 5,
-    en: "Switched from another company and never looked back. Great loads, honest communication, fast payment. Click Express really stands out.",
-    ru: "Перешёл с другой компании и не пожалел. Хорошие грузы, честное общение, быстрая оплата. Click Express выделяется на фоне остальных.",
-  },
+interface ReviewDTO {
+  id: number;
+  username: string;
+  rating: number;
+  text: string;
+  createdAt: string;
+}
+
+const FALLBACK = [
+  { username: "Marcus T.", rating: 5, text: "Best dispatcher I've worked with. Always smooth loads, great communication. Highly recommend Click Express to any driver." },
+  { username: "Roberto M.", rating: 5, text: "Professional team, fast bookings and solid rates. They always find the best loads for my route." },
+  { username: "Dmitri K.", rating: 5, text: "Switched from another company and never looked back. Great loads, honest communication, fast payment." },
 ];
+
+function getInitials(name: string) {
+  return name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
+}
 
 export const ReviewsStrip: React.FC<ReviewsStripProps> = ({ theme = "dark", onAllReviews }) => {
   const isDark = theme === "dark";
   const { lang } = useLanguage();
   const [hovered, setHovered] = useState<number | null>(null);
+  const [reviews, setReviews] = useState<ReviewDTO[]>([]);
+
+  useEffect(() => {
+    fetch(`${API_BASE}/review?onlyApproved=true`)
+      .then(r => r.ok ? r.json() : Promise.reject())
+      .then((data: ReviewDTO[]) => {
+        const top = data
+          .sort((a, b) => b.rating - a.rating || new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+          .slice(0, 3);
+        if (top.length > 0) setReviews(top);
+        else setReviews(FALLBACK as ReviewDTO[]);
+      })
+      .catch(() => setReviews(FALLBACK as ReviewDTO[]));
+  }, []);
 
   const bg = isDark ? "#080808" : "#f5f5f5";
   const cardBg = isDark ? "#0f0f0f" : "#ffffff";
@@ -79,8 +86,8 @@ export const ReviewsStrip: React.FC<ReviewsStripProps> = ({ theme = "dark", onAl
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(300px,1fr))", gap: 20 }}>
-          {REVIEWS.map((r, i) => (
-            <div key={i}
+          {reviews.map((r, i) => (
+            <div key={r.id ?? i}
               onMouseEnter={() => setHovered(i)}
               onMouseLeave={() => setHovered(null)}
               style={{
@@ -91,20 +98,22 @@ export const ReviewsStrip: React.FC<ReviewsStripProps> = ({ theme = "dark", onAl
                 boxShadow: hovered === i ? "0 16px 40px rgba(0,0,0,0.4)" : "none",
               }}>
               <div style={{ display: "flex", gap: 4, marginBottom: 16 }}>
-                {Array.from({ length: r.stars }).map((_, s) => (
+                {Array.from({ length: r.rating }).map((_, s) => (
                   <svg key={s} width="14" height="14" viewBox="0 0 24 24" fill="#CC0000"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg>
                 ))}
               </div>
               <p style={{ fontFamily: "'Barlow',sans-serif", fontSize: 14, lineHeight: 1.7, color: quoteColor, marginBottom: 20, fontStyle: "italic" }}>
-                "{lang === "ru" ? r.ru : r.en}"
+                "{r.text}"
               </p>
               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                <div style={{ width: 40, height: 40, borderRadius: "50%", background: r.gradient, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                  <span style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 800, fontSize: 12, color: "#fff" }}>{r.avatar}</span>
+                <div style={{ width: 40, height: 40, borderRadius: "50%", background: GRADIENTS[i % GRADIENTS.length], display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                  <span style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 800, fontSize: 12, color: "#fff" }}>{getInitials(r.username)}</span>
                 </div>
                 <div>
-                  <div style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 13, color: textColor }}>{r.name}</div>
-                  <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 11, color: subColor, textTransform: "uppercase", letterSpacing: 0.8 }}>{r.role} · {r.state}</div>
+                  <div style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 13, color: textColor }}>{r.username}</div>
+                  <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 11, color: subColor, textTransform: "uppercase", letterSpacing: 0.8 }}>
+                    {new Date(r.createdAt).toLocaleDateString(lang === "ru" ? "ru-RU" : "en-US", { month: "short", year: "numeric" })}
+                  </div>
                 </div>
               </div>
             </div>

@@ -13,6 +13,8 @@ interface FooterProps {
   onContactClick?: () => void;
   onCareersClick?: () => void;
   onFleetClick?: () => void;
+  onFaqClick?: () => void;
+  onPrivacyClick?: () => void;
 }
 
 const FooterLink: React.FC<{
@@ -56,6 +58,8 @@ export const Footer: React.FC<FooterProps> = ({
   onContactClick,
   onCareersClick,
   onFleetClick,
+  onFaqClick,
+  onPrivacyClick,
 }) => {
   const { lang } = useLanguage();
   const t = translations[lang].footer;
@@ -180,6 +184,8 @@ export const Footer: React.FC<FooterProps> = ({
                 {t.quickItems[2]}
               </FooterLink>
               <FooterLink onClick={onContactClick} isLight={isLight}>{t.quickItems[3]}</FooterLink>
+              <FooterLink onClick={onFaqClick} isLight={isLight}>FAQ</FooterLink>
+              <FooterLink onClick={onPrivacyClick} isLight={isLight}>{lang === "ru" ? "Конфиденциальность" : "Privacy Policy"}</FooterLink>
             </div>
           </div>
 

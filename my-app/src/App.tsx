@@ -42,6 +42,8 @@ import { NotFoundPage } from "./components/pages/NotFoundPage";
 import { CookieConsent } from "./components/ui/CookieConsent";
 import { ReviewsStrip } from "./components/sections/ReviewsStrip";
 import { ContactSection } from "./components/sections/ContactSection";
+import { FaqPage } from "./components/pages/FaqPage";
+import { PrivacyPage } from "./components/pages/PrivacyPage";
 
 // Анимированное сердечко для секции "Лучшие грузы недели" 
 function WeeklyHeartBtn({ saved, onClick }: { saved: boolean; onClick: () => void }) {
@@ -281,6 +283,8 @@ function AppContent() {
   const [showFleet, setShowFleet] = useState(false);
   const [showAdmin, setShowAdmin] = useState(false);
   const [show404, setShow404] = useState(false);
+  const [showFaq, setShowFaq] = useState(false);
+  const [showPrivacy, setShowPrivacy] = useState(false);
   const [trackLoad, setTrackLoad] = useState<Load | null>(null);
   const [notifications, setNotifications] = useState<Array<{ id: number; text: string }>>([]);
 
@@ -755,6 +759,38 @@ function AppContent() {
     );
   }
 
+ // FAQ page
+  if (showFaq) {
+    return (
+      <div style={{ background: bgColor, minHeight: "100vh", color: textColor }}>
+        {sharedStyle}
+        {sharedHeader}
+        <div style={{ paddingTop: 70 }}>
+          <FaqPage theme={theme} onBack={() => { setShowFaq(false); window.scrollTo({ top: 0 }); }} />
+        </div>
+        {showAuth && <AuthModal onClose={() => setShowAuth(false)} theme={theme} onSuccess={(s) => { setSession(s); setShowAuth(false); }} />}
+        {showQuote && <QuoteModal onClose={() => setShowQuote(false)} theme={theme} />}
+        {sharedPanels}
+      </div>
+    );
+  }
+
+ // Privacy page
+  if (showPrivacy) {
+    return (
+      <div style={{ background: bgColor, minHeight: "100vh", color: textColor }}>
+        {sharedStyle}
+        {sharedHeader}
+        <div style={{ paddingTop: 70 }}>
+          <PrivacyPage theme={theme} onBack={() => { setShowPrivacy(false); window.scrollTo({ top: 0 }); }} />
+        </div>
+        {showAuth && <AuthModal onClose={() => setShowAuth(false)} theme={theme} onSuccess={(s) => { setSession(s); setShowAuth(false); }} />}
+        {showQuote && <QuoteModal onClose={() => setShowQuote(false)} theme={theme} />}
+        {sharedPanels}
+      </div>
+    );
+  }
+
  // Fleet page
   if (showFleet) {
     return (
@@ -1017,7 +1053,7 @@ function AppContent() {
       <ContactSection theme={theme} />
 
       <div ref={contactRef}>
-        <Footer theme={theme} onCatalogClick={() => scrollTo(catalogRef)} onAboutClick={() => scrollTo(aboutRef)} onQuoteClick={() => setShowQuote(true)} onContactClick={() => scrollTo(contactRef)} onCareersClick={() => { setShowCareers(true); window.scrollTo({ top: 0, behavior: "smooth" }); }} onFleetClick={() => { setShowFleet(true); window.scrollTo({ top: 0, behavior: "smooth" }); }} />
+        <Footer theme={theme} onCatalogClick={() => scrollTo(catalogRef)} onAboutClick={() => scrollTo(aboutRef)} onQuoteClick={() => setShowQuote(true)} onContactClick={() => scrollTo(contactRef)} onCareersClick={() => { setShowCareers(true); window.scrollTo({ top: 0, behavior: "smooth" }); }} onFleetClick={() => { setShowFleet(true); window.scrollTo({ top: 0, behavior: "smooth" }); }} onFaqClick={() => { setShowFaq(true); window.scrollTo({ top: 0, behavior: "smooth" }); }} onPrivacyClick={() => { setShowPrivacy(true); window.scrollTo({ top: 0, behavior: "smooth" }); }} />
       </div>
 
       {showAuth && <AuthModal onClose={() => setShowAuth(false)} theme={theme} onSuccess={(s) => { setSession(s); setShowAuth(false); }} />}

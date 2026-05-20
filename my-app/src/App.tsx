@@ -27,6 +27,7 @@ import { ReviewsPage } from "./components/pages/ReviewsPage";
 import { FleetPage } from "./components/pages/FleetPage";
 import { Notification } from "./components/ui/Notification";
 import { ChatBot } from "./components/ui/ChatBot";
+import { BackToTop } from "./components/ui/BackToTop";
 import { PhoneIcon } from "./components/ui/PhoneIcon";
 import { LOADS } from "./utils/data";
 import type { Load } from "./types/index";
@@ -1063,6 +1064,7 @@ function AppContent() {
         <Notification key={idx} text={msg} onClose={() => setNotifications(n => n.filter((_, i) => i !== idx))} />
       ))}
       <ChatBot theme={theme} />
+      <BackToTop />
     </div>
   );
 }

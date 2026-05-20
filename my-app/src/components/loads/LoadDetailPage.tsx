@@ -112,6 +112,12 @@ export const LoadDetailPage: React.FC<LoadDetailPageProps> = ({
         .stat-card:hover { border-color: rgba(204,0,0,0.5) !important; transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
         .detail-scroll::-webkit-scrollbar { width: 5px; }
         .detail-scroll::-webkit-scrollbar-thumb { background: rgba(204,0,0,0.4); border-radius: 3px; }
+        .dp-aside::-webkit-scrollbar { width: 4px; }
+        .dp-aside::-webkit-scrollbar-thumb { background: rgba(204,0,0,0.35); border-radius: 2px; }
+        @media (max-width: 860px) {
+          .dp-grid  { grid-template-columns: 1fr !important; }
+          .dp-aside { position: static !important; max-height: none !important; overflow: visible !important; order: -1; }
+        }
       `}</style>
 
  {/* Top nav bar */}
@@ -225,7 +231,7 @@ export const LoadDetailPage: React.FC<LoadDetailPageProps> = ({
         </div>
 
  {/* Two-column layout below */}
-        <div style={{ display:"grid", gridTemplateColumns:"1fr clamp(280px,35%,400px)", gap:24, alignItems:"start" }}>
+        <div className="dp-grid" style={{ display:"grid", gridTemplateColumns:"1fr clamp(280px,35%,400px)", gap:24, alignItems:"start" }}>
 
  {/* Left column */}
           <div style={{ display:"flex", flexDirection:"column", gap:20 }}>
@@ -475,7 +481,10 @@ export const LoadDetailPage: React.FC<LoadDetailPageProps> = ({
           </div>
 
  {/* Right column — sticky booking card */}
-          <div style={{ position:"sticky", top:76 }}>
+          <div
+            className="dp-aside"
+            style={{ position:"sticky", top:76, alignSelf:"start", maxHeight:"calc(100vh - 92px)", overflowY:"auto" }}
+          >
             <div style={{
               background:card, border:`1px solid ${bord}`, borderRadius:16,
               overflow:"hidden", animation:"detailFadeUp 0.5s ease 0.2s both",

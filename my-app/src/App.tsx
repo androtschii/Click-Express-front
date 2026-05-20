@@ -40,6 +40,7 @@ import { fetchProducts } from "./api/client.js";
 import { AdminPage } from "./components/pages/AdminPage";
 import { NotFoundPage } from "./components/pages/NotFoundPage";
 import { CookieConsent } from "./components/ui/CookieConsent";
+import { ReviewsStrip } from "./components/sections/ReviewsStrip";
 
 // Анимированное сердечко для секции "Лучшие грузы недели" 
 function WeeklyHeartBtn({ saved, onClick }: { saved: boolean; onClick: () => void }) {
@@ -1005,6 +1006,8 @@ function AppContent() {
       </section>
 
       <HaulTypes theme={theme} onQuoteClick={() => setShowQuote(true)} />
+
+      <ReviewsStrip theme={theme} onAllReviews={() => { setShowReviews(true); window.scrollTo({ top: 0, behavior: "smooth" }); }} />
 
       <div ref={aboutRef}>
         <AboutSection onContactClick={() => scrollTo(contactRef)} theme={theme} />

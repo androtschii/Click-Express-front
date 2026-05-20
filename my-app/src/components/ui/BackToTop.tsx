@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { ArrowUp } from "@phosphor-icons/react";
 
 export const BackToTop: React.FC = () => {
   const [visible, setVisible] = useState(false);
@@ -19,9 +20,9 @@ export const BackToTop: React.FC = () => {
       style={{
         position: "fixed",
         bottom: 90,
-        right: 24,
-        width: 46,
-        height: 46,
+        right: 28,
+        width: 50,
+        height: 50,
         borderRadius: "50%",
         border: "none",
         cursor: "pointer",
@@ -41,9 +42,7 @@ export const BackToTop: React.FC = () => {
         transition: "opacity 0.3s ease, transform 0.25s ease, background 0.15s, box-shadow 0.15s",
       }}
     >
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-        <path d="M12 19V5M5 12l7-7 7 7" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
+      <ArrowUp size={22} weight="bold" color="#fff" />
     </button>
   );
 };

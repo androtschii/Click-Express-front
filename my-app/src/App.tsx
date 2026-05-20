@@ -279,7 +279,7 @@ function AppContent() {
   const [showAdmin, setShowAdmin] = useState(false);
   const [show404, setShow404] = useState(false);
   const [trackLoad, setTrackLoad] = useState<Load | null>(null);
-  const [notifications, setNotifications] = useState<string[]>([]);
+  const [notifications, setNotifications] = useState<Array<{ id: number; text: string }>>([]);
 
   const catalogRef = useRef<HTMLDivElement>(null);
   const aboutRef = useRef<HTMLDivElement>(null);
@@ -442,7 +442,10 @@ function AppContent() {
   };
 
   const notify = (text: string) => {
-    setNotifications(n => [...n, text]);
+    setNotifications(n => {
+      const next = [...n, { id: Date.now(), text }];
+      return next.length > 3 ? next.slice(-3) : next;
+    });
   };
 
   const fetchCart = () => {
@@ -610,8 +613,8 @@ function AppContent() {
         {showAuth && <AuthModal onClose={() => setShowAuth(false)} theme={theme} onSuccess={(s) => { setSession(s); setShowAuth(false); }} />}
         {showQuote && <QuoteModal onClose={() => setShowQuote(false)} theme={theme} />}
         {sharedPanels}
-        {notifications.map((msg, idx) => (
-          <Notification key={idx} text={msg} onClose={() => setNotifications(n => n.filter((_, i) => i !== idx))} />
+        {notifications.map((item, idx) => (
+          <Notification key={item.id} item={item} index={idx} onClose={(id) => setNotifications(n => n.filter(x => x.id !== id))} />
         ))}
       </div>
     );
@@ -785,8 +788,8 @@ function AppContent() {
         {showAuth && <AuthModal onClose={() => setShowAuth(false)} theme={theme} onSuccess={(s) => { setSession(s); setShowAuth(false); }} />}
         {showQuote && <QuoteModal onClose={() => setShowQuote(false)} theme={theme} />}
         {sharedPanels}
-        {notifications.map((msg, idx) => (
-          <Notification key={idx} text={msg} onClose={() => setNotifications(n => n.filter((_, i) => i !== idx))} />
+        {notifications.map((item, idx) => (
+          <Notification key={item.id} item={item} index={idx} onClose={(id) => setNotifications(n => n.filter(x => x.id !== id))} />
         ))}
       </div>
     );

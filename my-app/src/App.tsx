@@ -40,6 +40,7 @@ import { fetchProducts } from "./api/client.js";
 import { AdminPage } from "./components/pages/AdminPage";
 import { NotFoundPage } from "./components/pages/NotFoundPage";
 import { CookieConsent } from "./components/ui/CookieConsent";
+import { MobileCallBar } from "./components/ui/MobileCallBar";
 import { CoverageMap } from "./components/sections/CoverageMap";
 import { WhyUs } from "./components/sections/WhyUs";
 import { ReviewsStrip } from "./components/sections/ReviewsStrip";
@@ -1123,6 +1124,7 @@ function AppContent() {
       ))}
       <ChatBot theme={theme} />
       <BackToTop />
+      <MobileCallBar />
       <CookieConsent theme={theme} />
     </div>
   );

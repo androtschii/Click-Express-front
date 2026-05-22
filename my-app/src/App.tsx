@@ -41,6 +41,7 @@ import { AdminPage } from "./components/pages/AdminPage";
 import { NotFoundPage } from "./components/pages/NotFoundPage";
 import { CookieConsent } from "./components/ui/CookieConsent";
 import { CoverageMap } from "./components/sections/CoverageMap";
+import { WhyUs } from "./components/sections/WhyUs";
 import { ReviewsStrip } from "./components/sections/ReviewsStrip";
 import { ContactSection } from "./components/sections/ContactSection";
 import { FaqPage } from "./components/pages/FaqPage";
@@ -1048,6 +1049,8 @@ function AppContent() {
           onCompare={handleCompare}
         />
       </section>
+
+      <WhyUs theme={theme} onQuoteClick={() => setShowQuote(true)} />
 
       <HaulTypes theme={theme} onQuoteClick={() => setShowQuote(true)} />
 

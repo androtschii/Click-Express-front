@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useLanguage } from "../../context/LanguageContext";
 import { API_BASE } from "../../config";
+import { useInView } from "../../hooks/useInView";
 
 const GRADIENTS = [
   "linear-gradient(135deg,#CC0000,#ff4d4d)",
@@ -38,6 +39,7 @@ export const ReviewsStrip: React.FC<ReviewsStripProps> = ({ theme = "dark", onAl
   const { lang } = useLanguage();
   const [hovered, setHovered] = useState<number | null>(null);
   const [reviews, setReviews] = useState<ReviewDTO[]>([]);
+  const { ref, inView } = useInView<HTMLElement>(0.1);
 
   useEffect(() => {
     fetch(`${API_BASE}/review?onlyApproved=true`)
@@ -60,9 +62,14 @@ export const ReviewsStrip: React.FC<ReviewsStripProps> = ({ theme = "dark", onAl
   const quoteColor = isDark ? "rgba(255,255,255,0.75)" : "rgba(0,0,0,0.7)";
 
   return (
-    <section style={{ background: bg, padding: "72px clamp(20px,5vw,64px)" }}>
+    <section ref={ref} style={{ background: bg, padding: "72px clamp(20px,5vw,64px)" }}>
       <div style={{ maxWidth: 1240, margin: "0 auto" }}>
-        <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 40, flexWrap: "wrap", gap: 16 }}>
+        <div style={{
+          display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 40, flexWrap: "wrap", gap: 16,
+          opacity: inView ? 1 : 0,
+          transform: inView ? "none" : "translateY(24px)",
+          transition: "opacity 0.6s ease, transform 0.6s ease",
+        }}>
           <div>
             <div style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 800, fontSize: 11, color: "#CC0000", letterSpacing: 4, textTransform: "uppercase", marginBottom: 10, display: "flex", alignItems: "center", gap: 8 }}>
               <span style={{ width: 20, height: 2, background: "#CC0000", display: "inline-block" }} />
@@ -94,9 +101,12 @@ export const ReviewsStrip: React.FC<ReviewsStripProps> = ({ theme = "dark", onAl
               style={{
                 background: cardBg, border: `1px solid ${hovered === i ? "#CC0000" : cardBorder}`,
                 borderRadius: 8, padding: "24px 22px",
-                transition: "all 0.2s",
+                transitionProperty: "border-color, transform, box-shadow, opacity",
+                transitionDuration: "0.2s, 0.2s, 0.2s, 0.5s",
+                transitionDelay: `0s, 0s, 0s, ${i * 120 + 200}ms`,
                 transform: hovered === i ? "translateY(-5px)" : "none",
                 boxShadow: hovered === i ? "0 16px 40px rgba(0,0,0,0.4)" : "none",
+                opacity: inView ? 1 : 0,
               }}>
               <div style={{ display: "flex", gap: 4, marginBottom: 16 }}>
                 {Array.from({ length: r.rating }).map((_, s) => (

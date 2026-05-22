@@ -40,6 +40,7 @@ import { fetchProducts } from "./api/client.js";
 import { AdminPage } from "./components/pages/AdminPage";
 import { NotFoundPage } from "./components/pages/NotFoundPage";
 import { CookieConsent } from "./components/ui/CookieConsent";
+import { CoverageMap } from "./components/sections/CoverageMap";
 import { ReviewsStrip } from "./components/sections/ReviewsStrip";
 import { ContactSection } from "./components/sections/ContactSection";
 import { FaqPage } from "./components/pages/FaqPage";
@@ -1049,6 +1050,8 @@ function AppContent() {
       </section>
 
       <HaulTypes theme={theme} onQuoteClick={() => setShowQuote(true)} />
+
+      <CoverageMap theme={theme} />
 
       <ReviewsStrip theme={theme} onAllReviews={() => { setShowReviews(true); window.scrollTo({ top: 0, behavior: "smooth" }); }} />
 

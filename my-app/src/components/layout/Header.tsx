@@ -4,6 +4,7 @@ import type { Session } from "../../services/authService";
 import { useLanguage } from "../../context/LanguageContext";
 import { translations } from "../../i18n/translations";
 import { Gear, User, ListBullets, SignOut, List, X } from "@phosphor-icons/react";
+import NotificationBell from "../ui/NotificationBell";
 
 interface HeaderProps {
   cartCount: number;
@@ -292,6 +293,8 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
         </div>
       )}
+
+      {session && <NotificationBell isLight={isLight} />}
 
       {session ? (
         <div style={{ position: "relative", flexShrink: 0 }}>

@@ -3,7 +3,7 @@ import { CELogo } from "../ui/Logo";
 import { PhoneIcon } from "../ui/PhoneIcon";
 import { useLanguage } from "../../context/LanguageContext";
 import { translations } from "../../i18n/translations";
-import { Truck } from "@phosphor-icons/react";
+import { Truck, InstagramLogo, FacebookLogo, LinkedinLogo, TiktokLogo } from "@phosphor-icons/react";
 
 interface FooterProps {
   theme?: "dark" | "light";
@@ -48,6 +48,50 @@ const FooterLink: React.FC<{
   return (
     <div onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)} onClick={onClick} style={style}>
       {children}
+    </div>
+  );
+};
+
+const NewsletterStrip: React.FC<{ isLight: boolean; lang: string }> = ({ isLight, lang }) => {
+  const [email, setEmail] = useState("");
+  const [done, setDone] = useState(false);
+  const border = isLight ? "rgba(0,0,0,0.1)" : "rgba(255,255,255,0.08)";
+  const text = isLight ? "#1a1a1a" : "#fff";
+  const muted = isLight ? "rgba(0,0,0,0.45)" : "rgba(255,255,255,0.45)";
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email.trim()) return;
+    setDone(true);
+    setEmail("");
+  };
+
+  return (
+    <div style={{ borderTop: `1px solid ${border}`, paddingTop: 28, marginBottom: 0, display: "flex", gap: 24, alignItems: "center", flexWrap: "wrap" as const, justifyContent: "space-between" }}>
+      <div>
+        <div style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 16, color: text, marginBottom: 4 }}>
+          {lang === "ru" ? "Будьте в курсе" : "Stay in the Loop"}
+        </div>
+        <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 12, color: muted }}>
+          {lang === "ru" ? "Новые грузы и новости индустрии" : "New loads, market insights, and freight news"}
+        </div>
+      </div>
+      {done ? (
+        <div style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 13, color: "#22c55e" }}>✓ {lang === "ru" ? "Подписка оформлена!" : "Subscribed!"}</div>
+      ) : (
+        <form onSubmit={handleSubmit} style={{ display: "flex", gap: 8 }}>
+          <input
+            type="email"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+            placeholder={lang === "ru" ? "Ваш email" : "your@email.com"}
+            style={{ padding: "9px 14px", borderRadius: 5, border: `1px solid ${border}`, background: isLight ? "#f8f8f8" : "rgba(255,255,255,0.05)", color: text, fontFamily: "'Barlow',sans-serif", fontSize: 13, outline: "none", width: 200 }}
+          />
+          <button type="submit" style={{ padding: "9px 18px", background: "#CC0000", color: "#fff", border: "none", borderRadius: 5, fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 12, letterSpacing: 1, textTransform: "uppercase" as const, cursor: "pointer", whiteSpace: "nowrap" as const }}>
+            {lang === "ru" ? "Подписаться" : "Subscribe"}
+          </button>
+        </form>
+      )}
     </div>
   );
 };
@@ -149,6 +193,21 @@ export const Footer: React.FC<FooterProps> = ({
                   Hallandale Beach, FL 33009
                 </span>
               </div>
+              <div style={{ marginTop: 18, display: "flex", gap: 10 }}>
+                {[
+                  { href: "https://www.instagram.com/clickexpress.official", Icon: InstagramLogo, label: "Instagram" },
+                  { href: "https://www.facebook.com/clickexpress", Icon: FacebookLogo, label: "Facebook" },
+                  { href: "https://www.linkedin.com/company/clickexpress", Icon: LinkedinLogo, label: "LinkedIn" },
+                  { href: "https://www.tiktok.com/@clickexpress", Icon: TiktokLogo, label: "TikTok" },
+                ].map(s => (
+                  <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer" aria-label={s.label}
+                    style={{ width: 34, height: 34, borderRadius: "50%", border: `1px solid ${isLight ? "rgba(0,0,0,0.12)" : "rgba(255,255,255,0.12)"}`, display: "flex", alignItems: "center", justifyContent: "center", color: mutedColor, textDecoration: "none", transition: "all 0.2s" }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = "#CC0000"; (e.currentTarget as HTMLElement).style.color = "#CC0000"; (e.currentTarget as HTMLElement).style.background = "rgba(204,0,0,0.08)"; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = isLight ? "rgba(0,0,0,0.12)" : "rgba(255,255,255,0.12)"; (e.currentTarget as HTMLElement).style.color = mutedColor; (e.currentTarget as HTMLElement).style.background = "transparent"; }}>
+                    <s.Icon size={16} />
+                  </a>
+                ))}
+              </div>
             </div>
 
             <div>
@@ -195,13 +254,30 @@ export const Footer: React.FC<FooterProps> = ({
             </div>
           </div>
 
-          <div style={{ borderTop: `1px solid ${dividerColor}`, paddingTop: 20, display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
-            <p style={{ color: subtleColor, fontSize: 12, fontFamily: "'Barlow',sans-serif" }}>
-              {t.copyright}
-            </p>
-            <p style={{ color: isLight ? "rgba(0,0,0,0.2)" : "rgba(255,255,255,0.1)", fontSize: 11, fontFamily: "'Barlow',sans-serif" }}>
-              React · UTM Lab
-            </p>
+          <NewsletterStrip isLight={isLight} lang={lang} />
+
+          <div style={{ borderTop: `1px solid ${dividerColor}`, paddingTop: 20, marginTop: 20 }}>
+            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" as const, marginBottom: 16 }}>
+              {[
+                { label: "FMCSA Registered", icon: "🛡️" },
+                { label: "MC Licensed", icon: "✅" },
+                { label: "DOT Compliant", icon: "⚖️" },
+                { label: "Fully Insured", icon: "🔒" },
+              ].map(b => (
+                <div key={b.label} style={{ display: "flex", alignItems: "center", gap: 5, padding: "5px 11px", border: `1px solid ${isLight ? "rgba(0,0,0,0.1)" : "rgba(255,255,255,0.1)"}`, borderRadius: 20 }}>
+                  <span style={{ fontSize: 11 }}>{b.icon}</span>
+                  <span style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 10, color: subtleColor, letterSpacing: 0.8, textTransform: "uppercase" as const }}>{b.label}</span>
+                </div>
+              ))}
+            </div>
+            <div style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap" as const, gap: 10 }}>
+              <p style={{ color: subtleColor, fontSize: 12, fontFamily: "'Barlow',sans-serif" }}>
+                {t.copyright}
+              </p>
+              <p style={{ color: isLight ? "rgba(0,0,0,0.2)" : "rgba(255,255,255,0.1)", fontSize: 11, fontFamily: "'Barlow',sans-serif" }}>
+                React · UTM Lab
+              </p>
+            </div>
           </div>
         </div>
       </footer>

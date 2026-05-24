@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, lazy, Suspense } from "react";
 import { ThemeProvider, useTheme } from "./theme";
 import { LanguageProvider, useLanguage } from "./context/LanguageContext";
 import { translations } from "./i18n/translations";
@@ -17,14 +17,6 @@ import { CompareModal } from "./components/Modals/CompareModal";
 import { CartPanel, type CartItemDto } from "./components/Modals/CartPanel";
 import { getSession, logout, type Session } from "./services/authService";
 import { LoadListView } from "./components/loads/LoadList";
-import { LoadDetailPage } from "./components/loads/LoadDetailPage";
-import { CareersPage } from "./components/pages/CareersPage";
-import { ProfilePage } from "./components/pages/ProfilePage";
-import { OrdersPage } from "./components/pages/OrdersPage";
-import { TrackingPage } from "./components/pages/TrackingPage";
-import { NewsPage } from "./components/pages/NewsPage";
-import { ReviewsPage } from "./components/pages/ReviewsPage";
-import { FleetPage } from "./components/pages/FleetPage";
 import { Notification } from "./components/ui/Notification";
 import { ChatBot } from "./components/ui/ChatBot";
 import { BackToTop } from "./components/ui/BackToTop";
@@ -37,20 +29,36 @@ import { X, Heart, ClipboardText } from "@phosphor-icons/react";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import { fetchProducts } from "./api/client.js";
-import { AdminPage } from "./components/pages/AdminPage";
-import { NotFoundPage } from "./components/pages/NotFoundPage";
 import { CookieConsent } from "./components/ui/CookieConsent";
 import { MobileCallBar } from "./components/ui/MobileCallBar";
-import { CoverageMap } from "./components/sections/CoverageMap";
 import { WhyUs } from "./components/sections/WhyUs";
 import { ReviewsStrip } from "./components/sections/ReviewsStrip";
 import { ContactSection } from "./components/sections/ContactSection";
-import { FaqPage } from "./components/pages/FaqPage";
-import { PrivacyPage } from "./components/pages/PrivacyPage";
-import { PricingSection } from "./components/sections/PricingSection";
-import { RateCalculator } from "./components/sections/RateCalculator";
-import { DriverSignupPage } from "./components/pages/DriverSignupPage";
 import { API_BASE } from "./config";
+
+const LoadDetailPage = lazy(() => import("./components/loads/LoadDetailPage").then(m => ({ default: m.LoadDetailPage })));
+const CareersPage = lazy(() => import("./components/pages/CareersPage").then(m => ({ default: m.CareersPage })));
+const ProfilePage = lazy(() => import("./components/pages/ProfilePage").then(m => ({ default: m.ProfilePage })));
+const OrdersPage = lazy(() => import("./components/pages/OrdersPage").then(m => ({ default: m.OrdersPage })));
+const TrackingPage = lazy(() => import("./components/pages/TrackingPage").then(m => ({ default: m.TrackingPage })));
+const NewsPage = lazy(() => import("./components/pages/NewsPage").then(m => ({ default: m.NewsPage })));
+const ReviewsPage = lazy(() => import("./components/pages/ReviewsPage").then(m => ({ default: m.ReviewsPage })));
+const FleetPage = lazy(() => import("./components/pages/FleetPage").then(m => ({ default: m.FleetPage })));
+const AdminPage = lazy(() => import("./components/pages/AdminPage").then(m => ({ default: m.AdminPage })));
+const NotFoundPage = lazy(() => import("./components/pages/NotFoundPage").then(m => ({ default: m.NotFoundPage })));
+const FaqPage = lazy(() => import("./components/pages/FaqPage").then(m => ({ default: m.FaqPage })));
+const PrivacyPage = lazy(() => import("./components/pages/PrivacyPage").then(m => ({ default: m.PrivacyPage })));
+const PricingSection = lazy(() => import("./components/sections/PricingSection").then(m => ({ default: m.PricingSection })));
+const RateCalculator = lazy(() => import("./components/sections/RateCalculator").then(m => ({ default: m.RateCalculator })));
+const CoverageMap = lazy(() => import("./components/sections/CoverageMap").then(m => ({ default: m.CoverageMap })));
+const DriverSignupPage = lazy(() => import("./components/pages/DriverSignupPage").then(m => ({ default: m.DriverSignupPage })));
+
+const PageLoader = () => (
+  <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "50vh" }}>
+    <div style={{ width: 36, height: 36, border: "3px solid rgba(204,0,0,0.2)", borderTopColor: "#CC0000", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+    <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+  </div>
+);
 
 // Анимированное сердечко для секции "Лучшие грузы недели" 
 function WeeklyHeartBtn({ saved, onClick }: { saved: boolean; onClick: () => void }) {
@@ -622,14 +630,16 @@ function AppContent() {
         {sharedStyle}
         {sharedHeader}
         <div style={{ paddingTop: 70 }}>
-          <LoadDetailPage
-            load={detailLoad}
-            theme={theme}
-            isBooked={cartItems.some(i => i.productId === detailLoad.id)}
-            onClose={() => { setDetailLoad(null); setTimeout(() => scrollTo(catalogRef), 80); }}
-            onBook={(load) => handleBook(load)}
-            onCancelBook={(load) => handleCancelBook(load)}
-          />
+          <Suspense fallback={<PageLoader />}>
+            <LoadDetailPage
+              load={detailLoad}
+              theme={theme}
+              isBooked={cartItems.some(i => i.productId === detailLoad.id)}
+              onClose={() => { setDetailLoad(null); setTimeout(() => scrollTo(catalogRef), 80); }}
+              onBook={(load) => handleBook(load)}
+              onCancelBook={(load) => handleCancelBook(load)}
+            />
+          </Suspense>
         </div>
         {showAuth && <AuthModal onClose={() => setShowAuth(false)} theme={theme} onSuccess={(s) => { setSession(s); setShowAuth(false); }} />}
         {showQuote && <QuoteModal onClose={() => setShowQuote(false)} theme={theme} />}
@@ -648,7 +658,7 @@ function AppContent() {
         {sharedStyle}
         {sharedHeader}
         <div style={{ paddingTop: 70 }}>
-          <ReviewsPage theme={theme} session={session} onBack={() => { setShowReviews(false); window.scrollTo({ top: 0 }); }} />
+          <Suspense fallback={<PageLoader />}><ReviewsPage theme={theme} session={session} onBack={() => { setShowReviews(false); window.scrollTo({ top: 0 }); }} /></Suspense>
         </div>
         {showAuth && <AuthModal onClose={() => setShowAuth(false)} theme={theme} onSuccess={(s) => { setSession(s); setShowAuth(false); }} />}
         {showQuote && <QuoteModal onClose={() => setShowQuote(false)} theme={theme} />}
@@ -664,7 +674,7 @@ function AppContent() {
         {sharedStyle}
         {sharedHeader}
         <div style={{ paddingTop: 70 }}>
-          <NewsPage theme={theme} session={session} onBack={() => { setShowNews(false); window.scrollTo({ top: 0 }); }} onViewLoads={() => { setShowNews(false); setTimeout(() => scrollTo(catalogRef), 80); }} onLoadDetail={(load) => { setShowNews(false); setDetailLoad(load); window.scrollTo({ top: 0 }); }} />
+          <Suspense fallback={<PageLoader />}><NewsPage theme={theme} session={session} onBack={() => { setShowNews(false); window.scrollTo({ top: 0 }); }} onViewLoads={() => { setShowNews(false); setTimeout(() => scrollTo(catalogRef), 80); }} onLoadDetail={(load) => { setShowNews(false); setDetailLoad(load); window.scrollTo({ top: 0 }); }} /></Suspense>
         </div>
         {showAuth && <AuthModal onClose={() => setShowAuth(false)} theme={theme} onSuccess={(s) => { setSession(s); setShowAuth(false); }} />}
         {showQuote && <QuoteModal onClose={() => setShowQuote(false)} theme={theme} />}
@@ -680,7 +690,7 @@ function AppContent() {
         {sharedStyle}
         {sharedHeader}
         <div style={{ paddingTop: 70 }}>
-          <CareersPage theme={theme} session={session} onBack={() => { setShowCareers(false); window.scrollTo({ top: 0 }); }} />
+          <Suspense fallback={<PageLoader />}><CareersPage theme={theme} session={session} onBack={() => { setShowCareers(false); window.scrollTo({ top: 0 }); }} /></Suspense>
         </div>
         {showAuth && <AuthModal onClose={() => setShowAuth(false)} theme={theme} onSuccess={(s) => { setSession(s); setShowAuth(false); }} />}
         {showQuote && <QuoteModal onClose={() => setShowQuote(false)} theme={theme} />}
@@ -695,10 +705,12 @@ function AppContent() {
       <div style={{ background: bgColor, minHeight: "100vh", color: textColor }}>
         {sharedStyle}
         {sharedHeader}
-        <AdminPage
-          theme={theme}
-          onBack={() => { setShowAdmin(false); window.scrollTo({ top: 0 }); }}
-        />
+        <Suspense fallback={<PageLoader />}>
+          <AdminPage
+            theme={theme}
+            onBack={() => { setShowAdmin(false); window.scrollTo({ top: 0 }); }}
+          />
+        </Suspense>
         {showAuth && <AuthModal onClose={() => setShowAuth(false)} theme={theme} onSuccess={(s) => { setSession(s); setShowAuth(false); }} />}
         {showQuote && <QuoteModal onClose={() => setShowQuote(false)} theme={theme} />}
       </div>
@@ -712,7 +724,7 @@ function AppContent() {
         {sharedStyle}
         {sharedHeader}
         <div style={{ paddingTop: 70 }}>
-          <ProfilePage
+          <Suspense fallback={<PageLoader />}><ProfilePage
             session={session}
             theme={theme}
             savedLoads={savedLoads}
@@ -725,7 +737,7 @@ function AppContent() {
             onSaveRemove={(l) => handleSave(l, false)}
             onOrderCancel={(l) => handleCancelBook(l)}
             onTrack={(l) => { setShowProfile(false); setTrackLoad(l); window.scrollTo({ top: 0 }); }}
-          />
+          /></Suspense>
         </div>
         {showAuth && <AuthModal onClose={() => setShowAuth(false)} theme={theme} onSuccess={(s) => { setSession(s); setShowAuth(false); }} />}
         {showQuote && <QuoteModal onClose={() => setShowQuote(false)} theme={theme} />}
@@ -741,14 +753,14 @@ function AppContent() {
         {sharedStyle}
         {sharedHeader}
         <div style={{ paddingTop: 70 }}>
-          <TrackingPage
+          <Suspense fallback={<PageLoader />}><TrackingPage
             load={trackLoad}
             theme={theme}
             orderId={orderIdMap.get(trackLoad.id)}
             session={session}
             apiBase={API_BASE}
             onBack={() => setTrackLoad(null)}
-          />
+          /></Suspense>
         </div>
         {showAuth && <AuthModal onClose={() => setShowAuth(false)} theme={theme} onSuccess={(s) => { setSession(s); setShowAuth(false); }} />}
         {showQuote && <QuoteModal onClose={() => setShowQuote(false)} theme={theme} />}
@@ -764,7 +776,7 @@ function AppContent() {
         {sharedStyle}
         {sharedHeader}
         <div style={{ paddingTop: 70 }}>
-          <NotFoundPage theme={theme} onBack={() => { setShow404(false); window.scrollTo({ top: 0 }); }} />
+          <Suspense fallback={<PageLoader />}><NotFoundPage theme={theme} onBack={() => { setShow404(false); window.scrollTo({ top: 0 }); }} /></Suspense>
         </div>
         {showAuth && <AuthModal onClose={() => setShowAuth(false)} theme={theme} onSuccess={(s) => { setSession(s); setShowAuth(false); }} />}
         {showQuote && <QuoteModal onClose={() => setShowQuote(false)} theme={theme} />}
@@ -780,7 +792,7 @@ function AppContent() {
         {sharedStyle}
         {sharedHeader}
         <div style={{ paddingTop: 70 }}>
-          <FaqPage theme={theme} onBack={() => { setShowFaq(false); window.scrollTo({ top: 0 }); }} />
+          <Suspense fallback={<PageLoader />}><FaqPage theme={theme} onBack={() => { setShowFaq(false); window.scrollTo({ top: 0 }); }} /></Suspense>
         </div>
         {showAuth && <AuthModal onClose={() => setShowAuth(false)} theme={theme} onSuccess={(s) => { setSession(s); setShowAuth(false); }} />}
         {showQuote && <QuoteModal onClose={() => setShowQuote(false)} theme={theme} />}
@@ -796,7 +808,7 @@ function AppContent() {
         {sharedStyle}
         {sharedHeader}
         <div style={{ paddingTop: 70 }}>
-          <PricingSection theme={theme} standalone onBack={() => { setShowPricing(false); window.scrollTo({ top: 0 }); }} onQuoteClick={() => setShowQuote(true)} />
+          <Suspense fallback={<PageLoader />}><PricingSection theme={theme} standalone onBack={() => { setShowPricing(false); window.scrollTo({ top: 0 }); }} onQuoteClick={() => setShowQuote(true)} /></Suspense>
         </div>
         {showAuth && <AuthModal onClose={() => setShowAuth(false)} theme={theme} onSuccess={(s) => { setSession(s); setShowAuth(false); }} />}
         {showQuote && <QuoteModal onClose={() => setShowQuote(false)} theme={theme} />}
@@ -812,7 +824,7 @@ function AppContent() {
         {sharedStyle}
         {sharedHeader}
         <div style={{ paddingTop: 70 }}>
-          <PrivacyPage theme={theme} onBack={() => { setShowPrivacy(false); window.scrollTo({ top: 0 }); }} />
+          <Suspense fallback={<PageLoader />}><PrivacyPage theme={theme} onBack={() => { setShowPrivacy(false); window.scrollTo({ top: 0 }); }} /></Suspense>
         </div>
         {showAuth && <AuthModal onClose={() => setShowAuth(false)} theme={theme} onSuccess={(s) => { setSession(s); setShowAuth(false); }} />}
         {showQuote && <QuoteModal onClose={() => setShowQuote(false)} theme={theme} />}
@@ -828,7 +840,7 @@ function AppContent() {
         {sharedStyle}
         {sharedHeader}
         <div style={{ paddingTop: 70 }}>
-          <DriverSignupPage theme={theme} onBack={() => { setShowDriverSignup(false); window.scrollTo({ top: 0 }); }} />
+          <Suspense fallback={<PageLoader />}><DriverSignupPage theme={theme} onBack={() => { setShowDriverSignup(false); window.scrollTo({ top: 0 }); }} /></Suspense>
         </div>
         {showAuth && <AuthModal onClose={() => setShowAuth(false)} theme={theme} onSuccess={(s) => { setSession(s); setShowAuth(false); }} />}
         {showQuote && <QuoteModal onClose={() => setShowQuote(false)} theme={theme} />}
@@ -844,7 +856,7 @@ function AppContent() {
         {sharedStyle}
         {sharedHeader}
         <div style={{ paddingTop: 70 }}>
-          <FleetPage theme={theme} onBack={() => { setShowFleet(false); window.scrollTo({ top: 0 }); }} />
+          <Suspense fallback={<PageLoader />}><FleetPage theme={theme} onBack={() => { setShowFleet(false); window.scrollTo({ top: 0 }); }} /></Suspense>
         </div>
         {showAuth && <AuthModal onClose={() => setShowAuth(false)} theme={theme} onSuccess={(s) => { setSession(s); setShowAuth(false); }} />}
         {showQuote && <QuoteModal onClose={() => setShowQuote(false)} theme={theme} />}
@@ -860,7 +872,7 @@ function AppContent() {
         {sharedStyle}
         {sharedHeader}
         <div style={{ paddingTop: 70 }}>
-          <OrdersPage
+          <Suspense fallback={<PageLoader />}><OrdersPage
             orders={bookedLoads}
             theme={theme}
             onBack={() => { setShowOrders(false); window.scrollTo({ top: 0 }); }}
@@ -868,7 +880,7 @@ function AppContent() {
             onCancel={(load) => { handleCancelBook(load); }}
             onDetails={(load) => { setShowOrders(false); setDetailLoad(load); window.scrollTo({ top: 0 }); }}
             onTrack={(load) => { setShowOrders(false); setTrackLoad(load); window.scrollTo({ top: 0 }); }}
-          />
+          /></Suspense>
         </div>
         {showAuth && <AuthModal onClose={() => setShowAuth(false)} theme={theme} onSuccess={(s) => { setSession(s); setShowAuth(false); }} />}
         {showQuote && <QuoteModal onClose={() => setShowQuote(false)} theme={theme} />}
@@ -1092,7 +1104,7 @@ function AppContent() {
 
       <HaulTypes theme={theme} onQuoteClick={() => setShowQuote(true)} />
 
-      <CoverageMap theme={theme} />
+      <Suspense fallback={<PageLoader />}><CoverageMap theme={theme} /></Suspense>
 
       <ReviewsStrip theme={theme} onAllReviews={() => { setShowReviews(true); window.scrollTo({ top: 0, behavior: "smooth" }); }} />
 
@@ -1100,9 +1112,9 @@ function AppContent() {
         <AboutSection onContactClick={() => scrollTo(contactRef)} theme={theme} />
       </div>
 
-      <RateCalculator theme={theme} onQuoteClick={() => setShowQuote(true)} />
+      <Suspense fallback={<PageLoader />}><RateCalculator theme={theme} onQuoteClick={() => setShowQuote(true)} /></Suspense>
 
-      <PricingSection theme={theme} onQuoteClick={() => setShowQuote(true)} />
+      <Suspense fallback={<PageLoader />}><PricingSection theme={theme} onQuoteClick={() => setShowQuote(true)} /></Suspense>
 
       <ContactSection theme={theme} />
 

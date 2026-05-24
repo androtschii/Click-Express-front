@@ -49,6 +49,7 @@ import { FaqPage } from "./components/pages/FaqPage";
 import { PrivacyPage } from "./components/pages/PrivacyPage";
 import { PricingSection } from "./components/sections/PricingSection";
 import { RateCalculator } from "./components/sections/RateCalculator";
+import { DriverSignupPage } from "./components/pages/DriverSignupPage";
 import { API_BASE } from "./config";
 
 // Анимированное сердечко для секции "Лучшие грузы недели" 
@@ -291,6 +292,7 @@ function AppContent() {
   const [showFaq, setShowFaq] = useState(false);
   const [showPrivacy, setShowPrivacy] = useState(false);
   const [showPricing, setShowPricing] = useState(false);
+  const [showDriverSignup, setShowDriverSignup] = useState(false);
   const [trackLoad, setTrackLoad] = useState<Load | null>(null);
   const [notifications, setNotifications] = useState<Array<{ id: number; text: string }>>([]);
   const [isMobileView, setIsMobileView] = useState(() => typeof window !== "undefined" ? window.innerWidth < 768 : false);
@@ -819,6 +821,22 @@ function AppContent() {
     );
   }
 
+ // Driver signup page
+  if (showDriverSignup) {
+    return (
+      <div style={{ background: bgColor, minHeight: "100vh", color: textColor }}>
+        {sharedStyle}
+        {sharedHeader}
+        <div style={{ paddingTop: 70 }}>
+          <DriverSignupPage theme={theme} onBack={() => { setShowDriverSignup(false); window.scrollTo({ top: 0 }); }} />
+        </div>
+        {showAuth && <AuthModal onClose={() => setShowAuth(false)} theme={theme} onSuccess={(s) => { setSession(s); setShowAuth(false); }} />}
+        {showQuote && <QuoteModal onClose={() => setShowQuote(false)} theme={theme} />}
+        {sharedPanels}
+      </div>
+    );
+  }
+
  // Fleet page
   if (showFleet) {
     return (
@@ -1089,7 +1107,7 @@ function AppContent() {
       <ContactSection theme={theme} />
 
       <div ref={contactRef}>
-        <Footer theme={theme} onCatalogClick={() => scrollTo(catalogRef)} onAboutClick={() => scrollTo(aboutRef)} onQuoteClick={() => setShowQuote(true)} onContactClick={() => scrollTo(contactRef)} onCareersClick={() => { setShowCareers(true); window.scrollTo({ top: 0, behavior: "smooth" }); }} onFleetClick={() => { setShowFleet(true); window.scrollTo({ top: 0, behavior: "smooth" }); }} onFaqClick={() => { setShowFaq(true); window.scrollTo({ top: 0, behavior: "smooth" }); }} onPrivacyClick={() => { setShowPrivacy(true); window.scrollTo({ top: 0, behavior: "smooth" }); }} onPricingClick={() => { setShowPricing(true); window.scrollTo({ top: 0, behavior: "smooth" }); }} />
+        <Footer theme={theme} onCatalogClick={() => scrollTo(catalogRef)} onAboutClick={() => scrollTo(aboutRef)} onQuoteClick={() => setShowQuote(true)} onContactClick={() => scrollTo(contactRef)} onCareersClick={() => { setShowCareers(true); window.scrollTo({ top: 0, behavior: "smooth" }); }} onFleetClick={() => { setShowFleet(true); window.scrollTo({ top: 0, behavior: "smooth" }); }} onFaqClick={() => { setShowFaq(true); window.scrollTo({ top: 0, behavior: "smooth" }); }} onPrivacyClick={() => { setShowPrivacy(true); window.scrollTo({ top: 0, behavior: "smooth" }); }} onPricingClick={() => { setShowPricing(true); window.scrollTo({ top: 0, behavior: "smooth" }); }} onDriverSignupClick={() => { setShowDriverSignup(true); window.scrollTo({ top: 0, behavior: "smooth" }); }} />
       </div>
 
       {showAuth && <AuthModal onClose={() => setShowAuth(false)} theme={theme} onSuccess={(s) => { setSession(s); setShowAuth(false); }} />}

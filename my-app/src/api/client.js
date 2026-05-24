@@ -282,6 +282,15 @@ export const approveReview = async (id) => {
   return response.json();
 };
 
+export const rejectReview = async (id) => {
+  const response = await fetch(`${API_BASE_URL}/review/${id}/reject`, {
+    method: "PATCH",
+    headers: authHeaders(),
+  });
+  if (!response.ok) throw new Error("Ошибка отклонения");
+  return response.json();
+};
+
 export const deleteReview = async (id) => {
   const response = await fetch(`${API_BASE_URL}/review/${id}`, {
     method: "DELETE",

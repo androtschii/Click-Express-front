@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useLanguage } from "../../context/LanguageContext";
-import { fetchReviews, createReview, approveReview, deleteReview } from "../../api/client.js";
+import { fetchReviews, createReview, approveReview, rejectReview, deleteReview } from "../../api/client.js";
 import type { Session } from "../../services/authService";
 import { Threads } from "../ui/Threads";
 
@@ -250,6 +250,7 @@ export const ReviewsPage: React.FC<ReviewsPageProps> = ({ theme = "dark", onBack
   const [showForm, setShowForm] = useState(false);
   const [formName, setFormName] = useState("");
   const [formRole, setFormRole] = useState("");
+  const [formLocation, setFormLocation] = useState("");
   const [formStars, setFormStars] = useState(5);
   const [formComment, setFormComment] = useState("");
   const [formSubmitted, setFormSubmitted] = useState(false);
@@ -307,8 +308,8 @@ export const ReviewsPage: React.FC<ReviewsPageProps> = ({ theme = "dark", onBack
     if (formComment.trim().length < 20) { setFormError(lang === "ru" ? "Отзыв слишком короткий (мин. 20 символов)" : "Review too short (min 20 chars)"); return; }
     setFormError("");
     try {
-      await createReview({ rating: formStars, text: formComment.trim() });
-      setFormName(""); setFormRole(""); setFormStars(5); setFormComment("");
+      await createReview({ rating: formStars, text: formComment.trim(), role: formRole.trim() || undefined, location: formLocation.trim() || undefined });
+      setFormName(""); setFormRole(""); setFormLocation(""); setFormStars(5); setFormComment("");
       setFormSubmitted(true);
       setShowForm(false);
       setTimeout(() => setFormSubmitted(false), 5000);
@@ -322,6 +323,15 @@ export const ReviewsPage: React.FC<ReviewsPageProps> = ({ theme = "dark", onBack
     try {
       await approveReview(id);
       setReviews(rs => rs.map(r => r.id === id && r.isFromApi ? { ...r, isApproved: true } : r));
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "Error");
+    }
+  };
+
+  const handleReject = async (id: number) => {
+    try {
+      await rejectReview(id);
+      setReviews(rs => rs.map(r => r.id === id && r.isFromApi ? { ...r, isApproved: false } : r));
     } catch (e) {
       alert(e instanceof Error ? e.message : "Error");
     }
@@ -481,6 +491,18 @@ export const ReviewsPage: React.FC<ReviewsPageProps> = ({ theme = "dark", onBack
                   style={inputStyle}
                 />
               </div>
+              <div>
+                <label style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 11, color: textSubtle, letterSpacing: 1.5, textTransform: "uppercase", display: "block", marginBottom: 6 }}>
+                  {lang === "ru" ? "Город / Штат" : "City / State"}
+                </label>
+                <input
+                  className="rev-input"
+                  value={formLocation}
+                  onChange={e => setFormLocation(e.target.value)}
+                  placeholder={lang === "ru" ? "Майами, Флорида" : "Miami, Florida"}
+                  style={inputStyle}
+                />
+              </div>
             </div>
 
             <div style={{ marginBottom: 20 }}>
@@ -573,9 +595,15 @@ export const ReviewsPage: React.FC<ReviewsPageProps> = ({ theme = "dark", onBack
                           ✓ {lang === "ru" ? "Одобрить" : "Approve"}
                         </button>
                       )}
+                      {review.isApproved && (
+                        <button onClick={() => handleReject(review.id)} title={lang === "ru" ? "Отклонить" : "Reject"}
+                          style={{ padding: "4px 10px", background: "rgba(234,88,12,0.12)", border: "1px solid rgba(234,88,12,0.4)", borderRadius: 6, color: "#ea580c", fontFamily: "'Barlow',sans-serif", fontSize: 11, fontWeight: 700, cursor: "pointer", letterSpacing: 1, textTransform: "uppercase" }}>
+                          ✕ {lang === "ru" ? "Отклонить" : "Reject"}
+                        </button>
+                      )}
                       <button onClick={() => handleDeleteReview(review.id)} title={lang === "ru" ? "Удалить" : "Delete"}
                         style={{ padding: "4px 10px", background: "rgba(204,0,0,0.12)", border: "1px solid rgba(204,0,0,0.4)", borderRadius: 6, color: "#CC0000", fontFamily: "'Barlow',sans-serif", fontSize: 11, fontWeight: 700, cursor: "pointer", letterSpacing: 1, textTransform: "uppercase" }}>
-                        ✕
+                        🗑
                       </button>
                     </div>
                   )}

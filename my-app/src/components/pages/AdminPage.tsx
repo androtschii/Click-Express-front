@@ -12,6 +12,7 @@ import {
   fetchAdminStats,
 } from "../../api/client.js";
 import { useLanguage } from "../../context/LanguageContext";
+import { API_BASE } from "../../config";
 
 interface Product {
   id: number;
@@ -147,6 +148,22 @@ export const AdminPage: React.FC<AdminPageProps> = ({ theme, onBack }) => {
   const notify = (t: string, ok = true) => {
     setMsg({ text: t, ok });
     setTimeout(() => setMsg(null), 3000);
+  };
+
+  const exportCsv = async (endpoint: string, filename: string) => {
+    try {
+      const raw = localStorage.getItem("ce_session");
+      const token = raw ? JSON.parse(raw).token : null;
+      const res = await fetch(`${API_BASE}/${endpoint}`, {
+        headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+      });
+      if (!res.ok) { notify(ru ? "Ошибка экспорта" : "Export failed", false); return; }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url; a.download = filename; a.click();
+      URL.revokeObjectURL(url);
+    } catch { notify(ru ? "Ошибка экспорта" : "Export failed", false); }
   };
 
   const load = async () => {
@@ -1000,7 +1017,7 @@ export const AdminPage: React.FC<AdminPageProps> = ({ theme, onBack }) => {
           return (
             <>
               {/* Sub-tabs */}
-              <div style={{ display: "flex", gap: 8, marginBottom: 24 }}>
+              <div style={{ display: "flex", gap: 8, marginBottom: 24, alignItems: "center", flexWrap: "wrap" as const }}>
                 {([
                   { key: "quotes", label: ru ? "Заявки на перевозку" : "Quote Requests" },
                   { key: "jobs",   label: ru ? "Вакансии" : "Job Applications" },
@@ -1023,6 +1040,18 @@ export const AdminPage: React.FC<AdminPageProps> = ({ theme, onBack }) => {
                     )}
                   </button>
                 ))}
+                <div style={{ marginLeft: "auto" }}>
+                  <button
+                    onClick={() => leadsSubTab === "quotes"
+                      ? exportCsv("lead/export", `leads_${new Date().toISOString().slice(0,10)}.csv`)
+                      : exportCsv("jobapplication/export", `applications_${new Date().toISOString().slice(0,10)}.csv`)}
+                    style={{ padding: "7px 16px", borderRadius: 6, border: `1px solid ${border}`, background: "transparent", color: sub, fontFamily: "'Barlow',sans-serif", fontWeight: 600, fontSize: 12, cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = "#CC0000"; (e.currentTarget as HTMLElement).style.color = "#CC0000"; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = border; (e.currentTarget as HTMLElement).style.color = sub; }}
+                  >
+                    ↓ {ru ? "Экспорт CSV" : "Export CSV"}
+                  </button>
+                </div>
               </div>
 
               {/* Quote Requests */}

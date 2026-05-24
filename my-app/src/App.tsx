@@ -47,6 +47,7 @@ import { ReviewsStrip } from "./components/sections/ReviewsStrip";
 import { ContactSection } from "./components/sections/ContactSection";
 import { FaqPage } from "./components/pages/FaqPage";
 import { PrivacyPage } from "./components/pages/PrivacyPage";
+import { PricingSection } from "./components/sections/PricingSection";
 import { API_BASE } from "./config";
 
 // Анимированное сердечко для секции "Лучшие грузы недели" 
@@ -288,6 +289,7 @@ function AppContent() {
   const [show404, setShow404] = useState(false);
   const [showFaq, setShowFaq] = useState(false);
   const [showPrivacy, setShowPrivacy] = useState(false);
+  const [showPricing, setShowPricing] = useState(false);
   const [trackLoad, setTrackLoad] = useState<Load | null>(null);
   const [notifications, setNotifications] = useState<Array<{ id: number; text: string }>>([]);
   const [isMobileView, setIsMobileView] = useState(() => typeof window !== "undefined" ? window.innerWidth < 768 : false);
@@ -784,6 +786,22 @@ function AppContent() {
     );
   }
 
+ // Pricing page
+  if (showPricing) {
+    return (
+      <div style={{ background: bgColor, minHeight: "100vh", color: textColor }}>
+        {sharedStyle}
+        {sharedHeader}
+        <div style={{ paddingTop: 70 }}>
+          <PricingSection theme={theme} standalone onBack={() => { setShowPricing(false); window.scrollTo({ top: 0 }); }} onQuoteClick={() => setShowQuote(true)} />
+        </div>
+        {showAuth && <AuthModal onClose={() => setShowAuth(false)} theme={theme} onSuccess={(s) => { setSession(s); setShowAuth(false); }} />}
+        {showQuote && <QuoteModal onClose={() => setShowQuote(false)} theme={theme} />}
+        {sharedPanels}
+      </div>
+    );
+  }
+
  // Privacy page
   if (showPrivacy) {
     return (
@@ -1063,10 +1081,12 @@ function AppContent() {
         <AboutSection onContactClick={() => scrollTo(contactRef)} theme={theme} />
       </div>
 
+      <PricingSection theme={theme} onQuoteClick={() => setShowQuote(true)} />
+
       <ContactSection theme={theme} />
 
       <div ref={contactRef}>
-        <Footer theme={theme} onCatalogClick={() => scrollTo(catalogRef)} onAboutClick={() => scrollTo(aboutRef)} onQuoteClick={() => setShowQuote(true)} onContactClick={() => scrollTo(contactRef)} onCareersClick={() => { setShowCareers(true); window.scrollTo({ top: 0, behavior: "smooth" }); }} onFleetClick={() => { setShowFleet(true); window.scrollTo({ top: 0, behavior: "smooth" }); }} onFaqClick={() => { setShowFaq(true); window.scrollTo({ top: 0, behavior: "smooth" }); }} onPrivacyClick={() => { setShowPrivacy(true); window.scrollTo({ top: 0, behavior: "smooth" }); }} />
+        <Footer theme={theme} onCatalogClick={() => scrollTo(catalogRef)} onAboutClick={() => scrollTo(aboutRef)} onQuoteClick={() => setShowQuote(true)} onContactClick={() => scrollTo(contactRef)} onCareersClick={() => { setShowCareers(true); window.scrollTo({ top: 0, behavior: "smooth" }); }} onFleetClick={() => { setShowFleet(true); window.scrollTo({ top: 0, behavior: "smooth" }); }} onFaqClick={() => { setShowFaq(true); window.scrollTo({ top: 0, behavior: "smooth" }); }} onPrivacyClick={() => { setShowPrivacy(true); window.scrollTo({ top: 0, behavior: "smooth" }); }} onPricingClick={() => { setShowPricing(true); window.scrollTo({ top: 0, behavior: "smooth" }); }} />
       </div>
 
       {showAuth && <AuthModal onClose={() => setShowAuth(false)} theme={theme} onSuccess={(s) => { setSession(s); setShowAuth(false); }} />}

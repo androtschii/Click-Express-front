@@ -24,7 +24,6 @@ import { PhoneIcon } from "./components/ui/PhoneIcon";
 import { LOADS } from "./utils/data";
 import type { Load } from "./types/index";
 import { filterLoads, fetchLoads } from "./services/loadService.ts";
-import { healthCheck } from "./services/userService";
 import { X, Heart, ClipboardText } from "@phosphor-icons/react";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
@@ -287,9 +286,6 @@ function AppContent() {
   const [session, setSession] = useState<Session | null>(() => getSession());
   const [detailLoad, setDetailLoad] = useState<Load | null>(null);
   const [showCareers, setShowCareers] = useState(false);
-  const [backendUsers] = useState<unknown[]>([]);
-  const [apiHealthy, setApiHealthy] = useState<boolean | null>(null);
-  const [apiError, setApiError] = useState<string | null>(null);
   const [showNews, setShowNews] = useState(false);
   const [showReviews, setShowReviews] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
@@ -353,20 +349,6 @@ function AppContent() {
     run();
   }, []);
 
-  useEffect(() => {
-    const checkBackend = async () => {
-  try {
-    await healthCheck();
-    setApiHealthy(true);
-    setApiError(null);
-  } catch (err) {
-    setApiHealthy(false);
-    setApiError((err as Error).message);
-  }
-};
-
-    checkBackend();
-  }, []);
 
   useEffect(() => {
     const fn = () => setIsMobileView(window.innerWidth < 768);
@@ -544,31 +526,6 @@ function AppContent() {
     `}</style>
   );
 
-  const apiStatusBanner = (
-    <div style={{
-      position: "fixed",
-      top: 70,
-      right: 20,
-      zIndex: 1400,
-      background: theme === "dark" ? "rgba(10,10,10,0.92)" : "rgba(255,255,255,0.96)",
-      border: "1px solid " + (theme === "dark" ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.12)"),
-      color: theme === "dark" ? "#fff" : "#1a1a1a",
-      borderRadius: 18,
-      padding: "10px 16px",
-      fontFamily: "'Barlow',sans-serif",
-      fontSize: 12,
-      fontWeight: 600,
-      boxShadow: "0 16px 40px rgba(0,0,0,0.12)",
-      minWidth: 220,
-      pointerEvents: "none",
-    }}>
-      {apiHealthy === null
-        ? "API: проверка..."
-        : apiHealthy
-        ? `API online · ${backendUsers.length} users loaded`
-        : `API offline · ${apiError ?? "Ошибка соединения"}`}
-    </div>
-  );
 
   const sharedHeader = (
     <>

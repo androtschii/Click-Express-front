@@ -221,18 +221,13 @@ export const ReviewsPage: React.FC<ReviewsPageProps> = ({ theme = "dark", onBack
   const inputBorder = isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.12)";
 
   const [reviews, setReviews] = useState<ReviewItem[]>(INITIAL_REVIEWS);
-  const [apiLoading, setApiLoading] = useState(false);
-
   const loadApiReviews = async () => {
-    setApiLoading(true);
     try {
       const data: ApiReview[] = await fetchReviews(!isAdmin);
       const apiItems = data.map((r, i) => apiToReviewItem(r, i));
       setReviews([...apiItems, ...INITIAL_REVIEWS]);
     } catch {
       // если API недоступен — оставляем INITIAL_REVIEWS
-    } finally {
-      setApiLoading(false);
     }
   };
 

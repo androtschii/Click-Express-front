@@ -4,6 +4,8 @@ import { getUserById, updateUser } from "../../services/authService";
 import { useLanguage } from "../../context/LanguageContext";
 import { translations } from "../../i18n/translations";
 import type { Load } from "../../types/index";
+import { API_BASE } from "../../config";
+import { UploadSimple, FilePdf, FileImage, FileDoc, Trash, DownloadSimple } from "@phosphor-icons/react";
 
 interface ProfilePageProps {
   session: Session;
@@ -20,7 +22,14 @@ interface ProfilePageProps {
   onTrack?: (load: Load) => void;
 }
 
-type Tab = "overview" | "orders" | "saved" | "payment" | "settings";
+type Tab = "overview" | "orders" | "saved" | "documents" | "payment" | "settings";
+
+interface DocItem {
+  id: number;
+  fileName: string;
+  fileType: string;
+  uploadedAt: string;
+}
 
 export const ProfilePage: React.FC<ProfilePageProps> = ({
   session, theme = "dark",
@@ -65,6 +74,36 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
   const [payLoad, setPayLoad]         = useState<Load | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
+  const [docs, setDocs]               = useState<DocItem[]>([]);
+  const [docUploading, setDocUploading] = useState(false);
+  const [docDragOver, setDocDragOver] = useState(false);
+  const docInputRef                   = useRef<HTMLInputElement>(null);
+
+  const uploadDoc = async (file: File) => {
+    setDocUploading(true);
+    const form = new FormData();
+    form.append("file", file);
+    try {
+      const res = await fetch(`${API_BASE}/document/upload`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${session.token}` },
+        body: form,
+      });
+      if (!res.ok) throw new Error();
+      const data = await res.json();
+      setDocs(prev => [{ id: data.id, fileName: file.name, fileType: file.type, uploadedAt: new Date().toISOString() }, ...prev]);
+    } catch {
+      notify(lang === "ru" ? "Ошибка загрузки файла" : "Upload failed");
+    } finally {
+      setDocUploading(false);
+    }
+  };
+
+  const handleDocFiles = (files: FileList | null) => {
+    if (!files) return;
+    Array.from(files).forEach(f => uploadDoc(f));
+  };
+
   useEffect(() => {
     if (toast) { const id = setTimeout(() => setToast(null), 3200); return () => clearTimeout(id); }
   }, [toast]);
@@ -107,8 +146,9 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
   const TABS: { id: Tab; label: string; count?: number }[] = [
     { id: "overview", label: lang === "ru" ? "Обзор" : "Overview" },
     { id: "orders",   label: lang === "ru" ? "Мои заказы" : "My Orders", count: bookedLoads.length },
-    { id: "saved",    label: lang === "ru" ? "Избранное" : "Saved", count: savedLoads.length },
-    { id: "payment",  label: lang === "ru" ? "Оплата" : "Payment" },
+    { id: "saved",     label: lang === "ru" ? "Избранное" : "Saved", count: savedLoads.length },
+    { id: "documents", label: lang === "ru" ? "Документы" : "Documents", count: docs.length || undefined },
+    { id: "payment",   label: lang === "ru" ? "Оплата" : "Payment" },
     { id: "settings", label: lang === "ru" ? "Настройки" : "Settings" },
   ];
 
@@ -397,6 +437,99 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                           </button>
                         </div>
                       </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
+
+ {/* DOCUMENTS */}
+        {tab === "documents" && (
+          <div style={{ maxWidth: 720 }}>
+            <div style={{ fontFamily:"'Oswald',sans-serif", fontWeight:700, fontSize:22, color:text, textTransform:"uppercase", marginBottom:6 }}>
+              {lang === "ru" ? "МОИ ДОКУМЕНТЫ" : "MY DOCUMENTS"}
+            </div>
+            <p style={{ fontFamily:"'Barlow',sans-serif", fontSize:13, color:muted, marginBottom:24 }}>
+              {lang === "ru"
+                ? "Загружайте BOL, CMR, разрешения и другие документы. Поддерживаются PDF, JPG, PNG, DOC, DOCX."
+                : "Upload BOLs, permits, insurance certificates and other documents. Accepted: PDF, JPG, PNG, DOC, DOCX."}
+            </p>
+
+            {/* Drop zone */}
+            <div
+              onDragOver={e => { e.preventDefault(); setDocDragOver(true); }}
+              onDragLeave={() => setDocDragOver(false)}
+              onDrop={e => { e.preventDefault(); setDocDragOver(false); handleDocFiles(e.dataTransfer.files); }}
+              onClick={() => docInputRef.current?.click()}
+              style={{
+                border: `2px dashed ${docDragOver ? "#CC0000" : isDark ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.15)"}`,
+                borderRadius: 10,
+                padding: "36px 24px",
+                textAlign: "center",
+                cursor: "pointer",
+                background: docDragOver ? "rgba(204,0,0,0.06)" : "transparent",
+                transition: "all 0.2s",
+                marginBottom: 20,
+              }}
+            >
+              <input
+                ref={docInputRef}
+                type="file"
+                multiple
+                accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                style={{ display: "none" }}
+                onChange={e => handleDocFiles(e.target.files)}
+              />
+              <UploadSimple size={32} color={docDragOver ? "#CC0000" : muted} weight="duotone" style={{ marginBottom: 10 }} />
+              <div style={{ fontFamily:"'Barlow',sans-serif", fontWeight:700, fontSize:14, color: docDragOver ? "#CC0000" : text, marginBottom:6 }}>
+                {docUploading
+                  ? (lang === "ru" ? "Загрузка..." : "Uploading...")
+                  : (lang === "ru" ? "Перетащите файлы или нажмите для выбора" : "Drag & drop files or click to browse")}
+              </div>
+              <div style={{ fontFamily:"'Barlow',sans-serif", fontSize:11, color:muted }}>PDF, JPG, PNG, DOC, DOCX · max 10MB</div>
+            </div>
+
+            {/* File list */}
+            {docs.length === 0 ? (
+              <div style={{ textAlign:"center", padding:"32px 0", color:muted, fontFamily:"'Barlow',sans-serif", fontSize:13 }}>
+                {lang === "ru" ? "Нет загруженных документов" : "No documents uploaded yet"}
+              </div>
+            ) : (
+              <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+                {docs.map(doc => {
+                  const isPdf = doc.fileType.includes("pdf") || doc.fileName.endsWith(".pdf");
+                  const isImg = doc.fileType.startsWith("image/");
+                  const Icon = isPdf ? FilePdf : isImg ? FileImage : FileDoc;
+                  return (
+                    <div key={doc.id} style={{
+                      display:"flex", alignItems:"center", gap:12,
+                      background: card, border:`1px solid ${border}`,
+                      borderRadius:8, padding:"12px 16px",
+                    }}>
+                      <Icon size={22} color="#CC0000" weight="duotone" style={{ flexShrink:0 }} />
+                      <div style={{ flex:1, minWidth:0 }}>
+                        <div style={{ fontFamily:"'Barlow',sans-serif", fontWeight:700, fontSize:13, color:text, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{doc.fileName}</div>
+                        <div style={{ fontFamily:"'Barlow',sans-serif", fontSize:10, color:muted, marginTop:2 }}>
+                          {new Date(doc.uploadedAt).toLocaleDateString(lang === "ru" ? "ru-RU" : "en-US", { day:"2-digit", month:"short", year:"numeric" })}
+                        </div>
+                      </div>
+                      <a
+                        href={`${API_BASE}/document/${doc.id}/download`}
+                        download={doc.fileName}
+                        style={{ color:muted, display:"flex", alignItems:"center" }}
+                        title={lang === "ru" ? "Скачать" : "Download"}
+                      >
+                        <DownloadSimple size={18} />
+                      </a>
+                      <button
+                        onClick={() => setDocs(prev => prev.filter(d => d.id !== doc.id))}
+                        style={{ background:"transparent", border:"none", cursor:"pointer", color:muted, display:"flex", alignItems:"center", padding:0 }}
+                        title={lang === "ru" ? "Удалить" : "Remove"}
+                      >
+                        <Trash size={16} />
+                      </button>
                     </div>
                   );
                 })}

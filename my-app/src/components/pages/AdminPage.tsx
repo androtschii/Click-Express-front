@@ -80,7 +80,7 @@ interface JobApplication {
   createdAt: string;
 }
 
-type Tab = "loads" | "fleet" | "drivers" | "leads" | "stats";
+type Tab = "loads" | "fleet" | "drivers" | "leads" | "stats" | "reviews";
 
 interface AdminStats {
   totalOrders: number;
@@ -137,6 +137,10 @@ export const AdminPage: React.FC<AdminPageProps> = ({ theme, onBack }) => {
 
   const [adminStats, setAdminStats] = useState<AdminStats | null>(null);
   const [statsLoading, setStatsLoading] = useState(false);
+
+  const [adminReviews, setAdminReviews] = useState<Array<{ id: number; username: string; rating: number; text: string; isApproved: boolean; role: string | null; location: string | null; createdAt: string }>>([]);
+  const [reviewsLoading, setReviewsLoading] = useState(false);
+  const [pendingReviewCount, setPendingReviewCount] = useState(0);
 
   const isDark = theme === "dark";
   const bg = isDark ? "#0a0a0a" : "#f5f5f5";
@@ -372,6 +376,7 @@ export const AdminPage: React.FC<AdminPageProps> = ({ theme, onBack }) => {
       if (leadsSubTab === "jobs" && jobApps.length === 0 && !jobAppsLoading) loadJobApps();
     }
     if (tab === "stats" && !adminStats && !statsLoading) loadStats();
+    if (tab === "reviews" && adminReviews.length === 0 && !reviewsLoading) loadAdminReviews();
   }, [tab, leadsSubTab]);
 
   const loadStats = async () => {
@@ -381,6 +386,46 @@ export const AdminPage: React.FC<AdminPageProps> = ({ theme, onBack }) => {
       setAdminStats(data);
     } catch { notify(ru ? "Ошибка загрузки аналитики" : "Stats load error", false); }
     finally { setStatsLoading(false); }
+  };
+
+  const loadAdminReviews = async () => {
+    setReviewsLoading(true);
+    try {
+      const raw = localStorage.getItem("ce_session");
+      const token = raw ? JSON.parse(raw).token : null;
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (token) headers["Authorization"] = `Bearer ${token}`;
+      const [revRes, countRes] = await Promise.all([
+        fetch(`${API_BASE}/review?onlyApproved=false`, { headers }),
+        fetch(`${API_BASE}/review/pending/count`, { headers }),
+      ]);
+      if (revRes.ok) setAdminReviews(await revRes.json());
+      if (countRes.ok) { const d = await countRes.json(); setPendingReviewCount(d.count ?? 0); }
+    } catch { notify(ru ? "Ошибка загрузки отзывов" : "Reviews load error", false); }
+    finally { setReviewsLoading(false); }
+  };
+
+  const handleReviewApprove = async (id: number) => {
+    const raw = localStorage.getItem("ce_session");
+    const token = raw ? JSON.parse(raw).token : null;
+    await fetch(`${API_BASE}/review/${id}/approve`, { method: "PATCH", headers: { Authorization: `Bearer ${token}` } });
+    setAdminReviews(prev => prev.map(r => r.id === id ? { ...r, isApproved: true } : r));
+    setPendingReviewCount(p => Math.max(0, p - 1));
+  };
+
+  const handleReviewReject = async (id: number) => {
+    const raw = localStorage.getItem("ce_session");
+    const token = raw ? JSON.parse(raw).token : null;
+    await fetch(`${API_BASE}/review/${id}/reject`, { method: "PATCH", headers: { Authorization: `Bearer ${token}` } });
+    setAdminReviews(prev => prev.map(r => r.id === id ? { ...r, isApproved: false } : r));
+  };
+
+  const handleReviewDelete = async (id: number) => {
+    if (!confirm(ru ? "Удалить отзыв?" : "Delete review?")) return;
+    const raw = localStorage.getItem("ce_session");
+    const token = raw ? JSON.parse(raw).token : null;
+    await fetch(`${API_BASE}/review/${id}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } });
+    setAdminReviews(prev => prev.filter(r => r.id !== id));
   };
 
   const handleCreateVehicle = async () => {
@@ -501,6 +546,11 @@ export const AdminPage: React.FC<AdminPageProps> = ({ theme, onBack }) => {
                 ↻ {ru ? "Обновить" : "Refresh"}
               </button>
             )}
+            {tab === "reviews" && (
+              <button onClick={() => { setAdminReviews([]); loadAdminReviews(); }} style={{ ...btn("gray"), padding: "8px 18px", fontSize: 13 }}>
+                ↻ {ru ? "Обновить" : "Refresh"}
+              </button>
+            )}
             <button onClick={onBack} style={btn("gray")}>{ru ? "← Назад" : "← Back"}</button>
           </div>
         </div>
@@ -512,6 +562,7 @@ export const AdminPage: React.FC<AdminPageProps> = ({ theme, onBack }) => {
             { key: "fleet",   label: ru ? "Автопарк" : "Fleet" },
             { key: "drivers", label: ru ? "Водители" : "Drivers" },
             { key: "leads",   label: ru ? "Лиды" : "Leads" },
+            { key: "reviews", label: ru ? "Отзывы" : "Reviews" },
             { key: "stats",   label: ru ? "Аналитика" : "Analytics" },
           ] as { key: Tab; label: string }[]).map(t => (
             <button
@@ -530,9 +581,15 @@ export const AdminPage: React.FC<AdminPageProps> = ({ theme, onBack }) => {
                 padding: "10px 18px",
                 cursor: "pointer",
                 marginBottom: -1,
+                position: "relative",
               }}
             >
               {t.label}
+              {t.key === "reviews" && pendingReviewCount > 0 && (
+                <span style={{ position: "absolute", top: 6, right: 4, minWidth: 16, height: 16, borderRadius: 8, background: "#CC0000", color: "#fff", fontFamily: "'Barlow',sans-serif", fontWeight: 900, fontSize: 9, display: "inline-flex", alignItems: "center", justifyContent: "center", padding: "0 3px" }}>
+                  {pendingReviewCount}
+                </span>
+              )}
             </button>
           ))}
         </div>
@@ -855,6 +912,70 @@ export const AdminPage: React.FC<AdminPageProps> = ({ theme, onBack }) => {
               );
             })()}
           </>
+        )}
+
+        {/* Reviews section */}
+        {tab === "reviews" && (
+          reviewsLoading ? (
+            <div style={{ textAlign: "center", color: sub, padding: 80 }}>
+              <div style={{ display: "inline-block", width: 36, height: 36, border: "3px solid rgba(204,0,0,0.2)", borderTopColor: "#CC0000", borderRadius: "50%", animation: "spin 0.8s linear infinite", marginBottom: 16 }} />
+              <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
+              <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 14 }}>{ru ? "Загрузка..." : "Loading..."}</div>
+            </div>
+          ) : adminReviews.length === 0 ? (
+            <div style={{ textAlign: "center", color: sub, padding: 80, border: `1px dashed ${border}`, borderRadius: 12 }}>
+              <div style={{ fontSize: 40, marginBottom: 12 }}>💬</div>
+              <div style={{ fontFamily: "'Oswald',sans-serif", fontSize: 18, color: text }}>{ru ? "Отзывов нет" : "No reviews"}</div>
+            </div>
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              {adminReviews.map(r => (
+                <div key={r.id} style={{
+                  background: card,
+                  border: `1px solid ${r.isApproved ? border : "rgba(245,158,11,0.35)"}`,
+                  borderRadius: 12, padding: 20,
+                }}>
+                  <div style={{ display: "flex", gap: 16, alignItems: "flex-start" }}>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8, flexWrap: "wrap" as const }}>
+                        <span style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 15 }}>{r.username}</span>
+                        {r.role && <span style={{ fontSize: 11, color: sub, fontStyle: "italic" }}>{r.role}</span>}
+                        {r.location && <span style={{ fontSize: 11, color: sub }}>📍 {r.location}</span>}
+                        <span style={{ fontSize: 11, padding: "2px 8px", borderRadius: 20, fontWeight: 700, background: r.isApproved ? "rgba(22,163,74,0.15)" : "rgba(245,158,11,0.15)", color: r.isApproved ? "#16a34a" : "#f59e0b" }}>
+                          {r.isApproved ? (ru ? "Одобрен" : "Approved") : (ru ? "На модерации" : "Pending")}
+                        </span>
+                        <span style={{ fontSize: 11, color: sub, marginLeft: "auto" }}>{new Date(r.createdAt).toLocaleDateString()}</span>
+                      </div>
+
+                      <div style={{ display: "flex", gap: 2, marginBottom: 8 }}>
+                        {Array.from({ length: 5 }).map((_, i) => (
+                          <span key={i} style={{ fontSize: 16, color: i < r.rating ? "#f59e0b" : (isDark ? "#333" : "#ddd") }}>★</span>
+                        ))}
+                      </div>
+
+                      <div style={{ fontSize: 13, color: sub, lineHeight: 1.5 }}>{r.text}</div>
+                    </div>
+
+                    <div style={{ display: "flex", flexDirection: "column", gap: 8, flexShrink: 0 }}>
+                      {!r.isApproved && (
+                        <button style={{ ...btn("green"), minWidth: 100 }} onClick={() => handleReviewApprove(r.id)}>
+                          {ru ? "Одобрить" : "Approve"}
+                        </button>
+                      )}
+                      {r.isApproved && (
+                        <button style={{ ...btn("gray"), minWidth: 100 }} onClick={() => handleReviewReject(r.id)}>
+                          {ru ? "Скрыть" : "Reject"}
+                        </button>
+                      )}
+                      <button style={{ ...btn("red"), minWidth: 100 }} onClick={() => handleReviewDelete(r.id)}>
+                        {ru ? "Удалить" : "Delete"}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )
         )}
 
         {/* Drivers section */}

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import type { Load } from "../../types/index";
 import { useLanguage } from "../../context/LanguageContext";
 import { translations } from "../../i18n/translations";
+import { API_BASE } from "../../config";
 
 interface LoadDetailPageProps {
   load: Load;
@@ -60,6 +61,7 @@ export const LoadDetailPage: React.FC<LoadDetailPageProps> = ({
     requestAnimationFrame(() => setEntered(true));
     topRef.current?.scrollIntoView({ behavior: "auto" });
     window.scrollTo(0, 0);
+    fetch(`${API_BASE}/product/${load.id}/view`, { method: "POST" }).catch(() => {});
     return () => {};
   }, []);
 

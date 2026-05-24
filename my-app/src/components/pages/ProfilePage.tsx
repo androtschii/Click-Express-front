@@ -322,8 +322,27 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
  {/* MY ORDERS */}
         {tab === "orders" && (
           <div>
-            <div style={{ fontFamily:"'Oswald',sans-serif", fontWeight:700, fontSize:22, color:text, textTransform:"uppercase", marginBottom:20 }}>
-              {lang==="ru"?"МОИ ЗАКАЗЫ":"MY ORDERS"} <span style={{ color:"#CC0000" }}>({bookedLoads.length})</span>
+            <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:20, flexWrap:"wrap", gap:10 }}>
+              <div style={{ fontFamily:"'Oswald',sans-serif", fontWeight:700, fontSize:22, color:text, textTransform:"uppercase" }}>
+                {lang==="ru"?"МОИ ЗАКАЗЫ":"MY ORDERS"} <span style={{ color:"#CC0000" }}>({bookedLoads.length})</span>
+              </div>
+              {bookedLoads.length > 0 && (
+                <button
+                  onClick={() => {
+                    const rows = [["Route","Destination","Cargo","Price","Miles","RPM"],...bookedLoads.map(l => [l.route,l.dest,l.cargo,l.price,l.miles,(l.price/l.miles).toFixed(2)])];
+                    const csv = rows.map(r => r.join(",")).join("\n");
+                    const a = document.createElement("a");
+                    a.href = URL.createObjectURL(new Blob([csv],{type:"text/csv"}));
+                    a.download = `orders_${new Date().toISOString().slice(0,10)}.csv`;
+                    a.click();
+                  }}
+                  style={{ padding:"7px 16px", background:"transparent", border:`1px solid ${border}`, borderRadius:6, color:muted, fontFamily:"'Barlow',sans-serif", fontWeight:700, fontSize:12, letterSpacing:0.5, cursor:"pointer", transition:"all 0.15s" }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor="#CC0000"; e.currentTarget.style.color="#CC0000"; }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor=border; e.currentTarget.style.color=muted; }}
+                >
+                  ↓ {lang==="ru"?"Экспорт CSV":"Export CSV"}
+                </button>
+              )}
             </div>
             {bookedLoads.length === 0 ? (
               <div style={{ textAlign:"center", padding:"80px 0" }}>

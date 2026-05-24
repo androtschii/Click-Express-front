@@ -154,8 +154,8 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onContactClick, them
                 muted
                 loop
                 playsInline
-                preload="metadata"
-                style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                preload="none"
+                style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", background: "#111" }}
               />
  {/* Subtle red glow top */}
               <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 40, background: "linear-gradient(to bottom, rgba(204,0,0,0.15), transparent)", pointerEvents: "none" }} />

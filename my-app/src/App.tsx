@@ -48,6 +48,7 @@ import { ContactSection } from "./components/sections/ContactSection";
 import { FaqPage } from "./components/pages/FaqPage";
 import { PrivacyPage } from "./components/pages/PrivacyPage";
 import { PricingSection } from "./components/sections/PricingSection";
+import { RateCalculator } from "./components/sections/RateCalculator";
 import { API_BASE } from "./config";
 
 // Анимированное сердечко для секции "Лучшие грузы недели" 
@@ -1080,6 +1081,8 @@ function AppContent() {
       <div ref={aboutRef}>
         <AboutSection onContactClick={() => scrollTo(contactRef)} theme={theme} />
       </div>
+
+      <RateCalculator theme={theme} onQuoteClick={() => setShowQuote(true)} />
 
       <PricingSection theme={theme} onQuoteClick={() => setShowQuote(true)} />
 

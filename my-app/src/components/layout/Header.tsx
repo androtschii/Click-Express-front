@@ -92,6 +92,11 @@ export const Header: React.FC<HeaderProps> = ({
     return () => window.removeEventListener("resize", fn);
   }, []);
 
+  useEffect(() => {
+    document.body.style.overflow = mobileOpen ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [mobileOpen]);
+
   const handleSavedClick = () => {
     setHeartBurst(true);
     setTimeout(() => setHeartBurst(false), 600);
@@ -197,71 +202,106 @@ export const Header: React.FC<HeaderProps> = ({
           {t.header.applyNow}
         </button>
       )}
-      {isMobile && mobileOpen && (
-        <div style={{ position: "absolute", top: 70, left: 0, right: 0, background: isLight ? "rgba(255,255,255,0.98)" : "rgba(10,10,10,0.97)", backdropFilter: "blur(20px)", borderBottom: "1px solid rgba(204,0,0,0.3)", padding: "8px 0", boxShadow: "0 12px 30px rgba(0,0,0,0.4)" }}>
-          {[
-            { label: t.nav.catalog, fn: onCatalogClick },
-            { label: t.nav.getQuote, fn: onQuoteClick },
-            { label: t.nav.aboutUs, fn: onAboutClick },
-            { label: t.nav.contact, fn: onContactClick },
-            { label: t.nav.careers, fn: onCareersClick },
-            { label: t.nav.news, fn: onNewsClick },
-            { label: t.nav.reviews, fn: onReviewsClick },
-            { label: t.nav.fleet, fn: onFleetClick },
-          ].map(item => (
-            <div key={item.label} onClick={() => { setMobileOpen(false); item.fn?.(); }}
-              style={{ padding: "14px 24px", fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 14, letterSpacing: 1.4, textTransform: "uppercase", color: isLight ? "rgba(0,0,0,0.78)" : "rgba(255,255,255,0.82)", cursor: "pointer", borderBottom: `1px solid ${isLight ? "rgba(0,0,0,0.05)" : "rgba(255,255,255,0.05)"}` }}>
-              {item.label}
-            </div>
-          ))}
-          {onCareersClick && (
-            <div onClick={() => { setMobileOpen(false); onCareersClick(); }}
-              style={{ padding: "16px 24px", fontFamily: "'Barlow',sans-serif", fontWeight: 800, fontSize: 14, letterSpacing: 1.4, textTransform: "uppercase", color: "#CC0000", cursor: "pointer", borderBottom: `1px solid ${isLight ? "rgba(0,0,0,0.05)" : "rgba(255,255,255,0.05)"}` }}>
-              ● {t.header.applyNow} →
-            </div>
-          )}
-          <div style={{ padding: "12px 24px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <button
-              onClick={toggleLang}
-              style={{
-                display: "flex", alignItems: "center", gap: 0,
-                background: "transparent", border: `1px solid ${isLight ? "rgba(0,0,0,0.15)" : "rgba(255,255,255,0.2)"}`,
-                borderRadius: 4, overflow: "hidden", cursor: "pointer", padding: 0,
-              }}
-            >
-              {(['en', 'ru'] as const).map(l => (
-                <span key={l} style={{
-                  padding: "6px 12px",
-                  fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 12,
-                  letterSpacing: 1, textTransform: "uppercase",
-                  background: lang === l ? "#CC0000" : "transparent",
-                  color: lang === l ? "#fff" : (isLight ? "rgba(0,0,0,0.45)" : "rgba(255,255,255,0.45)"),
-                  transition: "all 0.15s",
-                }}>{l}</span>
-              ))}
-            </button>
-            {session ? (
-              <div onClick={() => { setMobileOpen(false); onProfileClick?.(); }} style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
-                <div style={{ width: 30, height: 30, borderRadius: "50%", background: "linear-gradient(135deg,#CC0000,#ff4d4d)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 13, color: "#fff" }}>
-                  {session.name.charAt(0).toUpperCase()}
-                </div>
-                <span style={{ fontFamily: "'Barlow',sans-serif", fontSize: 13, fontWeight: 600, color: isLight ? "#1a1a1a" : "#fff" }}>{session.name.split(" ")[0]}</span>
+      {isMobile && (
+        <>
+          {/* Backdrop */}
+          <div
+            onClick={() => setMobileOpen(false)}
+            style={{
+              position: "fixed", inset: 0,
+              background: "rgba(0,0,0,0.55)",
+              zIndex: 1200,
+              opacity: mobileOpen ? 1 : 0,
+              pointerEvents: mobileOpen ? "auto" : "none",
+              transition: "opacity 0.3s ease",
+            }}
+          />
+
+          {/* Side drawer */}
+          <div style={{
+            position: "fixed", top: 0, right: 0, bottom: 0,
+            width: "min(320px, 85vw)",
+            background: isLight ? "#fff" : "#0a0a0a",
+            borderLeft: "1px solid rgba(204,0,0,0.25)",
+            zIndex: 1201,
+            display: "flex", flexDirection: "column",
+            transform: mobileOpen ? "translateX(0)" : "translateX(100%)",
+            transition: "transform 0.32s cubic-bezier(0.22,1,0.36,1)",
+            boxShadow: "-8px 0 48px rgba(0,0,0,0.45)",
+            overflowY: "auto",
+          }}>
+            {/* Drawer header */}
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 20px", borderBottom: `1px solid ${isLight ? "rgba(0,0,0,0.08)" : "rgba(255,255,255,0.07)"}`, flexShrink: 0 }}>
+              <div style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 18, color: isLight ? "#1a1a1a" : "#fff", letterSpacing: 1, textTransform: "uppercase" }}>
+                <span style={{ color: "#CC0000" }}>CLICK</span> EXPRESS
               </div>
-            ) : (
-              <button onClick={() => { setMobileOpen(false); onLoginClick?.(); }} style={{ background: "#CC0000", color: "#fff", border: "none", borderRadius: 20, padding: "8px 20px", fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 12, letterSpacing: 1, textTransform: "uppercase", cursor: "pointer" }}>
-                {t.header.login}
+              <button onClick={() => setMobileOpen(false)} style={{ width: 34, height: 34, background: "transparent", border: `1px solid ${isLight ? "rgba(0,0,0,0.12)" : "rgba(255,255,255,0.15)"}`, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: isLight ? "#1a1a1a" : "#fff" }}>
+                <X size={16} weight="bold" />
               </button>
-            )}
+            </div>
+
+            {/* Nav links */}
+            <div style={{ flex: 1 }}>
+              {[
+                { label: t.nav.catalog,  fn: onCatalogClick },
+                { label: t.nav.getQuote, fn: onQuoteClick },
+                { label: t.nav.aboutUs,  fn: onAboutClick },
+                { label: t.nav.contact,  fn: onContactClick },
+                { label: t.nav.news,     fn: onNewsClick },
+                { label: t.nav.reviews,  fn: onReviewsClick },
+                { label: t.nav.fleet,    fn: onFleetClick },
+              ].map(item => (
+                <div key={item.label} onClick={() => { setMobileOpen(false); item.fn?.(); }}
+                  style={{ padding: "15px 24px", fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 14, letterSpacing: 1.2, textTransform: "uppercase", color: isLight ? "rgba(0,0,0,0.78)" : "rgba(255,255,255,0.82)", cursor: "pointer", borderBottom: `1px solid ${isLight ? "rgba(0,0,0,0.05)" : "rgba(255,255,255,0.05)"}`, transition: "color 0.15s, background 0.15s" }}
+                  onMouseEnter={e => { e.currentTarget.style.color = "#CC0000"; e.currentTarget.style.background = "rgba(204,0,0,0.05)"; }}
+                  onMouseLeave={e => { e.currentTarget.style.color = isLight ? "rgba(0,0,0,0.78)" : "rgba(255,255,255,0.82)"; e.currentTarget.style.background = "transparent"; }}>
+                  {item.label}
+                </div>
+              ))}
+
+              {/* Apply Now */}
+              {onCareersClick && (
+                <div onClick={() => { setMobileOpen(false); onCareersClick(); }}
+                  style={{ padding: "15px 24px", fontFamily: "'Barlow',sans-serif", fontWeight: 800, fontSize: 14, letterSpacing: 1.2, textTransform: "uppercase", color: "#CC0000", cursor: "pointer", borderBottom: `1px solid ${isLight ? "rgba(0,0,0,0.05)" : "rgba(255,255,255,0.05)"}`, display: "flex", alignItems: "center", gap: 8 }}>
+                  <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#CC0000", flexShrink: 0, animation: "applyPulse 1.6s ease-in-out infinite" }} />
+                  {t.header.applyNow} →
+                </div>
+              )}
+
+              {/* Requests */}
+              <div onClick={() => { setMobileOpen(false); (onRequestsClick || onCatalogClick)?.(); }}
+                style={{ padding: "15px 24px", background: "rgba(204,0,0,0.07)", fontFamily: "'Barlow',sans-serif", fontWeight: 800, fontSize: 14, letterSpacing: 1.2, textTransform: "uppercase", color: "#CC0000", cursor: "pointer", display: "flex", alignItems: "center", gap: 8, borderBottom: `1px solid ${isLight ? "rgba(0,0,0,0.05)" : "rgba(255,255,255,0.05)"}` }}>
+                <svg width="14" height="14" viewBox="0 0 256 256" fill="#CC0000">
+                  <path d="M173.66,98.34a8,8,0,0,1,0,11.32l-56,56a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L112,148.69l50.34-50.35A8,8,0,0,1,173.66,98.34ZM224,48V208a16,16,0,0,1-16,16H48a16,16,0,0,1-16-16V48A16,16,0,0,1,48,32H208A16,16,0,0,1,224,48ZM208,208V48H48V208H208Z"/>
+                </svg>
+                {t.header.requests}
+                {cartCount > 0 && <span style={{ background: "#CC0000", color: "#fff", borderRadius: "50%", width: 20, height: 20, fontSize: 10, fontWeight: 900, display: "inline-flex", alignItems: "center", justifyContent: "center" }}>{cartCount}</span>}
+              </div>
+            </div>
+
+            {/* Bottom: lang + auth */}
+            <div style={{ padding: "16px 20px", borderTop: `1px solid ${isLight ? "rgba(0,0,0,0.08)" : "rgba(255,255,255,0.07)"}`, display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
+              <button onClick={toggleLang} style={{ display: "flex", alignItems: "center", background: "transparent", border: `1px solid ${isLight ? "rgba(0,0,0,0.15)" : "rgba(255,255,255,0.2)"}`, borderRadius: 4, overflow: "hidden", cursor: "pointer", padding: 0 }}>
+                {(['en', 'ru'] as const).map(l => (
+                  <span key={l} style={{ padding: "6px 12px", fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 12, letterSpacing: 1, textTransform: "uppercase", background: lang === l ? "#CC0000" : "transparent", color: lang === l ? "#fff" : (isLight ? "rgba(0,0,0,0.45)" : "rgba(255,255,255,0.45)"), transition: "all 0.15s" }}>{l}</span>
+                ))}
+              </button>
+
+              {session ? (
+                <div onClick={() => { setMobileOpen(false); onProfileClick?.(); }} style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
+                  <div style={{ width: 30, height: 30, borderRadius: "50%", background: "linear-gradient(135deg,#CC0000,#ff4d4d)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 13, color: "#fff" }}>
+                    {session.name.charAt(0).toUpperCase()}
+                  </div>
+                  <span style={{ fontFamily: "'Barlow',sans-serif", fontSize: 13, fontWeight: 600, color: isLight ? "#1a1a1a" : "#fff" }}>{session.name.split(" ")[0]}</span>
+                </div>
+              ) : (
+                <button onClick={() => { setMobileOpen(false); onLoginClick?.(); }} style={{ background: "#CC0000", color: "#fff", border: "none", borderRadius: 20, padding: "8px 20px", fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 12, letterSpacing: 1, textTransform: "uppercase", cursor: "pointer" }}>
+                  {t.header.login}
+                </button>
+              )}
+            </div>
           </div>
-          <div onClick={() => { setMobileOpen(false); (onRequestsClick || onCatalogClick)?.(); }}
-            style={{ padding: "14px 24px", background: "rgba(204,0,0,0.08)", fontFamily: "'Barlow',sans-serif", fontWeight: 800, fontSize: 13, letterSpacing: 1.4, textTransform: "uppercase", color: "#CC0000", cursor: "pointer", display: "flex", alignItems: "center", gap: 8 }}>
-            <svg width="14" height="14" viewBox="0 0 256 256" fill="#CC0000">
-              <path d="M173.66,98.34a8,8,0,0,1,0,11.32l-56,56a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L112,148.69l50.34-50.35A8,8,0,0,1,173.66,98.34ZM224,48V208a16,16,0,0,1-16,16H48a16,16,0,0,1-16-16V48A16,16,0,0,1,48,32H208A16,16,0,0,1,224,48ZM208,208V48H48V208H208Z"/>
-            </svg>
-            {t.header.requests}
-            {cartCount > 0 && <span style={{ background: "#CC0000", color: "#fff", borderRadius: "50%", width: 20, height: 20, fontSize: 10, fontWeight: 900, display: "inline-flex", alignItems: "center", justifyContent: "center" }}>{cartCount}</span>}
-          </div>
-        </div>
+        </>
       )}
 
       {!isMobile && <PhoneLink isLight={isLight} />}

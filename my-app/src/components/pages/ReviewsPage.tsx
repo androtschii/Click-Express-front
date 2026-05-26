@@ -254,10 +254,26 @@ export const ReviewsPage: React.FC<ReviewsPageProps> = ({ theme = "dark", onBack
   const [formComment, setFormComment] = useState("");
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [formError, setFormError] = useState("");
+  const [sortBy, setSortBy] = useState<"recent" | "highest" | "lowest" | "liked">("recent");
+  const [filterStars, setFilterStars] = useState<number | null>(null);
 
   const avgStars = reviews.length
     ? Math.round((reviews.reduce((s, r) => s + r.stars, 0) / reviews.length) * 10) / 10
     : 0;
+
+  const ratingDist = [5, 4, 3, 2, 1].map(s => ({
+    stars: s,
+    count: reviews.filter(r => r.stars === s).length,
+  }));
+
+  const sortedReviews = [...reviews]
+    .filter(r => filterStars === null || r.stars === filterStars)
+    .sort((a, b) => {
+      if (sortBy === "highest") return b.stars - a.stars;
+      if (sortBy === "lowest")  return a.stars - b.stars;
+      if (sortBy === "liked")   return b.likes - a.likes;
+      return 0;
+    });
 
   const handleVote = (reviewId: number, type: "like" | "dislike") => {
     const prev = votes[reviewId];
@@ -554,13 +570,87 @@ export const ReviewsPage: React.FC<ReviewsPageProps> = ({ theme = "dark", onBack
 
  {/* REVIEWS GRID */}
       <div style={{ maxWidth: 1240, margin: "0 auto", padding: "40px clamp(20px,4vw,56px) 80px" }}>
+        {/* Sort + Filter bar */}
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 24, alignItems: "flex-start", marginBottom: 28, background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 12, padding: "18px 22px" }}>
+          {/* Rating distribution */}
+          <div style={{ flex: "1 1 220px" }}>
+            <div style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 10, letterSpacing: 2, textTransform: "uppercase", color: "#eab308", marginBottom: 10 }}>
+              {lang === "ru" ? "По рейтингу" : "By Rating"}
+            </div>
+            {ratingDist.map(({ stars, count }) => {
+              const pct = reviews.length ? (count / reviews.length) * 100 : 0;
+              const isActive = filterStars === stars;
+              return (
+                <div key={stars}
+                  onClick={() => setFilterStars(filterStars === stars ? null : stars)}
+                  style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6, cursor: "pointer", opacity: filterStars !== null && !isActive ? 0.4 : 1, transition: "opacity 0.15s" }}
+                >
+                  <span style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 11, color: isActive ? "#eab308" : textSubtle, width: 10, textAlign: "right" }}>{stars}</span>
+                  <span style={{ color: "#eab308", fontSize: 11, lineHeight: 1 }}>★</span>
+                  <div style={{ flex: 1, height: 6, borderRadius: 3, background: isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.07)", overflow: "hidden" }}>
+                    <div style={{ height: "100%", width: `${pct}%`, background: isActive ? "#eab308" : "rgba(234,179,8,0.45)", borderRadius: 3, transition: "width 0.5s ease" }} />
+                  </div>
+                  <span style={{ fontFamily: "'Barlow',sans-serif", fontSize: 11, color: isActive ? "#eab308" : textSubtle, width: 18, textAlign: "right" }}>{count}</span>
+                </div>
+              );
+            })}
+            {filterStars !== null && (
+              <button onClick={() => setFilterStars(null)} style={{ marginTop: 8, background: "transparent", border: "none", fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 11, color: "#eab308", cursor: "pointer", padding: 0, letterSpacing: 1, textTransform: "uppercase" }}>
+                ✕ {lang === "ru" ? "Сбросить" : "Clear filter"}
+              </button>
+            )}
+          </div>
+
+          {/* Divider */}
+          <div style={{ width: 1, alignSelf: "stretch", background: isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.07)" }} />
+
+          {/* Sort buttons */}
+          <div>
+            <div style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 10, letterSpacing: 2, textTransform: "uppercase", color: textSubtle, marginBottom: 10 }}>
+              {lang === "ru" ? "Сортировка" : "Sort By"}
+            </div>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+              {(["recent", "highest", "lowest", "liked"] as const).map(opt => {
+                const labels: Record<typeof opt, { en: string; ru: string }> = {
+                  recent:  { en: "Recent",     ru: "Новые"    },
+                  highest: { en: "Top Rated",  ru: "Лучшие"  },
+                  lowest:  { en: "Low Rated",  ru: "Низкие"  },
+                  liked:   { en: "Most Liked", ru: "Популярные" },
+                };
+                const active = sortBy === opt;
+                return (
+                  <button key={opt} onClick={() => setSortBy(opt)} style={{
+                    background: active ? "#eab308" : "transparent",
+                    color: active ? "#000" : textSubtle,
+                    border: `1px solid ${active ? "#eab308" : inputBorder}`,
+                    borderRadius: 6, padding: "5px 13px",
+                    fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 11,
+                    letterSpacing: 1, textTransform: "uppercase", cursor: "pointer",
+                    transition: "all 0.15s",
+                  }}>
+                    {lang === "ru" ? labels[opt].ru : labels[opt].en}
+                  </button>
+                );
+              })}
+            </div>
+            {!loading && (
+              <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 11, color: textSubtle, marginTop: 10 }}>
+                {lang === "ru"
+                  ? `${sortedReviews.length} из ${reviews.length} отзывов`
+                  : `${sortedReviews.length} of ${reviews.length} reviews`}
+                {filterStars !== null && <span style={{ color: "#eab308" }}> · {filterStars}★</span>}
+              </div>
+            )}
+          </div>
+        </div>
+
         {loading ? (
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(360px,1fr))", gap: 24 }}>
             {Array.from({ length: 8 }).map((_, i) => <ReviewSkeleton key={i} theme={theme} />)}
           </div>
         ) : (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(360px,1fr))", gap: 24 }}>
-          {reviews.map((review, idx) => {
+          {sortedReviews.map((review, idx) => {
             const userVote = votes[review.id];
             const commentsOpen = openComments.has(review.id);
             const commentText = commentInputs[review.id] || "";

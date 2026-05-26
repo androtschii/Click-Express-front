@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import type { Load } from "../../types/index";
 import { LoadCard } from "./LoadCard";
 import { LoadSkeleton } from "./LoadSkeleton";
@@ -41,6 +41,8 @@ theme = 'dark', onSearchChange, onFilterChange, onBook, onCancelBook, onSave, on
   const [viewMode, setViewMode] = useState<"grid" | "map">("grid");
   const [sortBy, setSortBy] = useState<"none" | "price_asc" | "price_desc" | "miles_asc" | "miles_desc" | "rate_asc" | "rate_desc">("none");
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const PAGE_SIZE = 6;
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [equipFilter, setEquipFilter] = useState<string>("All");
   const [priceMin, setPriceMin] = useState("");
   const [priceMax, setPriceMax] = useState("");
@@ -97,6 +99,10 @@ theme = 'dark', onSearchChange, onFilterChange, onBook, onCancelBook, onSave, on
     if (sortBy === "rate_desc")  return (b.price / b.miles) - (a.price / a.miles);
     return 0;
   });
+
+  useEffect(() => {
+    setVisibleCount(PAGE_SIZE);
+  }, [search, filter, sortBy, equipFilter, priceMin, priceMax, milesMin, milesMax]);
 
   if (loading) return (
     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(310px,1fr))", gap: 20 }}>
@@ -295,11 +301,58 @@ theme = 'dark', onSearchChange, onFilterChange, onBook, onCancelBook, onSave, on
           )}
         </div>
       ) : (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(310px,1fr))", gap: 20 }}>
-          {sorted.map(l => (
-            <LoadCard key={l.id} load={l} onBook={onBook} onCancelBook={onCancelBook} onSave={onSave} onDetails={onDetails} onCompare={onCompare} isBooked={bookedIds.includes(l.id)} isSaved={savedIds.includes(l.id)} isAdmin={isAdmin} isCompared={compareIds.includes(l.id)} compareDisabled={compareIds.length >= 3} />
-          ))}
-        </div>
+        <>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(310px,1fr))", gap: 20 }}>
+            {sorted.slice(0, visibleCount).map(l => (
+              <LoadCard key={l.id} load={l} onBook={onBook} onCancelBook={onCancelBook} onSave={onSave} onDetails={onDetails} onCompare={onCompare} isBooked={bookedIds.includes(l.id)} isSaved={savedIds.includes(l.id)} isAdmin={isAdmin} isCompared={compareIds.includes(l.id)} compareDisabled={compareIds.length >= 3} />
+            ))}
+          </div>
+
+          {visibleCount < sorted.length ? (
+            <div style={{ textAlign: "center", marginTop: 36, display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
+              <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 12, color: subColor, letterSpacing: 1 }}>
+                {lang === "ru"
+                  ? `Показано ${Math.min(visibleCount, sorted.length)} из ${sorted.length}`
+                  : `Showing ${Math.min(visibleCount, sorted.length)} of ${sorted.length}`}
+              </div>
+              <button
+                onClick={() => setVisibleCount(v => v + PAGE_SIZE)}
+                style={{
+                  padding: "12px 40px",
+                  background: "transparent",
+                  border: "1px solid rgba(204,0,0,0.45)",
+                  borderRadius: 6,
+                  color: "#CC0000",
+                  fontFamily: "'Oswald',sans-serif",
+                  fontWeight: 700,
+                  fontSize: 13,
+                  letterSpacing: 2,
+                  textTransform: "uppercase",
+                  cursor: "pointer",
+                  transition: "all 0.18s",
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.background = "rgba(204,0,0,0.1)";
+                  e.currentTarget.style.borderColor = "#CC0000";
+                  e.currentTarget.style.boxShadow = "0 4px 18px rgba(204,0,0,0.25)";
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.background = "transparent";
+                  e.currentTarget.style.borderColor = "rgba(204,0,0,0.45)";
+                  e.currentTarget.style.boxShadow = "none";
+                }}
+              >
+                {lang === "ru"
+                  ? `Загрузить ещё (${sorted.length - visibleCount})`
+                  : `Load More (${sorted.length - visibleCount})`}
+              </button>
+            </div>
+          ) : sorted.length > PAGE_SIZE ? (
+            <div style={{ textAlign: "center", marginTop: 28, fontFamily: "'Barlow',sans-serif", fontSize: 12, color: subColor, letterSpacing: 1 }}>
+              ✓ {lang === "ru" ? `Все ${sorted.length} грузов загружены` : `All ${sorted.length} loads shown`}
+            </div>
+          ) : null}
+        </>
       )}
     </div>
   );

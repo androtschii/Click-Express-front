@@ -12,6 +12,8 @@ export const LOADS: Load[] = [
   { id:8, route:"Las Vegas, NV",        dest:"Carnesville, GA",    price:6350,  miles:2047, type:"Partial",   cargo:"Flatbed / Construction Equipment",   image:"/images/real8.jpg", tag:"Best Load of the Week" },
   { id:9,  route:"Houston, TX",              dest:"Jackson, WY",            price:14900, miles:4201, type:"Full Load", cargo:"Flatbed / Multi-Stop Steel",        image:"/images/real1.jpg", tag:"Best Load of the Week" },
   { id:10, route:"Phoenix, AZ",             dest:"Memphis, TN",            price:6800,  miles:1620, type:"Full Load", cargo:"Flatbed / Heavy Equipment",           image:"/images/real10.jpg", tag:"Best Load of the Week" },
+  { id:11, route:"Phoenix, AZ",             dest:"Miami, FL",              price:12500, miles:3082, type:"Partial",   cargo:"Stepdeck / Generator Equipment (via Santa Fe Springs, CA)", image:"/images/новая карточка 1.png",  tag:"Best Load of the Week" },
+  { id:12, route:"Stillwater, OK",          dest:"Miami, FL",              price:22400, miles:5200, type:"Full Load", cargo:"Flatbed / Multi-Stop (7 stops via CA, AZ)",                 image:"/images/новая карточка 2.png",  tag:"Weekly Gross" },
 ];
 
 export const FILTERS = ["All Loads", "Full Load", "Partial", "Military Load"];

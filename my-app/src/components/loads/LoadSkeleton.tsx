@@ -85,6 +85,83 @@ export const LoadSkeleton: React.FC<LoadSkeletonProps> = ({ theme = "dark" }) =>
   );
 };
 
+// ── Review card skeleton — matches ReviewsPage card layout ──────────────────
+
+interface ReviewSkeletonProps {
+  theme?: "dark" | "light";
+}
+
+export const ReviewSkeleton: React.FC<ReviewSkeletonProps> = ({ theme = "dark" }) => {
+  const isDark = theme === "dark";
+  const cardBg  = isDark ? "#0f0f0f" : "#ffffff";
+  const cardBdr = isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.09)";
+  const divider = isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)";
+
+  return (
+    <>
+      <style>{CSS}</style>
+      <div style={{ background: cardBg, border: `1px solid ${cardBdr}`, borderRadius: 14, overflow: "hidden" }}>
+        <div style={{ height: 3, background: isDark ? "rgba(234,179,8,0.12)" : "rgba(234,179,8,0.18)" }} />
+        <div style={{ padding: "22px 24px 0" }}>
+          <S isDark={isDark} h={14} w={88} r={2} style={{ marginBottom: 14 }} />
+          <S isDark={isDark} h={10} w="92%" style={{ marginBottom: 7 }} />
+          <S isDark={isDark} h={10} w="80%" style={{ marginBottom: 7 }} />
+          <S isDark={isDark} h={10} w="60%" style={{ marginBottom: 20 }} />
+          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
+            <S isDark={isDark} h={42} w={42} r={99} />
+            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              <S isDark={isDark} h={12} w={110} />
+              <S isDark={isDark} h={10} w={80} />
+              <S isDark={isDark} h={9} w={130} />
+            </div>
+          </div>
+        </div>
+        <div style={{ display: "flex", gap: 6, padding: "12px 24px", borderTop: `1px solid ${divider}` }}>
+          <S isDark={isDark} h={28} w={62} r={6} />
+          <S isDark={isDark} h={28} w={62} r={6} />
+          <S isDark={isDark} h={28} w={108} r={6} style={{ marginLeft: "auto" }} />
+        </div>
+      </div>
+    </>
+  );
+};
+
+// ── News card skeleton — matches NewsPage card layout ────────────────────────
+
+interface NewsSkeletonProps {
+  theme?: "dark" | "light";
+}
+
+export const NewsSkeleton: React.FC<NewsSkeletonProps> = ({ theme = "dark" }) => {
+  const isDark = theme === "dark";
+  const cardBg  = isDark ? "#141414" : "#ffffff";
+  const cardBdr = isDark ? "rgba(240,237,232,0.08)" : "rgba(13,13,13,0.1)";
+  const divider = isDark ? "rgba(240,237,232,0.06)" : "rgba(13,13,13,0.06)";
+
+  return (
+    <>
+      <style>{CSS}</style>
+      <div style={{ background: cardBg, border: `1px solid ${cardBdr}`, borderTop: "3px solid rgba(204,0,0,0.18)", overflow: "hidden" }}>
+        <div style={{ padding: "28px 28px 24px", display: "flex", flexDirection: "column", gap: 14 }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <S isDark={isDark} h={22} w={96} r={2} />
+            <S isDark={isDark} h={11} w={70} />
+          </div>
+          <S isDark={isDark} h={16} w="85%" />
+          <S isDark={isDark} h={16} w="58%" style={{ marginTop: -6 }} />
+          <S isDark={isDark} h={11} w="100%" />
+          <S isDark={isDark} h={11} w="88%" style={{ marginTop: -4 }} />
+          <S isDark={isDark} h={11} w="72%" style={{ marginTop: -4 }} />
+          <div style={{ borderTop: `1px solid ${divider}`, paddingTop: 14, display: "flex", justifyContent: "space-between" }}>
+            <S isDark={isDark} h={11} w={80} />
+            <S isDark={isDark} h={11} w={36} />
+          </div>
+        </div>
+      </div>
+    </>
+  );
+};
+
 // ── Row skeleton — matches admin list rows (Drivers / Fleet / Loads) ────────
 
 interface AdminRowSkeletonProps {

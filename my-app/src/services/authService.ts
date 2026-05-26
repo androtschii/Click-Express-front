@@ -13,10 +13,12 @@ export interface Session {
   email: string;
   name: string;
   token: string;
+  refreshToken?: string;
   avatar?: string;
   role?: string;
 }
 
+const API = "http://localhost:5114/api";
 const USERS_KEY = "ce_users";
 const SESSION_KEY = "ce_session";
 const COOKIE_NAME = "ce_token";
@@ -66,33 +68,54 @@ function createSession(user: User) {
   setCookie(COOKIE_NAME, token, 30);
 }
 
-// Public API 
-export function register(
-  name: string,
+// Public API
+export async function register(
+  username: string,
   email: string,
   password: string
-): { ok: boolean; error?: string; user?: User } {
-  if (!name.trim()) return { ok: false, error: "Name is required" };
+): Promise<{ ok: boolean; error?: string; user?: User }> {
+  if (!username.trim()) return { ok: false, error: "Username is required" };
   if (!email.trim()) return { ok: false, error: "Email is required" };
   if (password.length < 6)
     return { ok: false, error: "Password must be at least 6 characters" };
 
-  const users = getUsers();
-  if (users.find((u) => u.email.toLowerCase() === email.toLowerCase())) {
-    return { ok: false, error: "Email already registered. Please login." };
-  }
+  try {
+    const response = await fetch(`${API}/auth/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, email, password }),
+    });
 
-  const user: User = {
-    id: crypto.randomUUID(),
-    name: name.trim(),
-    email: email.toLowerCase().trim(),
-    password,
-    createdAt: new Date().toISOString(),
-    provider: "local",
-  };
-  saveUsers([...users, user]);
-  createSession(user);
-  return { ok: true, user };
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({})) as { message?: string };
+      return { ok: false, error: err.message || "Registration failed" };
+    }
+
+    const data = await response.json() as { token: string; refreshToken: string; username: string; role: string };
+
+    const session: Session = {
+      userId: data.username,
+      email,
+      name: data.username,
+      token: data.token,
+      refreshToken: data.refreshToken,
+      role: data.role,
+    };
+    localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+    setCookie(COOKIE_NAME, data.token, 1);
+
+    const user: User = {
+      id: data.username,
+      name: data.username,
+      email,
+      password: "",
+      createdAt: new Date().toISOString(),
+      provider: "local",
+    };
+    return { ok: true, user };
+  } catch {
+    return { ok: false, error: "Ошибка подключения к серверу" };
+  }
 }
 
 export async function login(
@@ -113,14 +136,14 @@ export async function login(
       return { ok: false, error: "Неверный логин или пароль" };
     }
 
-    const data = await response.json();
+    const data = await response.json() as { token: string; refreshToken: string; username: string; role: string };
 
- // Сохраняем сессию с JWT токеном от бэкенда
     const session: Session = {
       userId: data.username,
       email: data.username,
       name: data.username,
       token: data.token,
+      refreshToken: data.refreshToken,
       role: data.role,
     };
     localStorage.setItem(SESSION_KEY, JSON.stringify(session));
@@ -185,8 +208,33 @@ export function getSession(): Session | null {
 }
 
 export function logout() {
+  const session = getSession();
+  if (session?.refreshToken) {
+    fetch(`${API}/auth/logout`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ refreshToken: session.refreshToken }),
+    }).catch(() => {});
+  }
   localStorage.removeItem(SESSION_KEY);
   deleteCookie(COOKIE_NAME);
+}
+
+export async function forgotPassword(
+  email: string
+): Promise<{ ok: boolean; error?: string; message?: string }> {
+  if (!email.trim()) return { ok: false, error: "Email is required" };
+  try {
+    const response = await fetch(`${API}/auth/forgot-password`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    });
+    const data = await response.json() as { message?: string };
+    return { ok: true, message: data.message };
+  } catch {
+    return { ok: false, error: "Ошибка подключения к серверу" };
+  }
 }
 
 export function getUserById(userId: string): User | null {

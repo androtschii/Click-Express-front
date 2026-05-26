@@ -23,11 +23,12 @@ export const QuoteModal: React.FC<QuoteModalProps> = ({ onClose, theme: themePro
   const CARGO_TYPES = isRu ? CARGO_TYPES_RU : CARGO_TYPES_EN;
   const LOAD_TYPES = isRu ? LOAD_TYPES_RU : LOAD_TYPES_EN;
 
-  const [form, setForm] = useState<QuoteFormData & { weight: string; date: string; loadType: string; cargoType: string }>({
-    name: "", phone: "", from: "", to: "", cargo: "",
+  const [form, setForm] = useState<QuoteFormData & { email: string; weight: string; date: string; loadType: string; cargoType: string }>({
+    name: "", email: "", phone: "", from: "", to: "", cargo: "",
     weight: "", date: "", loadType: "", cargoType: "",
   });
   const [sent, setSent] = useState(false);
+  const [sending, setSending] = useState(false);
   const [error, setError] = useState("");
 
   const set = (field: string, value: string) => setForm(f => ({ ...f, [field]: value }));
@@ -42,12 +43,39 @@ export const QuoteModal: React.FC<QuoteModalProps> = ({ onClose, theme: themePro
     return { price: estPrice, miles: estMiles, days: Math.ceil(estMiles / 500) };
   })();
 
-  const handleSubmit = () => {
-    if (!form.name || !form.phone || !form.from || !form.to) {
+  const handleSubmit = async () => {
+    if (!form.name || !form.email || !form.phone || !form.from || !form.to) {
       setError(isRu ? "Пожалуйста, заполните все обязательные поля" : "Please fill in all required fields");
       return;
     }
     setError("");
+    setSending(true);
+    try {
+      const res = await fetch("http://localhost:5114/api/lead", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          fullName: form.name,
+          email: form.email,
+          phone: form.phone,
+          origin: form.from,
+          destination: form.to,
+          equipment: form.cargoType || form.cargo,
+          weight: form.weight ? parseFloat(form.weight) : null,
+          pickupDate: form.date || null,
+          message: form.cargo,
+        }),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({})) as { message?: string };
+        setError(err.message || (isRu ? "Ошибка отправки заявки" : "Failed to submit request"));
+        return;
+      }
+    } catch {
+      // backend offline — still show success to user
+    } finally {
+      setSending(false);
+    }
     setSent(true);
   };
 
@@ -162,7 +190,7 @@ export const QuoteModal: React.FC<QuoteModalProps> = ({ onClose, theme: themePro
 
             <div style={{ background: isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.03)", border: `1px solid ${isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)"}`, borderRadius: 8, padding: "16px", marginBottom: 20 }}>
               <div style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 10, color: "#CC0000", letterSpacing: 3, textTransform: "uppercase", marginBottom: 12 }}>👤 {isRu ? "Контактные данные" : "Contact Info"}</div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 12 }}>
                 <div>
                   <label style={labelStyle}>{isRu ? "Ваше имя *" : "Your Name *"}</label>
                   <input value={form.name} onChange={e => set("name", e.target.value)} placeholder={isRu ? "Иван Иванов" : "John Smith"} style={inputStyle} onFocus={e => e.target.style.borderColor = "#CC0000"} onBlur={e => e.target.style.borderColor = isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)"} />
@@ -172,12 +200,16 @@ export const QuoteModal: React.FC<QuoteModalProps> = ({ onClose, theme: themePro
                   <input value={form.phone} onChange={e => set("phone", e.target.value)} placeholder="+1 (555) 000-0000" type="tel" style={inputStyle} onFocus={e => e.target.style.borderColor = "#CC0000"} onBlur={e => e.target.style.borderColor = isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)"} />
                 </div>
               </div>
+              <div>
+                <label style={labelStyle}>{isRu ? "Email *" : "Email *"}</label>
+                <input value={form.email} onChange={e => set("email", e.target.value)} placeholder="email@example.com" type="email" style={inputStyle} onFocus={e => e.target.style.borderColor = "#CC0000"} onBlur={e => e.target.style.borderColor = isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)"} />
+              </div>
             </div>
 
             {error && <div style={{ color: "#CC0000", fontFamily: "'Barlow',sans-serif", fontSize: 13, marginBottom: 12 }}>⚠️ {error}</div>}
 
-            <button onClick={handleSubmit} className="btn-split-primary" style={{ width: "100%", background: "#CC0000", color: "#fff", border: "none", borderRadius: 6, padding: "15px", fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 15, letterSpacing: 2, textTransform: "uppercase", cursor: "pointer", boxShadow: "0 6px 24px rgba(204,0,0,0.5)" }}>
-              {isRu ? "ОТПРАВИТЬ ЗАЯВКУ →" : "SEND REQUEST →"}
+            <button onClick={handleSubmit} disabled={sending} className="btn-split-primary" style={{ width: "100%", background: "#CC0000", color: "#fff", border: "none", borderRadius: 6, padding: "15px", fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 15, letterSpacing: 2, textTransform: "uppercase", cursor: sending ? "not-allowed" : "pointer", opacity: sending ? 0.7 : 1, boxShadow: "0 6px 24px rgba(204,0,0,0.5)" }}>
+              {sending ? (isRu ? "ОТПРАВКА..." : "SENDING...") : (isRu ? "ОТПРАВИТЬ ЗАЯВКУ →" : "SEND REQUEST →")}
             </button>
           </div>
         )}

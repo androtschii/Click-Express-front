@@ -3,6 +3,7 @@ import { useLanguage } from "../../context/LanguageContext";
 import type { Load } from "../../types/index";
 import { fetchNews, createNews, deleteNews } from "../../api/client.js";
 import type { Session } from "../../services/authService";
+import { NewsSkeleton } from "../loads/LoadSkeleton";
 
 interface NewsPageProps {
   theme?: "dark" | "light";
@@ -324,6 +325,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({ theme = "dark", onBack, onVi
 
   const [apiArticles, setApiArticles] = useState<Article[]>([]);
   const [apiIdMap, setApiIdMap] = useState<Map<number, number>>(new Map());
+  const [loading, setLoading] = useState(true);
 
   const loadApiNews = async () => {
     try {
@@ -332,6 +334,8 @@ export const NewsPage: React.FC<NewsPageProps> = ({ theme = "dark", onBack, onVi
       setApiIdMap(new Map(data.map(n => [100000 + n.id, n.id])));
     } catch {
       setApiArticles([]);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -685,6 +689,11 @@ export const NewsPage: React.FC<NewsPageProps> = ({ theme = "dark", onBack, onVi
           )}
 
  {/* GRID */}
+          {loading ? (
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(310px,1fr))", gap: 20 }}>
+              {Array.from({ length: 8 }).map((_, i) => <NewsSkeleton key={i} theme={theme} />)}
+            </div>
+          ) : (
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(310px,1fr))", gap: 20 }}>
             {rest.map((article, idx) => {
               const isLoad = article.category === "loads";
@@ -758,6 +767,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({ theme = "dark", onBack, onVi
               );
             })}
           </div>
+          )}
 
  {/* CTA */}
           <div style={{ marginTop: 64, background: "#CC0000", padding: "48px clamp(24px,5vw,64px)", position: "relative", overflow: "hidden", display: "grid", gridTemplateColumns: "1fr auto", gap: 40, alignItems: "center" }}>

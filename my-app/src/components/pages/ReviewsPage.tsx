@@ -3,6 +3,7 @@ import { useLanguage } from "../../context/LanguageContext";
 import { fetchReviews, createReview, approveReview, rejectReview, deleteReview } from "../../api/client.js";
 import type { Session } from "../../services/authService";
 import { Threads } from "../ui/Threads";
+import { ReviewSkeleton } from "../loads/LoadSkeleton";
 
 interface ReviewsPageProps {
   theme?: "dark" | "light";
@@ -221,6 +222,7 @@ export const ReviewsPage: React.FC<ReviewsPageProps> = ({ theme = "dark", onBack
   const inputBorder = isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.12)";
 
   const [reviews, setReviews] = useState<ReviewItem[]>(INITIAL_REVIEWS);
+  const [loading, setLoading] = useState(true);
   const loadApiReviews = async () => {
     try {
       const data: ApiReview[] = await fetchReviews(!isAdmin);
@@ -228,6 +230,8 @@ export const ReviewsPage: React.FC<ReviewsPageProps> = ({ theme = "dark", onBack
       setReviews([...apiItems, ...INITIAL_REVIEWS]);
     } catch {
       // если API недоступен — оставляем INITIAL_REVIEWS
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -550,6 +554,11 @@ export const ReviewsPage: React.FC<ReviewsPageProps> = ({ theme = "dark", onBack
 
  {/* REVIEWS GRID */}
       <div style={{ maxWidth: 1240, margin: "0 auto", padding: "40px clamp(20px,4vw,56px) 80px" }}>
+        {loading ? (
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(360px,1fr))", gap: 24 }}>
+            {Array.from({ length: 8 }).map((_, i) => <ReviewSkeleton key={i} theme={theme} />)}
+          </div>
+        ) : (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(360px,1fr))", gap: 24 }}>
           {reviews.map((review, idx) => {
             const userVote = votes[review.id];
@@ -718,6 +727,7 @@ export const ReviewsPage: React.FC<ReviewsPageProps> = ({ theme = "dark", onBack
             );
           })}
         </div>
+        )}
 
  {/* CTA */}
         <div style={{ marginTop: 60, background: "linear-gradient(135deg,#eab308,#a16207)", borderRadius: 14, padding: "44px 48px", position: "relative", overflow: "hidden", textAlign: "center" }}>

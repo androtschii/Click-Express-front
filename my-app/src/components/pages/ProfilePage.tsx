@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+﻿import React, { useState, useEffect, useRef } from "react";
 import type { Session } from "../../services/authService";
 import { getUserById, updateUser } from "../../services/authService";
 import { useLanguage } from "../../context/LanguageContext";
@@ -110,14 +110,14 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
 
   const notify = (msg: string, ok = true) => setToast({ msg, ok });
 
-  const handleSaveName = () => {
+  const handleSaveName = async () => {
     if (!nameVal.trim()) return;
-    const res = updateUser(session.userId, { name: nameVal.trim() });
+    const res = await updateUser(session.userId, { name: nameVal.trim() });
     if (res.ok) { setDisplayName(nameVal.trim()); onSessionUpdate?.(nameVal.trim()); setEditName(false); notify(t.nameSaved); }
   };
 
-  const handleSavePass = () => {
-    const res = updateUser(session.userId, { currentPassword: curPass, newPassword: newPass });
+  const handleSavePass = async () => {
+    const res = await updateUser(session.userId, { currentPassword: curPass, newPassword: newPass });
     if (!res.ok) { notify(res.error === "wrong_password" ? t.wrongPassword : t.passwordShort, false); }
     else { setCurPass(""); setNewPass(""); setEditPass(false); notify(t.passwordSaved); }
   };

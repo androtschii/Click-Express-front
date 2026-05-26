@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+﻿import React, { useState } from "react";
 import { useLanguage } from "../../context/LanguageContext";
 import { useInView } from "../../hooks/useInView";
 import { CheckCircle, XCircle, Star, ArrowRight } from "@phosphor-icons/react";

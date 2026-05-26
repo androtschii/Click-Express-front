@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+﻿import React, { useState, useEffect } from "react";
 import { PhoneIcon } from "../ui/PhoneIcon";
 import { useLanguage } from "../../context/LanguageContext";
 import { submitJobApplication, fetchJobApplications, updateJobApplicationStatus, deleteJobApplication } from "../../api/client.js";

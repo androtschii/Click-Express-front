@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 import { X, ShoppingCart, CheckCircle } from "@phosphor-icons/react";
 import type { Session } from "../../services/authService";
 import type { Load } from "../../types/index";

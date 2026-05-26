@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+﻿import React, { useState } from "react";
 import { useLanguage } from "../../context/LanguageContext";
 import { useInView } from "../../hooks/useInView";
 import { HandshakeIcon, ClockCounterClockwise, CurrencyDollar, FileText } from "@phosphor-icons/react";

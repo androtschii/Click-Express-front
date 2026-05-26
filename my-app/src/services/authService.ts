@@ -18,12 +18,12 @@ export interface Session {
   role?: string;
 }
 
-const API = "http://localhost:5114/api";
+const API_BASE = "http://localhost:5114/api";
 const USERS_KEY = "ce_users";
 const SESSION_KEY = "ce_session";
 const COOKIE_NAME = "ce_token";
 
-// Cookies 
+// Cookies
 function setCookie(name: string, value: string, days: number) {
   const expires = new Date(Date.now() + days * 864e5).toUTCString();
   document.cookie = `${name}=${value}; expires=${expires}; path=/; SameSite=Lax`;
@@ -42,7 +42,7 @@ function deleteCookie(name: string) {
   document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`;
 }
 
-// Storage 
+// Storage
 function getUsers(): User[] {
   try {
     return JSON.parse(localStorage.getItem(USERS_KEY) || "[]");
@@ -80,10 +80,10 @@ export async function register(
     return { ok: false, error: "Password must be at least 6 characters" };
 
   try {
-    const response = await fetch(`${API}/auth/register`, {
+    const response = await fetch(`${API_BASE}/auth/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, email, password }),
+      body: JSON.stringify({ username: username.trim(), email: email.trim(), password }),
     });
 
     if (!response.ok) {
@@ -95,7 +95,7 @@ export async function register(
 
     const session: Session = {
       userId: data.username,
-      email,
+      email: email.trim(),
       name: data.username,
       token: data.token,
       refreshToken: data.refreshToken,
@@ -107,7 +107,7 @@ export async function register(
     const user: User = {
       id: data.username,
       name: data.username,
-      email,
+      email: email.trim(),
       password: "",
       createdAt: new Date().toISOString(),
       provider: "local",
@@ -126,7 +126,7 @@ export async function login(
   if (!password) return { ok: false, error: "Password is required" };
 
   try {
- const response = await fetch("http://localhost:5114/api/auth/login", {
+    const response = await fetch(`${API_BASE}/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, password }),
@@ -168,7 +168,6 @@ export function loginWithGoogle(): Promise<{
   user?: User;
   error?: string;
 }> {
- // Mock Google OAuth — replace with real Google Identity Services in production
   return new Promise((resolve) => {
     setTimeout(() => {
       const mockEmail = `demo.google@gmail.com`;
@@ -183,7 +182,7 @@ export function loginWithGoogle(): Promise<{
           password: "",
           createdAt: new Date().toISOString(),
           provider: "google",
- avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(mockName)}&background=EA4335&color=fff&size=64`,
+          avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(mockName)}&background=EA4335&color=fff&size=64`,
         };
         saveUsers([...users, user]);
       }
@@ -210,7 +209,7 @@ export function getSession(): Session | null {
 export function logout() {
   const session = getSession();
   if (session?.refreshToken) {
-    fetch(`${API}/auth/logout`, {
+    fetch(`${API_BASE}/auth/logout`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ refreshToken: session.refreshToken }),
@@ -225,7 +224,7 @@ export async function forgotPassword(
 ): Promise<{ ok: boolean; error?: string; message?: string }> {
   if (!email.trim()) return { ok: false, error: "Email is required" };
   try {
-    const response = await fetch(`${API}/auth/forgot-password`, {
+    const response = await fetch(`${API_BASE}/auth/forgot-password`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email }),
@@ -241,36 +240,46 @@ export function getUserById(userId: string): User | null {
   return getUsers().find((u) => u.id === userId) ?? null;
 }
 
-export function updateUser(
+export async function updateUser(
   userId: string,
   updates: { name?: string; currentPassword?: string; newPassword?: string }
-): { ok: boolean; error?: string } {
-  const users = getUsers();
-  const idx = users.findIndex((u) => u.id === userId);
-  if (idx === -1) return { ok: false, error: "User not found" };
-
-  const user = { ...users[idx] };
+): Promise<{ ok: boolean; error?: string }> {
+  const session = JSON.parse(localStorage.getItem(SESSION_KEY) || "null") as Session | null;
 
   if (updates.name !== undefined) {
-    user.name = updates.name.trim();
+    if (!session?.token) return { ok: false, error: "Not authenticated" };
+    try {
+      const response = await fetch(`${API_BASE}/user/profile`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.token}`,
+        },
+        body: JSON.stringify({ fullName: updates.name.trim() }),
+      });
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        return { ok: false, error: data.message || "Update failed" };
+      }
+    } catch {
+      // Continue — update session locally even if API unreachable
+    }
+    localStorage.setItem(SESSION_KEY, JSON.stringify({ ...session, name: updates.name.trim() }));
+    return { ok: true };
   }
 
   if (updates.newPassword !== undefined) {
+    const users = getUsers();
+    const idx = users.findIndex((u) => u.id === userId);
+    if (idx === -1) return { ok: false, error: "wrong_password" };
+    const user = { ...users[idx] };
     if (user.provider === "google") return { ok: false, error: "Cannot change password for Google accounts" };
     if (user.password !== updates.currentPassword) return { ok: false, error: "wrong_password" };
     if (updates.newPassword.length < 6) return { ok: false, error: "password_short" };
     user.password = updates.newPassword;
-  }
-
-  users[idx] = user;
-  saveUsers(users);
-
- // Update session name if changed
-  if (updates.name !== undefined) {
-    const session = JSON.parse(localStorage.getItem(SESSION_KEY) || "null") as Session | null;
-    if (session && session.userId === userId) {
-      localStorage.setItem(SESSION_KEY, JSON.stringify({ ...session, name: user.name }));
-    }
+    users[idx] = user;
+    saveUsers(users);
+    return { ok: true };
   }
 
   return { ok: true };

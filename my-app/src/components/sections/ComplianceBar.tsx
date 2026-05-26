@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import { useLanguage } from "../../context/LanguageContext";
 import { ShieldCheck, Certificate, FirstAidKit, Buildings, ArrowSquareOut } from "@phosphor-icons/react";
 

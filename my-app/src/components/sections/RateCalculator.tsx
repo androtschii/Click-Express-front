@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+﻿import React, { useState, useMemo } from "react";
 import { useLanguage } from "../../context/LanguageContext";
 import { useInView } from "../../hooks/useInView";
 import { ArrowRight, Calculator, MapPin } from "@phosphor-icons/react";

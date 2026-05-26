@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+﻿import React, { useState, useEffect } from "react";
 import { useLanguage } from "../../context/LanguageContext";
 import { API_BASE } from "../../config";
 import { useInView } from "../../hooks/useInView";

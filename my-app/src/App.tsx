@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, lazy, Suspense } from "react";
+﻿import React, { useState, useRef, useEffect, lazy, Suspense } from "react";
 import { ThemeProvider, useTheme } from "./theme";
 import { LanguageProvider, useLanguage } from "./context/LanguageContext";
 import { translations } from "./i18n/translations";

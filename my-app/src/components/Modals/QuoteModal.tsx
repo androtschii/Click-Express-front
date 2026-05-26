@@ -55,15 +55,15 @@ export const QuoteModal: React.FC<QuoteModalProps> = ({ onClose, theme: themePro
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          fullName: form.name,
-          email: form.email,
-          phone: form.phone,
-          origin: form.from,
-          destination: form.to,
-          equipment: form.cargoType || form.cargo,
+          fullName: form.name.trim(),
+          email: form.email.trim(),
+          phone: form.phone.trim(),
+          origin: form.from.trim(),
+          destination: form.to.trim(),
+          equipment: form.cargoType || form.cargo || undefined,
           weight: form.weight ? parseFloat(form.weight) : null,
           pickupDate: form.date || null,
-          message: form.cargo,
+          message: form.cargo || undefined,
         }),
       });
       if (!res.ok) {
@@ -208,7 +208,7 @@ export const QuoteModal: React.FC<QuoteModalProps> = ({ onClose, theme: themePro
 
             {error && <div style={{ color: "#CC0000", fontFamily: "'Barlow',sans-serif", fontSize: 13, marginBottom: 12 }}>⚠️ {error}</div>}
 
-            <button onClick={handleSubmit} disabled={sending} className="btn-split-primary" style={{ width: "100%", background: "#CC0000", color: "#fff", border: "none", borderRadius: 6, padding: "15px", fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 15, letterSpacing: 2, textTransform: "uppercase", cursor: sending ? "not-allowed" : "pointer", opacity: sending ? 0.7 : 1, boxShadow: "0 6px 24px rgba(204,0,0,0.5)" }}>
+            <button onClick={handleSubmit} disabled={sending} className={sending ? "" : "btn-split-primary"} style={{ width: "100%", background: sending ? "rgba(204,0,0,0.6)" : "#CC0000", color: "#fff", border: "none", borderRadius: 6, padding: "15px", fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 15, letterSpacing: 2, textTransform: "uppercase", cursor: sending ? "not-allowed" : "pointer", boxShadow: "0 6px 24px rgba(204,0,0,0.5)" }}>
               {sending ? (isRu ? "ОТПРАВКА..." : "SENDING...") : (isRu ? "ОТПРАВИТЬ ЗАЯВКУ →" : "SEND REQUEST →")}
             </button>
           </div>

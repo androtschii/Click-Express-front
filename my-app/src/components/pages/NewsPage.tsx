@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+﻿import React, { useState, useEffect } from "react";
 import { useLanguage } from "../../context/LanguageContext";
 import type { Load } from "../../types/index";
 import { fetchNews, createNews, deleteNews } from "../../api/client.js";

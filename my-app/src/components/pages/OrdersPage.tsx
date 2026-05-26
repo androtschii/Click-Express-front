@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import type { Load } from "../../types/index";
 import { useLanguage } from "../../context/LanguageContext";
 import { translations } from "../../i18n/translations";

@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import { useLanguage } from "../../context/LanguageContext";
 import { translations } from "../../i18n/translations";
 import { useInView } from "../../hooks/useInView";
@@ -21,6 +21,12 @@ export const HaulTypes: React.FC<HaulTypesProps> = ({ theme = "dark", onQuoteCli
   const { lang } = useLanguage();
   const t = translations[lang].haulTypes;
   const { ref, inView } = useInView<HTMLElement>(0.1);
+  const [isMobile, setIsMobile] = React.useState(() => typeof window !== "undefined" ? window.innerWidth < 768 : false);
+  React.useEffect(() => {
+    const fn = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener("resize", fn);
+    return () => window.removeEventListener("resize", fn);
+  }, []);
 
   const bg      = isDark ? "#0a0a0a" : "#f4f0e8";
   const surface = isDark ? "#0e0e0e" : "#ffffff";
@@ -71,8 +77,8 @@ export const HaulTypes: React.FC<HaulTypesProps> = ({ theme = "dark", onQuoteCli
                   overflow: "hidden",
                   boxShadow: isDark ? "0 20px 50px rgba(0,0,0,0.45)" : "0 20px 40px rgba(0,0,0,0.12)",
                   display: "grid",
-                  gridTemplateColumns: "minmax(0, 1.1fr) minmax(0, 1fr)",
-                  minHeight: 320,
+                  gridTemplateColumns: isMobile ? "1fr" : "minmax(0, 1.1fr) minmax(0, 1fr)",
+                  minHeight: isMobile ? "auto" : 320,
                 }}
               >
                 <div style={{ padding: "clamp(24px,3.5vw,44px)", display: "flex", flexDirection: "column", justifyContent: "center", gap: 14 }}>
@@ -99,7 +105,7 @@ export const HaulTypes: React.FC<HaulTypesProps> = ({ theme = "dark", onQuoteCli
                       ? "radial-gradient(ellipse at 55% 60%, rgba(80,10,10,0.6) 0%, rgba(20,5,5,0.95) 70%)"
                       : "linear-gradient(160deg,#f5ecec 0%,#ede0e0 50%,#e8d8d8 100%)",
                     overflow: "hidden",
-                    minHeight: 280,
+                    minHeight: isMobile ? 200 : 280,
                   }}
                 >
                   <div style={{ position: "absolute", inset: 0, backgroundImage: `repeating-linear-gradient(135deg,rgba(204,0,0,${isDark?"0.05":"0.04"}) 0,rgba(204,0,0,${isDark?"0.05":"0.04"}) 1px,transparent 1px,transparent 22px)`, pointerEvents: "none" }} />

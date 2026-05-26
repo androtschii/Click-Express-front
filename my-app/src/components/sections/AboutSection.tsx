@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+﻿import React, { useRef } from "react";
 import { CELogo } from "../ui/Logo";
 import { useLanguage } from "../../context/LanguageContext";
 import { translations } from "../../i18n/translations";
@@ -61,6 +61,13 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onContactClick, them
   const t = translations[lang].about;
   const videoRef = useRef<HTMLVideoElement>(null);
   const videoWrapRef = useRef<HTMLDivElement>(null);
+  const [isMobile, setIsMobile] = React.useState(() => typeof window !== "undefined" ? window.innerWidth < 768 : false);
+
+  React.useEffect(() => {
+    const fn = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener("resize", fn);
+    return () => window.removeEventListener("resize", fn);
+  }, []);
 
  // Auto-play when visible, pause when out of view
   React.useEffect(() => {
@@ -98,7 +105,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onContactClick, them
         </div>
 
  {/* 3-column: company info | vertical video | contacts */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 260px 1fr", gap: 40, alignItems: "start" }}>
+        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 260px 1fr", gap: isMobile ? 32 : 40, alignItems: "start" }}>
 
  {/* LEFT — company info */}
           <div>
@@ -142,7 +149,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onContactClick, them
           </div>
 
  {/* CENTER — vertical video */}
-          <div ref={videoWrapRef} style={{ position: "sticky", top: 90 }}>
+          <div ref={videoWrapRef} style={{ position: isMobile ? "static" : "sticky", top: 90, maxWidth: isMobile ? 300 : "none", margin: isMobile ? "0 auto" : 0 }}>
             <div style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 9, color: "#CC0000", letterSpacing: 3, textTransform: "uppercase", textAlign: "center", marginBottom: 10 }}>
               ● {lang === "ru" ? "РЕКАП 2025" : "RECAP 2025"}
             </div>

@@ -269,17 +269,27 @@ export async function updateUser(
   }
 
   if (updates.newPassword !== undefined) {
-    const users = getUsers();
-    const idx = users.findIndex((u) => u.id === userId);
-    if (idx === -1) return { ok: false, error: "wrong_password" };
-    const user = { ...users[idx] };
-    if (user.provider === "google") return { ok: false, error: "Cannot change password for Google accounts" };
-    if (user.password !== updates.currentPassword) return { ok: false, error: "wrong_password" };
-    if (updates.newPassword.length < 6) return { ok: false, error: "password_short" };
-    user.password = updates.newPassword;
-    users[idx] = user;
-    saveUsers(users);
-    return { ok: true };
+    if (!session?.token) return { ok: false, error: "Not authenticated" };
+    try {
+      const response = await fetch(`${API_BASE}/auth/change-password`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.token}`,
+        },
+        body: JSON.stringify({ currentPassword: updates.currentPassword, newPassword: updates.newPassword }),
+      });
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({})) as { message?: string };
+        const msg = (data.message || "").toLowerCase();
+        if (msg.includes("incorrect")) return { ok: false, error: "wrong_password" };
+        if (msg.includes("8 char") || msg.includes("least 8")) return { ok: false, error: "password_short" };
+        return { ok: false, error: data.message || "wrong_password" };
+      }
+      return { ok: true };
+    } catch {
+      return { ok: false, error: "Ошибка подключения к серверу" };
+    }
   }
 
   return { ok: true };

@@ -29,6 +29,7 @@ interface DocItem {
   fileName: string;
   fileType: string;
   uploadedAt: string;
+  url: string;
 }
 
 export const ProfilePage: React.FC<ProfilePageProps> = ({
@@ -79,6 +80,21 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
   const [docDragOver, setDocDragOver] = useState(false);
   const docInputRef                   = useRef<HTMLInputElement>(null);
 
+  useEffect(() => {
+    fetch(`${API_BASE}/document`, { headers: { Authorization: `Bearer ${session.token}` } })
+      .then(r => r.ok ? r.json() : Promise.reject())
+      .then((data: { id: number; url: string; uploadedAt: string; fileName: string }[]) => {
+        setDocs(data.map(d => ({
+          id: d.id,
+          fileName: d.fileName || d.url.split("/").pop() || String(d.id),
+          fileType: d.url.split(".").pop() || "",
+          uploadedAt: d.uploadedAt,
+          url: d.url,
+        })));
+      })
+      .catch(() => {});
+  }, [session.token]);
+
   const uploadDoc = async (file: File) => {
     setDocUploading(true);
     const form = new FormData();
@@ -91,7 +107,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
       });
       if (!res.ok) throw new Error();
       const data = await res.json();
-      setDocs(prev => [{ id: data.id, fileName: file.name, fileType: file.type, uploadedAt: new Date().toISOString() }, ...prev]);
+      setDocs(prev => [{ id: data.id, fileName: file.name, fileType: file.type, uploadedAt: new Date().toISOString(), url: data.url ?? "" }, ...prev]);
     } catch {
       notify(lang === "ru" ? "Ошибка загрузки файла" : "Upload failed");
     } finally {
@@ -535,15 +551,25 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                         </div>
                       </div>
                       <a
-                        href={`${API_BASE}/document/${doc.id}/download`}
+                        href={doc.url ? `${API_BASE.replace("/api", "")}${doc.url}` : `${API_BASE}/document/${doc.id}/download`}
                         download={doc.fileName}
+                        target="_blank"
+                        rel="noreferrer"
                         style={{ color:muted, display:"flex", alignItems:"center" }}
                         title={lang === "ru" ? "Скачать" : "Download"}
                       >
                         <DownloadSimple size={18} />
                       </a>
                       <button
-                        onClick={() => setDocs(prev => prev.filter(d => d.id !== doc.id))}
+                        onClick={async () => {
+                          try {
+                            await fetch(`${API_BASE}/document/${doc.id}`, {
+                              method: "DELETE",
+                              headers: { Authorization: `Bearer ${session.token}` },
+                            });
+                          } catch { /* ignore network errors */ }
+                          setDocs(prev => prev.filter(d => d.id !== doc.id));
+                        }}
                         style={{ background:"transparent", border:"none", cursor:"pointer", color:muted, display:"flex", alignItems:"center", padding:0 }}
                         title={lang === "ru" ? "Удалить" : "Remove"}
                       >

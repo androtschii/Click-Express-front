@@ -1,4 +1,5 @@
 ﻿import React, { useState, useRef, useEffect, lazy, Suspense } from "react";
+import { Toaster } from "sonner";
 import { ThemeProvider, useTheme } from "./theme";
 import { LanguageProvider, useLanguage } from "./context/LanguageContext";
 import { translations } from "./i18n/translations";
@@ -1141,7 +1142,25 @@ function AppContent() {
 }
 
 function App() {
-  return <LanguageProvider><ThemeProvider><AppContent /></ThemeProvider></LanguageProvider>;
+  return (
+    <LanguageProvider>
+      <ThemeProvider>
+        <AppContent />
+        <Toaster
+          position="bottom-right"
+          toastOptions={{
+            style: {
+              background: "#0d0d0d",
+              border: "1px solid rgba(255,255,255,0.1)",
+              color: "#fff",
+              fontFamily: "'Barlow', sans-serif",
+            },
+          }}
+          richColors
+        />
+      </ThemeProvider>
+    </LanguageProvider>
+  );
 }
 
 export default App;

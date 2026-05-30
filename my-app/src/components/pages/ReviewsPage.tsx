@@ -4,6 +4,10 @@ import { fetchReviews, createReview, approveReview, rejectReview, deleteReview }
 import type { Session } from "../../services/authService";
 import { Threads } from "../ui/Threads";
 import { ReviewSkeleton } from "../loads/LoadSkeleton";
+import { SkeletonRow } from "../ui/Skeleton";
+import { EmptyState } from "../ui/EmptyState";
+import { toast } from "sonner";
+import { confirm } from "../ui/ConfirmDialog";
 
 interface ReviewsPageProps {
   theme?: "dark" | "light";
@@ -338,8 +342,9 @@ export const ReviewsPage: React.FC<ReviewsPageProps> = ({ theme = "dark", onBack
     try {
       await approveReview(id);
       setReviews(rs => rs.map(r => r.id === id && r.isFromApi ? { ...r, isApproved: true } : r));
+      toast.success(lang === "ru" ? "Отзыв одобрен" : "Review approved");
     } catch (e) {
-      alert(e instanceof Error ? e.message : "Error");
+      toast.error(e instanceof Error ? e.message : "Error");
     }
   };
 
@@ -347,18 +352,26 @@ export const ReviewsPage: React.FC<ReviewsPageProps> = ({ theme = "dark", onBack
     try {
       await rejectReview(id);
       setReviews(rs => rs.map(r => r.id === id && r.isFromApi ? { ...r, isApproved: false } : r));
+      toast.success(lang === "ru" ? "Отзыв отклонён" : "Review rejected");
     } catch (e) {
-      alert(e instanceof Error ? e.message : "Error");
+      toast.error(e instanceof Error ? e.message : "Error");
     }
   };
 
   const handleDeleteReview = async (id: number) => {
-    if (!confirm(lang === "ru" ? "Удалить отзыв?" : "Delete review?")) return;
+    const ok = await confirm({
+      title: lang === "ru" ? "Удалить отзыв?" : "Delete review?",
+      confirmLabel: lang === "ru" ? "Удалить" : "Delete",
+      cancelLabel: lang === "ru" ? "Отмена" : "Cancel",
+      danger: true,
+    });
+    if (!ok) return;
     try {
       await deleteReview(id);
       setReviews(rs => rs.filter(r => !(r.id === id && r.isFromApi)));
+      toast.success(lang === "ru" ? "Отзыв удалён" : "Review deleted");
     } catch (e) {
-      alert(e instanceof Error ? e.message : "Error");
+      toast.error(e instanceof Error ? e.message : "Error");
     }
   };
 

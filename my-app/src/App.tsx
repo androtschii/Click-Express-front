@@ -1,5 +1,6 @@
 ﻿import React, { useState, useRef, useEffect, lazy, Suspense } from "react";
 import { Toaster } from "sonner";
+import { ConfirmDialogProvider } from "./components/ui/ConfirmDialog";
 import { ThemeProvider, useTheme } from "./theme";
 import { LanguageProvider, useLanguage } from "./context/LanguageContext";
 import { translations } from "./i18n/translations";
@@ -1145,6 +1146,7 @@ function App() {
   return (
     <LanguageProvider>
       <ThemeProvider>
+        <ConfirmDialogProvider>
         <AppContent />
         <Toaster
           position="bottom-right"
@@ -1158,6 +1160,7 @@ function App() {
           }}
           richColors
         />
+        </ConfirmDialogProvider>
       </ThemeProvider>
     </LanguageProvider>
   );

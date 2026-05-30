@@ -179,6 +179,11 @@ input:focus {
 }
 
 /* Animations */
+@keyframes ce-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
 @keyframes pulse {
   0%, 100% {
     opacity: 1;

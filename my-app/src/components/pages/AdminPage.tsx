@@ -1,4 +1,6 @@
 ﻿import React, { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { confirm } from "../ui/ConfirmDialog";
 import { AdminRowSkeleton } from "../loads/LoadSkeleton";
 import {
   fetchProducts, fetchProductStats,
@@ -242,12 +244,13 @@ export const AdminPage: React.FC<AdminPageProps> = ({ theme, onBack }) => {
   };
 
   const handleDelete = async (id: number, name: string) => {
-    if (!confirm(ru ? `Удалить "${name}"?` : `Delete "${name}"?`)) return;
+    const ok = await confirm({ title: ru ? `Удалить "${name}"?` : `Delete "${name}"?`, danger: true, confirmLabel: ru ? "Удалить" : "Delete", cancelLabel: ru ? "Отмена" : "Cancel" });
+    if (!ok) return;
     try {
       await deleteProduct(id);
       setProducts(ps => ps.filter(p => p.id !== id));
-      notify(ru ? "Удалено ✓" : "Deleted ✓");
-    } catch { notify(ru ? "Ошибка удаления" : "Delete error", false); }
+      toast.success(ru ? "Удалено" : "Deleted");
+    } catch { toast.error(ru ? "Ошибка удаления" : "Delete error"); }
   };
 
   const loadVehicles = async () => {
@@ -308,12 +311,13 @@ export const AdminPage: React.FC<AdminPageProps> = ({ theme, onBack }) => {
   };
 
   const handleDeleteDriver = async (id: number, name: string) => {
-    if (!confirm(ru ? `Удалить "${name}"?` : `Delete "${name}"?`)) return;
+    const ok = await confirm({ title: ru ? `Удалить "${name}"?` : `Delete "${name}"?`, danger: true, confirmLabel: ru ? "Удалить" : "Delete", cancelLabel: ru ? "Отмена" : "Cancel" });
+    if (!ok) return;
     try {
       await deleteDriver(id);
       setDrivers(ds => ds.filter(d => d.id !== id));
-      notify(ru ? "Удалено ✓" : "Deleted ✓");
-    } catch { notify(ru ? "Ошибка удаления" : "Delete error", false); }
+      toast.success(ru ? "Удалено" : "Deleted");
+    } catch { toast.error(ru ? "Ошибка удаления" : "Delete error"); }
   };
 
   const loadLeads = async () => {
@@ -343,12 +347,13 @@ export const AdminPage: React.FC<AdminPageProps> = ({ theme, onBack }) => {
   };
 
   const handleDeleteLead = async (id: number) => {
-    if (!confirm(ru ? "Удалить лид?" : "Delete lead?")) return;
+    const ok = await confirm({ title: ru ? "Удалить лид?" : "Delete lead?", danger: true, confirmLabel: ru ? "Удалить" : "Delete", cancelLabel: ru ? "Отмена" : "Cancel" });
+    if (!ok) return;
     try {
       await deleteLead(id);
       setLeads(ls => ls.filter(l => l.id !== id));
-      notify(ru ? "Удалено ✓" : "Deleted ✓");
-    } catch { notify(ru ? "Ошибка удаления" : "Delete error", false); }
+      toast.success(ru ? "Удалено" : "Deleted");
+    } catch { toast.error(ru ? "Ошибка удаления" : "Delete error"); }
   };
 
   const handleJobAppStatus = async (id: number, status: string) => {
@@ -360,12 +365,13 @@ export const AdminPage: React.FC<AdminPageProps> = ({ theme, onBack }) => {
   };
 
   const handleDeleteJobApp = async (id: number) => {
-    if (!confirm(ru ? "Удалить заявку?" : "Delete application?")) return;
+    const ok = await confirm({ title: ru ? "Удалить заявку?" : "Delete application?", danger: true, confirmLabel: ru ? "Удалить" : "Delete", cancelLabel: ru ? "Отмена" : "Cancel" });
+    if (!ok) return;
     try {
       await deleteJobApplication(id);
       setJobApps(js => js.filter(j => j.id !== id));
-      notify(ru ? "Удалено ✓" : "Deleted ✓");
-    } catch { notify(ru ? "Ошибка удаления" : "Delete error", false); }
+      toast.success(ru ? "Удалено" : "Deleted");
+    } catch { toast.error(ru ? "Ошибка удаления" : "Delete error"); }
   };
 
   useEffect(() => {
@@ -411,6 +417,7 @@ export const AdminPage: React.FC<AdminPageProps> = ({ theme, onBack }) => {
     await fetch(`${API_BASE}/review/${id}/approve`, { method: "PATCH", headers: { Authorization: `Bearer ${token}` } });
     setAdminReviews(prev => prev.map(r => r.id === id ? { ...r, isApproved: true } : r));
     setPendingReviewCount(p => Math.max(0, p - 1));
+    toast.success(ru ? "Отзыв одобрен" : "Review approved");
   };
 
   const handleReviewReject = async (id: number) => {
@@ -418,14 +425,17 @@ export const AdminPage: React.FC<AdminPageProps> = ({ theme, onBack }) => {
     const token = raw ? JSON.parse(raw).token : null;
     await fetch(`${API_BASE}/review/${id}/reject`, { method: "PATCH", headers: { Authorization: `Bearer ${token}` } });
     setAdminReviews(prev => prev.map(r => r.id === id ? { ...r, isApproved: false } : r));
+    toast.success(ru ? "Отзыв отклонён" : "Review rejected");
   };
 
   const handleReviewDelete = async (id: number) => {
-    if (!confirm(ru ? "Удалить отзыв?" : "Delete review?")) return;
+    const ok = await confirm({ title: ru ? "Удалить отзыв?" : "Delete review?", danger: true, confirmLabel: ru ? "Удалить" : "Delete", cancelLabel: ru ? "Отмена" : "Cancel" });
+    if (!ok) return;
     const raw = localStorage.getItem("ce_session");
     const token = raw ? JSON.parse(raw).token : null;
     await fetch(`${API_BASE}/review/${id}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } });
     setAdminReviews(prev => prev.filter(r => r.id !== id));
+    toast.success(ru ? "Отзыв удалён" : "Review deleted");
   };
 
   const handleCreateVehicle = async () => {
@@ -467,12 +477,13 @@ export const AdminPage: React.FC<AdminPageProps> = ({ theme, onBack }) => {
   };
 
   const handleDeleteVehicle = async (id: number, model: string) => {
-    if (!confirm(ru ? `Удалить "${model}"?` : `Delete "${model}"?`)) return;
+    const ok = await confirm({ title: ru ? `Удалить "${model}"?` : `Delete "${model}"?`, danger: true, confirmLabel: ru ? "Удалить" : "Delete", cancelLabel: ru ? "Отмена" : "Cancel" });
+    if (!ok) return;
     try {
       await deleteVehicle(id);
       setVehicles(vs => vs.filter(v => v.id !== id));
-      notify(ru ? "Удалено ✓" : "Deleted ✓");
-    } catch { notify(ru ? "Ошибка удаления" : "Delete error", false); }
+      toast.success(ru ? "Удалено" : "Deleted");
+    } catch { toast.error(ru ? "Ошибка удаления" : "Delete error"); }
   };
 
   const inputStyle: React.CSSProperties = {

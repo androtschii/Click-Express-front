@@ -1,4 +1,6 @@
 ﻿import React, { useState, useEffect } from "react";
+import { toast } from "sonner";
+import { confirm } from "../ui/ConfirmDialog";
 import { useLanguage } from "../../context/LanguageContext";
 import type { Load } from "../../types/index";
 import { fetchNews, createNews, deleteNews } from "../../api/client.js";
@@ -383,12 +385,14 @@ export const NewsPage: React.FC<NewsPageProps> = ({ theme = "dark", onBack, onVi
   const handleDeleteApi = async (articleId: number) => {
     const realId = apiIdMap.get(articleId);
     if (!realId) return;
-    if (!confirm(lang === "ru" ? "Удалить новость?" : "Delete news?")) return;
+    const ok = await confirm({ title: lang === "ru" ? "Удалить новость?" : "Delete news?", danger: true, confirmLabel: lang === "ru" ? "Удалить" : "Delete", cancelLabel: lang === "ru" ? "Отмена" : "Cancel" });
+    if (!ok) return;
     try {
       await deleteNews(realId);
       await loadApiNews();
+      toast.success(lang === "ru" ? "Новость удалена" : "News deleted");
     } catch (e) {
-      alert(e instanceof Error ? e.message : "Error");
+      toast.error(e instanceof Error ? e.message : "Error");
     }
   };
 

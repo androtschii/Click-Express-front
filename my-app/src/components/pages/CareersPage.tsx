@@ -1,4 +1,6 @@
 ﻿import React, { useState, useEffect } from "react";
+import { toast } from "sonner";
+import { confirm } from "../ui/ConfirmDialog";
 import { PhoneIcon } from "../ui/PhoneIcon";
 import { useLanguage } from "../../context/LanguageContext";
 import { submitJobApplication, fetchJobApplications, updateJobApplicationStatus, deleteJobApplication } from "../../api/client.js";
@@ -186,12 +188,14 @@ export const CareersPage: React.FC<CareersPageProps> = ({ theme = "dark", onBack
   };
 
   const handleDelete = async (id: number) => {
-    if (!confirm(isRu ? "Удалить заявку?" : "Delete application?")) return;
+    const ok = await confirm({ title: isRu ? "Удалить заявку?" : "Delete application?", danger: true, confirmLabel: isRu ? "Удалить" : "Delete", cancelLabel: isRu ? "Отмена" : "Cancel" });
+    if (!ok) return;
     try {
       await deleteJobApplication(id);
       setApps(prev => prev.filter(a => a.id !== id));
+      toast.success(isRu ? "Заявка удалена" : "Application deleted");
     } catch (e) {
-      setAppsError(e instanceof Error ? e.message : "Failed to delete");
+      toast.error(e instanceof Error ? e.message : "Failed to delete");
     }
   };
 

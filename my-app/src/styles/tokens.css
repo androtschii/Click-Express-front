@@ -1,3 +1,17 @@
+/* Light theme overrides */
+[data-theme="light"] {
+  --color-bg: #f5f5f5;
+  --color-bg-card: #ffffff;
+  --color-bg-elevated: #efefef;
+  --color-bg-hover: rgba(0, 0, 0, 0.03);
+  --color-border: rgba(0, 0, 0, 0.08);
+  --color-border-strong: rgba(0, 0, 0, 0.15);
+  --color-text: #0a0a0a;
+  --color-text-secondary: rgba(0, 0, 0, 0.55);
+  --color-text-tertiary: rgba(0, 0, 0, 0.35);
+  --color-text-disabled: rgba(0, 0, 0, 0.2);
+}
+
 :root {
   /* Brand */
   --color-brand: #cc0000;

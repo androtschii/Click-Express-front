@@ -1,4 +1,5 @@
 ﻿import React, { useState, useEffect, useRef } from "react";
+import { toast } from "sonner";
 import type { Session } from "../../services/authService";
 import { getUserById, updateUser } from "../../services/authService";
 import { useLanguage } from "../../context/LanguageContext";
@@ -6,6 +7,9 @@ import { translations } from "../../i18n/translations";
 import type { Load } from "../../types/index";
 import { API_BASE } from "../../config";
 import { UploadSimple, FilePdf, FileImage, FileDoc, Trash, DownloadSimple } from "@phosphor-icons/react";
+import { StatusBadge } from "../ui/Badge";
+import { EmptyState } from "../ui/EmptyState";
+import { SkeletonRow } from "../ui/Skeleton";
 
 interface ProfilePageProps {
   session: Session;
@@ -124,7 +128,11 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
     if (toast) { const id = setTimeout(() => setToast(null), 3200); return () => clearTimeout(id); }
   }, [toast]);
 
-  const notify = (msg: string, ok = true) => setToast({ msg, ok });
+  const notify = (msg: string, ok = true) => {
+    setToast({ msg, ok });
+    if (ok) toast.success(msg);
+    else toast.error(msg);
+  };
 
   const handleSaveName = async () => {
     if (!nameVal.trim()) return;
@@ -361,16 +369,16 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
               )}
             </div>
             {bookedLoads.length === 0 ? (
-              <div style={{ textAlign:"center", padding:"80px 0" }}>
-                <div style={{ fontSize:56, marginBottom:14 }}>📦</div>
-                <div style={{ fontFamily:"'Barlow',sans-serif", fontSize:15, color:muted, marginBottom:24 }}>{lang==="ru"?"Заказов пока нет":"No orders yet"}</div>
-                <button onClick={onBrowseLoads ?? onBack} style={{ display:"inline-flex", alignItems:"center", gap:10, padding:"14px 32px", background:"linear-gradient(135deg,#CC0000,#ff3333)", border:"none", borderRadius:10, color:"#fff", fontFamily:"'Oswald',sans-serif", fontWeight:700, fontSize:15, letterSpacing:2, textTransform:"uppercase", cursor:"pointer", boxShadow:"0 6px 24px rgba(204,0,0,0.4)", transition:"all 0.15s" }}
-                  onMouseEnter={e => { e.currentTarget.style.transform="translateY(-2px)"; e.currentTarget.style.boxShadow="0 10px 32px rgba(204,0,0,0.55)"; }}
-                  onMouseLeave={e => { e.currentTarget.style.transform="none"; e.currentTarget.style.boxShadow="0 6px 24px rgba(204,0,0,0.4)"; }}>
-                  <span style={{ fontSize:20, lineHeight:1 }}>+</span>
-                  {lang==="ru"?"Найти груз":"Find a Load"}
-                </button>
-              </div>
+              <EmptyState
+                icon="📦"
+                title={lang === "ru" ? "Заказов пока нет" : "No orders yet"}
+                description={lang === "ru" ? "Найдите подходящий груз и оформите заказ" : "Browse available loads and place your first order"}
+                action={
+                  <button onClick={onBrowseLoads ?? onBack} style={{ padding:"12px 28px", background:"#CC0000", border:"none", borderRadius:8, color:"#fff", fontFamily:"'Barlow',sans-serif", fontWeight:700, fontSize:13, letterSpacing:1.5, textTransform:"uppercase", cursor:"pointer" }}>
+                    {lang === "ru" ? "Найти груз" : "Find a Load"}
+                  </button>
+                }
+              />
             ) : (
               <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(300px,1fr))", gap:16 }}>
                 {bookedLoads.map((l, idx) => {
@@ -382,8 +390,8 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                       <div onClick={() => onDetails?.(l)} style={{ position:"relative", height:160, cursor:"pointer" }}>
                         <img src={l.image} alt="" style={{ width:"100%", height:"100%", objectFit:"cover", objectPosition:"center 72%", filter: isDark?"brightness(0.6)":"brightness(0.72)" }} />
                         <div style={{ position:"absolute", inset:0, background:"linear-gradient(to bottom,transparent 30%,rgba(0,0,0,0.85))" }} />
-                        <div style={{ position:"absolute", top:10, right:10, background:"rgba(0,180,80,0.15)", border:"1px solid rgba(0,180,80,0.4)", borderRadius:20, padding:"3px 10px", fontFamily:"'Barlow',sans-serif", fontWeight:700, fontSize:9, color:"#00b450", letterSpacing:1, textTransform:"uppercase" }}>
-                          ✓ {lang==="ru"?"Активен":"Active"}
+                        <div style={{ position:"absolute", top:10, right:10 }}>
+                          <StatusBadge status="active" size="sm" />
                         </div>
                         <div style={{ position:"absolute", bottom:12, left:14 }}>
                           <div style={{ fontFamily:"'Oswald',sans-serif", fontWeight:700, fontSize:22, color:"#fff" }}>${l.price.toLocaleString()}</div>

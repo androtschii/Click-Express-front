@@ -438,16 +438,16 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
               {lang==="ru"?"ИЗБРАННОЕ":"SAVED LOADS"} <span style={{ color:"#CC0000" }}>({savedLoads.length})</span>
             </div>
             {savedLoads.length === 0 ? (
-              <div style={{ textAlign:"center", padding:"80px 0" }}>
-                <div style={{ fontSize:56, marginBottom:14 }}>❤️</div>
-                <div style={{ fontFamily:"'Barlow',sans-serif", fontSize:15, color:muted, marginBottom:24 }}>{lang==="ru"?"Нет сохранённых грузов":"No saved loads"}</div>
-                <button onClick={onBrowseLoads ?? onBack} style={{ display:"inline-flex", alignItems:"center", gap:10, padding:"14px 32px", background:"linear-gradient(135deg,#CC0000,#ff3333)", border:"none", borderRadius:10, color:"#fff", fontFamily:"'Oswald',sans-serif", fontWeight:700, fontSize:15, letterSpacing:2, textTransform:"uppercase", cursor:"pointer", boxShadow:"0 6px 24px rgba(204,0,0,0.4)", transition:"all 0.15s" }}
-                  onMouseEnter={e => { e.currentTarget.style.transform="translateY(-2px)"; e.currentTarget.style.boxShadow="0 10px 32px rgba(204,0,0,0.55)"; }}
-                  onMouseLeave={e => { e.currentTarget.style.transform="none"; e.currentTarget.style.boxShadow="0 6px 24px rgba(204,0,0,0.4)"; }}>
-                  <span style={{ fontSize:20, lineHeight:1 }}>+</span>
-                  {lang==="ru"?"Просмотреть грузы":"Browse Loads"}
-                </button>
-              </div>
+              <EmptyState
+                icon="❤️"
+                title={lang === "ru" ? "Нет сохранённых грузов" : "No saved loads"}
+                description={lang === "ru" ? "Добавьте понравившиеся грузы в избранное" : "Save loads you like to find them quickly later"}
+                action={
+                  <button onClick={onBrowseLoads ?? onBack} style={{ padding:"12px 28px", background:"#CC0000", border:"none", borderRadius:8, color:"#fff", fontFamily:"'Barlow',sans-serif", fontWeight:700, fontSize:13, letterSpacing:1.5, textTransform:"uppercase", cursor:"pointer" }}>
+                    {lang === "ru" ? "Просмотреть грузы" : "Browse Loads"}
+                  </button>
+                }
+              />
             ) : (
               <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(300px,1fr))", gap:16 }}>
                 {savedLoads.map((l, idx) => {
@@ -536,9 +536,11 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
 
             {/* File list */}
             {docs.length === 0 ? (
-              <div style={{ textAlign:"center", padding:"32px 0", color:muted, fontFamily:"'Barlow',sans-serif", fontSize:13 }}>
-                {lang === "ru" ? "Нет загруженных документов" : "No documents uploaded yet"}
-              </div>
+              <EmptyState
+                icon="📄"
+                title={lang === "ru" ? "Нет документов" : "No documents"}
+                description={lang === "ru" ? "Загрузите PDF, изображения или Word-файлы" : "Upload PDF, images or Word files"}
+              />
             ) : (
               <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
                 {docs.map(doc => {

@@ -2,6 +2,7 @@
 import { useLanguage } from "../../context/LanguageContext";
 import { API_BASE } from "../../config";
 import { useInView } from "../../hooks/useInView";
+import { FadeIn, Stagger, StaggerItem } from "../ui/FadeIn";
 
 const GRADIENTS = [
   "linear-gradient(135deg,#CC0000,#ff4d4d)",

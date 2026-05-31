@@ -1,5 +1,5 @@
 ﻿import React, { useState, useEffect, useRef } from "react";
-import { toast } from "sonner";
+import { toast as sonnerToast } from "sonner";
 import type { Session } from "../../services/authService";
 import { getUserById, updateUser } from "../../services/authService";
 import { useLanguage } from "../../context/LanguageContext";
@@ -9,7 +9,6 @@ import { API_BASE } from "../../config";
 import { UploadSimple, FilePdf, FileImage, FileDoc, Trash, DownloadSimple } from "@phosphor-icons/react";
 import { StatusBadge } from "../ui/Badge";
 import { EmptyState } from "../ui/EmptyState";
-import { SkeletonRow } from "../ui/Skeleton";
 
 interface ProfilePageProps {
   session: Session;
@@ -130,8 +129,8 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
 
   const notify = (msg: string, ok = true) => {
     setToast({ msg, ok });
-    if (ok) toast.success(msg);
-    else toast.error(msg);
+    if (ok) sonnerToast.success(msg);
+    else sonnerToast.error(msg);
   };
 
   const handleSaveName = async () => {

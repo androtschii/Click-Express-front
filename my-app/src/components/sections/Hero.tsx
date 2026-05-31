@@ -5,7 +5,6 @@ import { translations } from "../../i18n/translations";
 import { useInView } from "../../hooks/useInView";
 import { TextType } from "../ui/TextType";
 import { ElectricBorder } from "../ui/ElectricBorder";
-import { FadeIn, Stagger, StaggerItem } from "../ui/FadeIn";
 
 interface HeroBtnProps {
   children: React.ReactNode;

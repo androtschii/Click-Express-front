@@ -4,8 +4,6 @@ import { fetchReviews, createReview, approveReview, rejectReview, deleteReview }
 import type { Session } from "../../services/authService";
 import { Threads } from "../ui/Threads";
 import { ReviewSkeleton } from "../loads/LoadSkeleton";
-import { SkeletonRow } from "../ui/Skeleton";
-import { EmptyState } from "../ui/EmptyState";
 import { toast } from "sonner";
 import { confirm } from "../ui/ConfirmDialog";
 

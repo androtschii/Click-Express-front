@@ -37,13 +37,14 @@ async function refreshAccessToken(): Promise<string | null> {
 }
 
 export class ApiError extends Error {
-  constructor(
-    public readonly status: number,
-    message: string,
-    public readonly correlationId?: string
-  ) {
+  status: number;
+  correlationId?: string;
+
+  constructor(status: number, message: string, correlationId?: string) {
     super(message);
     this.name = "ApiError";
+    this.status = status;
+    this.correlationId = correlationId;
   }
 }
 

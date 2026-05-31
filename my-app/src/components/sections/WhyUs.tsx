@@ -2,7 +2,6 @@
 import { useLanguage } from "../../context/LanguageContext";
 import { useInView } from "../../hooks/useInView";
 import { HandshakeIcon, ClockCounterClockwise, CurrencyDollar, FileText } from "@phosphor-icons/react";
-import { FadeIn, Stagger, StaggerItem } from "../ui/FadeIn";
 
 interface WhyUsProps {
   theme?: "dark" | "light";

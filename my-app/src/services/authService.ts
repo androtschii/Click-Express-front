@@ -241,7 +241,7 @@ export function getUserById(userId: string): User | null {
 }
 
 export async function updateUser(
-  userId: string,
+  _userId: string,
   updates: { name?: string; currentPassword?: string; newPassword?: string }
 ): Promise<{ ok: boolean; error?: string }> {
   const session = JSON.parse(localStorage.getItem(SESSION_KEY) || "null") as Session | null;

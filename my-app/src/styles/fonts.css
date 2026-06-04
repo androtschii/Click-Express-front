@@ -1,3 +1,16 @@
+/*
+ * Critical fonts are preloaded via <link rel="preload"> in index.html.
+ * No @import here — that pattern serialises font loading and blocks paint.
+ * Google Fonts stylesheet is in index.html as a non-render-blocking link.
+ */
+
+:root {
+  --font-sans: 'Barlow', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-display: 'Oswald', 'Roboto Condensed', Arial Narrow, sans-serif;
+  --font-accent: 'Russo One', 'Anton', Impact, sans-serif;
+  --font-mono: ui-monospace, 'Cascadia Code', 'Source Code Pro', Consolas, monospace;
+}
+
 @font-face {
   font-family: 'Agus Sans';
   src: url('/fronts/Agus Sans - Free Font/AgusSans-Regular.woff2') format('woff2'),

@@ -517,7 +517,6 @@ function AppContent() {
 
   const sharedStyle = (
     <style>{`
- @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Barlow:wght@400;500;600;700;800&display=swap');
       *{box-sizing:border-box;margin:0;padding:0;}
       body{background:${bgColor};color:${textColor};transition: background 0.3s, color 0.3s;}
       ::selection{background:#CC0000;color:#fff;}

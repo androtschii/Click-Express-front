@@ -40,10 +40,10 @@ function truckEmoji(cargo: string) {
 }
 
 const ALL_REAL_IMAGES = [
-  "/images/real1.jpg", "/images/real2.jpg", "/images/real3.jpg",
-  "/images/real4.jpg", "/images/real5.jpg", "/images/real6.jpg",
-  "/images/real7.jpg", "/images/real8.jpg", "/images/real9.jpg",
-  "/images/real10.jpg",
+  "/images/real1.webp", "/images/real2.webp", "/images/real3.webp",
+  "/images/real4.webp", "/images/real5.webp", "/images/real6.webp",
+  "/images/real7.webp", "/images/real8.webp", "/images/real9.webp",
+  "/images/real10.webp",
 ];
 
 function getGallery(load: Load): string[] {

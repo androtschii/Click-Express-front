@@ -95,7 +95,7 @@ export const Hero: React.FC<HeroProps> = ({ onViewLoads, onQuoteClick, onCareers
       `}</style>
 
  {/* BG image with parallax */}
-      <div style={{ position: "absolute", top: "-15%", left: 0, right: 0, bottom: "-15%", backgroundImage: isDark ? "url('/images/red freightliner cascadia night.PNG')" : "url('/images/red freightliner cascadia light.png')", backgroundSize: "cover", backgroundPosition: "center 65%", transform: `translateY(${parallaxShift}px)`, willChange: "transform" }} />
+      <div style={{ position: "absolute", top: "-15%", left: 0, right: 0, bottom: "-15%", backgroundImage: isDark ? "url('/images/red freightliner cascadia night.webp')" : "url('/images/red freightliner cascadia light.webp')", backgroundSize: "cover", backgroundPosition: "center 65%", transform: `translateY(${parallaxShift}px)`, willChange: "transform" }} />
 
  {/* Gradient overlay for text readability */}
       <div style={{ position: "absolute", inset: 0, background: isDark ? "linear-gradient(to right, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.35) 55%, transparent 100%)" : "linear-gradient(to right, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.15) 50%, transparent 100%)", pointerEvents: "none" }} />

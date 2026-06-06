@@ -12,8 +12,8 @@ interface FleetPageProps {
 function TruckImage({ id, isDark, animKey }: { id: string; isDark: boolean; animKey: number }) {
   const [loaded, setLoaded] = useState(false);
   const imageMap: Record<string, string> = {
-    cascadia: "/images/Cascadia.png",
-    kenworth: "/images/Kenworth.png",
+    cascadia: "/images/Cascadia.webp",
+    kenworth: "/images/Kenworth.webp",
   };
   const src = imageMap[id] || "";
   useEffect(() => { setLoaded(false); }, [animKey]);
@@ -72,10 +72,10 @@ function TrailerImage({ id, isDark }: { id: string; isDark: boolean }) {
   const [hovered, setHovered] = useState(false);
 
   const imageMap: Record<string, string> = {
-    flatbed:   "/images/flatbed.png",
-    stepdeck:  "/images/stepdeck.png",
-    conestoga: "/images/conestoga.png",
-    lowboy:    "/images/lowboy.png",
+    flatbed:   "/images/flatbed.webp",
+    stepdeck:  "/images/stepdeck.webp",
+    conestoga: "/images/conestoga.webp",
+    lowboy:    "/images/lowboy.webp",
   };
   const labelMap: Record<string, string> = {
     flatbed: "53' FLATBED", stepdeck: "48' STEP DECK",
@@ -319,7 +319,7 @@ export const FleetPage: React.FC<FleetPageProps> = ({ theme = "dark", onBack }) 
         }}>
  {/* Dark theme: dimmed photo background */}
           {isDark && (
-            <div style={{ position: "absolute", inset: 0, backgroundImage: "url('/images/real1.jpg')", backgroundSize: "cover", backgroundPosition: "center 40%", filter: "brightness(0.18) saturate(0.5)", mixBlendMode: "luminosity" }} />
+            <div style={{ position: "absolute", inset: 0, backgroundImage: "url('/images/real1.webp')", backgroundSize: "cover", backgroundPosition: "center 40%", filter: "brightness(0.18) saturate(0.5)", mixBlendMode: "luminosity" }} />
           )}
  {/* Overlay gradient */}
           <div style={{ position: "absolute", inset: 0, background: isDark
@@ -339,7 +339,7 @@ export const FleetPage: React.FC<FleetPageProps> = ({ theme = "dark", onBack }) 
 
  {/* Truck image — right side, fully visible */}
           <div style={{ position: "absolute", right: "0%", bottom: 0, width: "clamp(300px,50%,700px)", zIndex: 1, pointerEvents: "none" }}>
-            <img src="/images/Cascadia.png" alt="truck" style={{
+            <img src="/images/Cascadia.webp" alt="truck" style={{
               width: "100%", height: "100%", display: "block",
               objectFit: "contain", objectPosition: "bottom center",
               maxHeight: 420,

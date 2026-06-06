@@ -255,7 +255,7 @@ export const CareersPage: React.FC<CareersPageProps> = ({ theme = "dark", onBack
  {/* Hero */}
       <div style={{ position: "relative", height: 480, overflow: "hidden", display: "flex", alignItems: "center" }}>
         <img
-          src={isDark ? "/images/red freightliner cascadia night.PNG" : "/images/red freightliner cascadia light.png"}
+          src={isDark ? "/images/red freightliner cascadia night.webp" : "/images/red freightliner cascadia light.webp"}
           alt="careers"
           style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "20% center", filter: isDark ? "brightness(0.38)" : "none" }}
         />

@@ -156,7 +156,7 @@ export const LoadCard: React.FC<LoadCardProps> = ({ load, onBook, onCancelBook, 
       <div onClick={() => onDetails && onDetails(load)} style={{ position:"relative", height:280, overflow:"hidden", cursor: onDetails ? "pointer" : "default" }}>
  {/* Skeleton */}
         {!imgLoaded && <div style={{ position:"absolute", inset:0, background: isDark ? "#1a1a1a" : "#e8e8e8", animation:"shimmer 1.4s ease infinite" }} />}
-        <img src={currentImage} alt={load.route} onLoad={() => setImgLoaded(true)} style={{
+        <img src={currentImage} alt={load.route} loading="lazy" decoding="async" onLoad={() => setImgLoaded(true)} style={{
           width:"100%", height:"100%", objectFit:"cover", objectPosition:"center 72%",
           filter: isDark ? "brightness(0.52)" : "brightness(1.0) saturate(1.1) contrast(1.04)",
           transform: hov ? "scale(1.06)" : "scale(1)",

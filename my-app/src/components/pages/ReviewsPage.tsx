@@ -388,7 +388,7 @@ export const ReviewsPage: React.FC<ReviewsPageProps> = ({ theme = "dark", onBack
       }}>
  {/* Background truck photo */}
         <img
-          src={isDark ? "/images/red freightliner cascadia night.PNG" : "/images/red freightliner cascadia light.png"}
+          src={isDark ? "/images/red freightliner cascadia night.webp" : "/images/red freightliner cascadia light.webp"}
           alt=""
           style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "right center", filter: isDark ? "brightness(0.45)" : "none", pointerEvents: "none" }}
         />

@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useMemo, lazy, Suspense } from "react";
 import { Routes, Route, Navigate, useNavigate, useLocation, useParams } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, MotionConfig } from "framer-motion";
 import { RouteTransition } from "./components/ui/RouteTransition";
 import { TopProgressBar } from "./components/ui/TopProgressBar";
 import { toast } from "sonner";
@@ -557,6 +557,7 @@ function TrackingRouteInner({ loads, orderIdMap, theme, session }: { loads: Load
 
 export default function App() {
   return (
+    <MotionConfig reducedMotion="user">
     <LanguageProvider>
       <ThemeProvider>
         <ConfirmDialogProvider>
@@ -569,5 +570,6 @@ export default function App() {
         </ConfirmDialogProvider>
       </ThemeProvider>
     </LanguageProvider>
+    </MotionConfig>
   );
 }

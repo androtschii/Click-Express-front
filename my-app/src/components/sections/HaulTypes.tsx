@@ -10,10 +10,10 @@ interface HaulTypesProps {
 }
 
 const IMAGE_BY_TAG: Record<string, string> = {
-  "01": "/images/flatbed.png",
-  "02": "/images/stepdeck.png",
-  "03": "/images/lowboy.png",
-  "04": "/images/conestoga.png",
+  "01": "/images/flatbed.webp",
+  "02": "/images/stepdeck.webp",
+  "03": "/images/lowboy.webp",
+  "04": "/images/conestoga.webp",
 };
 
 export const HaulTypes: React.FC<HaulTypesProps> = ({ theme = "dark", onQuoteClick }) => {

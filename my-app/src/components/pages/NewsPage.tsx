@@ -59,7 +59,7 @@ const ARTICLES: Article[] = [
     excerptRu: "1,780 миль на платформе. Негабаритная стальная конструкция, требует сопровождения. Ставка: $4.72/ми — один из лучших лотов 2025.",
     highlightEn: "$8,400 / 1,780 mi", highlightRu: "$8,400 / 1,780 ми",
     date: "Mar 24, 2025", readTime: "2 min",
-    load: { id: 101, route: "Connellsville, PA", dest: "Denver, CO", price: 8400, miles: 1780, type: "Full Load", cargo: "Flatbed / Oversized Steel Structure", image: "/images/real7.jpg", tag: "Best Load of the Week" },
+    load: { id: 101, route: "Connellsville, PA", dest: "Denver, CO", price: 8400, miles: 1780, type: "Full Load", cargo: "Flatbed / Oversized Steel Structure", image: "/images/real7.webp", tag: "Best Load of the Week" },
   },
   {
     id: 2, category: "loads",
@@ -70,7 +70,7 @@ const ARTICLES: Article[] = [
     excerptRu: "HVAC блоки, 1,374 мили, $3.73/ми. Чистый груз, без тарпинга. Забронировано за 2 часа после публикации.",
     highlightEn: "$5,120 / 1,374 mi", highlightRu: "$5,120 / 1,374 ми",
     date: "Mar 21, 2025", readTime: "2 min",
-    load: { id: 102, route: "Madera, CA", dest: "Fort Collins, CO", price: 5120, miles: 1374, type: "Full Load", cargo: "Flatbed / HVAC Units", image: "/images/real2.jpg", tag: "Best Load of the Week" },
+    load: { id: 102, route: "Madera, CA", dest: "Fort Collins, CO", price: 5120, miles: 1374, type: "Full Load", cargo: "Flatbed / HVAC Units", image: "/images/real2.webp", tag: "Best Load of the Week" },
   },
   {
     id: 3, category: "loads",
@@ -81,7 +81,7 @@ const ARTICLES: Article[] = [
     excerptRu: "Сертифицированный груз DOD. Специальные разрешения оформлены. 720 миль, $9.44/ми — премиальная ставка.",
     highlightEn: "$6,800 / 720 mi", highlightRu: "$6,800 / 720 ми",
     date: "Mar 18, 2025", readTime: "3 min",
-    load: { id: 103, route: "Deer Park, WA", dest: "Jackson, WY", price: 6800, miles: 720, type: "Full Load", cargo: "Flatbed / Military Equipment DOD", image: "/images/real3.jpg", tag: "Military Load" },
+    load: { id: 103, route: "Deer Park, WA", dest: "Jackson, WY", price: 6800, miles: 720, type: "Full Load", cargo: "Flatbed / Military Equipment DOD", image: "/images/real3.webp", tag: "Military Load" },
   },
   {
     id: 4, category: "loads",
@@ -92,7 +92,7 @@ const ARTICLES: Article[] = [
     excerptRu: "Техника на маршруте 1,447 миль через юг. $2.76/ми, без проблем. Водитель выполнил за 28ч.",
     highlightEn: "$4,000 / 1,447 mi", highlightRu: "$4,000 / 1,447 ми",
     date: "Mar 15, 2025", readTime: "2 min",
-    load: { id: 104, route: "Key Largo, FL", dest: "Lake Ozark, MO", price: 4000, miles: 1447, type: "Full Load", cargo: "Flatbed / Equipment", image: "/images/real5.jpg", tag: "Best Load of the Week" },
+    load: { id: 104, route: "Key Largo, FL", dest: "Lake Ozark, MO", price: 4000, miles: 1447, type: "Full Load", cargo: "Flatbed / Equipment", image: "/images/real5.webp", tag: "Best Load of the Week" },
   },
 
   {
@@ -110,7 +110,7 @@ const ARTICLES: Article[] = [
       { name: "Oklahoma City, OK — I-40 / I-35", rating: 5, noteEn: "Midpoint rest, TA Petro, full restaurant & showers", noteRu: "Середина маршрута, TA Petro, ресторан и душевые" },
       { name: "Memphis, TN — I-40 / I-55", rating: 4, noteEn: "Last major stop before GA, Flying J, laundry & fuel", noteRu: "Последняя крупная остановка перед Джорджией, Flying J, прачечная" },
     ],
-    load: { id: 105, route: "Las Vegas, NV", dest: "Carnesville, GA", price: 6350, miles: 2047, type: "Partial", cargo: "Flatbed / Construction Equipment", image: "/images/real8.jpg", tag: "Best Load of the Week" },
+    load: { id: 105, route: "Las Vegas, NV", dest: "Carnesville, GA", price: 6350, miles: 2047, type: "Partial", cargo: "Flatbed / Construction Equipment", image: "/images/real8.webp", tag: "Best Load of the Week" },
   },
 
  /* COMPANY NEWS */
@@ -507,7 +507,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({ theme = "dark", onBack, onVi
         <div style={{ position: "relative", overflow: "hidden", minHeight: "72vh", display: "flex", flexDirection: "column" }}>
  {/* Фото главной фуры */}
           <img
-            src={isDark ? "/images/red freightliner cascadia night.PNG" : "/images/red freightliner cascadia light.png"}
+            src={isDark ? "/images/red freightliner cascadia night.webp" : "/images/red freightliner cascadia light.webp"}
             alt=""
             style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "right center", filter: isDark ? "brightness(0.6) saturate(0.85)" : "none", pointerEvents: "none" }}
           />

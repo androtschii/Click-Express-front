@@ -189,7 +189,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
       <div style={{ background: isDark ? "linear-gradient(135deg,#0a0000 0%,#1a0000 40%,#0d0d0d 100%)" : "linear-gradient(135deg,#fff 0%,#fff5f5 60%,#ffe8e8 100%)", borderBottom: "1px solid rgba(204,0,0,0.2)", padding: "48px clamp(20px,5vw,64px) 0", position:"relative", overflow:"hidden" }}>
  {/* Truck silhouette background */}
         <div style={{ position:"absolute", right:0, bottom:0, top:0, width:"55%", pointerEvents:"none", zIndex:0 }}>
-          <img src="/images/real2.jpg" alt="" style={{ width:"100%", height:"100%", objectFit:"cover", objectPosition:"center 60%", filter: isDark ? "brightness(0.12) saturate(0.4)" : "brightness(0.08) saturate(0)", opacity: isDark ? 1 : 0.35 }} />
+          <img src="/images/real2.webp" alt="" style={{ width:"100%", height:"100%", objectFit:"cover", objectPosition:"center 60%", filter: isDark ? "brightness(0.12) saturate(0.4)" : "brightness(0.08) saturate(0)", opacity: isDark ? 1 : 0.35 }} />
           <div style={{ position:"absolute", inset:0, background: isDark ? "linear-gradient(to right,#0a0000 0%,transparent 55%)" : "linear-gradient(to right,#fff 0%,transparent 55%)" }} />
         </div>
         <div style={{ maxWidth: 1100, margin: "0 auto", position:"relative", zIndex:1 }}>

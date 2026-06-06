@@ -84,7 +84,7 @@ export const Hero: React.FC<HeroProps> = ({ onViewLoads, onQuoteClick, onCareers
   const parallaxShift = Math.min(scrollY * 0.28, 130);
 
   return (
-    <section style={{ minHeight: "100vh", position: "relative", overflow: "hidden", display: "flex", alignItems: "center", background: isDark ? '#0a0a0a' : '#f4f4f4', clipPath: "polygon(0 0, 100% 0, 100% 92%, 0 100%)" }}>
+    <section style={{ minHeight: "100vh", marginTop: -70, paddingTop: 70, position: "relative", overflow: "hidden", display: "flex", alignItems: "center", background: isDark ? '#0a0a0a' : '#f4f4f4', clipPath: "polygon(0 0, 100% 0, 100% 92%, 0 100%)" }}>
       <style>{`
         @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.35}}
         @keyframes heroFadeUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}

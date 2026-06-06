@@ -17,6 +17,7 @@ interface LoadCardProps {
   isAdmin?: boolean;
   isCompared?: boolean;
   compareDisabled?: boolean;
+  priority?: boolean;
 }
 
 const HeartIcon = ({ saved, onClick }: { saved: boolean; onClick: () => void }) => {
@@ -47,7 +48,7 @@ const HeartIcon = ({ saved, onClick }: { saved: boolean; onClick: () => void }) 
   );
 };
 
-export const LoadCard: React.FC<LoadCardProps> = ({ load, onBook, onCancelBook, onSave, onDetails, onCompare, isBooked = false, isSaved = false, isAdmin = false, isCompared = false, compareDisabled = false }) => {
+export const LoadCard: React.FC<LoadCardProps> = ({ load, onBook, onCancelBook, onSave, onDetails, onCompare, isBooked = false, isSaved = false, isAdmin = false, isCompared = false, compareDisabled = false, priority = false }) => {
   const context = useContext(ThemeContext) as { theme?: 'dark' | 'light' };
   const theme = context.theme || 'dark';
   const isDark = theme === 'dark';
@@ -156,7 +157,7 @@ export const LoadCard: React.FC<LoadCardProps> = ({ load, onBook, onCancelBook, 
       <div onClick={() => onDetails && onDetails(load)} style={{ position:"relative", height:280, overflow:"hidden", cursor: onDetails ? "pointer" : "default" }}>
  {/* Skeleton */}
         {!imgLoaded && <div style={{ position:"absolute", inset:0, background: isDark ? "#1a1a1a" : "#e8e8e8", animation:"shimmer 1.4s ease infinite" }} />}
-        <img src={currentImage} alt={load.route} loading="lazy" decoding="async" onLoad={() => setImgLoaded(true)} style={{
+        <img src={currentImage} alt={load.route} loading={priority ? "eager" : "lazy"} decoding="async" fetchPriority={priority ? "high" : "auto"} onLoad={() => setImgLoaded(true)} style={{
           width:"100%", height:"100%", objectFit:"cover", objectPosition:"center 72%",
           filter: isDark ? "brightness(0.52)" : "brightness(1.0) saturate(1.1) contrast(1.04)",
           transform: hov ? "scale(1.06)" : "scale(1)",

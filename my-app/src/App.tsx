@@ -320,8 +320,8 @@ function AppContent() {
 
       <TopProgressBar />
       <div style={{ paddingTop: 70 }}>
-        <RouteTransition>
-        <Suspense fallback={<PageLoader />}>
+      <RouteTransition>
+      <Suspense fallback={<PageLoader />}>
           <Routes>
             <Route path="/" element={
               <>

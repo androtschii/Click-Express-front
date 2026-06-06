@@ -1,9 +1,10 @@
-﻿import React, { useState, useEffect } from "react";
+﻿import React, { useState, useMemo } from "react";
 import { toast } from "sonner";
 import { confirm } from "../ui/ConfirmDialog";
 import { useLanguage } from "../../context/LanguageContext";
 import type { Load } from "../../types/index";
-import { fetchNews, createNews, deleteNews } from "../../api/client.js";
+import { useNews, useCreateNews, useDeleteNews } from "../../hooks/useNews";
+import type { ApiNewsArticle } from "../../hooks/useNews";
 import type { Session } from "../../services/authService";
 import { NewsSkeleton } from "../loads/LoadSkeleton";
 
@@ -15,15 +16,6 @@ interface NewsPageProps {
   session?: Session | null;
 }
 
-interface ApiNews {
-  id: number;
-  title: string;
-  content: string;
-  imageUrl: string | null;
-  publishedAt: string;
-  isPublished: boolean;
-  authorName: string;
-}
 
 type Category = "all" | "loads" | "company" | "freight" | "safety" | "drivers";
 
@@ -313,7 +305,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({ theme = "dark", onBack, onVi
 
   const isAdmin = session?.role === "Admin";
 
-  const apiToArticle = (n: ApiNews): Article => ({
+  const apiToArticle = (n: ApiNewsArticle): Article => ({
     id: 100000 + n.id,
     category: "company",
     titleEn: n.title, titleRu: n.title,
@@ -325,26 +317,15 @@ export const NewsPage: React.FC<NewsPageProps> = ({ theme = "dark", onBack, onVi
     author: n.authorName,
   });
 
-  const [apiArticles, setApiArticles] = useState<Article[]>([]);
-  const [apiIdMap, setApiIdMap] = useState<Map<number, number>>(new Map());
-  const [loading, setLoading] = useState(true);
+  const { data: rawNews = [], isLoading: loading } = useNews(!isAdmin);
+  const createNewsMutation = useCreateNews();
+  const deleteNewsMutation = useDeleteNews();
 
-  const loadApiNews = async () => {
-    try {
-      const data: ApiNews[] = await fetchNews(!isAdmin);
-      setApiArticles(data.map(apiToArticle));
-      setApiIdMap(new Map(data.map(n => [100000 + n.id, n.id])));
-    } catch {
-      setApiArticles([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    loadApiNews();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAdmin]);
+  const { apiArticles, apiIdMap } = useMemo(() => {
+    const articles = rawNews.map((n: ApiNewsArticle) => apiToArticle(n));
+    const idMap = new Map(rawNews.map((n: ApiNewsArticle) => [100000 + n.id, n.id] as [number, number]));
+    return { apiArticles: articles, apiIdMap: idMap };
+  }, [rawNews]);
 
   const allArticles = [...apiArticles, ...ARTICLES];
   const filtered = activecat === "all" ? allArticles : allArticles.filter(a => a.category === activecat);
@@ -366,7 +347,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({ theme = "dark", onBack, onVi
     }
     setCreating(true);
     try {
-      await createNews({
+      await createNewsMutation.mutateAsync({
         title: newTitle.trim(),
         content: newContent.trim(),
         imageUrl: newImage.trim() || null,
@@ -374,7 +355,6 @@ export const NewsPage: React.FC<NewsPageProps> = ({ theme = "dark", onBack, onVi
       });
       setNewTitle(""); setNewContent(""); setNewImage("");
       setShowCreate(false);
-      await loadApiNews();
     } catch (e) {
       setCreateError(e instanceof Error ? e.message : "Error");
     } finally {
@@ -388,8 +368,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({ theme = "dark", onBack, onVi
     const ok = await confirm({ title: lang === "ru" ? "Удалить новость?" : "Delete news?", danger: true, confirmLabel: lang === "ru" ? "Удалить" : "Delete", cancelLabel: lang === "ru" ? "Отмена" : "Cancel" });
     if (!ok) return;
     try {
-      await deleteNews(realId);
-      await loadApiNews();
+      await deleteNewsMutation.mutateAsync(realId);
       toast.success(lang === "ru" ? "Новость удалена" : "News deleted");
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Error");

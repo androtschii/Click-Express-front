@@ -1,6 +1,7 @@
-﻿import React, { useState, useEffect } from "react";
+﻿import React, { useState, useEffect, useMemo } from "react";
 import { useLanguage } from "../../context/LanguageContext";
-import { fetchReviews, createReview, approveReview, rejectReview, deleteReview } from "../../api/client.js";
+import { useReviews, useCreateReview, useApproveReview, useRejectReview, useDeleteReview } from "../../hooks/useReviews";
+import type { ApiReview } from "../../hooks/useReviews";
 import type { Session } from "../../services/authService";
 import { Threads } from "../ui/Threads";
 import { ReviewSkeleton } from "../loads/LoadSkeleton";
@@ -223,24 +224,17 @@ export const ReviewsPage: React.FC<ReviewsPageProps> = ({ theme = "dark", onBack
   const inputBg     = isDark ? "#1a1a1a" : "#f8f8f8";
   const inputBorder = isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.12)";
 
-  const [reviews, setReviews] = useState<ReviewItem[]>(INITIAL_REVIEWS);
-  const [loading, setLoading] = useState(true);
-  const loadApiReviews = async () => {
-    try {
-      const data: ApiReview[] = await fetchReviews(!isAdmin);
-      const apiItems = data.map((r, i) => apiToReviewItem(r, i));
-      setReviews([...apiItems, ...INITIAL_REVIEWS]);
-    } catch {
-      // если API недоступен — оставляем INITIAL_REVIEWS
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { data: apiData, isLoading: loading } = useReviews(!isAdmin);
+  const createReviewMutation = useCreateReview();
+  const approveMutation = useApproveReview();
+  const rejectMutation = useRejectReview();
+  const deleteMutation = useDeleteReview();
 
-  useEffect(() => {
-    loadApiReviews();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAdmin]);
+  const reviews = useMemo<ReviewItem[]>(() => {
+    if (!apiData) return INITIAL_REVIEWS;
+    const apiItems = apiData.map((r: ApiReview, i: number) => apiToReviewItem(r, i));
+    return [...apiItems, ...INITIAL_REVIEWS];
+  }, [apiData]);
 
   const [votes, setVotes] = useState<Record<number, "like" | "dislike" | null>>({});
   const [openComments, setOpenComments] = useState<Set<number>>(new Set());
@@ -325,35 +319,28 @@ export const ReviewsPage: React.FC<ReviewsPageProps> = ({ theme = "dark", onBack
     if (formComment.trim().length < 20) { setFormError(lang === "ru" ? "Отзыв слишком короткий (мин. 20 символов)" : "Review too short (min 20 chars)"); return; }
     setFormError("");
     try {
-      await createReview({ rating: formStars, text: formComment.trim(), role: formRole.trim() || undefined, location: formLocation.trim() || undefined });
+      await createReviewMutation.mutateAsync({ rating: formStars, text: formComment.trim(), role: formRole.trim() || undefined, location: formLocation.trim() || undefined });
       setFormName(""); setFormRole(""); setFormLocation(""); setFormStars(5); setFormComment("");
       setFormSubmitted(true);
       setShowForm(false);
       setTimeout(() => setFormSubmitted(false), 5000);
-      await loadApiReviews();
     } catch (e) {
       setFormError(e instanceof Error ? e.message : "Error");
     }
   };
 
-  const handleApprove = async (id: number) => {
-    try {
-      await approveReview(id);
-      setReviews(rs => rs.map(r => r.id === id && r.isFromApi ? { ...r, isApproved: true } : r));
-      toast.success(lang === "ru" ? "Отзыв одобрен" : "Review approved");
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Error");
-    }
+  const handleApprove = (id: number) => {
+    approveMutation.mutate(id, {
+      onSuccess: () => toast.success(lang === "ru" ? "Отзыв одобрен" : "Review approved"),
+      onError: (e) => toast.error(e instanceof Error ? e.message : "Error"),
+    });
   };
 
-  const handleReject = async (id: number) => {
-    try {
-      await rejectReview(id);
-      setReviews(rs => rs.map(r => r.id === id && r.isFromApi ? { ...r, isApproved: false } : r));
-      toast.success(lang === "ru" ? "Отзыв отклонён" : "Review rejected");
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Error");
-    }
+  const handleReject = (id: number) => {
+    rejectMutation.mutate(id, {
+      onSuccess: () => toast.success(lang === "ru" ? "Отзыв отклонён" : "Review rejected"),
+      onError: (e) => toast.error(e instanceof Error ? e.message : "Error"),
+    });
   };
 
   const handleDeleteReview = async (id: number) => {
@@ -364,13 +351,10 @@ export const ReviewsPage: React.FC<ReviewsPageProps> = ({ theme = "dark", onBack
       danger: true,
     });
     if (!ok) return;
-    try {
-      await deleteReview(id);
-      setReviews(rs => rs.filter(r => !(r.id === id && r.isFromApi)));
-      toast.success(lang === "ru" ? "Отзыв удалён" : "Review deleted");
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Error");
-    }
+    deleteMutation.mutate(id, {
+      onSuccess: () => toast.success(lang === "ru" ? "Отзыв удалён" : "Review deleted"),
+      onError: (e) => toast.error(e instanceof Error ? e.message : "Error"),
+    });
   };
 
   const inputStyle = {

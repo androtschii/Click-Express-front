@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { ArrowUp } from "@phosphor-icons/react";
 
 export const BackToTop: React.FC = () => {
   const [visible, setVisible] = useState(false);
-  const [hov, setHov] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setVisible(window.scrollY > 500);
@@ -12,37 +12,30 @@ export const BackToTop: React.FC = () => {
   }, []);
 
   return (
-    <button
-      aria-label="Back to top"
-      onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-      onMouseEnter={() => setHov(true)}
-      onMouseLeave={() => setHov(false)}
-      style={{
-        position: "fixed",
-        bottom: 90,
-        right: 28,
-        width: 50,
-        height: 50,
-        borderRadius: "50%",
-        border: "none",
-        cursor: "pointer",
-        background: hov ? "#aa0000" : "#CC0000",
-        boxShadow: hov
-          ? "0 6px 24px rgba(204,0,0,0.55), 0 2px 8px rgba(0,0,0,0.4)"
-          : "0 4px 16px rgba(204,0,0,0.4), 0 2px 6px rgba(0,0,0,0.3)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        zIndex: 1200,
-        opacity: visible ? 1 : 0,
-        transform: visible
-          ? hov ? "translateY(-3px) scale(1.08)" : "translateY(0) scale(1)"
-          : "translateY(16px) scale(0.85)",
-        pointerEvents: visible ? "auto" : "none",
-        transition: "opacity 0.3s ease, transform 0.25s ease, background 0.15s, box-shadow 0.15s",
-      }}
-    >
-      <ArrowUp size={22} weight="bold" color="#fff" />
-    </button>
+    <AnimatePresence>
+      {visible && (
+        <motion.button
+          aria-label="Back to top"
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          initial={{ opacity: 0, scale: 0.7, y: 16 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.7, y: 16 }}
+          whileHover={{ scale: 1.1, y: -3, boxShadow: "0 8px 28px rgba(204,0,0,0.65)" }}
+          whileTap={{ scale: 0.93 }}
+          transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+          style={{
+            position: "fixed", bottom: 90, right: 28,
+            width: 50, height: 50, borderRadius: "50%",
+            border: "none", cursor: "pointer",
+            background: "#CC0000",
+            boxShadow: "0 4px 16px rgba(204,0,0,0.4), 0 2px 6px rgba(0,0,0,0.3)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            zIndex: 1200,
+          }}
+        >
+          <ArrowUp size={22} weight="bold" color="#fff" />
+        </motion.button>
+      )}
+    </AnimatePresence>
   );
 };

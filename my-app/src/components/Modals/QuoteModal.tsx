@@ -1,4 +1,5 @@
 import React, { useState, useContext } from "react";
+import { motion } from "framer-motion";
 import { ThemeContext } from "../../theme";
 import { useLanguage } from "../../context/LanguageContext";
 import type { QuoteFormData } from "../../types/index";
@@ -316,11 +317,15 @@ export const QuoteModal: React.FC<QuoteModalProps> = ({ onClose, theme: themePro
         @keyframes qmSlideRight { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); } }
         @keyframes qmSlideLeft  { from { opacity: 0; transform: translateX(-40px); } to { opacity: 1; transform: translateX(0); } }
       `}</style>
-      <div
+      <motion.div
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.18 }}
         style={{ position: "fixed", inset: 0, zIndex: 2000, background: "rgba(0,0,0,0.85)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}
         onClick={onClose}
       >
-        <div
+        <motion.div
+          initial={{ opacity: 0, scale: 0.93, y: 16 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
           onClick={e => e.stopPropagation()}
           style={{ background: isDark ? "#0f0f0f" : "#fff", border: "1px solid rgba(204,0,0,0.4)", borderRadius: 12, width: "100%", maxWidth: 560, maxHeight: "90vh", overflowY: "auto", boxShadow: "0 40px 80px rgba(0,0,0,0.8)", display: "flex", flexDirection: "column" }}
         >
@@ -406,8 +411,8 @@ export const QuoteModal: React.FC<QuoteModalProps> = ({ onClose, theme: themePro
               </div>
             </>
           )}
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
     </>
   );
 };

@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import type { Load } from "../../types/index";
 import { LoadCard } from "./LoadCard";
 import { LoadSkeleton } from "./LoadSkeleton";
@@ -302,11 +303,28 @@ theme = 'dark', onSearchChange, onFilterChange, onBook, onCancelBook, onSave, on
         </div>
       ) : (
         <>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(310px,1fr))", gap: 20 }}>
-            {sorted.slice(0, visibleCount).map(l => (
-              <LoadCard key={l.id} load={l} onBook={onBook} onCancelBook={onCancelBook} onSave={onSave} onDetails={onDetails} onCompare={onCompare} isBooked={bookedIds.includes(l.id)} isSaved={savedIds.includes(l.id)} isAdmin={isAdmin} isCompared={compareIds.includes(l.id)} compareDisabled={compareIds.length >= 3} />
-            ))}
-          </div>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={`${search}-${filter}-${sortBy}-${equipFilter}`}
+              initial="hidden"
+              animate="visible"
+              variants={{ visible: { transition: { staggerChildren: 0.06 } } }}
+              style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(310px,1fr))", gap: 20 }}
+            >
+              {sorted.slice(0, visibleCount).map(l => (
+                <motion.div
+                  key={l.id}
+                  variants={{
+                    hidden:  { opacity: 0, y: 24, scale: 0.97 },
+                    visible: { opacity: 1, y: 0,  scale: 1, transition: { duration: 0.32, ease: [0.16, 1, 0.3, 1] } },
+                  }}
+                  style={{ willChange: "opacity, transform" }}
+                >
+                  <LoadCard load={l} onBook={onBook} onCancelBook={onCancelBook} onSave={onSave} onDetails={onDetails} onCompare={onCompare} isBooked={bookedIds.includes(l.id)} isSaved={savedIds.includes(l.id)} isAdmin={isAdmin} isCompared={compareIds.includes(l.id)} compareDisabled={compareIds.length >= 3} />
+                </motion.div>
+              ))}
+            </motion.div>
+          </AnimatePresence>
 
           {visibleCount < sorted.length ? (
             <div style={{ textAlign: "center", marginTop: 36, display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>

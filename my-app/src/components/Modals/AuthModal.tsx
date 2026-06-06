@@ -1,4 +1,5 @@
 ﻿import React, { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import {
   login,
   register,
@@ -125,7 +126,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const panelLeft = isLogin ? "0%" : "55%";
 
   return (
-    <div
+    <motion.div
+      initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.18 }}
       style={{
         position: "fixed",
         inset: 0,

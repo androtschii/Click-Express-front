@@ -1,5 +1,8 @@
 import React, { useState, useRef, useEffect, useMemo, lazy, Suspense } from "react";
-import { Routes, Route, Navigate, useNavigate, useLocation, useParams } from "react-router-dom";
+import { Routes, Route, Navigate, useNavigate, useParams } from "react-router-dom";
+import { motion } from "framer-motion";
+import { RouteTransition } from "./components/ui/RouteTransition";
+import { TopProgressBar } from "./components/ui/TopProgressBar";
 import { toast } from "sonner";
 import { Toaster } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
@@ -90,8 +93,8 @@ function FavoritesPanel({ loads, theme, onClose, onDetails, onRemove }: { loads:
   const t = translations[lang].favorites;
   useEffect(() => { document.body.style.overflow = "hidden"; return () => { document.body.style.overflow = ""; }; }, []);
   return (
-    <div style={{ position:"fixed", inset:0, zIndex:2000, background:"rgba(0,0,0,0.7)", backdropFilter:"blur(6px)" }} onClick={onClose}>
-      <div onClick={e => e.stopPropagation()} style={{ position:"absolute", right:0, top:0, bottom:0, width:"min(480px,100vw)", background:isDark?"#0a0a0a":"#fff", borderLeft:"2px solid #CC0000", display:"flex", flexDirection:"column", boxShadow:"-20px 0 60px rgba(0,0,0,0.6)" }}>
+    <motion.div initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ duration:0.2 }} style={{ position:"fixed", inset:0, zIndex:2000, background:"rgba(0,0,0,0.7)", backdropFilter:"blur(6px)" }} onClick={onClose}>
+      <motion.div initial={{ x:"100%" }} animate={{ x:0 }} transition={{ duration:0.32, ease:[0.22,1,0.36,1] }} onClick={e => e.stopPropagation()} style={{ position:"absolute", right:0, top:0, bottom:0, width:"min(480px,100vw)", background:isDark?"#0a0a0a":"#fff", borderLeft:"2px solid #CC0000", display:"flex", flexDirection:"column", boxShadow:"-20px 0 60px rgba(0,0,0,0.6)" }}>
         <div style={{ padding:"24px 24px 16px", borderBottom:`1px solid ${bord}`, display:"flex", justifyContent:"space-between", alignItems:"center" }}>
           <div>
             <div style={{ fontFamily:"'Barlow',sans-serif", fontSize:10, color:"#CC0000", letterSpacing:3, textTransform:"uppercase", marginBottom:4 }}>{t.saved}</div>
@@ -136,8 +139,8 @@ function FavoritesPanel({ loads, theme, onClose, onDetails, onRemove }: { loads:
             <a href="tel:+17862026599" style={{ fontFamily:"'Barlow',sans-serif", fontWeight:700, fontSize:13, color:"#CC0000", textDecoration:"none" }}>+1 786-202-6599</a>
           </div>
         )}
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
 
@@ -148,8 +151,8 @@ function RequestsPanel({ loads, theme, onClose, onDetails, onCancel, onBrowseLoa
   const t = translations[lang].requests;
   useEffect(() => { document.body.style.overflow = "hidden"; return () => { document.body.style.overflow = ""; }; }, []);
   return (
-    <div style={{ position:"fixed", inset:0, zIndex:2000, background:"rgba(0,0,0,0.7)", backdropFilter:"blur(6px)" }} onClick={onClose}>
-      <div onClick={e => e.stopPropagation()} style={{ position:"absolute", right:0, top:0, bottom:0, width:"min(480px,100vw)", background:isDark?"#0a0a0a":"#fff", borderLeft:"2px solid #CC0000", display:"flex", flexDirection:"column", boxShadow:"-20px 0 60px rgba(0,0,0,0.6)" }}>
+    <motion.div initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ duration:0.2 }} style={{ position:"fixed", inset:0, zIndex:2000, background:"rgba(0,0,0,0.7)", backdropFilter:"blur(6px)" }} onClick={onClose}>
+      <motion.div initial={{ x:"100%" }} animate={{ x:0 }} transition={{ duration:0.32, ease:[0.22,1,0.36,1] }} onClick={e => e.stopPropagation()} style={{ position:"absolute", right:0, top:0, bottom:0, width:"min(480px,100vw)", background:isDark?"#0a0a0a":"#fff", borderLeft:"2px solid #CC0000", display:"flex", flexDirection:"column", boxShadow:"-20px 0 60px rgba(0,0,0,0.6)" }}>
         <div style={{ padding:"24px 24px 16px", borderBottom:`1px solid ${bord}`, display:"flex", justifyContent:"space-between", alignItems:"center" }}>
           <div>
             <div style={{ fontFamily:"'Barlow',sans-serif", fontSize:10, color:"#CC0000", letterSpacing:3, textTransform:"uppercase", marginBottom:4 }}>{t.booked}</div>
@@ -197,8 +200,8 @@ function RequestsPanel({ loads, theme, onClose, onDetails, onCancel, onBrowseLoa
           <div style={{ fontFamily:"'Barlow',sans-serif", fontSize:12, color:isDark?"rgba(255,255,255,0.3)":"rgba(0,0,0,0.4)" }}>{t.dispatcher}</div>
           <a href="tel:+17862026599" style={{ display:"flex", alignItems:"center", gap:6, marginTop:6, fontFamily:"'Barlow',sans-serif", fontWeight:700, fontSize:14, color:"#CC0000", textDecoration:"none" }}><PhoneIcon size={14} color="#CC0000" />+1 786-202-6599</a>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
 
@@ -342,7 +345,9 @@ function AppContent() {
         onLoginClick={() => setShowAuth(true)}
       />
 
+      <TopProgressBar />
       <div style={{ paddingTop: 70 }}>
+        <RouteTransition>
         <Suspense fallback={<PageLoader />}>
           <Routes>
             <Route path="/" element={
@@ -453,6 +458,7 @@ function AppContent() {
             <Route path="*" element={<NotFoundPage theme={theme} onBack={() => navigate(-1)} />} />
           </Routes>
         </Suspense>
+        </RouteTransition>
       </div>
 
       {showFavorites && (

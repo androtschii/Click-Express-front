@@ -62,6 +62,7 @@ export const LoadCard: React.FC<LoadCardProps> = ({ load, onBook, onCancelBook, 
   const [bookHov, setBookHov] = useState(false);
   const [imgLoaded, setImgLoaded] = useState(false);
   const [spot, setSpot] = useState({ x: -200, y: -200 });
+  const [tilt, setTilt] = useState({ rx: 0, ry: 0 });
 
  // Admin edit state
   const [currentPrice, setCurrentPrice] = useState(load.price);
@@ -123,12 +124,32 @@ export const LoadCard: React.FC<LoadCardProps> = ({ load, onBook, onCancelBook, 
   const driveM = Math.round(((load.miles / 55) - driveH) * 60);
 
   return (
-    <div onMouseEnter={() => setHov(true)} onMouseLeave={() => { setHov(false); setSpot({ x: -200, y: -200 }); }}
+    <div
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => { setHov(false); setSpot({ x: -200, y: -200 }); setTilt({ rx: 0, ry: 0 }); }}
       onMouseMove={e => {
         const r = e.currentTarget.getBoundingClientRect();
-        setSpot({ x: e.clientX - r.left, y: e.clientY - r.top });
+        const x = e.clientX - r.left;
+        const y = e.clientY - r.top;
+        setSpot({ x, y });
+        setTilt({
+          rx: ((y / r.height) - 0.5) * -7,
+          ry: ((x / r.width)  - 0.5) *  7,
+        });
       }}
-      style={{ position: "relative", background:cardBg, border:`1px solid ${hov?"#CC0000":cardBorder}`, borderRadius:6, overflow:"hidden", transform:hov?"translateY(-6px)":"none", boxShadow:hov?"0 32px 64px rgba(0,0,0,0.72), 0 12px 28px rgba(204,0,0,0.18), 0 0 0 1px rgba(204,0,0,0.3)":"0 2px 14px rgba(0,0,0,0.22)", transition:"all 0.22s cubic-bezier(0.22,1,0.36,1)" }}>
+      style={{
+        position: "relative", background: cardBg,
+        border: `1px solid ${hov ? "#CC0000" : cardBorder}`,
+        borderRadius: 6, overflow: "hidden",
+        transform: hov
+          ? `perspective(800px) rotateX(${tilt.rx}deg) rotateY(${tilt.ry}deg) translateY(-6px)`
+          : "none",
+        boxShadow: hov
+          ? "0 32px 64px rgba(0,0,0,0.72), 0 12px 28px rgba(204,0,0,0.18), 0 0 0 1px rgba(204,0,0,0.3)"
+          : "0 2px 14px rgba(0,0,0,0.22)",
+        transition: "all 0.22s cubic-bezier(0.22,1,0.36,1)",
+        willChange: "transform",
+      }}>
       <div style={{ position: "absolute", inset: 0, pointerEvents: "none", zIndex: 2, opacity: hov ? 1 : 0, transition: "opacity 0.2s", background: `radial-gradient(360px circle at ${spot.x}px ${spot.y}px, rgba(204,0,0,0.12), transparent 50%)` }} />
 
  {/* Фото */}

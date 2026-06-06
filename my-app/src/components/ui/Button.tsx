@@ -1,17 +1,25 @@
-import { forwardRef } from "react";
+import React, { forwardRef } from "react";
 import { motion } from "framer-motion";
-import type { ReactNode, ButtonHTMLAttributes, CSSProperties } from "react";
+import type { ReactNode, CSSProperties } from "react";
 
 export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger";
 export type ButtonSize = "sm" | "md" | "lg";
 
-interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+interface ButtonProps {
   variant?: ButtonVariant;
   size?: ButtonSize;
   loading?: boolean;
   fullWidth?: boolean;
   leftIcon?: ReactNode;
   rightIcon?: ReactNode;
+  children?: ReactNode;
+  disabled?: boolean;
+  style?: CSSProperties;
+  onClick?: React.MouseEventHandler<HTMLButtonElement>;
+  type?: "button" | "submit" | "reset";
+  className?: string;
+  "aria-label"?: string;
+  form?: string;
 }
 
 const SIZE_STYLES: Record<ButtonSize, CSSProperties> = {
@@ -79,7 +87,11 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       children,
       disabled,
       style,
-      ...rest
+      onClick,
+      type = "button",
+      className,
+      "aria-label": ariaLabel,
+      form,
     },
     ref
   ) => {
@@ -112,6 +124,11 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       <motion.button
         ref={ref}
         disabled={isDisabled}
+        type={type}
+        onClick={onClick}
+        className={className}
+        aria-label={ariaLabel}
+        form={form}
         style={base}
         whileHover={
           !isDisabled
@@ -120,7 +137,6 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         }
         whileTap={!isDisabled ? { scale: 0.97 } : undefined}
         transition={{ duration: 0.15 }}
-        {...rest}
       >
         {loading ? (
           <Spinner size={size} />

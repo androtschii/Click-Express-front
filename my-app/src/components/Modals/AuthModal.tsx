@@ -463,7 +463,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           <X size={18} weight="bold" />
         </button>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

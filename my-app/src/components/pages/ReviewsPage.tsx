@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useMemo } from "react";
+﻿import React, { useState, useEffect } from "react";
 import { useLanguage } from "../../context/LanguageContext";
 import { useReviews, useCreateReview, useApproveReview, useRejectReview, useDeleteReview } from "../../hooks/useReviews";
 import type { ApiReview } from "../../hooks/useReviews";
@@ -14,15 +14,6 @@ interface ReviewsPageProps {
   session?: Session | null;
 }
 
-interface ApiReview {
-  id: number;
-  rating: number;
-  text: string;
-  createdAt: string;
-  isApproved: boolean;
-  productId: number | null;
-  username: string;
-}
 
 interface Comment {
   id: number;
@@ -230,10 +221,11 @@ export const ReviewsPage: React.FC<ReviewsPageProps> = ({ theme = "dark", onBack
   const rejectMutation = useRejectReview();
   const deleteMutation = useDeleteReview();
 
-  const reviews = useMemo<ReviewItem[]>(() => {
-    if (!apiData) return INITIAL_REVIEWS;
-    const apiItems = apiData.map((r: ApiReview, i: number) => apiToReviewItem(r, i));
-    return [...apiItems, ...INITIAL_REVIEWS];
+  const [reviews, setReviews] = useState<ReviewItem[]>(INITIAL_REVIEWS);
+
+  useEffect(() => {
+    const apiItems = (apiData ?? []).map((r: ApiReview, i: number) => apiToReviewItem(r, i));
+    setReviews([...apiItems, ...INITIAL_REVIEWS]);
   }, [apiData]);
 
   const [votes, setVotes] = useState<Record<number, "like" | "dislike" | null>>({});

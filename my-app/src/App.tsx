@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useMemo, lazy, Suspense } from "react";
-import { Routes, Route, Navigate, useNavigate, useParams } from "react-router-dom";
+import { Routes, Route, Navigate, useNavigate, useLocation, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { RouteTransition } from "./components/ui/RouteTransition";
 import { TopProgressBar } from "./components/ui/TopProgressBar";
@@ -65,26 +65,6 @@ const PageLoader = () => (
   </div>
 );
 
-function WeeklyHeartBtn({ saved, onClick }: { saved: boolean; onClick: () => void }) {
-  const [burst, setBurst] = useState(false);
-  const handleClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (!saved) { setBurst(true); setTimeout(() => setBurst(false), 600); }
-    onClick();
-  };
-  return (
-    <button onClick={handleClick} style={{ position:"absolute", top:10, right:10, zIndex:3, width:38, height:38, borderRadius:"50%", border:"none", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", background: saved ? "linear-gradient(135deg, #ff4d6d, #CC0000)" : "rgba(0,0,0,0.55)", boxShadow: saved ? "0 0 16px rgba(204,0,0,0.7), 0 0 32px rgba(204,0,0,0.3)" : "0 2px 8px rgba(0,0,0,0.4)", transition:"all 0.3s ease", animation: burst ? "heartBeat 0.6s ease" : "none", overflow:"visible" }}>
-      {burst && <div style={{ position:"absolute", left:"50%", top:"50%", width:38, height:38, borderRadius:"50%", border:"2px solid #ff4d6d", animation:"burstRing 0.5s ease-out forwards", pointerEvents:"none", transform:"translate(-50%,-50%)" }} />}
-      {burst && [0,45,90,135,180,225,270,315].map((deg, i) => {
-        const rad = deg * Math.PI / 180;
-        return <div key={i} style={{ position:"absolute", left:"50%", top:"50%", width:5, height:5, borderRadius:"50%", background: i%2===0 ? "#ff4d6d" : "#FFB300", animation:"particle 0.5s ease-out forwards", "--tx":`${Math.cos(rad)*18}px`, "--ty":`${Math.sin(rad)*18}px`, pointerEvents:"none" } as React.CSSProperties} />;
-      })}
-      <svg width="18" height="18" viewBox="0 0 24 24" style={{ transition:"all 0.3s", filter: saved ? "drop-shadow(0 0 4px rgba(255,100,100,0.8))" : "none" }}>
-        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill={saved ? "#fff" : "none"} stroke={saved ? "#fff" : "rgba(255,255,255,0.9)"} strokeWidth={saved ? "0" : "2"} style={{ transition:"all 0.3s" }} />
-      </svg>
-    </button>
-  );
-}
 
 function FavoritesPanel({ loads, theme, onClose, onDetails, onRemove }: { loads: Load[]; theme: string; onClose: () => void; onDetails?: (l: Load) => void; onRemove?: (l: Load) => void }) {
   const isDark = theme === "dark";
@@ -214,7 +194,6 @@ function AppContent() {
 
   useEffect(() => { document.documentElement.lang = lang; }, [lang]);
 
-  const [weeklyIdx, setWeeklyIdx] = useState(0);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("All Loads");
   const [showCart, setShowCart] = useState(false);
@@ -224,18 +203,12 @@ function AppContent() {
   const [showAuth, setShowAuth] = useState(false);
   const [compareIds, setCompareIds] = useState<number[]>([]);
   const [showCompare, setShowCompare] = useState(false);
-  const [isMobileView, setIsMobileView] = useState(() => typeof window !== "undefined" ? window.innerWidth < 768 : false);
 
   const catalogRef = useRef<HTMLDivElement>(null);
   const aboutRef   = useRef<HTMLDivElement>(null);
   const contactRef = useRef<HTMLDivElement>(null);
   const scrollTo = (ref: React.RefObject<HTMLDivElement | null>) => ref.current?.scrollIntoView({ behavior: "smooth" } as ScrollIntoViewOptions);
 
-  useEffect(() => {
-    const fn = () => setIsMobileView(window.innerWidth < 768);
-    window.addEventListener("resize", fn);
-    return () => window.removeEventListener("resize", fn);
-  }, []);
 
   const { data: loads = [], isLoading: loading, error: loadsError } = useLoads();
   const error = loadsError?.message ?? null;
@@ -437,7 +410,7 @@ function AppContent() {
             <Route path="/driver-signup" element={<DriverSignupPage theme={theme} onBack={() => navigate(-1)} />} />
 
             <Route path="/profile" element={session
-              ? <ProfilePage session={session} theme={theme} savedLoads={savedLoads} bookedLoads={bookedLoads} onBack={() => navigate(-1)} onBrowseLoads={() => navigate("/")} onLogout={handleLogout} onSessionUpdate={(name) => setSession(s => s ? { ...s, name } : s)} onDetails={(l) => navigate(`/loads/${l.id}`, { state: { load: l } })} onSaveRemove={(l) => handleSave(l, false)} onOrderCancel={(l) => handleCancelBook(l)} onTrack={(l) => { const orderId = orderIdMap.get(l.id); navigate(`/track/${orderId ?? 0}`, { state: { load: l } }); }} />
+              ? <ProfilePage session={session} theme={theme} savedLoads={savedLoads} bookedLoads={bookedLoads} onBack={() => navigate(-1)} onBrowseLoads={() => navigate("/")} onLogout={handleLogout} onSessionUpdate={(name) => setSession(session ? { ...session, name } : null)} onDetails={(l) => navigate(`/loads/${l.id}`, { state: { load: l } })} onSaveRemove={(l) => handleSave(l, false)} onOrderCancel={(l) => handleCancelBook(l)} onTrack={(l) => { const orderId = orderIdMap.get(l.id); navigate(`/track/${orderId ?? 0}`, { state: { load: l } }); }} />
               : <Navigate to="/" replace />
             } />
 
@@ -569,7 +542,7 @@ function LoadDetailRouteInner({ cartItems, loads, orderIdMap, addToCartMut, remo
   );
 }
 
-function TrackingRouteInner({ loads, orderIdMap, theme, session }: { loads: Load[]; orderIdMap: Map<number, number>; theme: string; session: ReturnType<typeof useSessionCtx>["session"]; }) {
+function TrackingRouteInner({ loads, orderIdMap, theme, session }: { loads: Load[]; orderIdMap: Map<number, number>; theme: "dark" | "light"; session: ReturnType<typeof useSessionCtx>["session"]; }) {
   const { orderId } = useParams<{ orderId: string }>();
   const { state } = useLocation();
   const navigate = useNavigate();

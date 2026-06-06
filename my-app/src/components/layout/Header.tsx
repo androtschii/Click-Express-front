@@ -1,7 +1,8 @@
 ﻿import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { CELogo } from "../ui/Logo";
-import type { Session } from "../../services/authService";
 import { useLanguage } from "../../context/LanguageContext";
+import { useSessionCtx } from "../../context/SessionContext";
 import { translations } from "../../i18n/translations";
 import { Gear, User, ListBullets, SignOut, List, X } from "@phosphor-icons/react";
 import NotificationBell from "../ui/NotificationBell";
@@ -15,19 +16,9 @@ interface HeaderProps {
   onAboutClick: () => void;
   onContactClick: () => void;
   onQuoteClick: () => void;
-  onCareersClick?: () => void;
-  onNewsClick?: () => void;
-  onReviewsClick?: () => void;
-  onFleetClick?: () => void;
   onSavedClick?: () => void;
   onRequestsClick?: () => void;
   onLoginClick?: () => void;
-  session?: Session | null;
-  onLogout?: () => void;
-  onLogoClick?: () => void;
-  onProfileClick?: () => void;
-  onOrdersClick?: () => void;
-  onAdminClick?: () => void;
 }
 
 const NavLink: React.FC<{ children: React.ReactNode; onClick?: () => void; isLight?: boolean; compact?: boolean }> = ({ children, onClick, isLight, compact }) => {
@@ -69,9 +60,10 @@ const PhoneLink: React.FC<{ isLight?: boolean }> = ({ isLight }) => {
 
 export const Header: React.FC<HeaderProps> = ({
   cartCount, savedCount = 0, theme = 'dark', onThemeToggle,
-  onCatalogClick, onAboutClick, onContactClick, onQuoteClick, onCareersClick, onNewsClick, onReviewsClick, onFleetClick, onSavedClick, onRequestsClick, onLoginClick,
-  session, onLogout, onLogoClick, onProfileClick, onOrdersClick, onAdminClick,
+  onCatalogClick, onAboutClick, onContactClick, onQuoteClick, onSavedClick, onRequestsClick, onLoginClick,
 }) => {
+  const navigate = useNavigate();
+  const { session, handleLogout } = useSessionCtx();
   const [scrolled, setScrolled] = useState(false);
   const [heartBurst, setHeartBurst] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
@@ -133,7 +125,7 @@ export const Header: React.FC<HeaderProps> = ({
         @keyframes applyPulse { 0%,100%{opacity:1} 50%{opacity:0.35} }
       `}</style>
 
-      <div onClick={onLogoClick || (() => window.scrollTo({ top: 0, behavior: "smooth" }))} style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", flexShrink: 0 }}>
+      <div onClick={() => { navigate("/"); window.scrollTo({ top:0, behavior:"smooth" }); }} style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", flexShrink: 0 }}>
         <CELogo size={42} theme={theme} />
         <div style={{ lineHeight: 1 }}>
           <div style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 21, color: isLight ? "#1a1a1a" : "#fff", letterSpacing: 1, textTransform: "uppercase" }}>
@@ -153,10 +145,10 @@ export const Header: React.FC<HeaderProps> = ({
           <NavLink onClick={onQuoteClick} isLight={isLight} compact={lang === 'ru'}>{t.nav.getQuote}</NavLink>
           <NavLink onClick={onAboutClick} isLight={isLight} compact={lang === 'ru'}>{t.nav.aboutUs}</NavLink>
           <NavLink onClick={onContactClick} isLight={isLight} compact={lang === 'ru'}>{t.nav.contact}</NavLink>
-          <NavLink onClick={onCareersClick} isLight={isLight} compact={lang === 'ru'}>{t.nav.careers}</NavLink>
-          <NavLink onClick={onNewsClick} isLight={isLight} compact={lang === 'ru'}>{t.nav.news}</NavLink>
-          <NavLink onClick={onReviewsClick} isLight={isLight} compact={lang === 'ru'}>{t.nav.reviews}</NavLink>
-          <NavLink onClick={onFleetClick} isLight={isLight} compact={lang === 'ru'}>{t.nav.fleet}</NavLink>
+          <NavLink onClick={() => navigate("/careers")} isLight={isLight} compact={lang === 'ru'}>{t.nav.careers}</NavLink>
+          <NavLink onClick={() => navigate("/news")} isLight={isLight} compact={lang === 'ru'}>{t.nav.news}</NavLink>
+          <NavLink onClick={() => navigate("/reviews")} isLight={isLight} compact={lang === 'ru'}>{t.nav.reviews}</NavLink>
+          <NavLink onClick={() => navigate("/fleet")} isLight={isLight} compact={lang === 'ru'}>{t.nav.fleet}</NavLink>
         </nav>
       )}
       {isMobile && <div style={{ flex: 1 }} />}
@@ -165,9 +157,9 @@ export const Header: React.FC<HeaderProps> = ({
           {mobileOpen ? <X size={20} weight="bold" /> : <List size={20} weight="bold" />}
         </button>
       )}
-      {!isMobile && onCareersClick && (
+      {!isMobile && (
         <button
-          onClick={onCareersClick}
+          onClick={() => navigate("/careers")}
           style={{
             display: "inline-flex",
             alignItems: "center",
@@ -247,9 +239,9 @@ export const Header: React.FC<HeaderProps> = ({
                 { label: t.nav.getQuote, fn: onQuoteClick },
                 { label: t.nav.aboutUs,  fn: onAboutClick },
                 { label: t.nav.contact,  fn: onContactClick },
-                { label: t.nav.news,     fn: onNewsClick },
-                { label: t.nav.reviews,  fn: onReviewsClick },
-                { label: t.nav.fleet,    fn: onFleetClick },
+                { label: t.nav.news,     fn: () => navigate("/news") },
+                { label: t.nav.reviews,  fn: () => navigate("/reviews") },
+                { label: t.nav.fleet,    fn: () => navigate("/fleet") },
               ].map(item => (
                 <div key={item.label} onClick={() => { setMobileOpen(false); item.fn?.(); }}
                   style={{ padding: "15px 24px", fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 14, letterSpacing: 1.2, textTransform: "uppercase", color: isLight ? "rgba(0,0,0,0.78)" : "rgba(255,255,255,0.82)", cursor: "pointer", borderBottom: `1px solid ${isLight ? "rgba(0,0,0,0.05)" : "rgba(255,255,255,0.05)"}`, transition: "color 0.15s, background 0.15s" }}
@@ -260,8 +252,8 @@ export const Header: React.FC<HeaderProps> = ({
               ))}
 
               {/* Apply Now */}
-              {onCareersClick && (
-                <div onClick={() => { setMobileOpen(false); onCareersClick(); }}
+              {(
+                <div onClick={() => { setMobileOpen(false); navigate("/careers"); }}
                   style={{ padding: "15px 24px", fontFamily: "'Barlow',sans-serif", fontWeight: 800, fontSize: 14, letterSpacing: 1.2, textTransform: "uppercase", color: "#CC0000", cursor: "pointer", borderBottom: `1px solid ${isLight ? "rgba(0,0,0,0.05)" : "rgba(255,255,255,0.05)"}`, display: "flex", alignItems: "center", gap: 8 }}>
                   <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#CC0000", flexShrink: 0, animation: "applyPulse 1.6s ease-in-out infinite" }} />
                   {t.header.applyNow} →
@@ -288,7 +280,7 @@ export const Header: React.FC<HeaderProps> = ({
               </button>
 
               {session ? (
-                <div onClick={() => { setMobileOpen(false); onProfileClick?.(); }} style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
+                <div onClick={() => { setMobileOpen(false); navigate("/profile"); }} style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
                   <div style={{ width: 30, height: 30, borderRadius: "50%", background: "linear-gradient(135deg,#CC0000,#ff4d4d)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 13, color: "#fff" }}>
                     {session.name.charAt(0).toUpperCase()}
                   </div>
@@ -407,9 +399,9 @@ export const Header: React.FC<HeaderProps> = ({
               </div>
               <div style={{ padding: "6px 0" }}>
                 {[
-                  ...(session?.role === "Admin" ? [{ label: lang === "ru" ? "Админ панель" : "Admin Panel", Icon: Gear, onClick: onAdminClick }] : []),
-                  { label: t.header.myProfile, Icon: User, onClick: onProfileClick },
-                  { label: t.header.myOrders, Icon: ListBullets, onClick: onOrdersClick },
+                  ...(session?.role === "Admin" ? [{ label: lang === "ru" ? "Админ панель" : "Admin Panel", Icon: Gear, onClick: () => navigate("/admin") }] : []),
+                  { label: t.header.myProfile, Icon: User, onClick: () => navigate("/profile") },
+                  { label: t.header.myOrders, Icon: ListBullets, onClick: () => navigate("/orders") },
                 ].map(item => (
                   <div key={item.label} onClick={() => { setUserMenuOpen(false); item.onClick?.(); }} style={{ padding: "9px 14px", display: "flex", alignItems: "center", gap: 10, cursor: "pointer", fontFamily: "'Barlow',sans-serif", fontSize: 13, color: isLight ? "rgba(0,0,0,0.7)" : "rgba(255,255,255,0.7)", transition: "all 0.15s" }}
                     onMouseEnter={e => { e.currentTarget.style.background = "rgba(204,0,0,0.08)"; e.currentTarget.style.color = "#CC0000"; }}
@@ -418,7 +410,7 @@ export const Header: React.FC<HeaderProps> = ({
                   </div>
                 ))}
                 <div style={{ margin: "6px 0", height: 1, background: isLight ? "rgba(0,0,0,0.07)" : "rgba(255,255,255,0.07)" }} />
-                <div onClick={onLogout} style={{ padding: "9px 14px", display: "flex", alignItems: "center", gap: 10, cursor: "pointer", fontFamily: "'Barlow',sans-serif", fontSize: 13, color: "#CC0000", transition: "all 0.15s" }}
+                <div onClick={handleLogout} style={{ padding: "9px 14px", display: "flex", alignItems: "center", gap: 10, cursor: "pointer", fontFamily: "'Barlow',sans-serif", fontSize: 13, color: "#CC0000", transition: "all 0.15s" }}
                   onMouseEnter={e => { e.currentTarget.style.background = "rgba(204,0,0,0.08)"; }}
                   onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}>
                   <SignOut size={16} weight="duotone" /> {t.header.signOut}
@@ -428,7 +420,7 @@ export const Header: React.FC<HeaderProps> = ({
           )}
         </div>
       ) : !isMobile ? (
-        <button onClick={onLoginClick} className="btn-split" style={{ borderRadius: 20, padding: "6px 15px", fontFamily: "'Barlow',sans-serif", fontWeight: 600, fontSize: 11, letterSpacing: 1.3, textTransform: "uppercase", cursor: "pointer", flexShrink: 0, color: isLight ? "#CC0000" : "#fff" }}>
+        <button onClick={onLoginClick} style={{ borderRadius: 20, padding: "6px 15px", fontFamily: "'Barlow',sans-serif", fontWeight: 600, fontSize: 11, letterSpacing: 1.3, textTransform: "uppercase", cursor: "pointer", flexShrink: 0, color: isLight ? "#CC0000" : "#fff", background: "transparent", border: `1px solid ${isLight ? "rgba(204,0,0,0.35)" : "rgba(255,255,255,0.25)"}` }}>
           {t.header.login}
         </button>
       ) : null}

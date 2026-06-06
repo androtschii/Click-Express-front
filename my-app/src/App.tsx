@@ -1,4 +1,8 @@
-﻿import React, { useState, useRef, useEffect, lazy, Suspense } from "react";
+﻿import React, { useState, useRef, useEffect, useMemo, lazy, Suspense } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { useLoads } from "./hooks/useLoads";
+import { useSavedLoads, useMyOrders, useSaveLoad, useUnsaveLoad, useCancelOrder } from "./hooks/useAuth";
+import { useCart, useAddToCart, useRemoveFromCart } from "./hooks/useCart";
 import { Toaster } from "sonner";
 import { ConfirmDialogProvider } from "./components/ui/ConfirmDialog";
 import { ThemeProvider, useTheme } from "./theme";
@@ -23,13 +27,9 @@ import { Notification } from "./components/ui/Notification";
 import { ChatBot } from "./components/ui/ChatBot";
 import { BackToTop } from "./components/ui/BackToTop";
 import { PhoneIcon } from "./components/ui/PhoneIcon";
-import { LOADS } from "./utils/data";
 import type { Load } from "./types/index";
-import { filterLoads, fetchLoads } from "./services/loadService.ts";
+import { filterLoads } from "./services/loadService.ts";
 import { X, Heart, ClipboardText } from "@phosphor-icons/react";
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import { fetchProducts } from "./api/client.js";
 import { CookieConsent } from "./components/ui/CookieConsent";
 import { MobileCallBar } from "./components/ui/MobileCallBar";
 import { WhyUs } from "./components/sections/WhyUs";
@@ -260,16 +260,13 @@ function AppContent() {
     document.documentElement.lang = lang;
   }, [lang]);
 
+  const qc = useQueryClient();
   const [weeklyIdx, setWeeklyIdx] = useState(0);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("All Loads");
-  const [loads, setLoads] = useState<Load[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [bookedLoads, setBookedLoads] = useState<Load[]>([]);
-  const [savedLoads, setSavedLoads] = useState<Load[]>([]);
-  const [orderIdMap, setOrderIdMap] = useState<Map<number, number>>(new Map());
-  const [cartItems, setCartItems] = useState<CartItemDto[]>([]);
+
+  const { data: loads = [], isLoading: loading, error: loadsError } = useLoads();
+  const error = loadsError?.message ?? null;
   const [showCart, setShowCart] = useState(false);
   const [showQuote, setShowQuote] = useState(false);
   const [showFavorites, setShowFavorites] = useState(false);
@@ -312,148 +309,40 @@ function AppContent() {
   };
 
   useEffect(() => {
-    setLoading(true);
-    setError(null);
-    const staticMap = new Map(LOADS.map(l => [l.id, l]));
-    const run = async () => {
-      try {
-        const products = await fetchProducts();
-        const mapped: Load[] = products
-          .filter((p: { isActive: boolean }) => p.isActive)
-          .map((p: { id: number; name: string; description: string; price: number; imageUrl: string; category: string }) => {
-            const parts = p.name.split(" → ");
-            const staticLoad = staticMap.get(p.id);
-            return {
-              id: p.id,
-              route: parts[0]?.trim() || p.name,
-              dest: parts[1]?.trim() || "",
-              price: p.price,
-              miles: staticLoad?.miles ?? 0,
-              type: (p.category === "Partial" ? "Partial" : "Full Load") as "Full Load" | "Partial",
-              cargo: p.description,
-              image: p.imageUrl,
-              tag: staticLoad?.tag ?? (p.category === "Military Load" ? "Military Load" : null),
-            };
-          });
-        setLoads(mapped);
-      } catch {
- // БД недоступна — показываем статические данные
-        try {
-          const data = await fetchLoads(LOADS);
-          setLoads(data);
-        } catch (err) {
-          setError((err as Error).message);
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-    run();
-  }, []);
-
-
-  useEffect(() => {
     const fn = () => setIsMobileView(window.innerWidth < 768);
     window.addEventListener("resize", fn);
     return () => window.removeEventListener("resize", fn);
   }, []);
 
-  useEffect(() => {
-    if (session) fetchCart();
-    else setCartItems([]);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [session]);
+  const { data: savedLoadIds = [] } = useSavedLoads(session?.token);
+  const { data: rawOrders = [] } = useMyOrders(session?.token);
+  const { data: cartItems = [] } = useCart(session?.token);
 
-  useEffect(() => {
-    if (!session || loading || loads.length === 0) return;
-    const token = session.token;
+  const saveLoad = useSaveLoad(session?.token);
+  const unsaveLoad = useUnsaveLoad(session?.token);
+  const cancelOrder = useCancelOrder(session?.token);
+  const addToCart = useAddToCart(session?.token);
+  const removeFromCart = useRemoveFromCart(session?.token);
 
-    fetch(`${API_BASE}/user/favorites`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then(r => (r.ok ? r.json() : Promise.reject()) as Promise<Array<{ productId: number }>>)
-      .then(data => {
-        const ids = new Set(data.map(d => d.productId));
-        setSavedLoads(loads.filter(l => ids.has(l.id)));
+  const savedLoads = useMemo(
+    () => loads.filter(l => savedLoadIds.some(s => s.productId === l.id)),
+    [loads, savedLoadIds]
+  );
+
+  const { bookedLoads, orderIdMap } = useMemo(() => {
+    const active = rawOrders.filter(o => o.status !== "Cancelled");
+    const map = new Map<number, number>();
+    const booked = active
+      .map(o => {
+        const load = loads.find(l => l.id === o.productId);
+        if (load) map.set(load.id, o.id);
+        return load ?? null;
       })
-      .catch(() => {});
-
-    fetch(`${API_BASE}/order/my`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then(r => (r.ok ? r.json() : Promise.reject()) as Promise<Array<{ id: number; productId: number; status: string }>>)
-      .then(orders => {
-        const active = orders.filter(o => o.status !== "Cancelled");
-        const newMap = new Map<number, number>();
-        const booked = active
-          .map(o => {
-            const load = loads.find(l => l.id === o.productId);
-            if (load) newMap.set(load.id, o.id);
-            return load ?? null;
-          })
-          .filter((l): l is Load => l !== null);
-        setBookedLoads(booked);
-        setOrderIdMap(newMap);
-      })
-      .catch(() => {});
-  }, [session, loading, loads]);
+      .filter((l): l is Load => l !== null);
+    return { bookedLoads: booked, orderIdMap: map };
+  }, [rawOrders, loads]);
 
   const filtered = filterLoads(loads, search, filter);
-
-  const handleSave = (load: Load, saved: boolean) => {
-    setSavedLoads(prev => saved ? [...prev, load] : prev.filter(l => l.id !== load.id));
-    notify(saved ? tn.savedToFavorites : tn.removedFromFavorites);
-    if (session) {
-      const token = session.token;
-      if (saved) {
-        fetch(`${API_BASE}/user/favorites`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-          body: JSON.stringify({ productId: load.id }),
-        }).catch(() => {});
-      } else {
-        fetch(`${API_BASE}/user/favorites/${load.id}`, {
-          method: "DELETE",
-          headers: { Authorization: `Bearer ${token}` },
-        }).catch(() => {});
-      }
-    }
-  };
-
-  const handleCancelBook = (load?: Load) => {
-    if (load && session) {
-      const cartItem = cartItems.find(i => i.productId === load.id);
-      if (cartItem) {
-        handleRemoveFromCart(cartItem.id);
-      } else {
-        // Cancel existing order if not in cart
-        const orderId = orderIdMap.get(load.id);
-        if (orderId) {
-          setBookedLoads(prev => prev.filter(l => l.id !== load.id));
-          fetch(`${API_BASE}/order/${orderId}/cancel`, {
-            method: "PATCH",
-            headers: { Authorization: `Bearer ${session.token}` },
-          }).catch(() => {});
-          setOrderIdMap(prev => { const m = new Map(prev); m.delete(load.id); return m; });
-        }
-      }
-    }
-    notify(tn.requestCancelled);
-  };
-
-  const handleBook = (load?: Load) => {
-    if (!load) return;
-    if (!session) { setShowAuth(true); return; }
-    fetch(`${API_BASE}/cart/items`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.token}` },
-      body: JSON.stringify({ productId: load.id, quantity: 1 }),
-    })
-      .then(r => (r.ok ? r.json() : Promise.reject()))
-      .then(() => fetchCart())
-      .catch(() => {});
-    notify(lang === "ru" ? "Добавлено в корзину" : "Added to cart");
-  };
 
   const notify = (text: string) => {
     setNotifications(n => {
@@ -462,39 +351,43 @@ function AppContent() {
     });
   };
 
-  const fetchCart = () => {
-    if (!session) { setCartItems([]); return; }
-    fetch(`${API_BASE}/cart/my`, { headers: { Authorization: `Bearer ${session.token}` } })
-      .then(r => (r.ok ? r.json() : Promise.reject()) as Promise<{ items: CartItemDto[] }>)
-      .then(data => setCartItems(data.items || []))
-      .catch(() => {});
+  const handleSave = (load: Load, saved: boolean) => {
+    notify(saved ? tn.savedToFavorites : tn.removedFromFavorites);
+    if (!session) return;
+    if (saved) {
+      saveLoad.mutate(load.id);
+    } else {
+      unsaveLoad.mutate(load.id);
+    }
+  };
+
+  const handleCancelBook = (load?: Load) => {
+    if (load && session) {
+      const cartItem = cartItems.find(i => i.productId === load.id);
+      if (cartItem) {
+        removeFromCart.mutate(cartItem.id);
+      } else {
+        const orderId = orderIdMap.get(load.id);
+        if (orderId) cancelOrder.mutate(orderId);
+      }
+    }
+    notify(tn.requestCancelled);
+  };
+
+  const handleBook = (load?: Load) => {
+    if (!load) return;
+    if (!session) { setShowAuth(true); return; }
+    addToCart.mutate(load.id);
+    notify(lang === "ru" ? "Добавлено в корзину" : "Added to cart");
   };
 
   const handleRemoveFromCart = (itemId: number) => {
-    if (!session) return;
-    setCartItems(prev => prev.filter(i => i.id !== itemId));
-    fetch(`${API_BASE}/cart/items/${itemId}`, {
-      method: "DELETE",
-      headers: { Authorization: `Bearer ${session.token}` },
-    }).then(() => fetchCart()).catch(() => {});
+    removeFromCart.mutate(itemId);
   };
 
   const handleCheckoutSuccess = () => {
-    setCartItems([]);
-    // Refresh orders after checkout
-    if (session) {
-      fetch(`${API_BASE}/order/my`, { headers: { Authorization: `Bearer ${session.token}` } })
-        .then(r => (r.ok ? r.json() : Promise.reject()) as Promise<Array<{ id: number; productId: number; status: string }>>)
-        .then(orders => {
-          const active = orders.filter(o => o.status !== "Cancelled");
-          const newMap = new Map<number, number>();
-          const booked = active
-            .map(o => { const load = loads.find(l => l.id === o.productId); if (load) newMap.set(load.id, o.id); return load ?? null; })
-            .filter((l): l is Load => l !== null);
-          setBookedLoads(booked);
-          setOrderIdMap(newMap);
-        }).catch(() => {});
-    }
+    qc.invalidateQueries({ queryKey: ["cart", session?.token] });
+    qc.invalidateQueries({ queryKey: ["my-orders", session?.token] });
     notify(lang === "ru" ? "Заказ оформлен!" : "Order placed!");
     setShowOrders(true);
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -503,10 +396,7 @@ function AppContent() {
   const handleLogout = () => {
     logout();
     setSession(null);
-    setSavedLoads([]);
-    setBookedLoads([]);
-    setOrderIdMap(new Map());
-    setCartItems([]);
+    qc.clear();
     setShowProfile(false);
     setShowOrders(false);
   };

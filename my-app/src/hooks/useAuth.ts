@@ -71,3 +71,46 @@ export function useMyOrders(token?: string) {
     staleTime: 1000 * 60,
   });
 }
+
+export function useSaveLoad(token?: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (productId: number) => {
+      const res = await fetch(`${API_BASE}/user/favorites`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ productId }),
+      });
+      if (!res.ok) throw new Error("Failed to save load");
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["saved-loads", token] }),
+  });
+}
+
+export function useUnsaveLoad(token?: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (loadId: number) => {
+      const res = await fetch(`${API_BASE}/user/favorites/${loadId}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error("Failed to unsave load");
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["saved-loads", token] }),
+  });
+}
+
+export function useCancelOrder(token?: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (orderId: number) => {
+      const res = await fetch(`${API_BASE}/order/${orderId}/cancel`, {
+        method: "PATCH",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error("Failed to cancel order");
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["my-orders", token] }),
+  });
+}

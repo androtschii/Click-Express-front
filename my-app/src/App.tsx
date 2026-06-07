@@ -3,6 +3,7 @@ import { Routes, Route, Navigate, useNavigate, useLocation, useParams } from "re
 import { motion, MotionConfig } from "framer-motion";
 import { RouteTransition } from "./components/ui/RouteTransition";
 import { TopProgressBar } from "./components/ui/TopProgressBar";
+import { ErrorBoundary } from "./components/ui/ErrorBoundary";
 import { toast } from "sonner";
 import { Toaster } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
@@ -560,14 +561,16 @@ export default function App() {
     <MotionConfig reducedMotion="user">
     <LanguageProvider>
       <ThemeProvider>
-        <ConfirmDialogProvider>
-          <AppContent />
-          <Toaster
-            position="bottom-right"
-            toastOptions={{ style: { background:"#0d0d0d", border:"1px solid rgba(255,255,255,0.1)", color:"#fff", fontFamily:"'Barlow',sans-serif" } }}
-            richColors
-          />
-        </ConfirmDialogProvider>
+        <ErrorBoundary>
+          <ConfirmDialogProvider>
+            <AppContent />
+            <Toaster
+              position="bottom-right"
+              toastOptions={{ style: { background:"#0d0d0d", border:"1px solid rgba(255,255,255,0.1)", color:"#fff", fontFamily:"'Barlow',sans-serif" } }}
+              richColors
+            />
+          </ConfirmDialogProvider>
+        </ErrorBoundary>
       </ThemeProvider>
     </LanguageProvider>
     </MotionConfig>

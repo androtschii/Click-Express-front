@@ -18,7 +18,7 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, info: { componentStack: string }) {
-    console.error("[ErrorBoundary]", error, info.componentStack);
+    console.error("[ErrorBoundary]", error.message, info.componentStack?.slice(0, 300));
   }
 
   reset = () => {
@@ -38,8 +38,8 @@ export class ErrorBoundary extends Component<Props, State> {
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          minHeight: 320,
-          padding: 32,
+          minHeight: "40vh",
+          padding: "48px 32px",
           textAlign: "center",
           gap: 16,
         }}
@@ -50,36 +50,39 @@ export class ErrorBoundary extends Component<Props, State> {
             height: 56,
             borderRadius: "50%",
             background: "var(--color-error-bg)",
+            border: "1px solid rgba(204,0,0,0.3)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            fontSize: 24,
+            fontSize: 22,
           }}
         >
           ⚠
         </div>
-        <p
-          style={{
-            color: "var(--color-text)",
-            fontSize: "var(--text-lg)",
-            fontWeight: 700,
-          }}
-        >
-          Something went wrong
-        </p>
-        <p
-          style={{
-            color: "var(--color-text-secondary)",
-            fontSize: "var(--text-sm)",
-            maxWidth: 360,
-          }}
-        >
-          {this.state.error.message || "An unexpected error occurred."}
-        </p>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+          <p
+            style={{
+              color: "var(--color-text)",
+              fontSize: "var(--text-lg)",
+              fontWeight: 700,
+            }}
+          >
+            Something went wrong
+          </p>
+          <p
+            style={{
+              color: "var(--color-text-secondary)",
+              fontSize: "var(--text-sm)",
+              maxWidth: 360,
+            }}
+          >
+            {this.state.error.message || "An unexpected error occurred."}
+          </p>
+        </div>
         <button
           onClick={this.reset}
           style={{
-            padding: "8px 20px",
+            padding: "10px 24px",
             background: "var(--color-brand)",
             color: "#fff",
             border: "none",
@@ -89,6 +92,7 @@ export class ErrorBoundary extends Component<Props, State> {
             fontSize: "var(--text-sm)",
             cursor: "pointer",
             letterSpacing: "0.5px",
+            textTransform: "uppercase",
           }}
         >
           Try again

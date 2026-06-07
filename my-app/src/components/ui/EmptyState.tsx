@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { ReactNode, CSSProperties } from "react";
 import { motion } from "framer-motion";
 
 interface EmptyStateProps {
@@ -6,9 +6,10 @@ interface EmptyStateProps {
   title: string;
   description?: string;
   action?: ReactNode;
+  style?: CSSProperties;
 }
 
-export function EmptyState({ icon, title, description, action }: EmptyStateProps) {
+export function EmptyState({ icon, title, description, action, style }: EmptyStateProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
@@ -22,6 +23,7 @@ export function EmptyState({ icon, title, description, action }: EmptyStateProps
         padding: "56px 32px",
         textAlign: "center",
         gap: "var(--space-4)",
+        ...style,
       }}
     >
       {icon && (

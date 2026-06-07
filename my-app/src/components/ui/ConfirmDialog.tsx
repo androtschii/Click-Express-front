@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface ConfirmOptions {
@@ -36,6 +36,21 @@ export function ConfirmDialogProvider({ children }: { children: React.ReactNode 
     setState(null);
   };
 
+  useEffect(() => {
+    if (!state) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") handleClose(false);
+      if (e.key === "Enter") handleClose(true);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [state]);
+
   return (
     <>
       {children}
@@ -61,6 +76,8 @@ export function ConfirmDialogProvider({ children }: { children: React.ReactNode 
           >
             <motion.div
               key="confirm-dialog"
+              role="dialog"
+              aria-modal="true"
               initial={{ opacity: 0, scale: 0.92, y: 12 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.94, y: 6 }}

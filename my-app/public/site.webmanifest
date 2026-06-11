@@ -1,0 +1,13 @@
+{
+  "name": "Click Express Inc",
+  "short_name": "ClickExpress",
+  "description": "Trucking dispatch services for owner-operators across 48 US states",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#CC0000",
+  "icons": [
+    { "src": "/icon-192.svg", "sizes": "192x192", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "/favicon.svg",  "sizes": "any",     "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}

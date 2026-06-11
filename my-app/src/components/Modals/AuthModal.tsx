@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from "react";
+﻿import React, { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import {
   login,
   register,
   loginWithGoogle,
+  forgotPassword,
   getSession,
   type Session,
 } from "../../services/authService";
@@ -45,6 +47,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     onClose();
   };
   const [isLogin, setIsLogin] = useState(true);
+  const [isForgot, setIsForgot] = useState(false);
   const [sliding, setSliding] = useState(false);
 
   const [name, setName] = useState("");
@@ -55,6 +58,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [googleLoading, setGoogleLoading] = useState(false);
   const [done, setDone] = useState(false);
   const [doneUser, setDoneUser] = useState("");
+  const [forgotDone, setForgotDone] = useState(false);
 
   const switchMode = () => {
     if (sliding) return;
@@ -72,7 +76,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     await new Promise((r) => setTimeout(r, 300));
     const result = isLogin
       ? await login(email, password)
-      : register(name, email, password);
+      : await register(name, email, password);
     setLoading(false);
     if (!result.ok) {
       setError(result.error || "Something went wrong");
@@ -80,13 +84,24 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     }
     setDoneUser(result.user!.name);
     setDone(true);
- // notify parent after short celebration
     setTimeout(() => {
       const session = getSession();
       document.body.style.overflow = "";
       if (session && onSuccess) onSuccess(session);
       onClose();
     }, 1800);
+  };
+
+  const handleForgot = async () => {
+    setError("");
+    setLoading(true);
+    const result = await forgotPassword(email);
+    setLoading(false);
+    if (!result.ok) {
+      setError(result.error || "Something went wrong");
+      return;
+    }
+    setForgotDone(true);
   };
 
   const handleGoogle = async () => {
@@ -111,7 +126,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const panelLeft = isLogin ? "0%" : "55%";
 
   return (
-    <div
+    <motion.div
+      initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.18 }}
       style={{
         position: "fixed",
         inset: 0,
@@ -174,9 +190,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             alignItems: "center",
             justifyContent: "center",
             padding: "40px 44px",
-            opacity: isLogin && !sliding ? 1 : 0,
+            opacity: isLogin && !isForgot && !sliding ? 1 : 0,
             transition: "opacity 0.25s ease",
-            pointerEvents: isLogin && !sliding ? "auto" : "none",
+            pointerEvents: isLogin && !isForgot && !sliding ? "auto" : "none",
           }}
         >
           <FormContent
@@ -195,6 +211,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             doneUser={doneUser}
             onSubmit={handleSubmit}
             onGoogle={handleGoogle}
+            onForgot={() => { setError(""); setEmail(""); setIsForgot(true); }}
           />
         </div>
 
@@ -212,9 +229,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             alignItems: "center",
             justifyContent: "center",
             padding: "40px 44px",
-            opacity: !isLogin && !sliding ? 1 : 0,
+            opacity: !isLogin && !isForgot && !sliding ? 1 : 0,
             transition: "opacity 0.25s ease",
-            pointerEvents: !isLogin && !sliding ? "auto" : "none",
+            pointerEvents: !isLogin && !isForgot && !sliding ? "auto" : "none",
           }}
         >
           <FormContent
@@ -235,6 +252,72 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             onGoogle={handleGoogle}
           />
         </div>
+
+ {/* Forgot Password form — full overlay */}
+        {isForgot && (
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              background: dark ? "#0f0f0f" : "#fff",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: "40px 44px",
+              zIndex: 6,
+              animation: "formFadeIn 0.3s ease",
+            }}
+          >
+            {forgotDone ? (
+              <div style={{ textAlign: "center" }}>
+                <div style={{ fontSize: 48, marginBottom: 16 }}>📧</div>
+                <h3 style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 22, color: dark ? "#fff" : "#1a1a1a", marginBottom: 8 }}>
+                  Check Your Email
+                </h3>
+                <p style={{ fontFamily: "'Barlow',sans-serif", fontSize: 13, color: "rgba(150,150,150,0.8)", lineHeight: 1.6, marginBottom: 20 }}>
+                  If this email is registered, a reset link has been sent.
+                </p>
+                <button
+                  onClick={() => { setIsForgot(false); setForgotDone(false); setEmail(""); setError(""); }}
+                  style={{ background: "#CC0000", border: "none", borderRadius: 25, padding: "10px 28px", color: "#fff", fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 13, letterSpacing: 2, textTransform: "uppercase", cursor: "pointer" }}
+                >
+                  Back to Sign In
+                </button>
+              </div>
+            ) : (
+              <div style={{ width: "100%", maxWidth: 320 }}>
+                <button
+                  onClick={() => { setIsForgot(false); setError(""); }}
+                  style={{ background: "none", border: "none", color: "#CC0000", fontFamily: "'Barlow',sans-serif", fontSize: 13, cursor: "pointer", marginBottom: 20, padding: 0, display: "flex", alignItems: "center", gap: 6 }}
+                >
+                  ← Back to Sign In
+                </button>
+                <h2 style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 26, color: dark ? "#fff" : "#1a1a1a", textTransform: "uppercase", marginBottom: 8 }}>
+                  Forgot Password?
+                </h2>
+                <p style={{ fontFamily: "'Barlow',sans-serif", fontSize: 13, color: "rgba(150,150,150,0.7)", marginBottom: 20, lineHeight: 1.6 }}>
+                  Enter your registered email and we'll send a reset link.
+                </p>
+                <InputField dark={dark} value={email} onChange={setEmail} placeholder="Email" type="email" icon="email"
+                  onKeyDown={(e) => e.key === "Enter" && handleForgot()} />
+                {error && (
+                  <div style={{ marginTop: 10, padding: "8px 12px", background: "rgba(204,0,0,0.12)", border: "1px solid rgba(204,0,0,0.35)", borderRadius: 6, fontFamily: "'Barlow',sans-serif", fontSize: 12, color: "#ff6b6b" }}>
+                    ⚠ {error}
+                  </div>
+                )}
+                <button
+                  onClick={handleForgot}
+                  disabled={loading}
+                  style={{ width: "100%", marginTop: 16, padding: "12px", background: loading ? "rgba(204,0,0,0.5)" : "#CC0000", border: "none", borderRadius: 25, color: "#fff", fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 14, letterSpacing: 2, textTransform: "uppercase", cursor: loading ? "not-allowed" : "pointer", boxShadow: "0 6px 20px rgba(204,0,0,0.4)", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}
+                >
+                  {loading && <span style={{ width: 16, height: 16, border: "2px solid rgba(255,255,255,0.3)", borderTopColor: "#fff", borderRadius: "50%", display: "inline-block", animation: "spin 0.7s linear infinite" }} />}
+                  Send Reset Link
+                </button>
+              </div>
+            )}
+          </div>
+        )}
 
  {/* Sliding red welcome panel */}
         <div
@@ -380,7 +463,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           <X size={18} weight="bold" />
         </button>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
@@ -401,6 +484,7 @@ interface FormContentProps {
   doneUser: string;
   onSubmit: () => void;
   onGoogle: () => void;
+  onForgot?: () => void;
 }
 
 const FormContent: React.FC<FormContentProps> = ({
@@ -419,6 +503,7 @@ const FormContent: React.FC<FormContentProps> = ({
   doneUser,
   onSubmit,
   onGoogle,
+  onForgot,
 }) => {
   const isLogin = mode === "login";
 
@@ -494,7 +579,7 @@ const FormContent: React.FC<FormContentProps> = ({
             dark={dark}
             value={name}
             onChange={setName}
-            placeholder="Full Name"
+            placeholder="Username"
             type="text"
             icon="user"
           />
@@ -516,15 +601,20 @@ const FormContent: React.FC<FormContentProps> = ({
           icon="lock"
           onKeyDown={(e) => e.key === "Enter" && onSubmit()}
         />
+        {!isLogin && password.length > 0 && (
+          <PasswordStrength password={password} dark={dark} />
+        )}
         {isLogin && (
           <div style={{ textAlign: "right", marginTop: -4 }}>
             <span
+              onClick={onForgot}
               style={{
                 fontFamily: "'Barlow',sans-serif",
                 fontSize: 12,
                 color: "#CC0000",
                 cursor: "pointer",
                 opacity: 0.8,
+                textDecoration: "underline",
               }}
             >
               Forgot Password?
@@ -805,7 +895,61 @@ const InputField: React.FC<{
   </div>
 );
 
-// Social button (fb, linkedin) 
+const PasswordStrength: React.FC<{
+  password: string;
+  dark: boolean;
+}> = ({ password, dark }) => {
+  const score = (() => {
+    let s = 0;
+    if (password.length >= 8) s++;
+    if (password.length >= 12) s++;
+    if (/[A-Z]/.test(password) && /[a-z]/.test(password)) s++;
+    if (/\d/.test(password)) s++;
+    if (/[^A-Za-z0-9]/.test(password)) s++;
+    return Math.min(s, 4);
+  })();
+
+  const labels = ["Too weak", "Weak", "Fair", "Good", "Strong"];
+  const colors = ["#CC0000", "#e07a3a", "#d9b441", "#7ac74f", "#3aa55a"];
+  const label = labels[score];
+  const color = colors[score];
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 6, marginTop: -4 }}>
+      <div style={{ display: "flex", gap: 4 }}>
+        {[0, 1, 2, 3].map((i) => (
+          <div
+            key={i}
+            style={{
+              flex: 1,
+              height: 4,
+              borderRadius: 2,
+              background:
+                i < score
+                  ? color
+                  : dark
+                  ? "rgba(255,255,255,0.1)"
+                  : "rgba(0,0,0,0.08)",
+              transition: "background 0.2s",
+            }}
+          />
+        ))}
+      </div>
+      <span
+        style={{
+          fontFamily: "'Barlow',sans-serif",
+          fontSize: 11,
+          color,
+          opacity: 0.9,
+        }}
+      >
+        {label}
+      </span>
+    </div>
+  );
+};
+
+// Social button (fb, linkedin)
 const SocialBtn: React.FC<{
   dark: boolean;
   color: string;

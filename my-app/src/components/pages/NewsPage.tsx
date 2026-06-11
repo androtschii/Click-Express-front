@@ -1,8 +1,12 @@
-import React, { useState, useEffect } from "react";
+﻿import React, { useState, useMemo } from "react";
+import { toast } from "sonner";
+import { confirm } from "../ui/ConfirmDialog";
 import { useLanguage } from "../../context/LanguageContext";
 import type { Load } from "../../types/index";
-import { fetchNews, createNews, deleteNews } from "../../api/client.js";
+import { useNews, useCreateNews, useDeleteNews } from "../../hooks/useNews";
+import type { ApiNewsArticle } from "../../hooks/useNews";
 import type { Session } from "../../services/authService";
+import { NewsSkeleton } from "../loads/LoadSkeleton";
 
 interface NewsPageProps {
   theme?: "dark" | "light";
@@ -12,15 +16,6 @@ interface NewsPageProps {
   session?: Session | null;
 }
 
-interface ApiNews {
-  id: number;
-  title: string;
-  content: string;
-  imageUrl: string | null;
-  publishedAt: string;
-  isPublished: boolean;
-  authorName: string;
-}
 
 type Category = "all" | "loads" | "company" | "freight" | "safety" | "drivers";
 
@@ -64,7 +59,7 @@ const ARTICLES: Article[] = [
     excerptRu: "1,780 миль на платформе. Негабаритная стальная конструкция, требует сопровождения. Ставка: $4.72/ми — один из лучших лотов 2025.",
     highlightEn: "$8,400 / 1,780 mi", highlightRu: "$8,400 / 1,780 ми",
     date: "Mar 24, 2025", readTime: "2 min",
-    load: { id: 101, route: "Connellsville, PA", dest: "Denver, CO", price: 8400, miles: 1780, type: "Full Load", cargo: "Flatbed / Oversized Steel Structure", image: "/images/real7.jpg", tag: "Best Load of the Week" },
+    load: { id: 101, route: "Connellsville, PA", dest: "Denver, CO", price: 8400, miles: 1780, type: "Full Load", cargo: "Flatbed / Oversized Steel Structure", image: "/images/real7.webp", tag: "Best Load of the Week" },
   },
   {
     id: 2, category: "loads",
@@ -75,7 +70,7 @@ const ARTICLES: Article[] = [
     excerptRu: "HVAC блоки, 1,374 мили, $3.73/ми. Чистый груз, без тарпинга. Забронировано за 2 часа после публикации.",
     highlightEn: "$5,120 / 1,374 mi", highlightRu: "$5,120 / 1,374 ми",
     date: "Mar 21, 2025", readTime: "2 min",
-    load: { id: 102, route: "Madera, CA", dest: "Fort Collins, CO", price: 5120, miles: 1374, type: "Full Load", cargo: "Flatbed / HVAC Units", image: "/images/real2.jpg", tag: "Best Load of the Week" },
+    load: { id: 102, route: "Madera, CA", dest: "Fort Collins, CO", price: 5120, miles: 1374, type: "Full Load", cargo: "Flatbed / HVAC Units", image: "/images/real2.webp", tag: "Best Load of the Week" },
   },
   {
     id: 3, category: "loads",
@@ -86,7 +81,7 @@ const ARTICLES: Article[] = [
     excerptRu: "Сертифицированный груз DOD. Специальные разрешения оформлены. 720 миль, $9.44/ми — премиальная ставка.",
     highlightEn: "$6,800 / 720 mi", highlightRu: "$6,800 / 720 ми",
     date: "Mar 18, 2025", readTime: "3 min",
-    load: { id: 103, route: "Deer Park, WA", dest: "Jackson, WY", price: 6800, miles: 720, type: "Full Load", cargo: "Flatbed / Military Equipment DOD", image: "/images/real3.jpg", tag: "Military Load" },
+    load: { id: 103, route: "Deer Park, WA", dest: "Jackson, WY", price: 6800, miles: 720, type: "Full Load", cargo: "Flatbed / Military Equipment DOD", image: "/images/real3.webp", tag: "Military Load" },
   },
   {
     id: 4, category: "loads",
@@ -97,7 +92,7 @@ const ARTICLES: Article[] = [
     excerptRu: "Техника на маршруте 1,447 миль через юг. $2.76/ми, без проблем. Водитель выполнил за 28ч.",
     highlightEn: "$4,000 / 1,447 mi", highlightRu: "$4,000 / 1,447 ми",
     date: "Mar 15, 2025", readTime: "2 min",
-    load: { id: 104, route: "Key Largo, FL", dest: "Lake Ozark, MO", price: 4000, miles: 1447, type: "Full Load", cargo: "Flatbed / Equipment", image: "/images/real5.jpg", tag: "Best Load of the Week" },
+    load: { id: 104, route: "Key Largo, FL", dest: "Lake Ozark, MO", price: 4000, miles: 1447, type: "Full Load", cargo: "Flatbed / Equipment", image: "/images/real5.webp", tag: "Best Load of the Week" },
   },
 
   {
@@ -115,7 +110,7 @@ const ARTICLES: Article[] = [
       { name: "Oklahoma City, OK — I-40 / I-35", rating: 5, noteEn: "Midpoint rest, TA Petro, full restaurant & showers", noteRu: "Середина маршрута, TA Petro, ресторан и душевые" },
       { name: "Memphis, TN — I-40 / I-55", rating: 4, noteEn: "Last major stop before GA, Flying J, laundry & fuel", noteRu: "Последняя крупная остановка перед Джорджией, Flying J, прачечная" },
     ],
-    load: { id: 105, route: "Las Vegas, NV", dest: "Carnesville, GA", price: 6350, miles: 2047, type: "Partial", cargo: "Flatbed / Construction Equipment", image: "/images/real8.jpg", tag: "Best Load of the Week" },
+    load: { id: 105, route: "Las Vegas, NV", dest: "Carnesville, GA", price: 6350, miles: 2047, type: "Partial", cargo: "Flatbed / Construction Equipment", image: "/images/real8.webp", tag: "Best Load of the Week" },
   },
 
  /* COMPANY NEWS */
@@ -310,7 +305,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({ theme = "dark", onBack, onVi
 
   const isAdmin = session?.role === "Admin";
 
-  const apiToArticle = (n: ApiNews): Article => ({
+  const apiToArticle = (n: ApiNewsArticle): Article => ({
     id: 100000 + n.id,
     category: "company",
     titleEn: n.title, titleRu: n.title,
@@ -322,23 +317,15 @@ export const NewsPage: React.FC<NewsPageProps> = ({ theme = "dark", onBack, onVi
     author: n.authorName,
   });
 
-  const [apiArticles, setApiArticles] = useState<Article[]>([]);
-  const [apiIdMap, setApiIdMap] = useState<Map<number, number>>(new Map());
+  const { data: rawNews = [], isLoading: loading } = useNews(!isAdmin);
+  const createNewsMutation = useCreateNews();
+  const deleteNewsMutation = useDeleteNews();
 
-  const loadApiNews = async () => {
-    try {
-      const data: ApiNews[] = await fetchNews(!isAdmin);
-      setApiArticles(data.map(apiToArticle));
-      setApiIdMap(new Map(data.map(n => [100000 + n.id, n.id])));
-    } catch {
-      setApiArticles([]);
-    }
-  };
-
-  useEffect(() => {
-    loadApiNews();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAdmin]);
+  const { apiArticles, apiIdMap } = useMemo(() => {
+    const articles = rawNews.map((n: ApiNewsArticle) => apiToArticle(n));
+    const idMap = new Map(rawNews.map((n: ApiNewsArticle) => [100000 + n.id, n.id] as [number, number]));
+    return { apiArticles: articles, apiIdMap: idMap };
+  }, [rawNews]);
 
   const allArticles = [...apiArticles, ...ARTICLES];
   const filtered = activecat === "all" ? allArticles : allArticles.filter(a => a.category === activecat);
@@ -360,7 +347,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({ theme = "dark", onBack, onVi
     }
     setCreating(true);
     try {
-      await createNews({
+      await createNewsMutation.mutateAsync({
         title: newTitle.trim(),
         content: newContent.trim(),
         imageUrl: newImage.trim() || null,
@@ -368,7 +355,6 @@ export const NewsPage: React.FC<NewsPageProps> = ({ theme = "dark", onBack, onVi
       });
       setNewTitle(""); setNewContent(""); setNewImage("");
       setShowCreate(false);
-      await loadApiNews();
     } catch (e) {
       setCreateError(e instanceof Error ? e.message : "Error");
     } finally {
@@ -379,12 +365,13 @@ export const NewsPage: React.FC<NewsPageProps> = ({ theme = "dark", onBack, onVi
   const handleDeleteApi = async (articleId: number) => {
     const realId = apiIdMap.get(articleId);
     if (!realId) return;
-    if (!confirm(lang === "ru" ? "Удалить новость?" : "Delete news?")) return;
+    const ok = await confirm({ title: lang === "ru" ? "Удалить новость?" : "Delete news?", danger: true, confirmLabel: lang === "ru" ? "Удалить" : "Delete", cancelLabel: lang === "ru" ? "Отмена" : "Cancel" });
+    if (!ok) return;
     try {
-      await deleteNews(realId);
-      await loadApiNews();
+      await deleteNewsMutation.mutateAsync(realId);
+      toast.success(lang === "ru" ? "Новость удалена" : "News deleted");
     } catch (e) {
-      alert(e instanceof Error ? e.message : "Error");
+      toast.error(e instanceof Error ? e.message : "Error");
     }
   };
 
@@ -408,6 +395,11 @@ export const NewsPage: React.FC<NewsPageProps> = ({ theme = "dark", onBack, onVi
         .catbtn:hover { background: rgba(204,0,0,0.07) !important; text-shadow: 0 0 18px rgba(204,0,0,0.55); }
         .backbtn { transition: color 0.15s !important; }
         .backbtn:hover { color:#CC0000 !important; }
+        .news-hero-grid { display:grid; grid-template-columns:1fr 1fr; gap:60px; align-items:center; padding-bottom:72px; }
+        @media (max-width: 900px) {
+          .news-hero-grid { grid-template-columns:1fr; gap:32px; padding-bottom:48px; }
+          .news-dot-info { display:none !important; }
+        }
         .ctabtn { transition: all 0.18s ease !important; }
         .ctabtn:hover { transform:translateY(-2px) !important; box-shadow:0 12px 40px rgba(0,0,0,0.45) !important; }
         * { box-sizing:border-box; }
@@ -520,7 +512,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({ theme = "dark", onBack, onVi
         <div style={{ position: "relative", overflow: "hidden", minHeight: "72vh", display: "flex", flexDirection: "column" }}>
  {/* Фото главной фуры */}
           <img
-            src={isDark ? "/images/red freightliner cascadia night.PNG" : "/images/red freightliner cascadia light.png"}
+            src={isDark ? "/images/red freightliner cascadia night.webp" : "/images/red freightliner cascadia light.webp"}
             alt=""
             style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "right center", filter: isDark ? "brightness(0.6) saturate(0.85)" : "none", pointerEvents: "none" }}
           />
@@ -539,7 +531,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({ theme = "dark", onBack, onVi
               <button className="backbtn" onClick={onBack} style={{ background: "transparent", border: "none", color: textMuted, fontFamily: "'Anton', sans-serif", fontSize: 11, letterSpacing: 3, cursor: "pointer", textTransform: "uppercase", display: "flex", alignItems: "center", gap: 8 }}>
                 ← {lang === "ru" ? "НАЗАД" : "BACK"}
               </button>
-              <div style={{ fontFamily: "'Anton', sans-serif", fontSize: 10, letterSpacing: 3, color: textSubtle, textTransform: "uppercase" }}>US DOT 3159368 · MC 110572 · +1 786-202-6599</div>
+              <div className="news-dot-info" style={{ fontFamily: "'Anton', sans-serif", fontSize: 10, letterSpacing: 3, color: textSubtle, textTransform: "uppercase" }}>US DOT 3159368 · MC 110572 · +1 786-202-6599</div>
               <div style={{ display: "flex", alignItems: "center", gap: 8, background: "rgba(204,0,0,0.12)", border: "1px solid rgba(204,0,0,0.35)", borderRadius: 20, padding: "5px 14px" }}>
                 <div style={{ width: 7, height: 7, borderRadius: "50%", background: "#CC0000", animation: "pulse 1.6s ease infinite" }} />
                 <span style={{ fontFamily: "'Anton', sans-serif", fontSize: 9, letterSpacing: 3, color: "#CC0000", textTransform: "uppercase" }}>{lang === "ru" ? "АКТУАЛЬНО" : "LIVE"}</span>
@@ -547,13 +539,13 @@ export const NewsPage: React.FC<NewsPageProps> = ({ theme = "dark", onBack, onVi
             </div>
 
  {/* Основной контент — две колонки */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 60, alignItems: "center", paddingBottom: 72, animation: "slideUp 0.6s ease both" }}>
+            <div className="news-hero-grid" style={{ animation: "slideUp 0.6s ease both" }}>
  {/* Левая: текст */}
               <div>
                 <div style={{ fontFamily: "'Anton', sans-serif", fontSize: 9, letterSpacing: 6, color: "#CC0000", textTransform: "uppercase", marginBottom: 18 }}>
                   {lang === "ru" ? "ОФИЦИАЛЬНЫЕ НОВОСТИ КОМПАНИИ" : "OFFICIAL COMPANY DISPATCH"}
                 </div>
-                <h1 style={{ fontFamily: "'Anton', sans-serif", fontSize: "clamp(52px,7.5vw,104px)", textTransform: "uppercase", lineHeight: 1.05, letterSpacing: -1, color: textPrimary, margin: "0 0 32px" }}>
+                <h1 style={{ fontFamily: "'Anton', sans-serif", fontSize: "clamp(38px,7.5vw,96px)", textTransform: "uppercase", lineHeight: 1.05, letterSpacing: -1, color: textPrimary, margin: "0 0 32px" }}>
                   <span style={{ color: "#CC0000" }}>CLICK</span>{" "}EXPRESS<br />
                   <span style={{ color: "#CC0000" }}>{lang === "ru" ? "НОВОСТИ" : "DISPATCH"}</span>
                 </h1>
@@ -685,6 +677,11 @@ export const NewsPage: React.FC<NewsPageProps> = ({ theme = "dark", onBack, onVi
           )}
 
  {/* GRID */}
+          {loading ? (
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(310px,1fr))", gap: 20 }}>
+              {Array.from({ length: 8 }).map((_, i) => <NewsSkeleton key={i} theme={theme} />)}
+            </div>
+          ) : (
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(310px,1fr))", gap: 20 }}>
             {rest.map((article, idx) => {
               const isLoad = article.category === "loads";
@@ -758,6 +755,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({ theme = "dark", onBack, onVi
               );
             })}
           </div>
+          )}
 
  {/* CTA */}
           <div style={{ marginTop: 64, background: "#CC0000", padding: "48px clamp(24px,5vw,64px)", position: "relative", overflow: "hidden", display: "grid", gridTemplateColumns: "1fr auto", gap: 40, alignItems: "center" }}>

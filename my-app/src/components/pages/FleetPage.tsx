@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useRef } from "react";
+﻿import React, { useState, useEffect, useRef } from "react";
 import { useLanguage } from "../../context/LanguageContext";
+import { TiltedCard } from "../ui/TiltedCard";
 
 interface FleetPageProps {
   theme?: "dark" | "light";
@@ -11,8 +12,8 @@ interface FleetPageProps {
 function TruckImage({ id, isDark, animKey }: { id: string; isDark: boolean; animKey: number }) {
   const [loaded, setLoaded] = useState(false);
   const imageMap: Record<string, string> = {
-    cascadia: "/images/Cascadia.png",
-    kenworth: "/images/Kenworth.png",
+    cascadia: "/images/Cascadia.webp",
+    kenworth: "/images/Kenworth.webp",
   };
   const src = imageMap[id] || "";
   useEffect(() => { setLoaded(false); }, [animKey]);
@@ -71,10 +72,10 @@ function TrailerImage({ id, isDark }: { id: string; isDark: boolean }) {
   const [hovered, setHovered] = useState(false);
 
   const imageMap: Record<string, string> = {
-    flatbed:   "/images/flatbed.png",
-    stepdeck:  "/images/stepdeck.png",
-    conestoga: "/images/conestoga.png",
-    lowboy:    "/images/lowboy.png",
+    flatbed:   "/images/flatbed.webp",
+    stepdeck:  "/images/stepdeck.webp",
+    conestoga: "/images/conestoga.webp",
+    lowboy:    "/images/lowboy.webp",
   };
   const labelMap: Record<string, string> = {
     flatbed: "53' FLATBED", stepdeck: "48' STEP DECK",
@@ -318,7 +319,7 @@ export const FleetPage: React.FC<FleetPageProps> = ({ theme = "dark", onBack }) 
         }}>
  {/* Dark theme: dimmed photo background */}
           {isDark && (
-            <div style={{ position: "absolute", inset: 0, backgroundImage: "url('/images/real1.jpg')", backgroundSize: "cover", backgroundPosition: "center 40%", filter: "brightness(0.18) saturate(0.5)", mixBlendMode: "luminosity" }} />
+            <div style={{ position: "absolute", inset: 0, backgroundImage: "url('/images/real1.webp')", backgroundSize: "cover", backgroundPosition: "center 40%", filter: "brightness(0.18) saturate(0.5)", mixBlendMode: "luminosity" }} />
           )}
  {/* Overlay gradient */}
           <div style={{ position: "absolute", inset: 0, background: isDark
@@ -338,7 +339,7 @@ export const FleetPage: React.FC<FleetPageProps> = ({ theme = "dark", onBack }) 
 
  {/* Truck image — right side, fully visible */}
           <div style={{ position: "absolute", right: "0%", bottom: 0, width: "clamp(300px,50%,700px)", zIndex: 1, pointerEvents: "none" }}>
-            <img src="/images/Cascadia.png" alt="truck" style={{
+            <img src="/images/Cascadia.webp" alt="truck" style={{
               width: "100%", height: "100%", display: "block",
               objectFit: "contain", objectPosition: "bottom center",
               maxHeight: 420,
@@ -497,7 +498,7 @@ export const FleetPage: React.FC<FleetPageProps> = ({ theme = "dark", onBack }) 
                   </span>
                 </div>
 
-                <div style={{ border: `1px solid ${cardBorder}`, overflow: "hidden", boxShadow: cardShadow, position: "relative" }}>
+                <TiltedCard maxTilt={6} scale={1.015} glareOpacity={0.22} style={{ border: `1px solid ${cardBorder}`, boxShadow: cardShadow, overflow: "hidden" }}>
                   <div style={{ height: 3, background: "linear-gradient(90deg,#CC0000 0%,#880000 60%,transparent 100%)" }} />
                   <div style={{ position: "absolute", top: 14, right: 14, zIndex: 2, background: "#CC0000", color: "#fff", fontFamily: "'Barlow',sans-serif", fontWeight: 800, fontSize: 9, letterSpacing: 2.5, textTransform: "uppercase", padding: "4px 12px" }}>
                     {truck.badge}
@@ -514,7 +515,7 @@ export const FleetPage: React.FC<FleetPageProps> = ({ theme = "dark", onBack }) 
                       </span>
                     </div>
                   </div>
-                </div>
+                </TiltedCard>
                 <div style={{ height: 3, background: `repeating-linear-gradient(90deg,${isDark?"rgba(204,0,0,0.14)":"rgba(204,0,0,0.12)"} 0,${isDark?"rgba(204,0,0,0.14)":"rgba(204,0,0,0.12)"} 3px,transparent 3px,transparent 9px)` }} />
               </div>
             </div>
@@ -596,7 +597,7 @@ export const FleetPage: React.FC<FleetPageProps> = ({ theme = "dark", onBack }) 
               <div style={{ borderTop: `1px solid ${divider}` }} />
             </div>
 
- {/* RIGHT: trailer photo */}
+ {/* RIGHT: trailer photo with 3D tilt */}
             <div style={{ position: "sticky", top: 84 }}>
               <div key={`t-${trailerKey}`} style={{ animation: "truckRollIn 0.6s cubic-bezier(0.22,1,0.36,1) both" }}>
                 <div style={{ marginBottom: 14, display: "flex", alignItems: "baseline", gap: 14 }}>
@@ -604,7 +605,7 @@ export const FleetPage: React.FC<FleetPageProps> = ({ theme = "dark", onBack }) 
                     {lang === "ru" ? trailer.nameRu : trailer.nameEn}
                   </span>
                 </div>
-                <div style={{ border: `1px solid ${cardBorder}`, overflow: "hidden", boxShadow: cardShadow }}>
+                <TiltedCard maxTilt={6} scale={1.015} glareOpacity={0.22} style={{ border: `1px solid ${cardBorder}`, boxShadow: cardShadow, overflow: "hidden" }}>
                   <div style={{ height: 3, background: "linear-gradient(90deg,#CC0000 0%,#880000 60%,transparent 100%)" }} />
                   <TrailerImage id={activeTrailer} isDark={isDark} />
  {/* 3 quick specs row */}
@@ -620,7 +621,7 @@ export const FleetPage: React.FC<FleetPageProps> = ({ theme = "dark", onBack }) 
                       </div>
                     ))}
                   </div>
-                </div>
+                </TiltedCard>
               </div>
             </div>
           </div>

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192">
+  <rect width="192" height="192" rx="24" fill="#0a0a0a"/>
+  <rect width="192" height="8" y="0" rx="4" fill="#CC0000"/>
+  <text x="96" y="110" font-family="Arial Black, sans-serif" font-size="72" font-weight="900" text-anchor="middle" fill="#CC0000">CE</text>
+  <text x="96" y="148" font-family="Arial, sans-serif" font-size="18" font-weight="700" text-anchor="middle" fill="rgba(255,255,255,0.5)" letter-spacing="4">EXPRESS</text>
+</svg>

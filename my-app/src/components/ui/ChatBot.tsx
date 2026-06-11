@@ -1,4 +1,5 @@
-import React, { useState, useRef, useEffect } from "react";
+﻿import React, { useState, useRef, useEffect } from "react";
+import { ChatTeardropDots, X } from "@phosphor-icons/react";
 import { useLanguage } from "../../context/LanguageContext";
 
 interface Message {
@@ -526,12 +527,12 @@ export const ChatBot: React.FC<ChatBotProps> = ({ theme = "dark" }) => {
  {/* Floating button */}
       <div style={{ position:"fixed", bottom:28, right:28, zIndex:3000 }}>
         <button onClick={() => setOpen(o => !o)}
-          style={{ width:58, height:58, borderRadius:"50%", background:"linear-gradient(135deg,#CC0000,#ff3333)", border:"none", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", boxShadow:"0 8px 32px rgba(204,0,0,0.5)", animation: pulse && !open ? "chatPulse 2s infinite" : "none", transition:"transform 0.2s", position:"relative" }}
+          style={{ width:50, height:50, borderRadius:"50%", background:"linear-gradient(135deg,#CC0000,#ff3333)", border:"none", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", boxShadow:"0 8px 32px rgba(204,0,0,0.5)", animation: pulse && !open ? "chatPulse 2s infinite" : "none", transition:"transform 0.2s", position:"relative" }}
           onMouseEnter={e => { e.currentTarget.style.transform="scale(1.1)"; }}
           onMouseLeave={e => { e.currentTarget.style.transform="scale(1)"; }}>
           {open
-            ? <svg width="22" height="22" viewBox="0 0 256 256" fill="#fff"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"/></svg>
-            : <svg width="26" height="26" viewBox="0 0 256 256" fill="#fff"><path d="M216,48H40A16,16,0,0,0,24,64V224a15.84,15.84,0,0,0,9.25,14.5A16.05,16.05,0,0,0,40,240a15.89,15.89,0,0,0,10.25-3.78.69.69,0,0,0,.13-.11L82.5,208H216a16,16,0,0,0,16-16V64A16,16,0,0,0,216,48ZM216,192H80a8,8,0,0,0-5.23,1.95L40,224V64H216ZM88,112a8,8,0,0,1,8-8h64a8,8,0,0,1,0,16H96A8,8,0,0,1,88,112Zm0,32a8,8,0,0,1,8-8h64a8,8,0,0,1,0,16H96A8,8,0,0,1,88,144Z"/></svg>
+            ? <X size={22} weight="bold" color="#fff" />
+            : <ChatTeardropDots size={24} weight="fill" color="#fff" />
           }
           {!open && unread > 0 && (
             <div style={{ position:"absolute", top:-4, right:-4, width:20, height:20, borderRadius:"50%", background:"#ff4444", border:"2px solid #fff", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"'Barlow',sans-serif", fontWeight:900, fontSize:10, color:"#fff" }}>

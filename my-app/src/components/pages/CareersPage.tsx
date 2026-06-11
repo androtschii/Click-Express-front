@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from "react";
+﻿import React, { useState, useEffect } from "react";
+import { toast } from "sonner";
+import { confirm } from "../ui/ConfirmDialog";
 import { PhoneIcon } from "../ui/PhoneIcon";
 import { useLanguage } from "../../context/LanguageContext";
 import { submitJobApplication, fetchJobApplications, updateJobApplicationStatus, deleteJobApplication } from "../../api/client.js";
@@ -186,12 +188,14 @@ export const CareersPage: React.FC<CareersPageProps> = ({ theme = "dark", onBack
   };
 
   const handleDelete = async (id: number) => {
-    if (!confirm(isRu ? "Удалить заявку?" : "Delete application?")) return;
+    const ok = await confirm({ title: isRu ? "Удалить заявку?" : "Delete application?", danger: true, confirmLabel: isRu ? "Удалить" : "Delete", cancelLabel: isRu ? "Отмена" : "Cancel" });
+    if (!ok) return;
     try {
       await deleteJobApplication(id);
       setApps(prev => prev.filter(a => a.id !== id));
+      toast.success(isRu ? "Заявка удалена" : "Application deleted");
     } catch (e) {
-      setAppsError(e instanceof Error ? e.message : "Failed to delete");
+      toast.error(e instanceof Error ? e.message : "Failed to delete");
     }
   };
 
@@ -239,10 +243,19 @@ export const CareersPage: React.FC<CareersPageProps> = ({ theme = "dark", onBack
         @keyframes mapPulse { 0%,100%{opacity:0.7} 50%{opacity:1} }
       `}</style>
 
+ {/* Top bar with back button (above hero, no overlap) */}
+      <div style={{ padding: "90px clamp(20px,5vw,64px) 16px", background: bg }}>
+        <button onClick={onBack} style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "transparent", border: "none", color: isDark ? "rgba(255,255,255,0.55)" : "rgba(0,0,0,0.55)", fontFamily: "'Barlow',sans-serif", fontWeight: 600, fontSize: 13, letterSpacing: 1, cursor: "pointer", padding: 0, transition: "color 0.15s" }}
+          onMouseEnter={e => { e.currentTarget.style.color = "#CC0000"; }}
+          onMouseLeave={e => { e.currentTarget.style.color = isDark ? "rgba(255,255,255,0.55)" : "rgba(0,0,0,0.55)"; }}>
+          ← {isRu ? "Назад" : "Back"}
+        </button>
+      </div>
+
  {/* Hero */}
-      <div style={{ position: "relative", height: 520, overflow: "hidden", display: "flex", alignItems: "center" }}>
+      <div style={{ position: "relative", height: 480, overflow: "hidden", display: "flex", alignItems: "center" }}>
         <img
-          src={isDark ? "/images/red freightliner cascadia night.PNG" : "/images/red freightliner cascadia light.png"}
+          src={isDark ? "/images/red freightliner cascadia night.webp" : "/images/red freightliner cascadia light.webp"}
           alt="careers"
           style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "20% center", filter: isDark ? "brightness(0.38)" : "none" }}
         />
@@ -252,19 +265,14 @@ export const CareersPage: React.FC<CareersPageProps> = ({ theme = "dark", onBack
           : "linear-gradient(to right, rgba(255,255,255,0.88) 0%, rgba(255,255,255,0.6) 38%, rgba(255,255,255,0.05) 65%, transparent 100%)"
         }} />
 
- {/* Back button */}
-        <button onClick={onBack} style={{ position: "absolute", top: 90, left: 32, display: "flex", alignItems: "center", gap: 8, background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.2)", borderRadius: 24, padding: "8px 18px", color: "#fff", fontFamily: "'Barlow',sans-serif", fontWeight: 600, fontSize: 12, letterSpacing: 1.5, textTransform: "uppercase", cursor: "pointer", backdropFilter: "blur(8px)", transition: "all 0.2s" }}
-          onMouseEnter={e => { e.currentTarget.style.background = "rgba(204,0,0,0.4)"; e.currentTarget.style.borderColor = "#CC0000"; }}
-          onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.1)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.2)"; }}>
-          {isRu ? "← Назад" : "← Back"}
-        </button>
-
  {/* Text on the left */}
         <div style={{ position: "relative", width: "100%", display: "flex", justifyContent: "flex-start" }}>
-          <div style={{ maxWidth: 520, padding: "0 clamp(20px,5vw,64px)", animation: "careersIn 0.6s ease" }}>
+          <div style={{ maxWidth: 560, padding: "0 clamp(20px,5vw,64px)", animation: "careersIn 0.6s ease" }}>
             <div style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 10, color: "#CC0000", letterSpacing: 4, textTransform: "uppercase", marginBottom: 14 }}>— {isRu ? "Присоединяйтесь к нам" : "Join Our Team"}</div>
-            <h1 style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: "clamp(36px,5vw,66px)", color: isDark ? "#fff" : "#0d0d0d", textTransform: "uppercase", lineHeight: 1, marginBottom: 16 }}>
-              {isRu ? <>ПОСТРОЙТЕ СВОЮ<br /><span style={{ color: "#CC0000" }}>КАРЬЕРУ</span> С НАМИ</> : <>BUILD YOUR<br /><span style={{ color: "#CC0000" }}>CAREER</span> WITH US</>}
+            <h1 style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: "clamp(34px,4.6vw,60px)", color: isDark ? "#fff" : "#0d0d0d", textTransform: "uppercase", lineHeight: 1.02, marginBottom: 18 }}>
+              {isRu
+                ? <>ПОСТРОЙТЕ<br />СВОЮ <span style={{ color: "#CC0000" }}>КАРЬЕРУ</span><br />С НАМИ</>
+                : <>BUILD YOUR<br /><span style={{ color: "#CC0000" }}>CAREER</span><br />WITH US</>}
             </h1>
             <p style={{ fontFamily: "'Barlow',sans-serif", fontSize: 15, color: isDark ? "rgba(255,255,255,0.65)" : "rgba(0,0,0,0.65)", maxWidth: 460, lineHeight: 1.7, marginBottom: 28 }}>
               {isRu ? "Click Express Inc — растущая транспортная компания с рейтингом 4.9★. Мы нанимаем диспетчеров, водителей и операторов по всей США." : "Click Express Inc is a growing freight company with 4.9★ rating. We're hiring dispatchers, drivers, and operators across the US."}
@@ -274,13 +282,16 @@ export const CareersPage: React.FC<CareersPageProps> = ({ theme = "dark", onBack
                 {isRu ? "Открытые вакансии" : "View Open Positions"}
               </a>
  <a href="https://www.carriersource.io/carriers/click-express-inc" target="_blank" rel="noreferrer"
-                style={{ background: "transparent", color: isDark ? "#fff" : "#0d0d0d", border: `1px solid ${isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.3)"}`, borderRadius: 4, padding: "13px 28px", fontFamily: "'Oswald',sans-serif", fontWeight: 600, fontSize: 14, letterSpacing: 2, textTransform: "uppercase", cursor: "pointer", textDecoration: "none" }}>
+                style={{ background: isDark ? "rgba(0,0,0,0.45)" : "rgba(255,255,255,0.6)", color: isDark ? "#fff" : "#0d0d0d", border: `1px solid ${isDark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.35)"}`, borderRadius: 4, padding: "13px 28px", fontFamily: "'Oswald',sans-serif", fontWeight: 600, fontSize: 14, letterSpacing: 2, textTransform: "uppercase", cursor: "pointer", textDecoration: "none", backdropFilter: "blur(6px)" }}>
                 ★ 4.9 on CarrierSource
               </a>
             </div>
           </div>
         </div>
       </div>
+
+ {/* Spacer between hero and red stats bar so the outline CTA doesn't kiss the red */}
+      <div style={{ height: 32, background: bg }} />
 
  {/* Stats bar */}
       <div style={{ background: "#CC0000", padding: "18px clamp(20px,5vw,64px)" }}>

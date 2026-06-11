@@ -1,7 +1,10 @@
-import React, { useState, useContext, useEffect } from "react";
+﻿import React, { useState, useContext, useEffect } from "react";
 import { ThemeContext } from "../../theme";
 import { useLanguage } from "../../context/LanguageContext";
 import { translations } from "../../i18n/translations";
+import { useInView } from "../../hooks/useInView";
+import { TextType } from "../ui/TextType";
+import { ElectricBorder } from "../ui/ElectricBorder";
 
 interface HeroBtnProps {
   children: React.ReactNode;
@@ -37,9 +40,10 @@ export const HeroBtn: React.FC<HeroBtnProps> = ({ children, primary, onClick }) 
 interface HeroProps {
   onViewLoads?: () => void;
   onQuoteClick?: () => void;
+  onCareersClick?: () => void;
 }
 
-export const Hero: React.FC<HeroProps> = ({ onViewLoads, onQuoteClick }) => {
+export const Hero: React.FC<HeroProps> = ({ onViewLoads, onQuoteClick, onCareersClick }) => {
   const context = useContext(ThemeContext) as { theme?: 'dark' | 'light'; toggleTheme?: () => void };
   const theme = context.theme || 'dark';
   const { lang } = useLanguage();
@@ -48,8 +52,17 @@ export const Hero: React.FC<HeroProps> = ({ onViewLoads, onQuoteClick }) => {
 
   const [counts, setCounts] = useState({ loads: 0, states: 0, miles: 0 });
   const [scrollY, setScrollY] = useState(0);
+  const [isMobile, setIsMobile] = useState(() => typeof window !== "undefined" ? window.innerWidth < 768 : false);
+  const { ref: statsRef, inView: statsInView } = useInView<HTMLDivElement>(0.4);
 
   useEffect(() => {
+    const fn = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener("resize", fn);
+    return () => window.removeEventListener("resize", fn);
+  }, []);
+
+  useEffect(() => {
+    if (!statsInView) return;
     const targets = { loads: 500, states: 48, miles: 2 };
     const steps = 55;
     let step = 0;
@@ -60,7 +73,7 @@ export const Hero: React.FC<HeroProps> = ({ onViewLoads, onQuoteClick }) => {
       if (step >= steps) clearInterval(timer);
     }, 28);
     return () => clearInterval(timer);
-  }, []);
+  }, [statsInView]);
 
   useEffect(() => {
     const onScroll = () => setScrollY(window.scrollY);
@@ -68,10 +81,10 @@ export const Hero: React.FC<HeroProps> = ({ onViewLoads, onQuoteClick }) => {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  const parallaxShift = scrollY * 0.3;
+  const parallaxShift = Math.min(scrollY * 0.28, 130);
 
   return (
-    <section style={{ minHeight: "100vh", position: "relative", overflow: "hidden", display: "flex", alignItems: "center", background: isDark ? '#0a0a0a' : '#f4f4f4' }}>
+    <section style={{ minHeight: "100vh", marginTop: -70, paddingTop: 70, position: "relative", overflow: "hidden", display: "flex", alignItems: "center", background: isDark ? '#0a0a0a' : '#f4f4f4', clipPath: "polygon(0 0, 100% 0, 100% 92%, 0 100%)" }}>
       <style>{`
         @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.35}}
         @keyframes heroFadeUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
@@ -82,18 +95,16 @@ export const Hero: React.FC<HeroProps> = ({ onViewLoads, onQuoteClick }) => {
       `}</style>
 
  {/* BG image with parallax */}
-      <div style={{ position: "absolute", inset: 0, backgroundImage: isDark ? "url('/images/red freightliner cascadia night.PNG')" : "url('/images/red freightliner cascadia light.png')", backgroundSize: "cover", backgroundPosition: `center calc(50% + ${parallaxShift}px)`, transition: "background-position 0.05s linear" }} />
+      <div style={{ position: "absolute", top: "-15%", left: 0, right: 0, bottom: "-15%", backgroundImage: isDark ? "url('/images/red freightliner cascadia night.webp')" : "url('/images/red freightliner cascadia light.webp')", backgroundSize: "cover", backgroundPosition: "center 65%", transform: `translateY(${parallaxShift}px)`, willChange: "transform" }} />
 
  {/* Gradient overlay for text readability */}
       <div style={{ position: "absolute", inset: 0, background: isDark ? "linear-gradient(to right, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.35) 55%, transparent 100%)" : "linear-gradient(to right, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.15) 50%, transparent 100%)", pointerEvents: "none" }} />
 
  {/* Left red bar */}
       <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 5, background: "linear-gradient(to bottom, #CC0000, #880000)" }} />
- {/* Bottom red line */}
-      <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: 3, background: "linear-gradient(90deg, #CC0000 0%, #ff3333 40%, #CC0000 100%)" }} />
 
  {/* Main content */}
-      <div style={{ position: "relative", zIndex: 2, padding: "120px clamp(24px,5vw,64px) 160px", maxWidth: 860, width: "100%" }}>
+      <div style={{ position: "relative", zIndex: 2, padding: isMobile ? "80px 24px 100px" : "120px clamp(24px,5vw,64px) 160px", maxWidth: 860, width: "100%" }}>
 
  {/* Live badge */}
         <div style={{ display: "inline-flex", alignItems: "center", gap: 10, border: "1px solid rgba(204,0,0,0.45)", padding: "6px 16px", marginBottom: 32, background: "rgba(204,0,0,0.08)", animation: "heroSlideIn 0.6s ease 0.1s both", position: "relative" }}>
@@ -104,20 +115,99 @@ export const Hero: React.FC<HeroProps> = ({ onViewLoads, onQuoteClick }) => {
           <span style={{ fontFamily: "'Anton', sans-serif", fontSize: 10, color: "#CC0000", letterSpacing: 3, textTransform: "uppercase" }}>{t.badge}</span>
         </div>
 
- {/* Headline */}
-        <h1 style={{ fontFamily: lang === 'ru' ? "'Russo One', sans-serif" : "'Anton', sans-serif", fontSize: "clamp(48px,7.5vw,96px)", color: isDark ? "#fff" : "#0d0d0d", lineHeight: 1.05, margin: "0 0 4px", textTransform: "uppercase", animation: "heroFadeUp 0.6s ease 0.2s both", letterSpacing: lang === 'ru' ? 0 : -1, whiteSpace: "nowrap" }}>{t.line1}</h1>
-        <h1 style={{ fontFamily: lang === 'ru' ? "'Russo One', sans-serif" : "'Anton', sans-serif", fontSize: "clamp(48px,7.5vw,96px)", color: isDark ? "#fff" : "#0d0d0d", lineHeight: 1.05, margin: "0 0 4px", textTransform: "uppercase", animation: "heroFadeUp 0.6s ease 0.32s both", letterSpacing: lang === 'ru' ? 0 : -1, whiteSpace: "nowrap" }}>{t.line2}</h1>
-        <h1 style={{ fontFamily: lang === 'ru' ? "'Russo One', sans-serif" : "'Anton', sans-serif", fontSize: "clamp(48px,7.5vw,96px)", color: "#CC0000", lineHeight: 1.05, margin: "0 0 36px", textTransform: "uppercase", animation: "heroFadeUp 0.6s ease 0.44s both", letterSpacing: lang === 'ru' ? 0 : -1, whiteSpace: "nowrap" }}>{t.line3}</h1>
+ {/* Headline — typed in cascade, preserves original scale and red on line 3 */}
+        {(() => {
+          const headlineFamily = lang === 'ru' ? "'Russo One', sans-serif" : "'Anton', sans-serif";
+          const baseStyle = { display: "block" as const, fontFamily: headlineFamily, fontSize: isMobile ? "clamp(28px,8.5vw,56px)" : "clamp(40px,5.2vw,72px)", lineHeight: 1.05, textTransform: "uppercase" as const, letterSpacing: lang === 'ru' ? 0 : -1 };
+          const speed = 55;
+          const len1 = t.line1.length;
+          const len2 = t.line2.length;
+          return (
+            <>
+              <TextType
+                as="h1"
+                key={`l1-${lang}`}
+                text={t.line1}
+                typingSpeed={speed}
+                initialDelay={150}
+                loop={false}
+                showCursor
+                hideCursorWhileTyping={false}
+                cursorCharacter="▍"
+                cursorClassName="hero-headline-cursor"
+                style={{ ...baseStyle, color: isDark ? "#fff" : "#0d0d0d", margin: "0 0 4px" }}
+              />
+              <TextType
+                as="h1"
+                key={`l2-${lang}`}
+                text={t.line2}
+                typingSpeed={speed}
+                initialDelay={150 + len1 * speed + 120}
+                loop={false}
+                showCursor
+                hideCursorWhileTyping={false}
+                cursorCharacter="▍"
+                cursorClassName="hero-headline-cursor"
+                style={{ ...baseStyle, color: isDark ? "#fff" : "#0d0d0d", margin: "0 0 4px" }}
+              />
+              <TextType
+                as="h1"
+                key={`l3-${lang}`}
+                text={t.line3}
+                typingSpeed={speed}
+                initialDelay={150 + (len1 + len2) * speed + 240}
+                loop={false}
+                showCursor
+                hideCursorWhileTyping={false}
+                cursorCharacter="▍"
+                cursorClassName="hero-headline-cursor hero-headline-cursor--accent"
+                style={{ ...baseStyle, color: "#CC0000", margin: "0 0 36px" }}
+              />
+            </>
+          );
+        })()}
 
         <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: isDark ? "rgba(255,255,255,0.9)" : "rgba(0,0,0,0.75)", lineHeight: 1.85, maxWidth: 480, marginBottom: 44, animation: "heroFadeUp 0.6s ease 0.58s both" }}>{t.desc}</p>
 
         <div style={{ display: "flex", gap: 14, flexWrap: "wrap", animation: "heroFadeUp 0.6s ease 0.72s both" }}>
           <HeroBtn primary onClick={onViewLoads}>{t.viewLoads}</HeroBtn>
-          <HeroBtn onClick={onQuoteClick}>{t.getQuote}</HeroBtn>
+          <ElectricBorder color="#CC0000" speed={1.2} thickness={2} radius={4}>
+            <HeroBtn onClick={onQuoteClick}>{t.getQuote}</HeroBtn>
+          </ElectricBorder>
         </div>
 
+        {onCareersClick && (
+          <button
+            onClick={onCareersClick}
+            style={{
+              marginTop: 20,
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 10,
+              background: "transparent",
+              border: "none",
+              padding: 0,
+              cursor: "pointer",
+              fontFamily: "'Barlow',sans-serif",
+              fontWeight: 700,
+              fontSize: 13,
+              letterSpacing: 2,
+              textTransform: "uppercase",
+              color: isDark ? "rgba(255,255,255,0.85)" : "rgba(0,0,0,0.78)",
+              animation: "heroFadeUp 0.6s ease 0.85s both",
+              transition: "color 0.15s",
+            }}
+            onMouseEnter={e => { e.currentTarget.style.color = "#CC0000"; }}
+            onMouseLeave={e => { e.currentTarget.style.color = isDark ? "rgba(255,255,255,0.85)" : "rgba(0,0,0,0.78)"; }}
+          >
+            <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#CC0000", boxShadow: "0 0 10px rgba(204,0,0,0.7)", animation: "pulse 1.4s ease-in-out infinite" }} />
+            {t.driverCta}
+            <span style={{ fontSize: 16, lineHeight: 1 }}>→</span>
+          </button>
+        )}
+
  {/* Animated stats row */}
-        <div style={{ display: "flex", gap: 40, marginTop: 56, flexWrap: "wrap", animation: "statReveal 0.7s ease 1.1s both" }}>
+        <div ref={statsRef} style={{ display: "flex", gap: isMobile ? 20 : 40, marginTop: isMobile ? 32 : 56, flexWrap: "wrap", animation: statsInView ? "statReveal 0.7s ease 0.1s both" : "none", opacity: statsInView ? undefined : 0 }}>
           {[
             { val: `${counts.loads}+`, label: lang === 'ru' ? 'Грузов доставлено' : 'Loads Delivered' },
             { val: counts.states, label: lang === 'ru' ? 'Штатов покрыто' : 'States Covered' },

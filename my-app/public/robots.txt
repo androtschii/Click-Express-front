@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://clickexpress.inc/sitemap.xml
+
+Disallow: /api/
+Disallow: /admin/

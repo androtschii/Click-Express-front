@@ -1,7 +1,12 @@
-import React, { useState, useEffect } from "react";
+﻿import React, { useState, useEffect } from "react";
 import { useLanguage } from "../../context/LanguageContext";
-import { fetchReviews, createReview, approveReview, deleteReview } from "../../api/client.js";
+import { useReviews, useCreateReview, useApproveReview, useRejectReview, useDeleteReview } from "../../hooks/useReviews";
+import type { ApiReview } from "../../hooks/useReviews";
 import type { Session } from "../../services/authService";
+import { Threads } from "../ui/Threads";
+import { ReviewSkeleton } from "../loads/LoadSkeleton";
+import { toast } from "sonner";
+import { confirm } from "../ui/ConfirmDialog";
 
 interface ReviewsPageProps {
   theme?: "dark" | "light";
@@ -9,15 +14,6 @@ interface ReviewsPageProps {
   session?: Session | null;
 }
 
-interface ApiReview {
-  id: number;
-  rating: number;
-  text: string;
-  createdAt: string;
-  isApproved: boolean;
-  productId: number | null;
-  username: string;
-}
 
 interface Comment {
   id: number;
@@ -219,26 +215,18 @@ export const ReviewsPage: React.FC<ReviewsPageProps> = ({ theme = "dark", onBack
   const inputBg     = isDark ? "#1a1a1a" : "#f8f8f8";
   const inputBorder = isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.12)";
 
-  const [reviews, setReviews] = useState<ReviewItem[]>(INITIAL_REVIEWS);
-  const [apiLoading, setApiLoading] = useState(false);
+  const { data: apiData, isLoading: loading } = useReviews(!isAdmin);
+  const createReviewMutation = useCreateReview();
+  const approveMutation = useApproveReview();
+  const rejectMutation = useRejectReview();
+  const deleteMutation = useDeleteReview();
 
-  const loadApiReviews = async () => {
-    setApiLoading(true);
-    try {
-      const data: ApiReview[] = await fetchReviews(!isAdmin);
-      const apiItems = data.map((r, i) => apiToReviewItem(r, i));
-      setReviews([...apiItems, ...INITIAL_REVIEWS]);
-    } catch {
-      // если API недоступен — оставляем INITIAL_REVIEWS
-    } finally {
-      setApiLoading(false);
-    }
-  };
+  const [reviews, setReviews] = useState<ReviewItem[]>(INITIAL_REVIEWS);
 
   useEffect(() => {
-    loadApiReviews();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAdmin]);
+    const apiItems = (apiData ?? []).map((r: ApiReview, i: number) => apiToReviewItem(r, i));
+    setReviews([...apiItems, ...INITIAL_REVIEWS]);
+  }, [apiData]);
 
   const [votes, setVotes] = useState<Record<number, "like" | "dislike" | null>>({});
   const [openComments, setOpenComments] = useState<Set<number>>(new Set());
@@ -249,14 +237,31 @@ export const ReviewsPage: React.FC<ReviewsPageProps> = ({ theme = "dark", onBack
   const [showForm, setShowForm] = useState(false);
   const [formName, setFormName] = useState("");
   const [formRole, setFormRole] = useState("");
+  const [formLocation, setFormLocation] = useState("");
   const [formStars, setFormStars] = useState(5);
   const [formComment, setFormComment] = useState("");
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [formError, setFormError] = useState("");
+  const [sortBy, setSortBy] = useState<"recent" | "highest" | "lowest" | "liked">("recent");
+  const [filterStars, setFilterStars] = useState<number | null>(null);
 
   const avgStars = reviews.length
     ? Math.round((reviews.reduce((s, r) => s + r.stars, 0) / reviews.length) * 10) / 10
     : 0;
+
+  const ratingDist = [5, 4, 3, 2, 1].map(s => ({
+    stars: s,
+    count: reviews.filter(r => r.stars === s).length,
+  }));
+
+  const sortedReviews = [...reviews]
+    .filter(r => filterStars === null || r.stars === filterStars)
+    .sort((a, b) => {
+      if (sortBy === "highest") return b.stars - a.stars;
+      if (sortBy === "lowest")  return a.stars - b.stars;
+      if (sortBy === "liked")   return b.likes - a.likes;
+      return 0;
+    });
 
   const handleVote = (reviewId: number, type: "like" | "dislike") => {
     const prev = votes[reviewId];
@@ -306,34 +311,42 @@ export const ReviewsPage: React.FC<ReviewsPageProps> = ({ theme = "dark", onBack
     if (formComment.trim().length < 20) { setFormError(lang === "ru" ? "Отзыв слишком короткий (мин. 20 символов)" : "Review too short (min 20 chars)"); return; }
     setFormError("");
     try {
-      await createReview({ rating: formStars, text: formComment.trim() });
-      setFormName(""); setFormRole(""); setFormStars(5); setFormComment("");
+      await createReviewMutation.mutateAsync({ rating: formStars, text: formComment.trim(), role: formRole.trim() || undefined, location: formLocation.trim() || undefined });
+      setFormName(""); setFormRole(""); setFormLocation(""); setFormStars(5); setFormComment("");
       setFormSubmitted(true);
       setShowForm(false);
       setTimeout(() => setFormSubmitted(false), 5000);
-      await loadApiReviews();
     } catch (e) {
       setFormError(e instanceof Error ? e.message : "Error");
     }
   };
 
-  const handleApprove = async (id: number) => {
-    try {
-      await approveReview(id);
-      setReviews(rs => rs.map(r => r.id === id && r.isFromApi ? { ...r, isApproved: true } : r));
-    } catch (e) {
-      alert(e instanceof Error ? e.message : "Error");
-    }
+  const handleApprove = (id: number) => {
+    approveMutation.mutate(id, {
+      onSuccess: () => toast.success(lang === "ru" ? "Отзыв одобрен" : "Review approved"),
+      onError: (e) => toast.error(e instanceof Error ? e.message : "Error"),
+    });
+  };
+
+  const handleReject = (id: number) => {
+    rejectMutation.mutate(id, {
+      onSuccess: () => toast.success(lang === "ru" ? "Отзыв отклонён" : "Review rejected"),
+      onError: (e) => toast.error(e instanceof Error ? e.message : "Error"),
+    });
   };
 
   const handleDeleteReview = async (id: number) => {
-    if (!confirm(lang === "ru" ? "Удалить отзыв?" : "Delete review?")) return;
-    try {
-      await deleteReview(id);
-      setReviews(rs => rs.filter(r => !(r.id === id && r.isFromApi)));
-    } catch (e) {
-      alert(e instanceof Error ? e.message : "Error");
-    }
+    const ok = await confirm({
+      title: lang === "ru" ? "Удалить отзыв?" : "Delete review?",
+      confirmLabel: lang === "ru" ? "Удалить" : "Delete",
+      cancelLabel: lang === "ru" ? "Отмена" : "Cancel",
+      danger: true,
+    });
+    if (!ok) return;
+    deleteMutation.mutate(id, {
+      onSuccess: () => toast.success(lang === "ru" ? "Отзыв удалён" : "Review deleted"),
+      onError: (e) => toast.error(e instanceof Error ? e.message : "Error"),
+    });
   };
 
   const inputStyle = {
@@ -375,7 +388,7 @@ export const ReviewsPage: React.FC<ReviewsPageProps> = ({ theme = "dark", onBack
       }}>
  {/* Background truck photo */}
         <img
-          src={isDark ? "/images/red freightliner cascadia night.PNG" : "/images/red freightliner cascadia light.png"}
+          src={isDark ? "/images/red freightliner cascadia night.webp" : "/images/red freightliner cascadia light.webp"}
           alt=""
           style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "right center", filter: isDark ? "brightness(0.45)" : "none", pointerEvents: "none" }}
         />
@@ -387,10 +400,12 @@ export const ReviewsPage: React.FC<ReviewsPageProps> = ({ theme = "dark", onBack
         <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 4, background: "#eab308" }} />
         <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: "linear-gradient(90deg,transparent,#eab308 30%,#fde047 60%,#eab308 80%,transparent)" }} />
 
-        <div style={{ position: "relative", width: "100%", padding: "90px clamp(20px,5vw,64px) 56px" }}>
+        <Threads color="#eab308" count={16} opacity={isDark ? 0.32 : 0.18} speed={0.85} thickness={1} />
+
+        <div style={{ position: "relative", width: "100%", padding: "90px clamp(20px,5vw,64px) 56px", zIndex: 1 }}>
 
         <div style={{ maxWidth: 900, animation: "revSlideUp 0.6s ease both" }}>
-          <button onClick={onBack} style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "transparent", border: "none", color: isDark ? "rgba(255,255,255,0.45)" : "rgba(0,0,0,0.45)", fontFamily: "'Barlow',sans-serif", fontWeight: 600, fontSize: 13, letterSpacing: 1, cursor: "pointer", padding: "0 0 20px", transition: "color 0.15s" }}
+          <button onClick={onBack} style={{ display: "flex", alignItems: "center", gap: 6, background: "transparent", border: "none", color: isDark ? "rgba(255,255,255,0.45)" : "rgba(0,0,0,0.45)", fontFamily: "'Barlow',sans-serif", fontWeight: 600, fontSize: 13, letterSpacing: 1, cursor: "pointer", padding: 0, marginBottom: 28, transition: "color 0.15s" }}
             onMouseEnter={e => { e.currentTarget.style.color = "#eab308"; }}
             onMouseLeave={e => { e.currentTarget.style.color = isDark ? "rgba(255,255,255,0.45)" : "rgba(0,0,0,0.45)"; }}>
             ← {lang === "ru" ? "Назад" : "Back"}
@@ -478,6 +493,18 @@ export const ReviewsPage: React.FC<ReviewsPageProps> = ({ theme = "dark", onBack
                   style={inputStyle}
                 />
               </div>
+              <div>
+                <label style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 11, color: textSubtle, letterSpacing: 1.5, textTransform: "uppercase", display: "block", marginBottom: 6 }}>
+                  {lang === "ru" ? "Город / Штат" : "City / State"}
+                </label>
+                <input
+                  className="rev-input"
+                  value={formLocation}
+                  onChange={e => setFormLocation(e.target.value)}
+                  placeholder={lang === "ru" ? "Майами, Флорида" : "Miami, Florida"}
+                  style={inputStyle}
+                />
+              </div>
             </div>
 
             <div style={{ marginBottom: 20 }}>
@@ -530,8 +557,87 @@ export const ReviewsPage: React.FC<ReviewsPageProps> = ({ theme = "dark", onBack
 
  {/* REVIEWS GRID */}
       <div style={{ maxWidth: 1240, margin: "0 auto", padding: "40px clamp(20px,4vw,56px) 80px" }}>
+        {/* Sort + Filter bar */}
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 24, alignItems: "flex-start", marginBottom: 28, background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 12, padding: "18px 22px" }}>
+          {/* Rating distribution */}
+          <div style={{ flex: "1 1 220px" }}>
+            <div style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 10, letterSpacing: 2, textTransform: "uppercase", color: "#eab308", marginBottom: 10 }}>
+              {lang === "ru" ? "По рейтингу" : "By Rating"}
+            </div>
+            {ratingDist.map(({ stars, count }) => {
+              const pct = reviews.length ? (count / reviews.length) * 100 : 0;
+              const isActive = filterStars === stars;
+              return (
+                <div key={stars}
+                  onClick={() => setFilterStars(filterStars === stars ? null : stars)}
+                  style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6, cursor: "pointer", opacity: filterStars !== null && !isActive ? 0.4 : 1, transition: "opacity 0.15s" }}
+                >
+                  <span style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 11, color: isActive ? "#eab308" : textSubtle, width: 10, textAlign: "right" }}>{stars}</span>
+                  <span style={{ color: "#eab308", fontSize: 11, lineHeight: 1 }}>★</span>
+                  <div style={{ flex: 1, height: 6, borderRadius: 3, background: isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.07)", overflow: "hidden" }}>
+                    <div style={{ height: "100%", width: `${pct}%`, background: isActive ? "#eab308" : "rgba(234,179,8,0.45)", borderRadius: 3, transition: "width 0.5s ease" }} />
+                  </div>
+                  <span style={{ fontFamily: "'Barlow',sans-serif", fontSize: 11, color: isActive ? "#eab308" : textSubtle, width: 18, textAlign: "right" }}>{count}</span>
+                </div>
+              );
+            })}
+            {filterStars !== null && (
+              <button onClick={() => setFilterStars(null)} style={{ marginTop: 8, background: "transparent", border: "none", fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 11, color: "#eab308", cursor: "pointer", padding: 0, letterSpacing: 1, textTransform: "uppercase" }}>
+                ✕ {lang === "ru" ? "Сбросить" : "Clear filter"}
+              </button>
+            )}
+          </div>
+
+          {/* Divider */}
+          <div style={{ width: 1, alignSelf: "stretch", background: isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.07)" }} />
+
+          {/* Sort buttons */}
+          <div>
+            <div style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 10, letterSpacing: 2, textTransform: "uppercase", color: textSubtle, marginBottom: 10 }}>
+              {lang === "ru" ? "Сортировка" : "Sort By"}
+            </div>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+              {(["recent", "highest", "lowest", "liked"] as const).map(opt => {
+                const labels: Record<typeof opt, { en: string; ru: string }> = {
+                  recent:  { en: "Recent",     ru: "Новые"    },
+                  highest: { en: "Top Rated",  ru: "Лучшие"  },
+                  lowest:  { en: "Low Rated",  ru: "Низкие"  },
+                  liked:   { en: "Most Liked", ru: "Популярные" },
+                };
+                const active = sortBy === opt;
+                return (
+                  <button key={opt} onClick={() => setSortBy(opt)} style={{
+                    background: active ? "#eab308" : "transparent",
+                    color: active ? "#000" : textSubtle,
+                    border: `1px solid ${active ? "#eab308" : inputBorder}`,
+                    borderRadius: 6, padding: "5px 13px",
+                    fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 11,
+                    letterSpacing: 1, textTransform: "uppercase", cursor: "pointer",
+                    transition: "all 0.15s",
+                  }}>
+                    {lang === "ru" ? labels[opt].ru : labels[opt].en}
+                  </button>
+                );
+              })}
+            </div>
+            {!loading && (
+              <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 11, color: textSubtle, marginTop: 10 }}>
+                {lang === "ru"
+                  ? `${sortedReviews.length} из ${reviews.length} отзывов`
+                  : `${sortedReviews.length} of ${reviews.length} reviews`}
+                {filterStars !== null && <span style={{ color: "#eab308" }}> · {filterStars}★</span>}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {loading ? (
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(360px,1fr))", gap: 24 }}>
+            {Array.from({ length: 8 }).map((_, i) => <ReviewSkeleton key={i} theme={theme} />)}
+          </div>
+        ) : (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(360px,1fr))", gap: 24 }}>
-          {reviews.map((review, idx) => {
+          {sortedReviews.map((review, idx) => {
             const userVote = votes[review.id];
             const commentsOpen = openComments.has(review.id);
             const commentText = commentInputs[review.id] || "";
@@ -570,9 +676,15 @@ export const ReviewsPage: React.FC<ReviewsPageProps> = ({ theme = "dark", onBack
                           ✓ {lang === "ru" ? "Одобрить" : "Approve"}
                         </button>
                       )}
+                      {review.isApproved && (
+                        <button onClick={() => handleReject(review.id)} title={lang === "ru" ? "Отклонить" : "Reject"}
+                          style={{ padding: "4px 10px", background: "rgba(234,88,12,0.12)", border: "1px solid rgba(234,88,12,0.4)", borderRadius: 6, color: "#ea580c", fontFamily: "'Barlow',sans-serif", fontSize: 11, fontWeight: 700, cursor: "pointer", letterSpacing: 1, textTransform: "uppercase" }}>
+                          ✕ {lang === "ru" ? "Отклонить" : "Reject"}
+                        </button>
+                      )}
                       <button onClick={() => handleDeleteReview(review.id)} title={lang === "ru" ? "Удалить" : "Delete"}
                         style={{ padding: "4px 10px", background: "rgba(204,0,0,0.12)", border: "1px solid rgba(204,0,0,0.4)", borderRadius: 6, color: "#CC0000", fontFamily: "'Barlow',sans-serif", fontSize: 11, fontWeight: 700, cursor: "pointer", letterSpacing: 1, textTransform: "uppercase" }}>
-                        ✕
+                        🗑
                       </button>
                     </div>
                   )}
@@ -692,6 +804,7 @@ export const ReviewsPage: React.FC<ReviewsPageProps> = ({ theme = "dark", onBack
             );
           })}
         </div>
+        )}
 
  {/* CTA */}
         <div style={{ marginTop: 60, background: "linear-gradient(135deg,#eab308,#a16207)", borderRadius: 14, padding: "44px 48px", position: "relative", overflow: "hidden", textAlign: "center" }}>

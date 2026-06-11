@@ -2,10 +2,116 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>my-app</title>
-    <link href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap" rel="stylesheet" />
+
+    <title>Click Express Inc — Trucking Dispatch Services | 48 States</title>
+    <meta name="description" content="Click Express Inc — professional trucking dispatch for owner-operators and carriers across all 48 US states. No forced dispatch, 24/7 support, top market rates. Dry Van, Flatbed, Reefer." />
+    <meta name="keywords" content="trucking dispatch, freight dispatch, owner operator dispatch, flatbed dispatch, dry van dispatch, reefer dispatch, truck dispatcher, click express, 48 states trucking" />
+    <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content="#CC0000" />
+    <meta name="author" content="Click Express Inc" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Click Express Inc" />
+    <meta property="og:title" content="Click Express Inc — Trucking Dispatch | 48 States" />
+    <meta property="og:description" content="Professional trucking dispatch for owner-operators. No forced dispatch, 24/7 support, top market rates across all 48 US states." />
+    <meta property="og:url" content="https://clickexpress.inc" />
+    <meta property="og:image" content="https://clickexpress.inc/og-cover.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:locale:alternate" content="ru_RU" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Click Express Inc — Trucking Dispatch | 48 States" />
+    <meta name="twitter:description" content="Professional trucking dispatch for owner-operators. No forced dispatch, 24/7 support." />
+    <meta name="twitter:image" content="https://clickexpress.inc/og-cover.jpg" />
+
+    <!-- Canonical & hreflang -->
+    <link rel="canonical" href="https://clickexpress.inc" />
+    <link rel="alternate" hreflang="en" href="https://clickexpress.inc" />
+    <link rel="alternate" hreflang="ru" href="https://clickexpress.inc/?lang=ru" />
+    <link rel="alternate" hreflang="x-default" href="https://clickexpress.inc" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <!-- Preload hero image — biggest LCP element -->
+    <link rel="preload" as="image" href="/images/red freightliner cascadia night.webp" fetchpriority="high" />
+
+    <!-- Fonts: preconnect first, then a single consolidated stylesheet request -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- All typefaces in one round-trip; display=swap prevents invisible text during load -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,400&family=Oswald:wght@400;500;600;700&family=Russo+One&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Schema.org JSON-LD -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "LocalBusiness",
+          "@id": "https://clickexpress.inc/#business",
+          "name": "Click Express Inc",
+          "description": "Professional trucking dispatch services for owner-operators and carriers across all 48 US states.",
+          "url": "https://clickexpress.inc",
+          "telephone": "+17862026599",
+          "email": "clickexpress.inc@gmail.com",
+          "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Hallandale Beach",
+            "addressRegion": "FL",
+            "postalCode": "33009",
+            "addressCountry": "US"
+          },
+          "geo": {
+            "@type": "GeoCoordinates",
+            "latitude": 25.981,
+            "longitude": -80.148
+          },
+          "openingHoursSpecification": {
+            "@type": "OpeningHoursSpecification",
+            "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],
+            "opens": "00:00",
+            "closes": "23:59"
+          },
+          "priceRange": "5%–7% of gross freight",
+          "areaServed": {
+            "@type": "Country",
+            "name": "United States"
+          },
+          "knowsLanguage": ["en", "ru"],
+          "sameAs": []
+        },
+        {
+          "@type": "Service",
+          "@id": "https://clickexpress.inc/#dispatch",
+          "name": "Trucking Dispatch Service",
+          "provider": { "@id": "https://clickexpress.inc/#business" },
+          "serviceType": "Freight Dispatch",
+          "description": "24/7 load sourcing, rate negotiation, BOL handling, and full paperwork coverage for owner-operators.",
+          "areaServed": "United States"
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://clickexpress.inc/#website",
+          "url": "https://clickexpress.inc",
+          "name": "Click Express Inc",
+          "publisher": { "@id": "https://clickexpress.inc/#business" },
+          "inLanguage": ["en-US", "ru-RU"]
+        }
+      ]
+    }
+    </script>
   </head>
   <body>
     <div id="root"></div>

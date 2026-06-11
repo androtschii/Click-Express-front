@@ -1,10 +1,20 @@
-import React, { useEffect, useState } from "react";
+﻿import React, { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { confirm } from "../ui/ConfirmDialog";
+import { AdminRowSkeleton } from "../loads/LoadSkeleton";
 import {
   fetchProducts, fetchProductStats,
   updateProductPrice, updateProductImage,
-  updateProductStock, toggleProductActive, deleteProduct, createProduct
+  updateProductStock, toggleProductActive, deleteProduct, createProduct,
+  fetchVehicles, createVehicle, updateVehicle,
+  toggleVehicleAvailability, deleteVehicle,
+  fetchDrivers, createDriver, updateDriver, patchDriverStatus, deleteDriver,
+  fetchLeads, updateLeadStatus, deleteLead,
+  fetchJobApplications, updateJobApplicationStatus, deleteJobApplication,
+  fetchAdminStats,
 } from "../../api/client.js";
 import { useLanguage } from "../../context/LanguageContext";
+import { API_BASE } from "../../config";
 
 interface Product {
   id: number;
@@ -18,11 +28,75 @@ interface Product {
 }
 
 interface Stats {
-  totalProducts: number;
-  activeProducts: number;
+  total: number;
+  active: number;
   outOfStock: number;
   totalValue: number;
   categories: number;
+}
+
+interface Vehicle {
+  id: number;
+  model: string;
+  type: string;
+  year: number;
+  plate?: string;
+  available: boolean;
+}
+
+interface Driver {
+  id: number;
+  fullName: string;
+  phone: string;
+  cdlNumber: string;
+  status: string;
+  vehicleId?: number | null;
+  vehicleModel?: string | null;
+  createdAt: string;
+}
+
+interface Lead {
+  id: number;
+  fullName: string;
+  email: string;
+  phone: string;
+  company?: string;
+  origin: string;
+  destination: string;
+  equipment: string;
+  weight?: number;
+  pickupDate?: string;
+  message: string;
+  status: string;
+  createdAt: string;
+}
+
+interface JobApplication {
+  id: number;
+  fullName: string;
+  email: string;
+  phone: string;
+  position: string;
+  message: string;
+  status: string;
+  createdAt: string;
+}
+
+type Tab = "loads" | "fleet" | "drivers" | "leads" | "stats" | "reviews";
+
+interface AdminStats {
+  totalOrders: number;
+  orders30d: number;
+  activeOrders: number;
+  totalRevenue: number;
+  revenue30d: number;
+  totalUsers: number;
+  newUsers30d: number;
+  totalLeads: number;
+  conversionRate: number;
+  statusBreakdown: Array<{ status: string; count: number }>;
+  topRoutes: Array<{ route: string; count: number }>;
+  leadBreakdown: Array<{ status: string; count: number }>;
 }
 
 interface AdminPageProps {
@@ -34,6 +108,8 @@ export const AdminPage: React.FC<AdminPageProps> = ({ theme, onBack }) => {
   const { lang } = useLanguage();
   const ru = lang === "ru";
 
+  const [tab, setTab] = useState<Tab>("loads");
+
   const [products, setProducts] = useState<Product[]>([]);
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
@@ -43,6 +119,30 @@ export const AdminPage: React.FC<AdminPageProps> = ({ theme, onBack }) => {
   const [msg, setMsg] = useState<{ text: string; ok: boolean } | null>(null);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [newCard, setNewCard] = useState({ name: "", description: "", price: "", imageUrl: "", category: "Full Load", stock: "1" });
+
+  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [vehiclesLoading, setVehiclesLoading] = useState(false);
+  const [showVehicleForm, setShowVehicleForm] = useState(false);
+  const [newVehicle, setNewVehicle] = useState({ model: "", type: "Truck", year: String(new Date().getFullYear()), plate: "" });
+  const [editVehicle, setEditVehicle] = useState<{ id: number; model: string; type: string; year: string; plate: string } | null>(null);
+  const [drivers, setDrivers] = useState<Driver[]>([]);
+  const [driversLoading, setDriversLoading] = useState(false);
+  const [showDriverForm, setShowDriverForm] = useState(false);
+  const [newDriver, setNewDriver] = useState({ fullName: "", phone: "", cdlNumber: "", status: "Active" });
+  const [editDriver, setEditDriver] = useState<{ id: number; fullName: string; phone: string; cdlNumber: string; status: string } | null>(null);
+
+  const [leads, setLeads] = useState<Lead[]>([]);
+  const [leadsLoading, setLeadsLoading] = useState(false);
+  const [jobApps, setJobApps] = useState<JobApplication[]>([]);
+  const [jobAppsLoading, setJobAppsLoading] = useState(false);
+  const [leadsSubTab, setLeadsSubTab] = useState<"quotes" | "jobs">("quotes");
+
+  const [adminStats, setAdminStats] = useState<AdminStats | null>(null);
+  const [statsLoading, setStatsLoading] = useState(false);
+
+  const [adminReviews, setAdminReviews] = useState<Array<{ id: number; username: string; rating: number; text: string; isApproved: boolean; role: string | null; location: string | null; createdAt: string }>>([]);
+  const [reviewsLoading, setReviewsLoading] = useState(false);
+  const [pendingReviewCount, setPendingReviewCount] = useState(0);
 
   const isDark = theme === "dark";
   const bg = isDark ? "#0a0a0a" : "#f5f5f5";
@@ -56,13 +156,32 @@ export const AdminPage: React.FC<AdminPageProps> = ({ theme, onBack }) => {
     setTimeout(() => setMsg(null), 3000);
   };
 
+  const exportCsv = async (endpoint: string, filename: string) => {
+    try {
+      const raw = localStorage.getItem("ce_session");
+      const token = raw ? JSON.parse(raw).token : null;
+      const res = await fetch(`${API_BASE}/${endpoint}`, {
+        headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+      });
+      if (!res.ok) { notify(ru ? "Ошибка экспорта" : "Export failed", false); return; }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url; a.download = filename; a.click();
+      URL.revokeObjectURL(url);
+    } catch { notify(ru ? "Ошибка экспорта" : "Export failed", false); }
+  };
+
   const load = async () => {
     try {
-      const [p, s] = await Promise.all([fetchProducts(), fetchProductStats()]);
-      setProducts(p);
-      setStats(s);
-    } catch { notify(ru ? "Ошибка загрузки" : "Load error", false); }
+      const p = await fetchProducts();
+      setProducts(Array.isArray(p) ? p : []);
+    } catch { notify(ru ? "Ошибка загрузки товаров" : "Products load error", false); }
     finally { setLoading(false); }
+    try {
+      const s = await fetchProductStats();
+      setStats(s);
+    } catch { /* stats are optional */ }
   };
 
   useEffect(() => { load(); }, []);
@@ -125,12 +244,246 @@ export const AdminPage: React.FC<AdminPageProps> = ({ theme, onBack }) => {
   };
 
   const handleDelete = async (id: number, name: string) => {
-    if (!confirm(ru ? `Удалить "${name}"?` : `Delete "${name}"?`)) return;
+    const ok = await confirm({ title: ru ? `Удалить "${name}"?` : `Delete "${name}"?`, danger: true, confirmLabel: ru ? "Удалить" : "Delete", cancelLabel: ru ? "Отмена" : "Cancel" });
+    if (!ok) return;
     try {
       await deleteProduct(id);
       setProducts(ps => ps.filter(p => p.id !== id));
-      notify(ru ? "Удалено ✓" : "Deleted ✓");
-    } catch { notify(ru ? "Ошибка удаления" : "Delete error", false); }
+      toast.success(ru ? "Удалено" : "Deleted");
+    } catch { toast.error(ru ? "Ошибка удаления" : "Delete error"); }
+  };
+
+  const loadVehicles = async () => {
+    setVehiclesLoading(true);
+    try {
+      const data = await fetchVehicles();
+      setVehicles(Array.isArray(data) ? data : []);
+    } catch { notify(ru ? "Ошибка загрузки автопарка" : "Fleet load error", false); }
+    finally { setVehiclesLoading(false); }
+  };
+
+  const loadDrivers = async () => {
+    setDriversLoading(true);
+    try {
+      const data = await fetchDrivers();
+      setDrivers(Array.isArray(data) ? data : []);
+    } catch { notify(ru ? "Ошибка загрузки водителей" : "Drivers load error", false); }
+    finally { setDriversLoading(false); }
+  };
+
+  const handleCreateDriver = async () => {
+    if (!newDriver.fullName.trim() || !newDriver.cdlNumber.trim()) return;
+    try {
+      const created = await createDriver({
+        fullName: newDriver.fullName.trim(),
+        phone: newDriver.phone.trim(),
+        cdlNumber: newDriver.cdlNumber.trim(),
+        status: newDriver.status,
+      });
+      setDrivers(ds => [...ds, created]);
+      setNewDriver({ fullName: "", phone: "", cdlNumber: "", status: "Active" });
+      setShowDriverForm(false);
+      notify(ru ? "Водитель добавлен ✓" : "Driver added ✓");
+    } catch { notify(ru ? "Ошибка создания" : "Create error", false); }
+  };
+
+  const handleUpdateDriver = async () => {
+    if (!editDriver) return;
+    try {
+      const updated = await updateDriver(editDriver.id, {
+        fullName: editDriver.fullName.trim(),
+        phone: editDriver.phone.trim(),
+        cdlNumber: editDriver.cdlNumber.trim(),
+        status: editDriver.status,
+      });
+      setDrivers(ds => ds.map(d => d.id === editDriver.id ? { ...d, ...updated } : d));
+      setEditDriver(null);
+      notify(ru ? "Обновлено ✓" : "Updated ✓");
+    } catch { notify(ru ? "Ошибка обновления" : "Update error", false); }
+  };
+
+  const handlePatchDriverStatus = async (id: number, status: string) => {
+    try {
+      await patchDriverStatus(id, status);
+      setDrivers(ds => ds.map(d => d.id === id ? { ...d, status } : d));
+      notify(ru ? "Статус обновлён ✓" : "Status updated ✓");
+    } catch { notify(ru ? "Ошибка" : "Error", false); }
+  };
+
+  const handleDeleteDriver = async (id: number, name: string) => {
+    const ok = await confirm({ title: ru ? `Удалить "${name}"?` : `Delete "${name}"?`, danger: true, confirmLabel: ru ? "Удалить" : "Delete", cancelLabel: ru ? "Отмена" : "Cancel" });
+    if (!ok) return;
+    try {
+      await deleteDriver(id);
+      setDrivers(ds => ds.filter(d => d.id !== id));
+      toast.success(ru ? "Удалено" : "Deleted");
+    } catch { toast.error(ru ? "Ошибка удаления" : "Delete error"); }
+  };
+
+  const loadLeads = async () => {
+    setLeadsLoading(true);
+    try {
+      const data = await fetchLeads();
+      setLeads(Array.isArray(data) ? data : []);
+    } catch { notify(ru ? "Ошибка загрузки лидов" : "Leads load error", false); }
+    finally { setLeadsLoading(false); }
+  };
+
+  const loadJobApps = async () => {
+    setJobAppsLoading(true);
+    try {
+      const data = await fetchJobApplications();
+      setJobApps(Array.isArray(data) ? data : []);
+    } catch { notify(ru ? "Ошибка загрузки заявок" : "Applications load error", false); }
+    finally { setJobAppsLoading(false); }
+  };
+
+  const handleLeadStatus = async (id: number, status: string) => {
+    try {
+      await updateLeadStatus(id, status);
+      setLeads(ls => ls.map(l => l.id === id ? { ...l, status } : l));
+      notify(ru ? "Статус обновлён ✓" : "Status updated ✓");
+    } catch { notify(ru ? "Ошибка" : "Error", false); }
+  };
+
+  const handleDeleteLead = async (id: number) => {
+    const ok = await confirm({ title: ru ? "Удалить лид?" : "Delete lead?", danger: true, confirmLabel: ru ? "Удалить" : "Delete", cancelLabel: ru ? "Отмена" : "Cancel" });
+    if (!ok) return;
+    try {
+      await deleteLead(id);
+      setLeads(ls => ls.filter(l => l.id !== id));
+      toast.success(ru ? "Удалено" : "Deleted");
+    } catch { toast.error(ru ? "Ошибка удаления" : "Delete error"); }
+  };
+
+  const handleJobAppStatus = async (id: number, status: string) => {
+    try {
+      await updateJobApplicationStatus(id, status);
+      setJobApps(js => js.map(j => j.id === id ? { ...j, status } : j));
+      notify(ru ? "Статус обновлён ✓" : "Status updated ✓");
+    } catch { notify(ru ? "Ошибка" : "Error", false); }
+  };
+
+  const handleDeleteJobApp = async (id: number) => {
+    const ok = await confirm({ title: ru ? "Удалить заявку?" : "Delete application?", danger: true, confirmLabel: ru ? "Удалить" : "Delete", cancelLabel: ru ? "Отмена" : "Cancel" });
+    if (!ok) return;
+    try {
+      await deleteJobApplication(id);
+      setJobApps(js => js.filter(j => j.id !== id));
+      toast.success(ru ? "Удалено" : "Deleted");
+    } catch { toast.error(ru ? "Ошибка удаления" : "Delete error"); }
+  };
+
+  useEffect(() => {
+    if (tab === "fleet" && vehicles.length === 0 && !vehiclesLoading) loadVehicles();
+    if (tab === "drivers" && drivers.length === 0 && !driversLoading) loadDrivers();
+    if (tab === "leads") {
+      if (leadsSubTab === "quotes" && leads.length === 0 && !leadsLoading) loadLeads();
+      if (leadsSubTab === "jobs" && jobApps.length === 0 && !jobAppsLoading) loadJobApps();
+    }
+    if (tab === "stats" && !adminStats && !statsLoading) loadStats();
+    if (tab === "reviews" && adminReviews.length === 0 && !reviewsLoading) loadAdminReviews();
+  }, [tab, leadsSubTab]);
+
+  const loadStats = async () => {
+    setStatsLoading(true);
+    try {
+      const data = await fetchAdminStats() as AdminStats;
+      setAdminStats(data);
+    } catch { notify(ru ? "Ошибка загрузки аналитики" : "Stats load error", false); }
+    finally { setStatsLoading(false); }
+  };
+
+  const loadAdminReviews = async () => {
+    setReviewsLoading(true);
+    try {
+      const raw = localStorage.getItem("ce_session");
+      const token = raw ? JSON.parse(raw).token : null;
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (token) headers["Authorization"] = `Bearer ${token}`;
+      const [revRes, countRes] = await Promise.all([
+        fetch(`${API_BASE}/review?onlyApproved=false`, { headers }),
+        fetch(`${API_BASE}/review/pending/count`, { headers }),
+      ]);
+      if (revRes.ok) setAdminReviews(await revRes.json());
+      if (countRes.ok) { const d = await countRes.json(); setPendingReviewCount(d.count ?? 0); }
+    } catch { notify(ru ? "Ошибка загрузки отзывов" : "Reviews load error", false); }
+    finally { setReviewsLoading(false); }
+  };
+
+  const handleReviewApprove = async (id: number) => {
+    const raw = localStorage.getItem("ce_session");
+    const token = raw ? JSON.parse(raw).token : null;
+    await fetch(`${API_BASE}/review/${id}/approve`, { method: "PATCH", headers: { Authorization: `Bearer ${token}` } });
+    setAdminReviews(prev => prev.map(r => r.id === id ? { ...r, isApproved: true } : r));
+    setPendingReviewCount(p => Math.max(0, p - 1));
+    toast.success(ru ? "Отзыв одобрен" : "Review approved");
+  };
+
+  const handleReviewReject = async (id: number) => {
+    const raw = localStorage.getItem("ce_session");
+    const token = raw ? JSON.parse(raw).token : null;
+    await fetch(`${API_BASE}/review/${id}/reject`, { method: "PATCH", headers: { Authorization: `Bearer ${token}` } });
+    setAdminReviews(prev => prev.map(r => r.id === id ? { ...r, isApproved: false } : r));
+    toast.success(ru ? "Отзыв отклонён" : "Review rejected");
+  };
+
+  const handleReviewDelete = async (id: number) => {
+    const ok = await confirm({ title: ru ? "Удалить отзыв?" : "Delete review?", danger: true, confirmLabel: ru ? "Удалить" : "Delete", cancelLabel: ru ? "Отмена" : "Cancel" });
+    if (!ok) return;
+    const raw = localStorage.getItem("ce_session");
+    const token = raw ? JSON.parse(raw).token : null;
+    await fetch(`${API_BASE}/review/${id}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } });
+    setAdminReviews(prev => prev.filter(r => r.id !== id));
+    toast.success(ru ? "Отзыв удалён" : "Review deleted");
+  };
+
+  const handleCreateVehicle = async () => {
+    if (!newVehicle.model.trim()) return;
+    try {
+      const created = await createVehicle({
+        model: newVehicle.model.trim(),
+        type: newVehicle.type,
+        year: parseInt(newVehicle.year) || new Date().getFullYear(),
+        plate: newVehicle.plate.trim() || undefined,
+      });
+      setVehicles(vs => [...vs, created]);
+      setNewVehicle({ model: "", type: "Truck", year: String(new Date().getFullYear()), plate: "" });
+      setShowVehicleForm(false);
+      notify(ru ? "Транспорт добавлен ✓" : "Vehicle added ✓");
+    } catch { notify(ru ? "Ошибка создания" : "Create error", false); }
+  };
+
+  const handleUpdateVehicle = async () => {
+    if (!editVehicle) return;
+    try {
+      const updated = await updateVehicle(editVehicle.id, {
+        model: editVehicle.model.trim(),
+        type: editVehicle.type,
+        year: parseInt(editVehicle.year) || new Date().getFullYear(),
+        plate: editVehicle.plate.trim() || undefined,
+      });
+      setVehicles(vs => vs.map(v => v.id === editVehicle.id ? { ...v, ...updated } : v));
+      setEditVehicle(null);
+      notify(ru ? "Обновлено ✓" : "Updated ✓");
+    } catch { notify(ru ? "Ошибка обновления" : "Update error", false); }
+  };
+
+  const handleToggleVehicle = async (id: number) => {
+    try {
+      const res = await toggleVehicleAvailability(id);
+      setVehicles(vs => vs.map(v => v.id === id ? { ...v, available: res.available ?? !v.available } : v));
+    } catch { notify(ru ? "Ошибка" : "Error", false); }
+  };
+
+  const handleDeleteVehicle = async (id: number, model: string) => {
+    const ok = await confirm({ title: ru ? `Удалить "${model}"?` : `Delete "${model}"?`, danger: true, confirmLabel: ru ? "Удалить" : "Delete", cancelLabel: ru ? "Отмена" : "Cancel" });
+    if (!ok) return;
+    try {
+      await deleteVehicle(id);
+      setVehicles(vs => vs.filter(v => v.id !== id));
+      toast.success(ru ? "Удалено" : "Deleted");
+    } catch { toast.error(ru ? "Ошибка удаления" : "Delete error"); }
   };
 
   const inputStyle: React.CSSProperties = {
@@ -163,7 +516,7 @@ export const AdminPage: React.FC<AdminPageProps> = ({ theme, onBack }) => {
 
       <div style={{ maxWidth: 1100, margin: "0 auto" }}>
 
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 32 }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
           <div>
             <h1 style={{ fontFamily: "'Oswald',sans-serif", fontSize: 28, fontWeight: 700, margin: 0 }}>
               <span style={{ color: "#CC0000" }}>ADMIN</span> {ru ? "ПАНЕЛЬ" : "PANEL"}
@@ -173,15 +526,87 @@ export const AdminPage: React.FC<AdminPageProps> = ({ theme, onBack }) => {
             </p>
           </div>
           <div style={{ display: "flex", gap: 10 }}>
-            <button onClick={() => setShowCreateForm(v => !v)} style={{ ...btn("green"), padding: "8px 18px", fontSize: 13 }}>
-              {showCreateForm ? "✕" : (ru ? "+ Новая карточка" : "+ New Card")}
-            </button>
+            {tab === "loads" && (
+              <button onClick={() => setShowCreateForm(v => !v)} style={{ ...btn("green"), padding: "8px 18px", fontSize: 13 }}>
+                {showCreateForm ? "✕" : (ru ? "+ Новая карточка" : "+ New Card")}
+              </button>
+            )}
+            {tab === "fleet" && (
+              <button onClick={() => setShowVehicleForm(v => !v)} style={{ ...btn("green"), padding: "8px 18px", fontSize: 13 }}>
+                {showVehicleForm ? "✕" : (ru ? "+ Транспорт" : "+ Vehicle")}
+              </button>
+            )}
+            {tab === "drivers" && (
+              <button onClick={() => setShowDriverForm(v => !v)} style={{ ...btn("green"), padding: "8px 18px", fontSize: 13 }}>
+                {showDriverForm ? "✕" : (ru ? "+ Водитель" : "+ Driver")}
+              </button>
+            )}
+            {tab === "leads" && (
+              <button
+                onClick={() => {
+                  if (leadsSubTab === "quotes") { setLeads([]); loadLeads(); }
+                  else { setJobApps([]); loadJobApps(); }
+                }}
+                style={{ ...btn("gray"), padding: "8px 18px", fontSize: 13 }}
+              >
+                ↻ {ru ? "Обновить" : "Refresh"}
+              </button>
+            )}
+            {tab === "stats" && (
+              <button onClick={() => { setAdminStats(null); loadStats(); }} style={{ ...btn("gray"), padding: "8px 18px", fontSize: 13 }}>
+                ↻ {ru ? "Обновить" : "Refresh"}
+              </button>
+            )}
+            {tab === "reviews" && (
+              <button onClick={() => { setAdminReviews([]); loadAdminReviews(); }} style={{ ...btn("gray"), padding: "8px 18px", fontSize: 13 }}>
+                ↻ {ru ? "Обновить" : "Refresh"}
+              </button>
+            )}
             <button onClick={onBack} style={btn("gray")}>{ru ? "← Назад" : "← Back"}</button>
           </div>
         </div>
 
- {/* Форма создания */}
-        {showCreateForm && (
+ {/* Tabs */}
+        <div style={{ display: "flex", gap: 4, marginBottom: 28, borderBottom: `1px solid ${border}` }}>
+          {([
+            { key: "loads",   label: ru ? "Грузы" : "Loads" },
+            { key: "fleet",   label: ru ? "Автопарк" : "Fleet" },
+            { key: "drivers", label: ru ? "Водители" : "Drivers" },
+            { key: "leads",   label: ru ? "Лиды" : "Leads" },
+            { key: "reviews", label: ru ? "Отзывы" : "Reviews" },
+            { key: "stats",   label: ru ? "Аналитика" : "Analytics" },
+          ] as { key: Tab; label: string }[]).map(t => (
+            <button
+              key={t.key}
+              onClick={() => setTab(t.key)}
+              style={{
+                background: "transparent",
+                border: "none",
+                borderBottom: tab === t.key ? "2px solid #CC0000" : "2px solid transparent",
+                color: tab === t.key ? "#CC0000" : sub,
+                fontFamily: "'Oswald',sans-serif",
+                fontWeight: 700,
+                fontSize: 14,
+                letterSpacing: 1,
+                textTransform: "uppercase",
+                padding: "10px 18px",
+                cursor: "pointer",
+                marginBottom: -1,
+                position: "relative",
+              }}
+            >
+              {t.label}
+              {t.key === "reviews" && pendingReviewCount > 0 && (
+                <span style={{ position: "absolute", top: 6, right: 4, minWidth: 16, height: 16, borderRadius: 8, background: "#CC0000", color: "#fff", fontFamily: "'Barlow',sans-serif", fontWeight: 900, fontSize: 9, display: "inline-flex", alignItems: "center", justifyContent: "center", padding: "0 3px" }}>
+                  {pendingReviewCount}
+                </span>
+              )}
+            </button>
+          ))}
+        </div>
+
+ {/* Loads create form */}
+        {tab === "loads" && showCreateForm && (
           <div style={{ background: card, border: "1px solid rgba(22,163,74,0.4)", borderRadius: 12, padding: 24, marginBottom: 24 }}>
             <h3 style={{ fontFamily: "'Oswald',sans-serif", fontSize: 18, margin: "0 0 16px", color: "#16a34a" }}>
               {ru ? "Новая карточка груза" : "New Load Card"}
@@ -229,14 +654,14 @@ export const AdminPage: React.FC<AdminPageProps> = ({ theme, onBack }) => {
           </div>
         )}
 
-        {stats && (
+        {tab === "loads" && stats && (
           <div style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 12, marginBottom: 32 }}>
             {[
-              { label: ru ? "Всего услуг" : "Total Loads", value: stats.totalProducts },
-              { label: ru ? "Активных" : "Active", value: stats.activeProducts },
+              { label: ru ? "Всего услуг" : "Total Loads", value: stats.total ?? 0 },
+              { label: ru ? "Активных" : "Active", value: stats.active ?? 0 },
               { label: ru ? "Нет в наличии" : "Out of Stock", value: stats.outOfStock },
               { label: ru ? "Категорий" : "Categories", value: stats.categories },
-              { label: ru ? "Стоимость склада" : "Total Value", value: `$${stats.totalValue.toLocaleString()}` },
+              { label: ru ? "Стоимость склада" : "Total Value", value: `$${(stats.totalValue ?? 0).toLocaleString()}` },
             ].map(s => (
               <div key={s.label} style={{ background: card, border: `1px solid ${border}`, borderRadius: 10, padding: "16px 20px" }}>
                 <div style={{ fontSize: 22, fontWeight: 800, fontFamily: "'Oswald',sans-serif", color: "#CC0000" }}>{s.value}</div>
@@ -246,8 +671,18 @@ export const AdminPage: React.FC<AdminPageProps> = ({ theme, onBack }) => {
           </div>
         )}
 
-        {loading ? (
-          <div style={{ textAlign: "center", color: sub, padding: 60 }}>{ru ? "Загрузка..." : "Loading..."}</div>
+        {tab === "loads" && (loading ? (
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            {Array.from({ length: 5 }).map((_, i) => <AdminRowSkeleton key={i} theme={theme} avatar="square" />)}
+          </div>
+        ) : products.length === 0 ? (
+          <div style={{ textAlign: "center", color: sub, padding: 80, border: `1px dashed ${border}`, borderRadius: 12 }}>
+            <div style={{ fontSize: 40, marginBottom: 12 }}>📦</div>
+            <div style={{ fontFamily: "'Oswald',sans-serif", fontSize: 18, marginBottom: 8, color: text }}>
+              {ru ? "Товаров нет" : "No loads yet"}
+            </div>
+            <div style={{ fontSize: 13 }}>{ru ? "Нажми «+ Новая карточка» чтобы добавить первый груз" : "Click «+ New Card» to add the first load"}</div>
+          </div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             {products.map(p => (
@@ -346,6 +781,692 @@ export const AdminPage: React.FC<AdminPageProps> = ({ theme, onBack }) => {
               </div>
             ))}
           </div>
+        ))}
+
+        {/* Stats / Analytics tab */}
+        {tab === "stats" && (
+          <>
+            {statsLoading ? (
+              <div style={{ textAlign: "center", color: sub, padding: 80 }}>
+                <div style={{ display: "inline-block", width: 36, height: 36, border: "3px solid rgba(204,0,0,0.2)", borderTopColor: "#CC0000", borderRadius: "50%", animation: "spin 0.8s linear infinite", marginBottom: 16 }} />
+                <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
+                <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 14 }}>{ru ? "Загрузка аналитики..." : "Loading analytics..."}</div>
+              </div>
+            ) : !adminStats ? (
+              <div style={{ textAlign: "center", color: sub, padding: 80, border: `1px dashed ${border}`, borderRadius: 12 }}>
+                {ru ? "Нет данных" : "No data"}
+              </div>
+            ) : (() => {
+              const s = adminStats;
+              const statusColor = (st: string) => {
+                const m: Record<string, string> = { "Pending": "#f59e0b", "Approved": "#3b82f6", "Confirmed": "#3b82f6", "Assigned": "#8b5cf6", "In Transit": "#7c3aed", "Delivered": "#16a34a", "Cancelled": "#CC0000" };
+                return m[st] ?? "#888";
+              };
+              const maxOrders = Math.max(...s.statusBreakdown.map(x => x.count), 1);
+              const maxRoute  = Math.max(...s.topRoutes.map(x => x.count), 1);
+
+              return (
+                <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
+
+                  {/* KPI row 1 — Revenue & Orders */}
+                  <div>
+                    <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 10, color: "#CC0000", letterSpacing: 3, textTransform: "uppercase", marginBottom: 12 }}>
+                      💰 {ru ? "ВЫРУЧКА И ЗАКАЗЫ" : "REVENUE & ORDERS"}
+                    </div>
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(160px,1fr))", gap: 12 }}>
+                      {[
+                        { label: ru ? "Общая выручка" : "Total Revenue",  value: `$${s.totalRevenue.toLocaleString()}`, accent: true },
+                        { label: ru ? "Выручка 30д" : "Revenue 30d",      value: `$${s.revenue30d.toLocaleString()}` },
+                        { label: ru ? "Всего заказов" : "Total Orders",    value: s.totalOrders },
+                        { label: ru ? "Заказы 30д" : "Orders 30d",        value: s.orders30d },
+                        { label: ru ? "Активных" : "Active Orders",        value: s.activeOrders },
+                      ].map(k => (
+                        <div key={k.label} style={{ background: card, border: `1px solid ${k.accent ? "rgba(204,0,0,0.3)" : border}`, borderRadius: 10, padding: "18px 20px" }}>
+                          <div style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 800, fontSize: 26, color: k.accent ? "#CC0000" : text, lineHeight: 1 }}>{k.value}</div>
+                          <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 11, color: sub, marginTop: 6, textTransform: "uppercase", letterSpacing: 0.6 }}>{k.label}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* KPI row 2 — Users & Leads */}
+                  <div>
+                    <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 10, color: "#CC0000", letterSpacing: 3, textTransform: "uppercase", marginBottom: 12 }}>
+                      👥 {ru ? "ПОЛЬЗОВАТЕЛИ И ЛИДЫ" : "USERS & LEADS"}
+                    </div>
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(160px,1fr))", gap: 12 }}>
+                      {[
+                        { label: ru ? "Всего пользователей" : "Total Users", value: s.totalUsers },
+                        { label: ru ? "Новых 30д" : "New Users 30d",         value: s.newUsers30d },
+                        { label: ru ? "Всего лидов" : "Total Leads",         value: s.totalLeads },
+                        { label: ru ? "Конверсия" : "Conversion",            value: `${s.conversionRate}%`, accent: s.conversionRate > 0 },
+                      ].map(k => (
+                        <div key={k.label} style={{ background: card, border: `1px solid ${border}`, borderRadius: 10, padding: "18px 20px" }}>
+                          <div style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 800, fontSize: 26, color: k.accent ? "#16a34a" : text, lineHeight: 1 }}>{k.value}</div>
+                          <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 11, color: sub, marginTop: 6, textTransform: "uppercase", letterSpacing: 0.6 }}>{k.label}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Bottom row: status breakdown + top routes */}
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
+
+                    {/* Order Status Breakdown */}
+                    <div style={{ background: card, border: `1px solid ${border}`, borderRadius: 12, padding: 24 }}>
+                      <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 10, color: "#CC0000", letterSpacing: 3, textTransform: "uppercase", marginBottom: 20 }}>
+                        📊 {ru ? "ЗАКАЗЫ ПО СТАТУСАМ" : "ORDERS BY STATUS"}
+                      </div>
+                      {s.statusBreakdown.length === 0 ? (
+                        <div style={{ color: sub, fontSize: 13 }}>{ru ? "Нет данных" : "No data"}</div>
+                      ) : s.statusBreakdown.map(item => {
+                        const pct = Math.round(item.count / maxOrders * 100);
+                        const color = statusColor(item.status);
+                        return (
+                          <div key={item.status} style={{ marginBottom: 14 }}>
+                            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}>
+                              <span style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 12, color: text }}>{item.status}</span>
+                              <span style={{ fontFamily: "'Barlow',sans-serif", fontSize: 12, color: sub }}>{item.count} ({Math.round(item.count / s.totalOrders * 100)}%)</span>
+                            </div>
+                            <div style={{ height: 7, background: isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.07)", borderRadius: 99, overflow: "hidden" }}>
+                              <div style={{ height: "100%", width: `${pct}%`, background: color, borderRadius: 99, transition: "width 0.8s cubic-bezier(0.4,0,0.2,1)" }} />
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* Top Routes */}
+                    <div style={{ background: card, border: `1px solid ${border}`, borderRadius: 12, padding: 24 }}>
+                      <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 10, color: "#CC0000", letterSpacing: 3, textTransform: "uppercase", marginBottom: 20 }}>
+                        🏆 {ru ? "ТОП-5 МАРШРУТОВ" : "TOP 5 ROUTES"}
+                      </div>
+                      {s.topRoutes.length === 0 ? (
+                        <div style={{ color: sub, fontSize: 13 }}>{ru ? "Нет данных" : "No data"}</div>
+                      ) : s.topRoutes.map((item, i) => {
+                        const pct = Math.round(item.count / maxRoute * 100);
+                        return (
+                          <div key={item.route} style={{ marginBottom: 14 }}>
+                            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}>
+                              <span style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 700, fontSize: 12, color: text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 220 }}>
+                                <span style={{ color: "#CC0000", marginRight: 6 }}>#{i + 1}</span>{item.route}
+                              </span>
+                              <span style={{ fontFamily: "'Barlow',sans-serif", fontSize: 12, color: sub, flexShrink: 0, marginLeft: 8 }}>{item.count}</span>
+                            </div>
+                            <div style={{ height: 7, background: isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.07)", borderRadius: 99, overflow: "hidden" }}>
+                              <div style={{ height: "100%", width: `${pct}%`, background: `linear-gradient(90deg,#CC0000,#ff4444)`, borderRadius: 99, transition: "width 0.8s cubic-bezier(0.4,0,0.2,1)" }} />
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Lead breakdown */}
+                  {s.leadBreakdown.length > 0 && (
+                    <div style={{ background: card, border: `1px solid ${border}`, borderRadius: 12, padding: 24 }}>
+                      <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 10, color: "#CC0000", letterSpacing: 3, textTransform: "uppercase", marginBottom: 16 }}>
+                        📋 {ru ? "ЛИДЫ ПО СТАТУСАМ" : "LEADS BY STATUS"}
+                      </div>
+                      <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+                        {s.leadBreakdown.map(item => (
+                          <div key={item.status} style={{ background: isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.04)", border: `1px solid ${border}`, borderRadius: 8, padding: "12px 20px", minWidth: 120, textAlign: "center" }}>
+                            <div style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 800, fontSize: 22, color: item.status === "Converted" ? "#16a34a" : item.status === "New" ? "#f59e0b" : text }}>{item.count}</div>
+                            <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 11, color: sub, marginTop: 4, textTransform: "uppercase", letterSpacing: 0.6 }}>{item.status}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                </div>
+              );
+            })()}
+          </>
+        )}
+
+        {/* Reviews section */}
+        {tab === "reviews" && (
+          reviewsLoading ? (
+            <div style={{ textAlign: "center", color: sub, padding: 80 }}>
+              <div style={{ display: "inline-block", width: 36, height: 36, border: "3px solid rgba(204,0,0,0.2)", borderTopColor: "#CC0000", borderRadius: "50%", animation: "spin 0.8s linear infinite", marginBottom: 16 }} />
+              <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
+              <div style={{ fontFamily: "'Barlow',sans-serif", fontSize: 14 }}>{ru ? "Загрузка..." : "Loading..."}</div>
+            </div>
+          ) : adminReviews.length === 0 ? (
+            <div style={{ textAlign: "center", color: sub, padding: 80, border: `1px dashed ${border}`, borderRadius: 12 }}>
+              <div style={{ fontSize: 40, marginBottom: 12 }}>💬</div>
+              <div style={{ fontFamily: "'Oswald',sans-serif", fontSize: 18, color: text }}>{ru ? "Отзывов нет" : "No reviews"}</div>
+            </div>
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              {adminReviews.map(r => (
+                <div key={r.id} style={{
+                  background: card,
+                  border: `1px solid ${r.isApproved ? border : "rgba(245,158,11,0.35)"}`,
+                  borderRadius: 12, padding: 20,
+                }}>
+                  <div style={{ display: "flex", gap: 16, alignItems: "flex-start" }}>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8, flexWrap: "wrap" as const }}>
+                        <span style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 15 }}>{r.username}</span>
+                        {r.role && <span style={{ fontSize: 11, color: sub, fontStyle: "italic" }}>{r.role}</span>}
+                        {r.location && <span style={{ fontSize: 11, color: sub }}>📍 {r.location}</span>}
+                        <span style={{ fontSize: 11, padding: "2px 8px", borderRadius: 20, fontWeight: 700, background: r.isApproved ? "rgba(22,163,74,0.15)" : "rgba(245,158,11,0.15)", color: r.isApproved ? "#16a34a" : "#f59e0b" }}>
+                          {r.isApproved ? (ru ? "Одобрен" : "Approved") : (ru ? "На модерации" : "Pending")}
+                        </span>
+                        <span style={{ fontSize: 11, color: sub, marginLeft: "auto" }}>{new Date(r.createdAt).toLocaleDateString()}</span>
+                      </div>
+
+                      <div style={{ display: "flex", gap: 2, marginBottom: 8 }}>
+                        {Array.from({ length: 5 }).map((_, i) => (
+                          <span key={i} style={{ fontSize: 16, color: i < r.rating ? "#f59e0b" : (isDark ? "#333" : "#ddd") }}>★</span>
+                        ))}
+                      </div>
+
+                      <div style={{ fontSize: 13, color: sub, lineHeight: 1.5 }}>{r.text}</div>
+                    </div>
+
+                    <div style={{ display: "flex", flexDirection: "column", gap: 8, flexShrink: 0 }}>
+                      {!r.isApproved && (
+                        <button style={{ ...btn("green"), minWidth: 100 }} onClick={() => handleReviewApprove(r.id)}>
+                          {ru ? "Одобрить" : "Approve"}
+                        </button>
+                      )}
+                      {r.isApproved && (
+                        <button style={{ ...btn("gray"), minWidth: 100 }} onClick={() => handleReviewReject(r.id)}>
+                          {ru ? "Скрыть" : "Reject"}
+                        </button>
+                      )}
+                      <button style={{ ...btn("red"), minWidth: 100 }} onClick={() => handleReviewDelete(r.id)}>
+                        {ru ? "Удалить" : "Delete"}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )
+        )}
+
+        {/* Drivers section */}
+        {tab === "drivers" && (
+          <>
+            {showDriverForm && (
+              <div style={{ background: card, border: "1px solid rgba(22,163,74,0.4)", borderRadius: 12, padding: 24, marginBottom: 24 }}>
+                <h3 style={{ fontFamily: "'Oswald',sans-serif", fontSize: 18, margin: "0 0 16px", color: "#16a34a" }}>
+                  {ru ? "Новый водитель" : "New Driver"}
+                </h3>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                  {[
+                    { key: "fullName",  label: ru ? "Имя" : "Full Name",   placeholder: "John Smith" },
+                    { key: "phone",     label: ru ? "Телефон" : "Phone",   placeholder: "+1 555 000 1234" },
+                    { key: "cdlNumber", label: "CDL Number",               placeholder: "CDL-123456" },
+                  ].map(f => (
+                    <div key={f.key}>
+                      <div style={{ fontSize: 11, color: sub, marginBottom: 4, textTransform: "uppercase" as const, letterSpacing: 0.5 }}>{f.label}</div>
+                      <input
+                        style={{ ...inputStyle, outline: "none" }}
+                        placeholder={f.placeholder}
+                        value={(newDriver as Record<string, string>)[f.key]}
+                        onChange={e => setNewDriver(v => ({ ...v, [f.key]: e.target.value }))}
+                      />
+                    </div>
+                  ))}
+                  <div>
+                    <div style={{ fontSize: 11, color: sub, marginBottom: 4, textTransform: "uppercase" as const, letterSpacing: 0.5 }}>{ru ? "Статус" : "Status"}</div>
+                    <select style={{ ...inputStyle, outline: "none" }} value={newDriver.status}
+                      onChange={e => setNewDriver(v => ({ ...v, status: e.target.value }))}>
+                      <option value="Active">Active</option>
+                      <option value="Off-duty">Off-duty</option>
+                      <option value="On-leave">On-leave</option>
+                    </select>
+                  </div>
+                </div>
+                <div style={{ marginTop: 16, display: "flex", gap: 10 }}>
+                  <button style={{ ...btn("green"), padding: "8px 22px", fontSize: 13 }} onClick={handleCreateDriver}>
+                    {ru ? "Создать" : "Create"}
+                  </button>
+                  <button style={{ ...btn("gray"), padding: "8px 22px", fontSize: 13 }} onClick={() => setShowDriverForm(false)}>
+                    {ru ? "Отмена" : "Cancel"}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {driversLoading ? (
+              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                {Array.from({ length: 4 }).map((_, i) => <AdminRowSkeleton key={i} theme={theme} avatar="circle" />)}
+              </div>
+            ) : drivers.length === 0 ? (
+              <div style={{ textAlign: "center", color: sub, padding: 60, border: `1px dashed ${border}`, borderRadius: 12 }}>
+                {ru ? "Водители не добавлены" : "No drivers yet"}
+              </div>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                {drivers.map(d => {
+                  const isEditing = editDriver?.id === d.id;
+                  const statusColor = d.status === "Active" ? "#16a34a" : d.status === "On-leave" ? "#f59e0b" : "#888";
+                  return (
+                    <div key={d.id} style={{ background: card, border: `1px solid ${border}`, borderRadius: 12, padding: 20 }}>
+                      <div style={{ display: "flex", gap: 20, alignItems: "flex-start" }}>
+
+                        <div style={{ width: 44, height: 44, borderRadius: "50%", background: isDark ? "#1a1a1a" : "#e5e5e5", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>
+                          🧑‍✈️
+                        </div>
+
+                        <div style={{ flex: 1 }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
+                            {isEditing ? (
+                              <input style={{ ...inputStyle, maxWidth: 220 }} value={editDriver.fullName}
+                                onChange={e => setEditDriver({ ...editDriver, fullName: e.target.value })} />
+                            ) : (
+                              <span style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 16 }}>{d.fullName}</span>
+                            )}
+                            <span style={{ fontSize: 11, padding: "2px 8px", borderRadius: 20, background: `${statusColor}22`, color: statusColor, fontWeight: 700 }}>
+                              {d.status}
+                            </span>
+                            {d.vehicleModel && (
+                              <span style={{ fontSize: 11, padding: "2px 8px", borderRadius: 20, background: isDark ? "#1a1a1a" : "#f0f0f0", color: sub }}>
+                                🚛 {d.vehicleModel}
+                              </span>
+                            )}
+                          </div>
+
+                          <div style={{ display: "flex", gap: 16, flexWrap: "wrap" as const }}>
+                            <div style={{ minWidth: 160 }}>
+                              <div style={{ fontSize: 11, color: sub, marginBottom: 4, textTransform: "uppercase" as const }}>{ru ? "Телефон" : "Phone"}</div>
+                              {isEditing ? (
+                                <input style={inputStyle} value={editDriver.phone}
+                                  onChange={e => setEditDriver({ ...editDriver, phone: e.target.value })} />
+                              ) : (
+                                <span style={{ fontSize: 13 }}>{d.phone || "—"}</span>
+                              )}
+                            </div>
+                            <div style={{ minWidth: 160 }}>
+                              <div style={{ fontSize: 11, color: sub, marginBottom: 4, textTransform: "uppercase" as const }}>CDL</div>
+                              {isEditing ? (
+                                <input style={inputStyle} value={editDriver.cdlNumber}
+                                  onChange={e => setEditDriver({ ...editDriver, cdlNumber: e.target.value })} />
+                              ) : (
+                                <span style={{ fontSize: 13, fontFamily: "'Barlow Condensed',sans-serif", letterSpacing: 1 }}>{d.cdlNumber}</span>
+                              )}
+                            </div>
+                            {isEditing && (
+                              <div style={{ minWidth: 140 }}>
+                                <div style={{ fontSize: 11, color: sub, marginBottom: 4, textTransform: "uppercase" as const }}>{ru ? "Статус" : "Status"}</div>
+                                <select style={inputStyle} value={editDriver.status}
+                                  onChange={e => setEditDriver({ ...editDriver, status: e.target.value })}>
+                                  <option value="Active">Active</option>
+                                  <option value="Off-duty">Off-duty</option>
+                                  <option value="On-leave">On-leave</option>
+                                </select>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        <div style={{ display: "flex", flexDirection: "column", gap: 8, flexShrink: 0 }}>
+                          {isEditing ? (
+                            <>
+                              <button style={btn("green")} onClick={handleUpdateDriver}>{ru ? "Сохранить" : "Save"}</button>
+                              <button style={btn("gray")} onClick={() => setEditDriver(null)}>{ru ? "Отмена" : "Cancel"}</button>
+                            </>
+                          ) : (
+                            <>
+                              <button style={btn("gray")} onClick={() => setEditDriver({ id: d.id, fullName: d.fullName, phone: d.phone, cdlNumber: d.cdlNumber, status: d.status })}>
+                                {ru ? "Изменить" : "Edit"}
+                              </button>
+                              <select
+                                style={{ ...btn("gray"), cursor: "pointer", appearance: "none" as const, textAlign: "center" as const }}
+                                value={d.status}
+                                onChange={e => handlePatchDriverStatus(d.id, e.target.value)}
+                              >
+                                <option value="Active">Active</option>
+                                <option value="Off-duty">Off-duty</option>
+                                <option value="On-leave">On-leave</option>
+                              </select>
+                              <button style={btn("red")} onClick={() => handleDeleteDriver(d.id, d.fullName)}>
+                                {ru ? "Удалить" : "Delete"}
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </>
+        )}
+
+        {/* Leads section */}
+        {tab === "leads" && (() => {
+          const leadStatusColor = (s: string) => s === "New" ? "#f59e0b" : s === "Contacted" ? "#3b82f6" : s === "Converted" ? "#16a34a" : "#888";
+          const appStatusColor  = (s: string) => s === "Pending" ? "#f59e0b" : s === "Reviewed" ? "#3b82f6" : s === "Accepted" ? "#16a34a" : s === "Rejected" ? "#CC0000" : "#888";
+
+          return (
+            <>
+              {/* Sub-tabs */}
+              <div style={{ display: "flex", gap: 8, marginBottom: 24, alignItems: "center", flexWrap: "wrap" as const }}>
+                {([
+                  { key: "quotes", label: ru ? "Заявки на перевозку" : "Quote Requests" },
+                  { key: "jobs",   label: ru ? "Вакансии" : "Job Applications" },
+                ] as { key: "quotes" | "jobs"; label: string }[]).map(st => (
+                  <button
+                    key={st.key}
+                    onClick={() => setLeadsSubTab(st.key)}
+                    style={{
+                      padding: "7px 18px", borderRadius: 20, border: `1px solid ${leadsSubTab === st.key ? "#CC0000" : border}`,
+                      background: leadsSubTab === st.key ? "rgba(204,0,0,0.1)" : "transparent",
+                      color: leadsSubTab === st.key ? "#CC0000" : sub,
+                      fontFamily: "'Barlow',sans-serif", fontWeight: 600, fontSize: 13, cursor: "pointer",
+                    }}
+                  >
+                    {st.label}
+                    {leadsSubTab === st.key && (
+                      <span style={{ marginLeft: 8, background: "#CC0000", color: "#fff", borderRadius: 10, padding: "1px 7px", fontSize: 11 }}>
+                        {st.key === "quotes" ? leads.length : jobApps.length}
+                      </span>
+                    )}
+                  </button>
+                ))}
+                <div style={{ marginLeft: "auto" }}>
+                  <button
+                    onClick={() => leadsSubTab === "quotes"
+                      ? exportCsv("lead/export", `leads_${new Date().toISOString().slice(0,10)}.csv`)
+                      : exportCsv("jobapplication/export", `applications_${new Date().toISOString().slice(0,10)}.csv`)}
+                    style={{ padding: "7px 16px", borderRadius: 6, border: `1px solid ${border}`, background: "transparent", color: sub, fontFamily: "'Barlow',sans-serif", fontWeight: 600, fontSize: 12, cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = "#CC0000"; (e.currentTarget as HTMLElement).style.color = "#CC0000"; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = border; (e.currentTarget as HTMLElement).style.color = sub; }}
+                  >
+                    ↓ {ru ? "Экспорт CSV" : "Export CSV"}
+                  </button>
+                </div>
+              </div>
+
+              {/* Quote Requests */}
+              {leadsSubTab === "quotes" && (
+                leadsLoading ? (
+                  <div style={{ textAlign: "center", color: sub, padding: 60 }}>{ru ? "Загрузка..." : "Loading..."}</div>
+                ) : leads.length === 0 ? (
+                  <div style={{ textAlign: "center", color: sub, padding: 60, border: `1px dashed ${border}`, borderRadius: 12 }}>
+                    {ru ? "Нет заявок" : "No quote requests"}
+                  </div>
+                ) : (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                    {leads.map(l => (
+                      <div key={l.id} style={{ background: card, border: `1px solid ${border}`, borderRadius: 12, padding: 20 }}>
+                        <div style={{ display: "flex", gap: 16, alignItems: "flex-start" }}>
+                          <div style={{ flex: 1 }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8, flexWrap: "wrap" as const }}>
+                              <span style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 15 }}>{l.fullName}</span>
+                              {l.company && <span style={{ fontSize: 11, color: sub }}>{l.company}</span>}
+                              <span style={{ fontSize: 11, padding: "2px 8px", borderRadius: 20, background: `${leadStatusColor(l.status)}22`, color: leadStatusColor(l.status), fontWeight: 700 }}>
+                                {l.status}
+                              </span>
+                              <span style={{ fontSize: 11, color: sub, marginLeft: "auto" }}>
+                                {new Date(l.createdAt).toLocaleDateString()}
+                              </span>
+                            </div>
+
+                            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 12, marginBottom: 10 }}>
+                              {[
+                                { label: "Email", value: l.email },
+                                { label: ru ? "Телефон" : "Phone", value: l.phone || "—" },
+                                { label: ru ? "Откуда" : "Origin", value: l.origin },
+                                { label: ru ? "Куда" : "Destination", value: l.destination },
+                                { label: ru ? "Груз" : "Equipment", value: l.equipment || "—" },
+                                { label: ru ? "Вес" : "Weight", value: l.weight ? `${l.weight} lb` : "—" },
+                              ].map(f => (
+                                <div key={f.label}>
+                                  <div style={{ fontSize: 10, color: sub, textTransform: "uppercase" as const, letterSpacing: 0.5, marginBottom: 2 }}>{f.label}</div>
+                                  <div style={{ fontSize: 13, fontWeight: 600 }}>{f.value}</div>
+                                </div>
+                              ))}
+                            </div>
+
+                            {l.message && (
+                              <div style={{ fontSize: 12, color: sub, background: isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.03)", borderRadius: 6, padding: "8px 12px" }}>
+                                {l.message}
+                              </div>
+                            )}
+                          </div>
+
+                          <div style={{ display: "flex", flexDirection: "column", gap: 8, flexShrink: 0 }}>
+                            <select
+                              style={{ ...btn("gray"), cursor: "pointer", appearance: "none" as const, textAlign: "center" as const, minWidth: 110 }}
+                              value={l.status}
+                              onChange={e => handleLeadStatus(l.id, e.target.value)}
+                            >
+                              <option value="New">New</option>
+                              <option value="Contacted">Contacted</option>
+                              <option value="Converted">Converted</option>
+                              <option value="Closed">Closed</option>
+                            </select>
+                            <button style={{ ...btn("red"), minWidth: 110 }} onClick={() => handleDeleteLead(l.id)}>
+                              {ru ? "Удалить" : "Delete"}
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )
+              )}
+
+              {/* Job Applications */}
+              {leadsSubTab === "jobs" && (
+                jobAppsLoading ? (
+                  <div style={{ textAlign: "center", color: sub, padding: 60 }}>{ru ? "Загрузка..." : "Loading..."}</div>
+                ) : jobApps.length === 0 ? (
+                  <div style={{ textAlign: "center", color: sub, padding: 60, border: `1px dashed ${border}`, borderRadius: 12 }}>
+                    {ru ? "Нет откликов" : "No applications"}
+                  </div>
+                ) : (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                    {jobApps.map(j => (
+                      <div key={j.id} style={{ background: card, border: `1px solid ${border}`, borderRadius: 12, padding: 20 }}>
+                        <div style={{ display: "flex", gap: 16, alignItems: "flex-start" }}>
+                          <div style={{ flex: 1 }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8, flexWrap: "wrap" as const }}>
+                              <span style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 15 }}>{j.fullName}</span>
+                              <span style={{ fontSize: 12, padding: "2px 10px", borderRadius: 20, background: isDark ? "#1a1a1a" : "#f0f0f0", color: sub, fontWeight: 600 }}>
+                                {j.position}
+                              </span>
+                              <span style={{ fontSize: 11, padding: "2px 8px", borderRadius: 20, background: `${appStatusColor(j.status)}22`, color: appStatusColor(j.status), fontWeight: 700 }}>
+                                {j.status}
+                              </span>
+                              <span style={{ fontSize: 11, color: sub, marginLeft: "auto" }}>
+                                {new Date(j.createdAt).toLocaleDateString()}
+                              </span>
+                            </div>
+
+                            <div style={{ display: "flex", gap: 24, marginBottom: 10, flexWrap: "wrap" as const }}>
+                              {[
+                                { label: "Email", value: j.email },
+                                { label: ru ? "Телефон" : "Phone", value: j.phone || "—" },
+                              ].map(f => (
+                                <div key={f.label}>
+                                  <div style={{ fontSize: 10, color: sub, textTransform: "uppercase" as const, letterSpacing: 0.5, marginBottom: 2 }}>{f.label}</div>
+                                  <div style={{ fontSize: 13, fontWeight: 600 }}>{f.value}</div>
+                                </div>
+                              ))}
+                            </div>
+
+                            {j.message && (
+                              <div style={{ fontSize: 12, color: sub, background: isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.03)", borderRadius: 6, padding: "8px 12px" }}>
+                                {j.message}
+                              </div>
+                            )}
+                          </div>
+
+                          <div style={{ display: "flex", flexDirection: "column", gap: 8, flexShrink: 0 }}>
+                            <select
+                              style={{ ...btn("gray"), cursor: "pointer", appearance: "none" as const, textAlign: "center" as const, minWidth: 110 }}
+                              value={j.status}
+                              onChange={e => handleJobAppStatus(j.id, e.target.value)}
+                            >
+                              <option value="Pending">Pending</option>
+                              <option value="Reviewed">Reviewed</option>
+                              <option value="Accepted">Accepted</option>
+                              <option value="Rejected">Rejected</option>
+                            </select>
+                            <button style={{ ...btn("red"), minWidth: 110 }} onClick={() => handleDeleteJobApp(j.id)}>
+                              {ru ? "Удалить" : "Delete"}
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )
+              )}
+            </>
+          );
+        })()}
+
+        {/* Fleet section */}
+        {tab === "fleet" && (
+          <>
+            {showVehicleForm && (
+              <div style={{ background: card, border: "1px solid rgba(22,163,74,0.4)", borderRadius: 12, padding: 24, marginBottom: 24 }}>
+                <h3 style={{ fontFamily: "'Oswald',sans-serif", fontSize: 18, margin: "0 0 16px", color: "#16a34a" }}>
+                  {ru ? "Новый транспорт" : "New Vehicle"}
+                </h3>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                  <div>
+                    <div style={{ fontSize: 11, color: sub, marginBottom: 4, textTransform: "uppercase", letterSpacing: 0.5 }}>{ru ? "Модель" : "Model"}</div>
+                    <input style={inputStyle} placeholder="Freightliner Cascadia" value={newVehicle.model}
+                      onChange={e => setNewVehicle(v => ({ ...v, model: e.target.value }))} />
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 11, color: sub, marginBottom: 4, textTransform: "uppercase", letterSpacing: 0.5 }}>{ru ? "Тип" : "Type"}</div>
+                    <select style={inputStyle} value={newVehicle.type}
+                      onChange={e => setNewVehicle(v => ({ ...v, type: e.target.value }))}>
+                      <option value="Truck">Truck</option>
+                      <option value="Trailer">Trailer</option>
+                      <option value="Van">Van</option>
+                    </select>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 11, color: sub, marginBottom: 4, textTransform: "uppercase", letterSpacing: 0.5 }}>{ru ? "Год" : "Year"}</div>
+                    <input style={inputStyle} type="number" placeholder="2024" value={newVehicle.year}
+                      onChange={e => setNewVehicle(v => ({ ...v, year: e.target.value }))} />
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 11, color: sub, marginBottom: 4, textTransform: "uppercase", letterSpacing: 0.5 }}>{ru ? "Номер" : "Plate"}</div>
+                    <input style={inputStyle} placeholder="ABC-1234" value={newVehicle.plate}
+                      onChange={e => setNewVehicle(v => ({ ...v, plate: e.target.value }))} />
+                  </div>
+                </div>
+                <div style={{ marginTop: 16, display: "flex", gap: 10 }}>
+                  <button style={{ ...btn("green"), padding: "8px 22px", fontSize: 13 }} onClick={handleCreateVehicle}>
+                    {ru ? "Создать" : "Create"}
+                  </button>
+                  <button style={{ ...btn("gray"), padding: "8px 22px", fontSize: 13 }} onClick={() => setShowVehicleForm(false)}>
+                    {ru ? "Отмена" : "Cancel"}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {vehiclesLoading ? (
+              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                {Array.from({ length: 4 }).map((_, i) => <AdminRowSkeleton key={i} theme={theme} avatar="square" />)}
+              </div>
+            ) : vehicles.length === 0 ? (
+              <div style={{ textAlign: "center", color: sub, padding: 60, border: `1px dashed ${border}`, borderRadius: 12 }}>
+                {ru ? "Транспорт не добавлен" : "No vehicles yet"}
+              </div>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                {vehicles.map(v => {
+                  const isEditing = editVehicle?.id === v.id;
+                  return (
+                    <div key={v.id} style={{
+                      background: card,
+                      border: `1px solid ${v.available ? border : "rgba(204,0,0,0.3)"}`,
+                      borderRadius: 12, padding: 20, opacity: v.available ? 1 : 0.65,
+                    }}>
+                      <div style={{ display: "flex", gap: 20, alignItems: "flex-start" }}>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
+                            <span style={{ fontFamily: "'Oswald',sans-serif", fontWeight: 700, fontSize: 16 }}>
+                              {isEditing ? (
+                                <input style={{ ...inputStyle, maxWidth: 280 }} value={editVehicle.model}
+                                  onChange={e => setEditVehicle({ ...editVehicle, model: e.target.value })} />
+                              ) : v.model}
+                            </span>
+                            <span style={{ fontSize: 11, padding: "2px 8px", borderRadius: 20, background: isDark ? "#1a1a1a" : "#f0f0f0", color: sub }}>{v.type}</span>
+                            <span style={{ fontSize: 11, padding: "2px 8px", borderRadius: 20, background: v.available ? "rgba(22,163,74,0.15)" : "rgba(204,0,0,0.15)", color: v.available ? "#16a34a" : "#CC0000" }}>
+                              {v.available ? (ru ? "Доступен" : "Available") : (ru ? "Занят" : "In use")}
+                            </span>
+                          </div>
+
+                          <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
+                            <div style={{ minWidth: 120 }}>
+                              <div style={{ fontSize: 11, color: sub, marginBottom: 4, textTransform: "uppercase" }}>{ru ? "Год" : "Year"}</div>
+                              {isEditing ? (
+                                <input style={inputStyle} type="number" value={editVehicle.year}
+                                  onChange={e => setEditVehicle({ ...editVehicle, year: e.target.value })} />
+                              ) : (
+                                <span style={{ fontWeight: 700, fontSize: 15 }}>{v.year}</span>
+                              )}
+                            </div>
+                            <div style={{ minWidth: 160 }}>
+                              <div style={{ fontSize: 11, color: sub, marginBottom: 4, textTransform: "uppercase" }}>{ru ? "Тип" : "Type"}</div>
+                              {isEditing ? (
+                                <select style={inputStyle} value={editVehicle.type}
+                                  onChange={e => setEditVehicle({ ...editVehicle, type: e.target.value })}>
+                                  <option value="Truck">Truck</option>
+                                  <option value="Trailer">Trailer</option>
+                                  <option value="Van">Van</option>
+                                </select>
+                              ) : (
+                                <span style={{ fontSize: 13 }}>{v.type}</span>
+                              )}
+                            </div>
+                            <div style={{ minWidth: 160 }}>
+                              <div style={{ fontSize: 11, color: sub, marginBottom: 4, textTransform: "uppercase" }}>{ru ? "Номер" : "Plate"}</div>
+                              {isEditing ? (
+                                <input style={inputStyle} value={editVehicle.plate}
+                                  onChange={e => setEditVehicle({ ...editVehicle, plate: e.target.value })} />
+                              ) : (
+                                <span style={{ fontSize: 13, color: v.plate ? text : sub }}>{v.plate || "—"}</span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div style={{ display: "flex", flexDirection: "column", gap: 8, flexShrink: 0 }}>
+                          {isEditing ? (
+                            <>
+                              <button style={btn("green")} onClick={handleUpdateVehicle}>{ru ? "Сохранить" : "Save"}</button>
+                              <button style={btn("gray")} onClick={() => setEditVehicle(null)}>{ru ? "Отмена" : "Cancel"}</button>
+                            </>
+                          ) : (
+                            <>
+                              <button style={btn("gray")} onClick={() => setEditVehicle({ id: v.id, model: v.model, type: v.type, year: String(v.year), plate: v.plate ?? "" })}>
+                                {ru ? "Изменить" : "Edit"}
+                              </button>
+                              <button style={btn(v.available ? "gray" : "green")} onClick={() => handleToggleVehicle(v.id)}>
+                                {v.available ? (ru ? "Занят" : "Mark in use") : (ru ? "Доступен" : "Mark available")}
+                              </button>
+                              <button style={btn("red")} onClick={() => handleDeleteVehicle(v.id, v.model)}>
+                                {ru ? "Удалить" : "Delete"}
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

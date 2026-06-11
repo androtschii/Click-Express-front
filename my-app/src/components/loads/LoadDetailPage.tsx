@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useRef } from "react";
+﻿import React, { useState, useEffect, useRef } from "react";
 import type { Load } from "../../types/index";
 import { useLanguage } from "../../context/LanguageContext";
 import { translations } from "../../i18n/translations";
+import { API_BASE } from "../../config";
 
 interface LoadDetailPageProps {
   load: Load;
@@ -38,6 +39,19 @@ function truckEmoji(cargo: string) {
   return "🚛";
 }
 
+const ALL_REAL_IMAGES = [
+  "/images/real1.webp", "/images/real2.webp", "/images/real3.webp",
+  "/images/real4.webp", "/images/real5.webp", "/images/real6.webp",
+  "/images/real7.webp", "/images/real8.webp", "/images/real9.webp",
+  "/images/real10.webp",
+];
+
+function getGallery(load: Load): string[] {
+  const others = ALL_REAL_IMAGES.filter(img => img !== load.image);
+  const picks = [0, 1, 2].map(i => others[(load.id * 3 + i * 7) % others.length]);
+  return [load.image, ...picks];
+}
+
 export const LoadDetailPage: React.FC<LoadDetailPageProps> = ({
   load, theme = "dark", isBooked = false, onClose, onBook, onCancelBook,
 }) => {
@@ -47,6 +61,9 @@ export const LoadDetailPage: React.FC<LoadDetailPageProps> = ({
   const [entered, setEntered] = useState(false);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [booked, setBooked] = useState(isBooked);
+  const [activeImg, setActiveImg] = useState(0);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const gallery = getGallery(load);
   const topRef = useRef<HTMLDivElement>(null);
   const [msgOpen, setMsgOpen] = useState(false);
   const msgRef = useRef<HTMLDivElement>(null);
@@ -60,11 +77,25 @@ export const LoadDetailPage: React.FC<LoadDetailPageProps> = ({
     requestAnimationFrame(() => setEntered(true));
     topRef.current?.scrollIntoView({ behavior: "auto" });
     window.scrollTo(0, 0);
+    fetch(`${API_BASE}/product/${load.id}/view`, { method: "POST" }).catch(() => {});
     return () => {};
   }, []);
 
  // sync if parent changes
   useEffect(() => { setBooked(isBooked); }, [isBooked]);
+
+  useEffect(() => { setActiveImg(0); }, [load.id]);
+
+  useEffect(() => {
+    if (!lightboxOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setLightboxOpen(false);
+      if (e.key === "ArrowRight") setActiveImg(i => (i + 1) % gallery.length);
+      if (e.key === "ArrowLeft")  setActiveImg(i => (i - 1 + gallery.length) % gallery.length);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [lightboxOpen, gallery.length]);
 
   const handleBook = () => {
     if (booked) {
@@ -108,10 +139,19 @@ export const LoadDetailPage: React.FC<LoadDetailPageProps> = ({
         @keyframes tireSpinReverse { to { transform:rotate(-360deg); } }
         @keyframes tirePulseGlow { 0%,100%{filter:drop-shadow(0 0 6px rgba(204,0,0,0.5))} 50%{filter:drop-shadow(0 0 16px rgba(204,0,0,0.9))} }
         @keyframes mapFadeIn { from{opacity:0} to{opacity:1} }
+        @keyframes lbFadeIn  { from{opacity:0;transform:scale(0.97)} to{opacity:1;transform:scale(1)} }
+        .gallery-thumb:hover { opacity:1 !important; border-color:rgba(255,255,255,0.55) !important; }
+        .lb-nav:hover { background:rgba(204,0,0,0.45) !important; }
         .stat-card { transition: all 0.2s; }
         .stat-card:hover { border-color: rgba(204,0,0,0.5) !important; transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
         .detail-scroll::-webkit-scrollbar { width: 5px; }
         .detail-scroll::-webkit-scrollbar-thumb { background: rgba(204,0,0,0.4); border-radius: 3px; }
+        .dp-aside::-webkit-scrollbar { width: 4px; }
+        .dp-aside::-webkit-scrollbar-thumb { background: rgba(204,0,0,0.35); border-radius: 2px; }
+        @media (max-width: 860px) {
+          .dp-grid  { grid-template-columns: 1fr !important; }
+          .dp-aside { position: static !important; max-height: none !important; overflow: visible !important; order: -1; }
+        }
       `}</style>
 
  {/* Top nav bar */}
@@ -167,14 +207,32 @@ export const LoadDetailPage: React.FC<LoadDetailPageProps> = ({
 
  {/* Hero banner */}
       <div style={{ position: "relative", height: "clamp(380px,48vw,540px)", overflow: "hidden" }}>
-        <img
-          src={load.image} alt={load.route}
-          style={{ width:"100%", height:"100%", objectFit:"cover", objectPosition:"center 72%", filter:"brightness(0.52) blur(2px)", transform:"scale(1.03)" }}
-        />
+        <div onClick={() => setLightboxOpen(true)} style={{ position:"absolute", inset:0, cursor:"zoom-in" }}>
+          <img
+            src={gallery[activeImg]} alt={load.route}
+            style={{ width:"100%", height:"100%", objectFit:"cover", objectPosition:"center 72%", filter:"brightness(0.52) blur(2px)", transform:"scale(1.03)", transition:"transform 0.4s ease" }}
+          />
+        </div>
         <div style={{
           position:"absolute", inset:0,
           background:"linear-gradient(160deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.55) 50%, rgba(8,8,8,1) 100%)",
+          pointerEvents:"none",
         }} />
+
+        {/* Expand badge */}
+        <div
+          onClick={() => setLightboxOpen(true)}
+          style={{ position:"absolute", top:16, right:16, display:"flex", alignItems:"center", gap:6, background:"rgba(0,0,0,0.55)", border:"1px solid rgba(255,255,255,0.18)", borderRadius:6, padding:"6px 10px", cursor:"pointer", backdropFilter:"blur(6px)", zIndex:2, transition:"background 0.15s" }}
+          onMouseEnter={e => { e.currentTarget.style.background="rgba(204,0,0,0.65)"; }}
+          onMouseLeave={e => { e.currentTarget.style.background="rgba(0,0,0,0.55)"; }}
+        >
+          <svg width="13" height="13" viewBox="0 0 256 256" fill="rgba(255,255,255,0.75)">
+            <path d="M221.66,34.34a8,8,0,0,0-9.19-1.7L28.52,120.64a8,8,0,0,0,.72,14.87L104,155.55V224a8,8,0,0,0,13.93,5.34l26.08-28.7L200,223.82a8,8,0,0,0,10.65-4.6l32-176A8,8,0,0,0,221.66,34.34Z"/>
+          </svg>
+          <span style={{ fontFamily:"'Barlow',sans-serif", fontSize:10, fontWeight:700, color:"rgba(255,255,255,0.8)", letterSpacing:1 }}>
+            {activeImg + 1} / {gallery.length}
+          </span>
+        </div>
 
         <div style={{
           position:"absolute", bottom:"clamp(28px,5vw,56px)",
@@ -204,6 +262,26 @@ export const LoadDetailPage: React.FC<LoadDetailPageProps> = ({
         </div>
       </div>
 
+ {/* Thumbnail strip */}
+      <div style={{ background: isDark ? "#0d0d0d" : "#ebebeb", borderBottom:`1px solid ${bord}`, padding:"10px clamp(20px,5vw,80px)", display:"flex", gap:8 }}>
+        {gallery.map((img, i) => (
+          <button
+            key={i}
+            className="gallery-thumb"
+            onClick={() => setActiveImg(i)}
+            style={{
+              width:64, height:44, borderRadius:4, overflow:"hidden", padding:0, flexShrink:0, cursor:"pointer",
+              border: i === activeImg ? "2px solid #CC0000" : "2px solid transparent",
+              opacity: i === activeImg ? 1 : 0.5,
+              boxShadow: i === activeImg ? "0 0 10px rgba(204,0,0,0.55)" : "none",
+              transition:"all 0.15s",
+            }}
+          >
+            <img src={img} alt="" style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }} />
+          </button>
+        ))}
+      </div>
+
  {/* Main content */}
       <div style={{ maxWidth:1100, margin:"0 auto", padding:"clamp(24px,4vw,56px) clamp(16px,4vw,48px) 80px" }}>
 
@@ -225,7 +303,7 @@ export const LoadDetailPage: React.FC<LoadDetailPageProps> = ({
         </div>
 
  {/* Two-column layout below */}
-        <div style={{ display:"grid", gridTemplateColumns:"1fr clamp(280px,35%,400px)", gap:24, alignItems:"start" }}>
+        <div className="dp-grid" style={{ display:"grid", gridTemplateColumns:"1fr clamp(280px,35%,400px)", gap:24, alignItems:"start" }}>
 
  {/* Left column */}
           <div style={{ display:"flex", flexDirection:"column", gap:20 }}>
@@ -475,7 +553,10 @@ export const LoadDetailPage: React.FC<LoadDetailPageProps> = ({
           </div>
 
  {/* Right column — sticky booking card */}
-          <div style={{ position:"sticky", top:76 }}>
+          <div
+            className="dp-aside"
+            style={{ position:"sticky", top:76, alignSelf:"start", maxHeight:"calc(100vh - 92px)", overflowY:"auto" }}
+          >
             <div style={{
               background:card, border:`1px solid ${bord}`, borderRadius:16,
               overflow:"hidden", animation:"detailFadeUp 0.5s ease 0.2s both",
@@ -614,6 +695,58 @@ export const LoadDetailPage: React.FC<LoadDetailPageProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Lightbox */}
+      {lightboxOpen && (
+        <div
+          onClick={() => setLightboxOpen(false)}
+          style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.93)", zIndex:3000, display:"flex", alignItems:"center", justifyContent:"center", animation:"lbFadeIn 0.22s ease both" }}
+        >
+          {/* Close */}
+          <button
+            onClick={() => setLightboxOpen(false)}
+            style={{ position:"absolute", top:18, right:18, width:40, height:40, background:"rgba(255,255,255,0.1)", border:"1px solid rgba(255,255,255,0.18)", borderRadius:"50%", color:"#fff", fontSize:18, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", zIndex:1, transition:"background 0.15s" }}
+            onMouseEnter={e => { e.currentTarget.style.background="rgba(204,0,0,0.5)"; }}
+            onMouseLeave={e => { e.currentTarget.style.background="rgba(255,255,255,0.1)"; }}
+          >✕</button>
+
+          {/* Counter */}
+          <div style={{ position:"absolute", top:24, left:"50%", transform:"translateX(-50%)", fontFamily:"'Barlow',sans-serif", fontSize:12, color:"rgba(255,255,255,0.45)", letterSpacing:2 }}>
+            {activeImg + 1} / {gallery.length}
+          </div>
+
+          {/* Prev */}
+          <button className="lb-nav" onClick={e => { e.stopPropagation(); setActiveImg(i => (i - 1 + gallery.length) % gallery.length); }}
+            style={{ position:"absolute", left:16, top:"50%", transform:"translateY(-50%)", width:46, height:46, background:"rgba(255,255,255,0.1)", border:"1px solid rgba(255,255,255,0.15)", borderRadius:"50%", color:"#fff", fontSize:24, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", transition:"background 0.15s", zIndex:1 }}>
+            ‹
+          </button>
+
+          {/* Image */}
+          <img
+            src={gallery[activeImg]} alt=""
+            onClick={e => e.stopPropagation()}
+            style={{ maxWidth:"88vw", maxHeight:"84vh", objectFit:"contain", borderRadius:6, boxShadow:"0 30px 80px rgba(0,0,0,0.8)", animation:"lbFadeIn 0.2s ease both" }}
+          />
+
+          {/* Next */}
+          <button className="lb-nav" onClick={e => { e.stopPropagation(); setActiveImg(i => (i + 1) % gallery.length); }}
+            style={{ position:"absolute", right:16, top:"50%", transform:"translateY(-50%)", width:46, height:46, background:"rgba(255,255,255,0.1)", border:"1px solid rgba(255,255,255,0.15)", borderRadius:"50%", color:"#fff", fontSize:24, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", transition:"background 0.15s", zIndex:1 }}>
+            ›
+          </button>
+
+          {/* Bottom thumbnails */}
+          <div style={{ position:"absolute", bottom:16, left:"50%", transform:"translateX(-50%)", display:"flex", gap:8 }}>
+            {gallery.map((img, i) => (
+              <button key={i} onClick={e => { e.stopPropagation(); setActiveImg(i); }}
+                style={{ width:54, height:38, borderRadius:3, overflow:"hidden", border: i === activeImg ? "2px solid #CC0000" : "2px solid rgba(255,255,255,0.2)", cursor:"pointer", padding:0, opacity: i === activeImg ? 1 : 0.45, transition:"all 0.15s" }}
+                onMouseEnter={e => { e.currentTarget.style.opacity = "1"; }}
+                onMouseLeave={e => { e.currentTarget.style.opacity = i === activeImg ? "1" : "0.45"; }}>
+                <img src={img} alt="" style={{ width:"100%", height:"100%", objectFit:"cover" }} />
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

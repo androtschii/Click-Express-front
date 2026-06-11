@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+﻿import React, { useState, useEffect, useContext } from "react";
 import { ThemeContext } from "../../theme";
 import type { Load } from "../../types/index";
 import { useLanguage } from "../../context/LanguageContext";
@@ -11,9 +11,13 @@ interface LoadCardProps {
   onCancelBook?: (load?: Load) => void;
   onSave?: (saved: boolean, load?: Load) => void;
   onDetails?: (load: Load) => void;
+  onCompare?: (load: Load) => void;
   isBooked?: boolean;
   isSaved?: boolean;
   isAdmin?: boolean;
+  isCompared?: boolean;
+  compareDisabled?: boolean;
+  priority?: boolean;
 }
 
 const HeartIcon = ({ saved, onClick }: { saved: boolean; onClick: () => void }) => {
@@ -30,7 +34,7 @@ const HeartIcon = ({ saved, onClick }: { saved: boolean; onClick: () => void }) 
         @keyframes burstRing{0%{transform:translate(-50%,-50%) scale(0.3);opacity:1}100%{transform:translate(-50%,-50%) scale(2.2);opacity:0}}
         @keyframes particle{0%{transform:translate(0,0) scale(1);opacity:1}100%{transform:translate(var(--tx),var(--ty)) scale(0);opacity:0}}
       `}</style>
-      <button onClick={handleClick} style={{ position:"absolute", top:10, right:10, width:38, height:38, borderRadius:"50%", border:"none", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", background: saved ? "linear-gradient(135deg, #ff4d6d, #CC0000)" : "rgba(0,0,0,0.55)", boxShadow: saved ? "0 0 16px rgba(204,0,0,0.7), 0 0 32px rgba(204,0,0,0.3)" : "0 2px 8px rgba(0,0,0,0.4)", transition:"all 0.3s ease", animation: burst ? "heartBeat 0.6s ease" : "none", overflow:"visible" }}>
+      <button className="lc-btn" onClick={handleClick} style={{ position:"absolute", top:10, right:10, width:38, height:38, borderRadius:"50%", border:"none", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", background: saved ? "linear-gradient(135deg, #ff4d6d, #CC0000)" : "rgba(0,0,0,0.55)", boxShadow: saved ? "0 0 16px rgba(204,0,0,0.7), 0 0 32px rgba(204,0,0,0.3)" : "0 2px 8px rgba(0,0,0,0.4)", transition:"all 0.3s ease", animation: burst ? "heartBeat 0.6s ease" : "none", overflow:"visible" }}>
         {burst && <div style={{ position:"absolute", left:"50%", top:"50%", width:38, height:38, borderRadius:"50%", border:"2px solid #ff4d6d", animation:"burstRing 0.5s ease-out forwards", pointerEvents:"none" }} />}
         {burst && [0,45,90,135,180,225,270,315].map((deg, i) => {
           const rad = deg * Math.PI / 180;
@@ -44,7 +48,7 @@ const HeartIcon = ({ saved, onClick }: { saved: boolean; onClick: () => void }) 
   );
 };
 
-export const LoadCard: React.FC<LoadCardProps> = ({ load, onBook, onCancelBook, onSave, onDetails, isBooked = false, isSaved = false, isAdmin = false }) => {
+export const LoadCard: React.FC<LoadCardProps> = ({ load, onBook, onCancelBook, onSave, onDetails, onCompare, isBooked = false, isSaved = false, isAdmin = false, isCompared = false, compareDisabled = false, priority = false }) => {
   const context = useContext(ThemeContext) as { theme?: 'dark' | 'light' };
   const theme = context.theme || 'dark';
   const isDark = theme === 'dark';
@@ -59,6 +63,7 @@ export const LoadCard: React.FC<LoadCardProps> = ({ load, onBook, onCancelBook, 
   const [bookHov, setBookHov] = useState(false);
   const [imgLoaded, setImgLoaded] = useState(false);
   const [spot, setSpot] = useState({ x: -200, y: -200 });
+  const [tilt, setTilt] = useState({ rx: 0, ry: 0 });
 
  // Admin edit state
   const [currentPrice, setCurrentPrice] = useState(load.price);
@@ -120,22 +125,42 @@ export const LoadCard: React.FC<LoadCardProps> = ({ load, onBook, onCancelBook, 
   const driveM = Math.round(((load.miles / 55) - driveH) * 60);
 
   return (
-    <div onMouseEnter={() => setHov(true)} onMouseLeave={() => { setHov(false); setSpot({ x: -200, y: -200 }); }}
+    <div
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => { setHov(false); setSpot({ x: -200, y: -200 }); setTilt({ rx: 0, ry: 0 }); }}
       onMouseMove={e => {
         const r = e.currentTarget.getBoundingClientRect();
-        setSpot({ x: e.clientX - r.left, y: e.clientY - r.top });
+        const x = e.clientX - r.left;
+        const y = e.clientY - r.top;
+        setSpot({ x, y });
+        setTilt({
+          rx: ((y / r.height) - 0.5) * -7,
+          ry: ((x / r.width)  - 0.5) *  7,
+        });
       }}
-      style={{ position: "relative", background:cardBg, border:`1px solid ${hov?"#CC0000":cardBorder}`, borderRadius:6, overflow:"hidden", transform:hov?"translateY(-6px)":"none", boxShadow:hov?"0 28px 56px rgba(0,0,0,0.65), 0 0 0 1px rgba(204,0,0,0.25)":"0 2px 14px rgba(0,0,0,0.22)", transition:"all 0.22s cubic-bezier(0.22,1,0.36,1)" }}>
+      style={{
+        position: "relative", background: cardBg,
+        border: `1px solid ${hov ? "#CC0000" : cardBorder}`,
+        borderRadius: 6, overflow: "hidden",
+        transform: hov
+          ? `perspective(800px) rotateX(${tilt.rx}deg) rotateY(${tilt.ry}deg) translateY(-6px)`
+          : "none",
+        boxShadow: hov
+          ? "0 32px 64px rgba(0,0,0,0.72), 0 12px 28px rgba(204,0,0,0.18), 0 0 0 1px rgba(204,0,0,0.3)"
+          : "0 2px 14px rgba(0,0,0,0.22)",
+        transition: "all 0.22s cubic-bezier(0.22,1,0.36,1)",
+        willChange: "transform",
+      }}>
       <div style={{ position: "absolute", inset: 0, pointerEvents: "none", zIndex: 2, opacity: hov ? 1 : 0, transition: "opacity 0.2s", background: `radial-gradient(360px circle at ${spot.x}px ${spot.y}px, rgba(204,0,0,0.12), transparent 50%)` }} />
 
  {/* Фото */}
       <div onClick={() => onDetails && onDetails(load)} style={{ position:"relative", height:280, overflow:"hidden", cursor: onDetails ? "pointer" : "default" }}>
  {/* Skeleton */}
         {!imgLoaded && <div style={{ position:"absolute", inset:0, background: isDark ? "#1a1a1a" : "#e8e8e8", animation:"shimmer 1.4s ease infinite" }} />}
-        <img src={currentImage} alt={load.route} onLoad={() => setImgLoaded(true)} style={{
+        <img src={currentImage} alt={load.route} loading={priority ? "eager" : "lazy"} decoding="async" fetchPriority={priority ? "high" : "auto"} onLoad={() => setImgLoaded(true)} style={{
           width:"100%", height:"100%", objectFit:"cover", objectPosition:"center 72%",
           filter: isDark ? "brightness(0.52)" : "brightness(1.0) saturate(1.1) contrast(1.04)",
-          transform: hov ? "scale(1.04)" : "scale(1)",
+          transform: hov ? "scale(1.06)" : "scale(1)",
           transition:"filter 0.3s ease, transform 0.5s cubic-bezier(0.22,1,0.36,1)",
           opacity: imgLoaded ? 1 : 0,
         }} />
@@ -146,8 +171,14 @@ export const LoadCard: React.FC<LoadCardProps> = ({ load, onBook, onCancelBook, 
 
  {/* Тег */}
         {load.tag && (
-          <div style={{ position:"absolute", top:0, left:0, background: load.tag==="Military Load" ? "linear-gradient(135deg,#1a3a6b,#0f2347)" : "linear-gradient(135deg,#CC0000,#990000)", color:"#fff", padding:"5px 14px", fontFamily:"'Anton',sans-serif", fontSize:9, letterSpacing:2.5, textTransform:"uppercase" }}>
-            {load.tag==="Best Load of the Week" ? "★ " : "✈ "}{load.tag}
+          <div style={{
+            position:"absolute", top:0, left:0,
+            background: load.tag==="Military Load" ? "linear-gradient(135deg,#1a3a6b,#0f2347)"
+                      : load.tag==="Weekly Gross"  ? "linear-gradient(135deg,#1a7a1a,#145214)"
+                      : "linear-gradient(135deg,#CC0000,#990000)",
+            color:"#fff", padding:"5px 14px", fontFamily:"'Anton',sans-serif", fontSize:9, letterSpacing:2.5, textTransform:"uppercase"
+          }}>
+            {load.tag==="Best Load of the Week" ? "★ " : load.tag==="Weekly Gross" ? "$ " : "✈ "}{load.tag}
           </div>
         )}
 
@@ -172,11 +203,11 @@ export const LoadCard: React.FC<LoadCardProps> = ({ load, onBook, onCancelBook, 
                   onChange={e => setImageInput(e.target.value)}
                   onKeyDown={e => e.key === "Enter" && saveImage()}
                 />
-                <button onClick={saveImage} style={{ padding:"3px 10px", borderRadius:4, border:"none", cursor:"pointer", fontSize:11, fontWeight:700, background:"#CC0000", color:"#fff", fontFamily:"'Barlow',sans-serif" }}>✓</button>
-                <button onClick={() => setEditingImage(false)} style={{ padding:"3px 10px", borderRadius:4, border:"none", cursor:"pointer", fontSize:11, fontWeight:700, background:"#555", color:"#fff", fontFamily:"'Barlow',sans-serif" }}>✕</button>
+                <button className="lc-btn" onClick={saveImage} style={{ padding:"3px 10px", borderRadius:4, border:"none", cursor:"pointer", fontSize:11, fontWeight:700, background:"#CC0000", color:"#fff", fontFamily:"'Barlow',sans-serif" }}>✓</button>
+                <button className="lc-btn" onClick={() => setEditingImage(false)} style={{ padding:"3px 10px", borderRadius:4, border:"none", cursor:"pointer", fontSize:11, fontWeight:700, background:"#555", color:"#fff", fontFamily:"'Barlow',sans-serif" }}>✕</button>
               </div>
             ) : (
-              <button onClick={() => { setImageInput(currentImage); setEditingImage(true); }} style={{ padding:"4px 10px", borderRadius:4, border:"1px solid rgba(255,255,255,0.25)", cursor:"pointer", fontSize:11, fontWeight:700, background:"rgba(0,0,0,0.7)", color:"#fff", fontFamily:"'Barlow',sans-serif", backdropFilter:"blur(4px)" }}>
+              <button className="lc-btn" onClick={() => { setImageInput(currentImage); setEditingImage(true); }} style={{ padding:"4px 10px", borderRadius:4, border:"1px solid rgba(255,255,255,0.25)", cursor:"pointer", fontSize:11, fontWeight:700, background:"rgba(0,0,0,0.7)", color:"#fff", fontFamily:"'Barlow',sans-serif", backdropFilter:"blur(4px)" }}>
                 {lang === 'ru' ? "📷 Фото" : "📷 Photo"}
               </button>
             )}
@@ -203,8 +234,8 @@ export const LoadCard: React.FC<LoadCardProps> = ({ load, onBook, onCancelBook, 
                     onChange={e => setPriceInput(e.target.value)}
                     onKeyDown={e => e.key === "Enter" && savePrice()}
                   />
-                  <button onClick={savePrice} style={{ padding:"4px 10px", borderRadius:4, border:"none", cursor:"pointer", fontSize:12, fontWeight:700, background:"#CC0000", color:"#fff", fontFamily:"'Barlow',sans-serif" }}>✓</button>
-                  <button onClick={() => setEditingPrice(false)} style={{ padding:"4px 10px", borderRadius:4, border:"none", cursor:"pointer", fontSize:12, fontWeight:700, background:"#555", color:"#fff", fontFamily:"'Barlow',sans-serif" }}>✕</button>
+                  <button className="lc-btn" onClick={savePrice} style={{ padding:"4px 10px", borderRadius:4, border:"none", cursor:"pointer", fontSize:12, fontWeight:700, background:"#CC0000", color:"#fff", fontFamily:"'Barlow',sans-serif" }}>✓</button>
+                  <button className="lc-btn" onClick={() => setEditingPrice(false)} style={{ padding:"4px 10px", borderRadius:4, border:"none", cursor:"pointer", fontSize:12, fontWeight:700, background:"#555", color:"#fff", fontFamily:"'Barlow',sans-serif" }}>✕</button>
                 </div>
               ) : (
                 <div style={{ display:"flex", alignItems:"center", gap:8 }}>
@@ -212,7 +243,7 @@ export const LoadCard: React.FC<LoadCardProps> = ({ load, onBook, onCancelBook, 
                     ${currentPrice.toLocaleString()}
                   </div>
                   {isAdmin && (
-                    <button onClick={() => { setPriceInput(String(currentPrice)); setEditingPrice(true); }} style={{ padding:"3px 8px", borderRadius:4, border:"1px solid rgba(255,255,255,0.25)", cursor:"pointer", fontSize:11, background:"rgba(0,0,0,0.6)", color:"#fff", fontFamily:"'Barlow',sans-serif", backdropFilter:"blur(4px)", alignSelf:"flex-end", marginBottom:6 }}>✏️</button>
+                    <button className="lc-btn" onClick={() => { setPriceInput(String(currentPrice)); setEditingPrice(true); }} style={{ padding:"3px 8px", borderRadius:4, border:"1px solid rgba(255,255,255,0.25)", cursor:"pointer", fontSize:11, background:"rgba(0,0,0,0.6)", color:"#fff", fontFamily:"'Barlow',sans-serif", backdropFilter:"blur(4px)", alignSelf:"flex-end", marginBottom:6 }}>✏️</button>
                   )}
                 </div>
               )}
@@ -275,6 +306,7 @@ export const LoadCard: React.FC<LoadCardProps> = ({ load, onBook, onCancelBook, 
             <div style={{ fontSize:13, color:textPhone, fontFamily:"'DM Sans',sans-serif", fontWeight:700, marginTop:1 }}>+1 786-202-6599</div>
           </div>
           <button
+            className="lc-btn"
             onClick={handleBook}
             onMouseEnter={() => setBookHov(true)}
             onMouseLeave={() => setBookHov(false)}
@@ -294,7 +326,33 @@ export const LoadCard: React.FC<LoadCardProps> = ({ load, onBook, onCancelBook, 
           </button>
         </div>
       </div>
-      <style>{`@keyframes shimmer{0%,100%{opacity:0.5}50%{opacity:1}}`}</style>
+        {onCompare && (
+          <button
+            className="lc-btn"
+            onClick={e => { e.stopPropagation(); onCompare(load); }}
+            disabled={compareDisabled && !isCompared}
+            style={{
+              marginTop: 10, width: "100%", padding: "7px",
+              background: isCompared ? (isDark ? "rgba(204,0,0,0.12)" : "rgba(204,0,0,0.08)") : "transparent",
+              border: `1px solid ${isCompared ? "#CC0000" : dividerColor}`,
+              color: isCompared ? "#CC0000" : textSecondary,
+              fontFamily: "'Anton', sans-serif", fontSize: 9, letterSpacing: 2.5,
+              textTransform: "uppercase", cursor: compareDisabled && !isCompared ? "not-allowed" : "pointer",
+              transition: "all 0.15s", opacity: compareDisabled && !isCompared ? 0.4 : 1,
+              display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+            }}
+            onMouseEnter={e => { if (!compareDisabled || isCompared) { (e.currentTarget as HTMLButtonElement).style.borderColor = "#CC0000"; (e.currentTarget as HTMLButtonElement).style.color = "#CC0000"; } }}
+            onMouseLeave={e => { if (!isCompared) { (e.currentTarget as HTMLButtonElement).style.borderColor = dividerColor; (e.currentTarget as HTMLButtonElement).style.color = textSecondary; } }}
+          >
+            {isCompared ? "✓ " : "⊕ "}
+            {isCompared
+              ? (lang === "ru" ? "В СРАВНЕНИИ" : "IN COMPARE")
+              : compareDisabled
+                ? (lang === "ru" ? "МАХ 3 ГРУЗА" : "MAX 3 LOADS")
+                : (lang === "ru" ? "СРАВНИТЬ" : "COMPARE")}
+          </button>
+        )}
+      <style>{`@keyframes shimmer{0%,100%{opacity:0.5}50%{opacity:1}}.lc-btn:active{transform:scale(0.97)!important;transition:transform 0.08s!important;}`}</style>
     </div>
   );
 };

@@ -1,9 +1,14 @@
-import React, { useState, useEffect, useRef } from "react";
+﻿import React, { useState, useEffect, useRef } from "react";
+import { toast as sonnerToast } from "sonner";
 import type { Session } from "../../services/authService";
 import { getUserById, updateUser } from "../../services/authService";
 import { useLanguage } from "../../context/LanguageContext";
 import { translations } from "../../i18n/translations";
 import type { Load } from "../../types/index";
+import { API_BASE } from "../../config";
+import { UploadSimple, FilePdf, FileImage, FileDoc, Trash, DownloadSimple } from "@phosphor-icons/react";
+import { StatusBadge } from "../ui/Badge";
+import { EmptyState } from "../ui/EmptyState";
 
 interface ProfilePageProps {
   session: Session;
@@ -20,7 +25,15 @@ interface ProfilePageProps {
   onTrack?: (load: Load) => void;
 }
 
-type Tab = "overview" | "orders" | "saved" | "payment" | "settings";
+type Tab = "overview" | "orders" | "saved" | "documents" | "payment" | "settings";
+
+interface DocItem {
+  id: number;
+  fileName: string;
+  fileType: string;
+  uploadedAt: string;
+  url: string;
+}
 
 export const ProfilePage: React.FC<ProfilePageProps> = ({
   session, theme = "dark",
@@ -65,20 +78,69 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
   const [payLoad, setPayLoad]         = useState<Load | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
+  const [docs, setDocs]               = useState<DocItem[]>([]);
+  const [docUploading, setDocUploading] = useState(false);
+  const [docDragOver, setDocDragOver] = useState(false);
+  const docInputRef                   = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    fetch(`${API_BASE}/document`, { headers: { Authorization: `Bearer ${session.token}` } })
+      .then(r => r.ok ? r.json() : Promise.reject())
+      .then((data: { id: number; url: string; uploadedAt: string; fileName: string }[]) => {
+        setDocs(data.map(d => ({
+          id: d.id,
+          fileName: d.fileName || d.url.split("/").pop() || String(d.id),
+          fileType: d.url.split(".").pop() || "",
+          uploadedAt: d.uploadedAt,
+          url: d.url,
+        })));
+      })
+      .catch(() => {});
+  }, [session.token]);
+
+  const uploadDoc = async (file: File) => {
+    setDocUploading(true);
+    const form = new FormData();
+    form.append("file", file);
+    try {
+      const res = await fetch(`${API_BASE}/document/upload`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${session.token}` },
+        body: form,
+      });
+      if (!res.ok) throw new Error();
+      const data = await res.json();
+      setDocs(prev => [{ id: data.id, fileName: file.name, fileType: file.type, uploadedAt: new Date().toISOString(), url: data.url ?? "" }, ...prev]);
+    } catch {
+      notify(lang === "ru" ? "Ошибка загрузки файла" : "Upload failed");
+    } finally {
+      setDocUploading(false);
+    }
+  };
+
+  const handleDocFiles = (files: FileList | null) => {
+    if (!files) return;
+    Array.from(files).forEach(f => uploadDoc(f));
+  };
+
   useEffect(() => {
     if (toast) { const id = setTimeout(() => setToast(null), 3200); return () => clearTimeout(id); }
   }, [toast]);
 
-  const notify = (msg: string, ok = true) => setToast({ msg, ok });
+  const notify = (msg: string, ok = true) => {
+    setToast({ msg, ok });
+    if (ok) sonnerToast.success(msg);
+    else sonnerToast.error(msg);
+  };
 
-  const handleSaveName = () => {
+  const handleSaveName = async () => {
     if (!nameVal.trim()) return;
-    const res = updateUser(session.userId, { name: nameVal.trim() });
+    const res = await updateUser(session.userId, { name: nameVal.trim() });
     if (res.ok) { setDisplayName(nameVal.trim()); onSessionUpdate?.(nameVal.trim()); setEditName(false); notify(t.nameSaved); }
   };
 
-  const handleSavePass = () => {
-    const res = updateUser(session.userId, { currentPassword: curPass, newPassword: newPass });
+  const handleSavePass = async () => {
+    const res = await updateUser(session.userId, { currentPassword: curPass, newPassword: newPass });
     if (!res.ok) { notify(res.error === "wrong_password" ? t.wrongPassword : t.passwordShort, false); }
     else { setCurPass(""); setNewPass(""); setEditPass(false); notify(t.passwordSaved); }
   };
@@ -107,8 +169,9 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
   const TABS: { id: Tab; label: string; count?: number }[] = [
     { id: "overview", label: lang === "ru" ? "Обзор" : "Overview" },
     { id: "orders",   label: lang === "ru" ? "Мои заказы" : "My Orders", count: bookedLoads.length },
-    { id: "saved",    label: lang === "ru" ? "Избранное" : "Saved", count: savedLoads.length },
-    { id: "payment",  label: lang === "ru" ? "Оплата" : "Payment" },
+    { id: "saved",     label: lang === "ru" ? "Избранное" : "Saved", count: savedLoads.length },
+    { id: "documents", label: lang === "ru" ? "Документы" : "Documents", count: docs.length || undefined },
+    { id: "payment",   label: lang === "ru" ? "Оплата" : "Payment" },
     { id: "settings", label: lang === "ru" ? "Настройки" : "Settings" },
   ];
 
@@ -126,7 +189,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
       <div style={{ background: isDark ? "linear-gradient(135deg,#0a0000 0%,#1a0000 40%,#0d0d0d 100%)" : "linear-gradient(135deg,#fff 0%,#fff5f5 60%,#ffe8e8 100%)", borderBottom: "1px solid rgba(204,0,0,0.2)", padding: "48px clamp(20px,5vw,64px) 0", position:"relative", overflow:"hidden" }}>
  {/* Truck silhouette background */}
         <div style={{ position:"absolute", right:0, bottom:0, top:0, width:"55%", pointerEvents:"none", zIndex:0 }}>
-          <img src="/images/real2.jpg" alt="" style={{ width:"100%", height:"100%", objectFit:"cover", objectPosition:"center 60%", filter: isDark ? "brightness(0.12) saturate(0.4)" : "brightness(0.08) saturate(0)", opacity: isDark ? 1 : 0.35 }} />
+          <img src="/images/real2.webp" alt="" style={{ width:"100%", height:"100%", objectFit:"cover", objectPosition:"center 60%", filter: isDark ? "brightness(0.12) saturate(0.4)" : "brightness(0.08) saturate(0)", opacity: isDark ? 1 : 0.35 }} />
           <div style={{ position:"absolute", inset:0, background: isDark ? "linear-gradient(to right,#0a0000 0%,transparent 55%)" : "linear-gradient(to right,#fff 0%,transparent 55%)" }} />
         </div>
         <div style={{ maxWidth: 1100, margin: "0 auto", position:"relative", zIndex:1 }}>
@@ -282,20 +345,39 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
  {/* MY ORDERS */}
         {tab === "orders" && (
           <div>
-            <div style={{ fontFamily:"'Oswald',sans-serif", fontWeight:700, fontSize:22, color:text, textTransform:"uppercase", marginBottom:20 }}>
-              {lang==="ru"?"МОИ ЗАКАЗЫ":"MY ORDERS"} <span style={{ color:"#CC0000" }}>({bookedLoads.length})</span>
+            <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:20, flexWrap:"wrap", gap:10 }}>
+              <div style={{ fontFamily:"'Oswald',sans-serif", fontWeight:700, fontSize:22, color:text, textTransform:"uppercase" }}>
+                {lang==="ru"?"МОИ ЗАКАЗЫ":"MY ORDERS"} <span style={{ color:"#CC0000" }}>({bookedLoads.length})</span>
+              </div>
+              {bookedLoads.length > 0 && (
+                <button
+                  onClick={() => {
+                    const rows = [["Route","Destination","Cargo","Price","Miles","RPM"],...bookedLoads.map(l => [l.route,l.dest,l.cargo,l.price,l.miles,(l.price/l.miles).toFixed(2)])];
+                    const csv = rows.map(r => r.join(",")).join("\n");
+                    const a = document.createElement("a");
+                    a.href = URL.createObjectURL(new Blob([csv],{type:"text/csv"}));
+                    a.download = `orders_${new Date().toISOString().slice(0,10)}.csv`;
+                    a.click();
+                  }}
+                  style={{ padding:"7px 16px", background:"transparent", border:`1px solid ${border}`, borderRadius:6, color:muted, fontFamily:"'Barlow',sans-serif", fontWeight:700, fontSize:12, letterSpacing:0.5, cursor:"pointer", transition:"all 0.15s" }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor="#CC0000"; e.currentTarget.style.color="#CC0000"; }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor=border; e.currentTarget.style.color=muted; }}
+                >
+                  ↓ {lang==="ru"?"Экспорт CSV":"Export CSV"}
+                </button>
+              )}
             </div>
             {bookedLoads.length === 0 ? (
-              <div style={{ textAlign:"center", padding:"80px 0" }}>
-                <div style={{ fontSize:56, marginBottom:14 }}>📦</div>
-                <div style={{ fontFamily:"'Barlow',sans-serif", fontSize:15, color:muted, marginBottom:24 }}>{lang==="ru"?"Заказов пока нет":"No orders yet"}</div>
-                <button onClick={onBrowseLoads ?? onBack} style={{ display:"inline-flex", alignItems:"center", gap:10, padding:"14px 32px", background:"linear-gradient(135deg,#CC0000,#ff3333)", border:"none", borderRadius:10, color:"#fff", fontFamily:"'Oswald',sans-serif", fontWeight:700, fontSize:15, letterSpacing:2, textTransform:"uppercase", cursor:"pointer", boxShadow:"0 6px 24px rgba(204,0,0,0.4)", transition:"all 0.15s" }}
-                  onMouseEnter={e => { e.currentTarget.style.transform="translateY(-2px)"; e.currentTarget.style.boxShadow="0 10px 32px rgba(204,0,0,0.55)"; }}
-                  onMouseLeave={e => { e.currentTarget.style.transform="none"; e.currentTarget.style.boxShadow="0 6px 24px rgba(204,0,0,0.4)"; }}>
-                  <span style={{ fontSize:20, lineHeight:1 }}>+</span>
-                  {lang==="ru"?"Найти груз":"Find a Load"}
-                </button>
-              </div>
+              <EmptyState
+                icon="📦"
+                title={lang === "ru" ? "Заказов пока нет" : "No orders yet"}
+                description={lang === "ru" ? "Найдите подходящий груз и оформите заказ" : "Browse available loads and place your first order"}
+                action={
+                  <button onClick={onBrowseLoads ?? onBack} style={{ padding:"12px 28px", background:"#CC0000", border:"none", borderRadius:8, color:"#fff", fontFamily:"'Barlow',sans-serif", fontWeight:700, fontSize:13, letterSpacing:1.5, textTransform:"uppercase", cursor:"pointer" }}>
+                    {lang === "ru" ? "Найти груз" : "Find a Load"}
+                  </button>
+                }
+              />
             ) : (
               <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(300px,1fr))", gap:16 }}>
                 {bookedLoads.map((l, idx) => {
@@ -307,8 +389,8 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                       <div onClick={() => onDetails?.(l)} style={{ position:"relative", height:160, cursor:"pointer" }}>
                         <img src={l.image} alt="" style={{ width:"100%", height:"100%", objectFit:"cover", objectPosition:"center 72%", filter: isDark?"brightness(0.6)":"brightness(0.72)" }} />
                         <div style={{ position:"absolute", inset:0, background:"linear-gradient(to bottom,transparent 30%,rgba(0,0,0,0.85))" }} />
-                        <div style={{ position:"absolute", top:10, right:10, background:"rgba(0,180,80,0.15)", border:"1px solid rgba(0,180,80,0.4)", borderRadius:20, padding:"3px 10px", fontFamily:"'Barlow',sans-serif", fontWeight:700, fontSize:9, color:"#00b450", letterSpacing:1, textTransform:"uppercase" }}>
-                          ✓ {lang==="ru"?"Активен":"Active"}
+                        <div style={{ position:"absolute", top:10, right:10 }}>
+                          <StatusBadge status="active" size="sm" />
                         </div>
                         <div style={{ position:"absolute", bottom:12, left:14 }}>
                           <div style={{ fontFamily:"'Oswald',sans-serif", fontWeight:700, fontSize:22, color:"#fff" }}>${l.price.toLocaleString()}</div>
@@ -355,16 +437,16 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
               {lang==="ru"?"ИЗБРАННОЕ":"SAVED LOADS"} <span style={{ color:"#CC0000" }}>({savedLoads.length})</span>
             </div>
             {savedLoads.length === 0 ? (
-              <div style={{ textAlign:"center", padding:"80px 0" }}>
-                <div style={{ fontSize:56, marginBottom:14 }}>❤️</div>
-                <div style={{ fontFamily:"'Barlow',sans-serif", fontSize:15, color:muted, marginBottom:24 }}>{lang==="ru"?"Нет сохранённых грузов":"No saved loads"}</div>
-                <button onClick={onBrowseLoads ?? onBack} style={{ display:"inline-flex", alignItems:"center", gap:10, padding:"14px 32px", background:"linear-gradient(135deg,#CC0000,#ff3333)", border:"none", borderRadius:10, color:"#fff", fontFamily:"'Oswald',sans-serif", fontWeight:700, fontSize:15, letterSpacing:2, textTransform:"uppercase", cursor:"pointer", boxShadow:"0 6px 24px rgba(204,0,0,0.4)", transition:"all 0.15s" }}
-                  onMouseEnter={e => { e.currentTarget.style.transform="translateY(-2px)"; e.currentTarget.style.boxShadow="0 10px 32px rgba(204,0,0,0.55)"; }}
-                  onMouseLeave={e => { e.currentTarget.style.transform="none"; e.currentTarget.style.boxShadow="0 6px 24px rgba(204,0,0,0.4)"; }}>
-                  <span style={{ fontSize:20, lineHeight:1 }}>+</span>
-                  {lang==="ru"?"Просмотреть грузы":"Browse Loads"}
-                </button>
-              </div>
+              <EmptyState
+                icon="❤️"
+                title={lang === "ru" ? "Нет сохранённых грузов" : "No saved loads"}
+                description={lang === "ru" ? "Добавьте понравившиеся грузы в избранное" : "Save loads you like to find them quickly later"}
+                action={
+                  <button onClick={onBrowseLoads ?? onBack} style={{ padding:"12px 28px", background:"#CC0000", border:"none", borderRadius:8, color:"#fff", fontFamily:"'Barlow',sans-serif", fontWeight:700, fontSize:13, letterSpacing:1.5, textTransform:"uppercase", cursor:"pointer" }}>
+                    {lang === "ru" ? "Просмотреть грузы" : "Browse Loads"}
+                  </button>
+                }
+              />
             ) : (
               <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(300px,1fr))", gap:16 }}>
                 {savedLoads.map((l, idx) => {
@@ -397,6 +479,111 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                           </button>
                         </div>
                       </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
+
+ {/* DOCUMENTS */}
+        {tab === "documents" && (
+          <div style={{ maxWidth: 720 }}>
+            <div style={{ fontFamily:"'Oswald',sans-serif", fontWeight:700, fontSize:22, color:text, textTransform:"uppercase", marginBottom:6 }}>
+              {lang === "ru" ? "МОИ ДОКУМЕНТЫ" : "MY DOCUMENTS"}
+            </div>
+            <p style={{ fontFamily:"'Barlow',sans-serif", fontSize:13, color:muted, marginBottom:24 }}>
+              {lang === "ru"
+                ? "Загружайте BOL, CMR, разрешения и другие документы. Поддерживаются PDF, JPG, PNG, DOC, DOCX."
+                : "Upload BOLs, permits, insurance certificates and other documents. Accepted: PDF, JPG, PNG, DOC, DOCX."}
+            </p>
+
+            {/* Drop zone */}
+            <div
+              onDragOver={e => { e.preventDefault(); setDocDragOver(true); }}
+              onDragLeave={() => setDocDragOver(false)}
+              onDrop={e => { e.preventDefault(); setDocDragOver(false); handleDocFiles(e.dataTransfer.files); }}
+              onClick={() => docInputRef.current?.click()}
+              style={{
+                border: `2px dashed ${docDragOver ? "#CC0000" : isDark ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.15)"}`,
+                borderRadius: 10,
+                padding: "36px 24px",
+                textAlign: "center",
+                cursor: "pointer",
+                background: docDragOver ? "rgba(204,0,0,0.06)" : "transparent",
+                transition: "all 0.2s",
+                marginBottom: 20,
+              }}
+            >
+              <input
+                ref={docInputRef}
+                type="file"
+                multiple
+                accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                style={{ display: "none" }}
+                onChange={e => handleDocFiles(e.target.files)}
+              />
+              <UploadSimple size={32} color={docDragOver ? "#CC0000" : muted} weight="duotone" style={{ marginBottom: 10 }} />
+              <div style={{ fontFamily:"'Barlow',sans-serif", fontWeight:700, fontSize:14, color: docDragOver ? "#CC0000" : text, marginBottom:6 }}>
+                {docUploading
+                  ? (lang === "ru" ? "Загрузка..." : "Uploading...")
+                  : (lang === "ru" ? "Перетащите файлы или нажмите для выбора" : "Drag & drop files or click to browse")}
+              </div>
+              <div style={{ fontFamily:"'Barlow',sans-serif", fontSize:11, color:muted }}>PDF, JPG, PNG, DOC, DOCX · max 10MB</div>
+            </div>
+
+            {/* File list */}
+            {docs.length === 0 ? (
+              <EmptyState
+                icon="📄"
+                title={lang === "ru" ? "Нет документов" : "No documents"}
+                description={lang === "ru" ? "Загрузите PDF, изображения или Word-файлы" : "Upload PDF, images or Word files"}
+              />
+            ) : (
+              <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+                {docs.map(doc => {
+                  const isPdf = doc.fileType.includes("pdf") || doc.fileName.endsWith(".pdf");
+                  const isImg = doc.fileType.startsWith("image/");
+                  const Icon = isPdf ? FilePdf : isImg ? FileImage : FileDoc;
+                  return (
+                    <div key={doc.id} style={{
+                      display:"flex", alignItems:"center", gap:12,
+                      background: card, border:`1px solid ${border}`,
+                      borderRadius:8, padding:"12px 16px",
+                    }}>
+                      <Icon size={22} color="#CC0000" weight="duotone" style={{ flexShrink:0 }} />
+                      <div style={{ flex:1, minWidth:0 }}>
+                        <div style={{ fontFamily:"'Barlow',sans-serif", fontWeight:700, fontSize:13, color:text, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{doc.fileName}</div>
+                        <div style={{ fontFamily:"'Barlow',sans-serif", fontSize:10, color:muted, marginTop:2 }}>
+                          {new Date(doc.uploadedAt).toLocaleDateString(lang === "ru" ? "ru-RU" : "en-US", { day:"2-digit", month:"short", year:"numeric" })}
+                        </div>
+                      </div>
+                      <a
+                        href={doc.url ? `${API_BASE.replace("/api", "")}${doc.url}` : `${API_BASE}/document/${doc.id}/download`}
+                        download={doc.fileName}
+                        target="_blank"
+                        rel="noreferrer"
+                        style={{ color:muted, display:"flex", alignItems:"center" }}
+                        title={lang === "ru" ? "Скачать" : "Download"}
+                      >
+                        <DownloadSimple size={18} />
+                      </a>
+                      <button
+                        onClick={async () => {
+                          try {
+                            await fetch(`${API_BASE}/document/${doc.id}`, {
+                              method: "DELETE",
+                              headers: { Authorization: `Bearer ${session.token}` },
+                            });
+                          } catch { /* ignore network errors */ }
+                          setDocs(prev => prev.filter(d => d.id !== doc.id));
+                        }}
+                        style={{ background:"transparent", border:"none", cursor:"pointer", color:muted, display:"flex", alignItems:"center", padding:0 }}
+                        title={lang === "ru" ? "Удалить" : "Remove"}
+                      >
+                        <Trash size={16} />
+                      </button>
                     </div>
                   );
                 })}

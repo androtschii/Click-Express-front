@@ -395,6 +395,11 @@ export const NewsPage: React.FC<NewsPageProps> = ({ theme = "dark", onBack, onVi
         .catbtn:hover { background: rgba(204,0,0,0.07) !important; text-shadow: 0 0 18px rgba(204,0,0,0.55); }
         .backbtn { transition: color 0.15s !important; }
         .backbtn:hover { color:#CC0000 !important; }
+        .news-hero-grid { display:grid; grid-template-columns:1fr 1fr; gap:60px; align-items:center; padding-bottom:72px; }
+        @media (max-width: 900px) {
+          .news-hero-grid { grid-template-columns:1fr; gap:32px; padding-bottom:48px; }
+          .news-dot-info { display:none !important; }
+        }
         .ctabtn { transition: all 0.18s ease !important; }
         .ctabtn:hover { transform:translateY(-2px) !important; box-shadow:0 12px 40px rgba(0,0,0,0.45) !important; }
         * { box-sizing:border-box; }
@@ -526,7 +531,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({ theme = "dark", onBack, onVi
               <button className="backbtn" onClick={onBack} style={{ background: "transparent", border: "none", color: textMuted, fontFamily: "'Anton', sans-serif", fontSize: 11, letterSpacing: 3, cursor: "pointer", textTransform: "uppercase", display: "flex", alignItems: "center", gap: 8 }}>
                 ← {lang === "ru" ? "НАЗАД" : "BACK"}
               </button>
-              <div style={{ fontFamily: "'Anton', sans-serif", fontSize: 10, letterSpacing: 3, color: textSubtle, textTransform: "uppercase" }}>US DOT 3159368 · MC 110572 · +1 786-202-6599</div>
+              <div className="news-dot-info" style={{ fontFamily: "'Anton', sans-serif", fontSize: 10, letterSpacing: 3, color: textSubtle, textTransform: "uppercase" }}>US DOT 3159368 · MC 110572 · +1 786-202-6599</div>
               <div style={{ display: "flex", alignItems: "center", gap: 8, background: "rgba(204,0,0,0.12)", border: "1px solid rgba(204,0,0,0.35)", borderRadius: 20, padding: "5px 14px" }}>
                 <div style={{ width: 7, height: 7, borderRadius: "50%", background: "#CC0000", animation: "pulse 1.6s ease infinite" }} />
                 <span style={{ fontFamily: "'Anton', sans-serif", fontSize: 9, letterSpacing: 3, color: "#CC0000", textTransform: "uppercase" }}>{lang === "ru" ? "АКТУАЛЬНО" : "LIVE"}</span>
@@ -534,13 +539,13 @@ export const NewsPage: React.FC<NewsPageProps> = ({ theme = "dark", onBack, onVi
             </div>
 
  {/* Основной контент — две колонки */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 60, alignItems: "center", paddingBottom: 72, animation: "slideUp 0.6s ease both" }}>
+            <div className="news-hero-grid" style={{ animation: "slideUp 0.6s ease both" }}>
  {/* Левая: текст */}
               <div>
                 <div style={{ fontFamily: "'Anton', sans-serif", fontSize: 9, letterSpacing: 6, color: "#CC0000", textTransform: "uppercase", marginBottom: 18 }}>
                   {lang === "ru" ? "ОФИЦИАЛЬНЫЕ НОВОСТИ КОМПАНИИ" : "OFFICIAL COMPANY DISPATCH"}
                 </div>
-                <h1 style={{ fontFamily: "'Anton', sans-serif", fontSize: "clamp(52px,7.5vw,104px)", textTransform: "uppercase", lineHeight: 1.05, letterSpacing: -1, color: textPrimary, margin: "0 0 32px" }}>
+                <h1 style={{ fontFamily: "'Anton', sans-serif", fontSize: "clamp(38px,7.5vw,96px)", textTransform: "uppercase", lineHeight: 1.05, letterSpacing: -1, color: textPrimary, margin: "0 0 32px" }}>
                   <span style={{ color: "#CC0000" }}>CLICK</span>{" "}EXPRESS<br />
                   <span style={{ color: "#CC0000" }}>{lang === "ru" ? "НОВОСТИ" : "DISPATCH"}</span>
                 </h1>

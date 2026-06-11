@@ -104,7 +104,7 @@ export const Hero: React.FC<HeroProps> = ({ onViewLoads, onQuoteClick, onCareers
       <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 5, background: "linear-gradient(to bottom, #CC0000, #880000)" }} />
 
  {/* Main content */}
-      <div style={{ position: "relative", zIndex: 2, padding: "120px clamp(24px,5vw,64px) 160px", maxWidth: 860, width: "100%" }}>
+      <div style={{ position: "relative", zIndex: 2, padding: isMobile ? "80px 24px 100px" : "120px clamp(24px,5vw,64px) 160px", maxWidth: 860, width: "100%" }}>
 
  {/* Live badge */}
         <div style={{ display: "inline-flex", alignItems: "center", gap: 10, border: "1px solid rgba(204,0,0,0.45)", padding: "6px 16px", marginBottom: 32, background: "rgba(204,0,0,0.08)", animation: "heroSlideIn 0.6s ease 0.1s both", position: "relative" }}>

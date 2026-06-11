@@ -68,7 +68,9 @@ export const Header: React.FC<HeaderProps> = ({
   const [heartBurst, setHeartBurst] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(typeof window !== "undefined" ? window.innerWidth < 1024 : false);
+  const [winW, setWinW] = useState(typeof window !== "undefined" ? window.innerWidth : 1920);
+  const isMobile = winW < 1024;
+  const isCompact = !isMobile && winW < 1500;
   const { lang, toggleLang } = useLanguage();
   const t = translations[lang];
 
@@ -79,7 +81,7 @@ export const Header: React.FC<HeaderProps> = ({
   }, []);
 
   useEffect(() => {
-    const fn = () => setIsMobile(window.innerWidth < 1024);
+    const fn = () => setWinW(window.innerWidth);
     window.addEventListener("resize", fn);
     return () => window.removeEventListener("resize", fn);
   }, []);
@@ -140,15 +142,15 @@ export const Header: React.FC<HeaderProps> = ({
       <div style={{ width: 1, height: 30, background: isLight ? "rgba(0,0,0,0.1)" : "rgba(255,255,255,0.1)", flexShrink: 0 }} />
 
       {!isMobile && (
-        <nav style={{ display: "flex", gap: lang === 'ru' ? 0 : 2, flex: 1 }}>
-          <NavLink onClick={onCatalogClick} isLight={isLight} compact={lang === 'ru'}>{t.nav.catalog}</NavLink>
-          <NavLink onClick={onQuoteClick} isLight={isLight} compact={lang === 'ru'}>{t.nav.getQuote}</NavLink>
-          <NavLink onClick={onAboutClick} isLight={isLight} compact={lang === 'ru'}>{t.nav.aboutUs}</NavLink>
-          <NavLink onClick={onContactClick} isLight={isLight} compact={lang === 'ru'}>{t.nav.contact}</NavLink>
-          <NavLink onClick={() => navigate("/careers")} isLight={isLight} compact={lang === 'ru'}>{t.nav.careers}</NavLink>
-          <NavLink onClick={() => navigate("/news")} isLight={isLight} compact={lang === 'ru'}>{t.nav.news}</NavLink>
-          <NavLink onClick={() => navigate("/reviews")} isLight={isLight} compact={lang === 'ru'}>{t.nav.reviews}</NavLink>
-          <NavLink onClick={() => navigate("/fleet")} isLight={isLight} compact={lang === 'ru'}>{t.nav.fleet}</NavLink>
+        <nav style={{ display: "flex", gap: (lang === 'ru' || isCompact) ? 0 : 2, flex: 1, minWidth: 0, overflow: "hidden" }}>
+          <NavLink onClick={onCatalogClick} isLight={isLight} compact={lang === 'ru' || isCompact}>{t.nav.catalog}</NavLink>
+          <NavLink onClick={onQuoteClick} isLight={isLight} compact={lang === 'ru' || isCompact}>{t.nav.getQuote}</NavLink>
+          <NavLink onClick={onAboutClick} isLight={isLight} compact={lang === 'ru' || isCompact}>{t.nav.aboutUs}</NavLink>
+          <NavLink onClick={onContactClick} isLight={isLight} compact={lang === 'ru' || isCompact}>{t.nav.contact}</NavLink>
+          <NavLink onClick={() => navigate("/careers")} isLight={isLight} compact={lang === 'ru' || isCompact}>{t.nav.careers}</NavLink>
+          <NavLink onClick={() => navigate("/news")} isLight={isLight} compact={lang === 'ru' || isCompact}>{t.nav.news}</NavLink>
+          <NavLink onClick={() => navigate("/reviews")} isLight={isLight} compact={lang === 'ru' || isCompact}>{t.nav.reviews}</NavLink>
+          <NavLink onClick={() => navigate("/fleet")} isLight={isLight} compact={lang === 'ru' || isCompact}>{t.nav.fleet}</NavLink>
         </nav>
       )}
       {isMobile && <div style={{ flex: 1 }} />}
@@ -168,11 +170,11 @@ export const Header: React.FC<HeaderProps> = ({
             color: "#CC0000",
             border: "1.5px solid #CC0000",
             borderRadius: 999,
-            padding: lang === 'ru' ? "6px 12px" : "7px 16px",
+            padding: (lang === 'ru' || isCompact) ? "6px 12px" : "7px 16px",
             fontFamily: "'Barlow',sans-serif",
             fontWeight: 800,
-            fontSize: lang === 'ru' ? 10 : 12,
-            letterSpacing: lang === 'ru' ? 0.6 : 1.2,
+            fontSize: (lang === 'ru' || isCompact) ? 10 : 12,
+            letterSpacing: (lang === 'ru' || isCompact) ? 0.6 : 1.2,
             textTransform: "uppercase",
             cursor: "pointer",
             flexShrink: 0,
@@ -383,9 +385,11 @@ export const Header: React.FC<HeaderProps> = ({
                 {session.name.charAt(0).toUpperCase()}
               </div>
             )}
+            {!isCompact && (
             <span style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 600, fontSize: 12, color: isLight ? "#1a1a1a" : "rgba(255,255,255,0.85)", maxWidth: 90, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
               {session.name.split(" ")[0]}
             </span>
+            )}
             <svg width="10" height="10" viewBox="0 0 256 256" fill={isLight ? "rgba(0,0,0,0.4)" : "rgba(255,255,255,0.5)"} style={{ transform: userMenuOpen ? "rotate(180deg)" : "none", transition: "transform 0.2s" }}>
               <path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"/>
             </svg>
@@ -433,8 +437,8 @@ export const Header: React.FC<HeaderProps> = ({
             display: "flex", alignItems: "center", gap: 7,
             background: "#CC0000",
             color: "#fff", border: "none", borderRadius: 5,
-            padding: "8px 16px", fontFamily: "'Barlow',sans-serif",
-            fontWeight: 800, fontSize: 11, letterSpacing: 1.3,
+            padding: isCompact ? "8px 11px" : "8px 16px", fontFamily: "'Barlow',sans-serif",
+            fontWeight: 800, fontSize: isCompact ? 10 : 11, letterSpacing: isCompact ? 0.8 : 1.3,
             textTransform: "uppercase", cursor: "pointer",
             flexShrink: 0, whiteSpace: "nowrap",
             boxShadow: "0 4px 20px rgba(204,0,0,0.4)",

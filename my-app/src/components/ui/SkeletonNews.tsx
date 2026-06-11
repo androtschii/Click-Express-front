@@ -1,4 +1,3 @@
-import React from 'react';
 import { Skeleton } from './Skeleton';
 
 export function SkeletonNewsCard() {
@@ -9,13 +8,13 @@ export function SkeletonNewsCard() {
       background: 'var(--clr-surface, rgba(255,255,255,0.04))',
       border: '1px solid var(--clr-border, rgba(255,255,255,0.07))',
     }}>
-      <Skeleton height={180} radius={0} />
+      <Skeleton height={180} borderRadius={0} />
       <div style={{ padding: '14px 16px 18px', display: 'flex', flexDirection: 'column', gap: 10 }}>
         <Skeleton height={10} width="28%" />
         <Skeleton height={18} width="78%" />
         <Skeleton height={13} />
         <Skeleton height={13} width="66%" />
-        <Skeleton height={36} style={{ marginTop: 6 }} radius={8} />
+        <Skeleton height={36} style={{ marginTop: 6 }} borderRadius={8} />
       </div>
     </div>
   );

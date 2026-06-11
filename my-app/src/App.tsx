@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useMemo, lazy, Suspense } from "react";
+﻿import React, { useState, useRef, useEffect, useMemo, lazy, Suspense } from "react";
 import { Routes, Route, Navigate, useNavigate, useLocation, useParams } from "react-router-dom";
 import { motion, MotionConfig } from "framer-motion";
 import { RouteTransition } from "./components/ui/RouteTransition";

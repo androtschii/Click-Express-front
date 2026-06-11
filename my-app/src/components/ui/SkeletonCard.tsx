@@ -1,4 +1,3 @@
-import React from 'react';
 import { Skeleton } from './Skeleton';
 
 export function SkeletonCard() {
@@ -9,7 +8,7 @@ export function SkeletonCard() {
       background: 'var(--clr-surface, rgba(255,255,255,0.04))',
       border: '1px solid var(--clr-border, rgba(255,255,255,0.07))',
     }}>
-      <Skeleton height={220} radius={0} />
+      <Skeleton height={220} borderRadius={0} />
       <div style={{ padding: '14px 16px 16px', display: 'flex', flexDirection: 'column', gap: 8 }}>
         <Skeleton height={20} width="68%" />
         <Skeleton height={13} width="42%" />
@@ -38,7 +37,7 @@ export function SkeletonCardGrid({ count = 6, columns = 'repeat(auto-fill, minma
 export function SkeletonDetailPage() {
   return (
     <div style={{ maxWidth: 960, margin: '0 auto', padding: '40px 24px', display: 'flex', flexDirection: 'column', gap: 24 }}>
-      <Skeleton height={380} radius={14} />
+      <Skeleton height={380} borderRadius={14} />
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         <Skeleton height={36} width="55%" />
         <Skeleton height={16} width="30%" />

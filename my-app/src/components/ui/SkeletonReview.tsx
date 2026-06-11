@@ -1,4 +1,3 @@
-import React from 'react';
 import { Skeleton } from './Skeleton';
 
 export function SkeletonReview() {
@@ -13,7 +12,7 @@ export function SkeletonReview() {
       gap: 12,
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        <Skeleton width={44} height={44} radius="50%" />
+        <Skeleton width={44} height={44} borderRadius="50%" />
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
           <Skeleton height={14} width="38%" />
           <Skeleton height={11} width="22%" />

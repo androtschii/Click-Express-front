@@ -95,7 +95,14 @@ export const Hero: React.FC<HeroProps> = ({ onViewLoads, onQuoteClick, onCareers
       `}</style>
 
  {/* BG image with parallax */}
-      <div style={{ position: "absolute", top: "-15%", left: 0, right: 0, bottom: "-15%", backgroundImage: isDark ? "url('/images/red freightliner cascadia night.webp')" : "url('/images/red freightliner cascadia light.webp')", backgroundSize: "cover", backgroundPosition: "center 65%", transform: `translateY(${parallaxShift}px)`, willChange: "transform" }} />
+      <div style={{ position: "absolute", top: "-5%", left: 0, right: 0, bottom: "-5%", overflow: "hidden", transform: `translateY(${parallaxShift}px)`, willChange: "transform" }}>
+        <img
+          src={isDark ? "/images/red freightliner cascadia night.webp" : "/images/red freightliner cascadia light.webp"}
+          alt=""
+          aria-hidden="true"
+          style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: isDark ? "40% 45%" : "50% 45%", display: "block", pointerEvents: "none", transform: isDark ? "none" : "scale(1.16) translateX(-9%)", transformOrigin: "center" }}
+        />
+      </div>
 
  {/* Gradient overlay for text readability */}
       <div style={{ position: "absolute", inset: 0, background: isDark ? "linear-gradient(to right, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.35) 55%, transparent 100%)" : "linear-gradient(to right, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.15) 50%, transparent 100%)", pointerEvents: "none" }} />

@@ -4,6 +4,7 @@ import { ThemeContext } from "../../theme";
 import { useLanguage } from "../../context/LanguageContext";
 import type { QuoteFormData } from "../../types/index";
 import { X, ArrowLeft, ArrowRight, Check } from "@phosphor-icons/react";
+import { API_BASE } from "../../config";
 
 interface QuoteModalProps {
   onClose?: () => void;
@@ -79,7 +80,7 @@ export const QuoteModal: React.FC<QuoteModalProps> = ({ onClose, theme: themePro
     setError("");
     setSending(true);
     try {
-      const res = await fetch("http://localhost:5114/api/lead", {
+      const res = await fetch(`${API_BASE}/lead`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -372,9 +373,9 @@ export const QuoteModal: React.FC<QuoteModalProps> = ({ onClose, theme: themePro
                   key={animKey}
                   style={{ animation: `${animDir === "forward" ? "qmSlideRight" : "qmSlideLeft"} 0.28s cubic-bezier(0.22,1,0.36,1)` }}
                 >
-                  {step === 1 && <Step1 />}
-                  {step === 2 && <Step2 />}
-                  {step === 3 && <Step3 />}
+                  {step === 1 && Step1()}
+                  {step === 2 && Step2()}
+                  {step === 3 && Step3()}
                 </div>
               </div>
 

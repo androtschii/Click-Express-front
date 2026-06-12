@@ -33,7 +33,7 @@ async function loadProducts(): Promise<Load[]> {
               | "Full Load"
               | "Partial",
             cargo: p.description,
-            image: p.imageUrl,
+            image: staticLoad?.image ?? p.imageUrl,
             tag:
               staticLoad?.tag ??
               (p.category === "Military Load" ? "Military Load" : null),

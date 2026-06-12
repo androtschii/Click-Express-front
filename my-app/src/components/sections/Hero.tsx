@@ -100,7 +100,7 @@ export const Hero: React.FC<HeroProps> = ({ onViewLoads, onQuoteClick, onCareers
           src={isDark ? "/images/red freightliner cascadia night.webp" : "/images/red freightliner cascadia light.webp"}
           alt=""
           aria-hidden="true"
-          style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: isDark ? "40% 45%" : "50% 45%", display: "block", pointerEvents: "none", transform: isDark ? "none" : "scale(1.16) translateX(-9%)", transformOrigin: "center" }}
+          style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: isDark ? "40% 45%" : "50% 45%", display: "block", pointerEvents: "none", transform: isDark ? "none" : "scale(1.22) translateX(-7%)", transformOrigin: "center" }}
         />
       </div>
 

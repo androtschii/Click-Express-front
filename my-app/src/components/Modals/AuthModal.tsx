@@ -1,5 +1,6 @@
 ﻿import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { useGoogleLogin } from "@react-oauth/google";
 import {
   login,
   register,
@@ -104,23 +105,34 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     setForgotDone(true);
   };
 
-  const handleGoogle = async () => {
-    setGoogleLoading(true);
+  const googleLogin = useGoogleLogin({
+    scope: "openid email profile",
+    onSuccess: async (tokenResponse) => {
+      const result = await loginWithGoogle(tokenResponse.access_token);
+      setGoogleLoading(false);
+      if (!result.ok) {
+        setError(result.error || "Google login failed");
+        return;
+      }
+      setDoneUser(result.user!.name);
+      setDone(true);
+      setTimeout(() => {
+        const session = getSession();
+        document.body.style.overflow = "";
+        if (session && onSuccess) onSuccess(session);
+        onClose();
+      }, 1800);
+    },
+    onError: () => {
+      setGoogleLoading(false);
+      setError("Google login failed");
+    },
+  });
+
+  const handleGoogle = () => {
     setError("");
-    const result = await loginWithGoogle();
-    setGoogleLoading(false);
-    if (!result.ok) {
-      setError(result.error || "Google login failed");
-      return;
-    }
-    setDoneUser(result.user!.name);
-    setDone(true);
-    setTimeout(() => {
-      const session = getSession();
-      document.body.style.overflow = "";
-      if (session && onSuccess) onSuccess(session);
-      onClose();
-    }, 1800);
+    setGoogleLoading(true);
+    googleLogin();
   };
 
   const panelLeft = isLogin ? "0%" : "55%";

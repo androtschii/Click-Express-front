@@ -51,23 +51,6 @@ function getUsers(): User[] {
   }
 }
 
-function saveUsers(users: User[]) {
-  localStorage.setItem(USERS_KEY, JSON.stringify(users));
-}
-
-function createSession(user: User) {
-  const token = btoa(`${user.id}:${Date.now()}:${Math.random()}`);
-  const session: Session = {
-    userId: user.id,
-    email: user.email,
-    name: user.name,
-    token,
-    avatar: user.avatar,
-  };
-  localStorage.setItem(SESSION_KEY, JSON.stringify(session));
-  setCookie(COOKIE_NAME, token, 30);
-}
-
 // Public API
 export async function register(
   username: string,
@@ -163,33 +146,55 @@ export async function login(
   }
 }
 
-export function loginWithGoogle(): Promise<{
-  ok: boolean;
-  user?: User;
-  error?: string;
-}> {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const mockEmail = `demo.google@gmail.com`;
-      const mockName = "Google Demo User";
-      const users = getUsers();
-      let user = users.find((u) => u.email === mockEmail);
-      if (!user) {
-        user = {
-          id: crypto.randomUUID(),
-          name: mockName,
-          email: mockEmail,
-          password: "",
-          createdAt: new Date().toISOString(),
-          provider: "google",
-          avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(mockName)}&background=EA4335&color=fff&size=64`,
-        };
-        saveUsers([...users, user]);
-      }
-      createSession(user);
-      resolve({ ok: true, user });
-    }, 1200);
-  });
+// Exchanges a Google OAuth access token (from @react-oauth/google) for our own
+// JWT session by calling the backend, which verifies the token with Google.
+export async function loginWithGoogle(
+  accessToken: string
+): Promise<{ ok: boolean; user?: User; error?: string }> {
+  if (!accessToken) return { ok: false, error: "Google did not return a token" };
+
+  try {
+    const response = await fetch(`${API_BASE}/auth/google`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ accessToken }),
+    });
+
+    if (!response.ok) {
+      const err = (await response.json().catch(() => ({}))) as { message?: string };
+      return { ok: false, error: err.message || "Google login failed" };
+    }
+
+    const data = (await response.json()) as {
+      token: string;
+      refreshToken: string;
+      username: string;
+      role: string;
+    };
+
+    const session: Session = {
+      userId: data.username,
+      email: data.username,
+      name: data.username,
+      token: data.token,
+      refreshToken: data.refreshToken,
+      role: data.role,
+    };
+    localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+    setCookie(COOKIE_NAME, data.token, 1);
+
+    const user: User = {
+      id: data.username,
+      name: data.username,
+      email: data.username,
+      password: "",
+      createdAt: new Date().toISOString(),
+      provider: "google",
+    };
+    return { ok: true, user };
+  } catch {
+    return { ok: false, error: "Ошибка подключения к серверу" };
+  }
 }
 
 export function getSession(): Session | null {
